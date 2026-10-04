@@ -288,7 +288,14 @@ fn bindings(specs: &[Spec]) -> String {
              \x20   #[getter]\n    fn name(&self) -> &'static str {{\n        \"{name}\"\n    }}\n\
              \n\
              \x20   fn __repr__(&self) -> String {{\n        format!(\n            \"<trendlib stream {name} bars_seen={{}} value={{:?}}>\",\n            self.inner.bars_seen(),\n            self.inner.value()\n        )\n    }}\n}}\n",
-            indent_block(&format!("let mut out = out;\n{}", wrap_in_place(spec)), 12),
+            indent_block(
+                &if moves_a_column(spec) {
+                    format!("let mut out = out;\n{}", wrap_in_place(spec))
+                } else {
+                    wrap_in_place(spec)
+                },
+                12,
+            ),
             py_value = py_value_type(spec),
         );
     }
@@ -351,12 +358,21 @@ fn column_expr(index: usize, dtype: &str, source: &str) -> String {
     }
 }
 
+/// Only a float column is moved out of the array; an integer one is mapped into
+/// a fresh vector and leaves the source untouched, so an all-integer indicator
+/// needs no mutable binding.
+fn moves_a_column(spec: &Spec) -> bool {
+    spec.outputs.iter().any(|o| o.dtype != "int32")
+}
+
 fn wrap_outputs(spec: &Spec) -> String {
     let body = wrap_in_place(spec);
-    format!(
-        "    let mut out = out;\n{}",
-        indent_block(&format!("Ok({body})"), 4)
-    )
+    let binding = if moves_a_column(spec) {
+        "    let mut out = out;\n"
+    } else {
+        ""
+    };
+    format!("{binding}{}", indent_block(&format!("Ok({body})"), 4))
 }
 
 fn wrap_in_place(spec: &Spec) -> String {
@@ -442,7 +458,9 @@ fn registration(specs: &[Spec]) -> String {
         "    m.add(\"PARAMS\", params_table(m.py())?)?;\n\
          \x20   m.add(\"INPUTS\", inputs_table(m.py())?)?;\n\
          \x20   m.add(\"OUTPUTS\", outputs_table(m.py())?)?;\n\
-         \x20   m.add(\"GROUPS\", groups_table(m.py())?)?;\n    Ok(())\n}\n\n",
+         \x20   m.add(\"GROUPS\", groups_table(m.py())?)?;\n\
+         \x20   m.add(\"FLAGS\", flags_table(m.py())?)?;\n\
+         \x20   m.add(\"DTYPES\", dtypes_table(m.py())?)?;\n    Ok(())\n}\n\n",
     );
 
     out.push_str(
@@ -506,6 +524,27 @@ fn registration(specs: &[Spec]) -> String {
                 .collect(),
         ),
         (
+            "dtypes_table",
+            "The declared dtype of each output, in spec order.",
+            specs
+                .iter()
+                .map(|s| {
+                    (
+                        s.name.clone(),
+                        s.outputs.iter().map(|o| o.dtype.clone()).collect(),
+                    )
+                })
+                .collect(),
+        ),
+        (
+            "flags_table",
+            "The spec flags each indicator carries.",
+            specs
+                .iter()
+                .map(|s| (s.name.clone(), s.flags.clone()))
+                .collect(),
+        ),
+        (
             "groups_table",
             "The group each indicator belongs to.",
             specs
@@ -524,11 +563,14 @@ fn registration(specs: &[Spec]) -> String {
             if single {
                 let _ = writeln!(out, "    table.set_item({name:?}, {})?;", rendered[0]);
             } else {
-                let _ = writeln!(
-                    out,
-                    "    table.set_item({name:?}, vec![{}])?;",
-                    rendered.join(", ")
-                );
+                // An indicator with no flags still needs a typed empty list,
+                // or the element type has nothing to be inferred from.
+                let list = if rendered.is_empty() {
+                    "Vec::<&str>::new()".to_string()
+                } else {
+                    format!("vec![{}]", rendered.join(", "))
+                };
+                let _ = writeln!(out, "    table.set_item({name:?}, {list})?;");
             }
         }
         out.push_str("    Ok(table)\n}\n\n");
@@ -1051,10 +1093,22 @@ fn test_registry(specs: &[Spec]) -> String {
              \x20           params: PARAMS,\n\
              \x20           may_be_non_finite: {non_finite},\n\
              \x20           path_dependent: {path_dependent},\n\
+             \x20           absolute_index: {absolute_index},\n\
+             \x20           integer_outputs: &[{integer_outputs}],\n\
              \x20           batch,\n            lookback,\n            open_and_fill,\n        }}\n    }}\n}}\n\n",
             ty = spec.type_name(),
             non_finite = spec.flags.iter().any(|f| f == "nan_inf_output"),
             path_dependent = spec.flags.iter().any(|f| f == "path_dependent"),
+            absolute_index = spec.flags.iter().any(|f| f == "absolute_index"),
+            integer_outputs = spec
+                .outputs
+                .iter()
+                .map(|o| if o.dtype == "int32" {
+                    "true, "
+                } else {
+                    "false, "
+                })
+                .collect::<String>(),
         );
     }
 

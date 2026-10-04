@@ -49,6 +49,8 @@ mod acos_adapter {
             params: PARAMS,
             may_be_non_finite: true,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -100,6 +102,8 @@ mod ad_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -151,6 +155,8 @@ mod add_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -209,6 +215,8 @@ mod adx_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -267,6 +275,128 @@ mod adxr_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod aroon_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::aroon::Aroon;
+    const INPUTS: usize = 2;
+    const OUTPUTS: usize = 2;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "period",
+        default: 14.0,
+        min: 2.0,
+        max: 100000.0,
+        integral: true,
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::aroon::Params {
+        trendlib::indicators::aroon::Params {
+            period: values[0] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "aroon takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::aroon::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false, false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod aroonosc_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::aroonosc::Aroonosc;
+    const INPUTS: usize = 2;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "period",
+        default: 14.0,
+        min: 2.0,
+        max: 100000.0,
+        integral: true,
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::aroonosc::Params {
+        trendlib::indicators::aroonosc::Params {
+            period: values[0] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "aroonosc takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::aroonosc::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -318,6 +448,8 @@ mod asin_adapter {
             params: PARAMS,
             may_be_non_finite: true,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -369,6 +501,8 @@ mod atan_adapter {
             params: PARAMS,
             may_be_non_finite: true,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -427,6 +561,8 @@ mod atr_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -485,6 +621,8 @@ mod avgdev_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -536,6 +674,8 @@ mod avgprice_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -587,6 +727,8 @@ mod bop_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -645,6 +787,8 @@ mod cci_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -696,6 +840,8 @@ mod ceil_adapter {
             params: PARAMS,
             may_be_non_finite: true,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -754,6 +900,8 @@ mod cmo_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -805,6 +953,8 @@ mod cos_adapter {
             params: PARAMS,
             may_be_non_finite: true,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -856,6 +1006,8 @@ mod cosh_adapter {
             params: PARAMS,
             may_be_non_finite: true,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -907,6 +1059,8 @@ mod cumsum_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -965,6 +1119,8 @@ mod dema_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -1016,6 +1172,8 @@ mod div_adapter {
             params: PARAMS,
             may_be_non_finite: true,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -1074,6 +1232,8 @@ mod dx_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -1132,6 +1292,8 @@ mod ema_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -1183,6 +1345,8 @@ mod exp_adapter {
             params: PARAMS,
             may_be_non_finite: true,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -1234,6 +1398,8 @@ mod floor_adapter {
             params: PARAMS,
             may_be_non_finite: true,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -1285,6 +1451,8 @@ mod ln_adapter {
             params: PARAMS,
             may_be_non_finite: true,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -1336,6 +1504,8 @@ mod log10_adapter {
             params: PARAMS,
             may_be_non_finite: true,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -1412,6 +1582,8 @@ mod macd_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false, false, false],
             batch,
             lookback,
             open_and_fill,
@@ -1470,6 +1642,68 @@ mod max_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod maxindex_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::maxindex::Maxindex;
+    const INPUTS: usize = 1;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "period",
+        default: 30.0,
+        min: 2.0,
+        max: 100000.0,
+        integral: true,
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::maxindex::Params {
+        trendlib::indicators::maxindex::Params {
+            period: values[0] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "maxindex takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::maxindex::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: true,
+            integer_outputs: &[true],
             batch,
             lookback,
             open_and_fill,
@@ -1521,6 +1755,8 @@ mod medprice_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -1579,6 +1815,8 @@ mod midpoint_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -1637,6 +1875,8 @@ mod midprice_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -1695,6 +1935,68 @@ mod min_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod minindex_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::minindex::Minindex;
+    const INPUTS: usize = 1;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "period",
+        default: 30.0,
+        min: 2.0,
+        max: 100000.0,
+        integral: true,
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::minindex::Params {
+        trendlib::indicators::minindex::Params {
+            period: values[0] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "minindex takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::minindex::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: true,
+            integer_outputs: &[true],
             batch,
             lookback,
             open_and_fill,
@@ -1753,6 +2055,68 @@ mod minmax_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false, false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod minmaxindex_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::minmaxindex::Minmaxindex;
+    const INPUTS: usize = 1;
+    const OUTPUTS: usize = 2;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "period",
+        default: 30.0,
+        min: 2.0,
+        max: 100000.0,
+        integral: true,
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::minmaxindex::Params {
+        trendlib::indicators::minmaxindex::Params {
+            period: values[0] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "minmaxindex takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::minmaxindex::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: true,
+            integer_outputs: &[true, true],
             batch,
             lookback,
             open_and_fill,
@@ -1811,6 +2175,8 @@ mod minus_di_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -1869,6 +2235,8 @@ mod minus_dm_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -1927,6 +2295,8 @@ mod mom_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -1978,6 +2348,8 @@ mod mult_adapter {
             params: PARAMS,
             may_be_non_finite: true,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -2036,6 +2408,8 @@ mod natr_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -2087,6 +2461,8 @@ mod obv_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -2145,6 +2521,8 @@ mod plus_di_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -2203,6 +2581,8 @@ mod plus_dm_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -2261,6 +2641,8 @@ mod rma_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -2319,6 +2701,8 @@ mod roc_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -2377,6 +2761,8 @@ mod rocp_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -2435,6 +2821,8 @@ mod rocr_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -2493,6 +2881,8 @@ mod rocr100_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -2551,6 +2941,8 @@ mod rsi_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -2602,6 +2994,8 @@ mod sin_adapter {
             params: PARAMS,
             may_be_non_finite: true,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -2653,6 +3047,8 @@ mod sinh_adapter {
             params: PARAMS,
             may_be_non_finite: true,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -2711,6 +3107,8 @@ mod sma_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -2762,6 +3160,8 @@ mod sqrt_adapter {
             params: PARAMS,
             may_be_non_finite: true,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -2830,6 +3230,8 @@ mod stddev_adapter {
             params: PARAMS,
             may_be_non_finite: true,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -2881,6 +3283,8 @@ mod sub_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -2939,6 +3343,8 @@ mod sum_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -2990,6 +3396,8 @@ mod tan_adapter {
             params: PARAMS,
             may_be_non_finite: true,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -3041,6 +3449,8 @@ mod tanh_adapter {
             params: PARAMS,
             may_be_non_finite: true,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -3099,6 +3509,8 @@ mod tema_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -3150,6 +3562,8 @@ mod trange_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -3208,6 +3622,8 @@ mod trima_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -3259,6 +3675,8 @@ mod typprice_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -3327,6 +3745,8 @@ mod var_adapter {
             params: PARAMS,
             may_be_non_finite: true,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -3378,6 +3798,8 @@ mod wclprice_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -3436,6 +3858,8 @@ mod willr_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -3494,6 +3918,8 @@ mod wma_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -3508,6 +3934,8 @@ pub fn registered() -> Vec<Registered> {
         add_adapter::registered(),
         adx_adapter::registered(),
         adxr_adapter::registered(),
+        aroon_adapter::registered(),
+        aroonosc_adapter::registered(),
         asin_adapter::registered(),
         atan_adapter::registered(),
         atr_adapter::registered(),
@@ -3530,11 +3958,14 @@ pub fn registered() -> Vec<Registered> {
         log10_adapter::registered(),
         macd_adapter::registered(),
         max_adapter::registered(),
+        maxindex_adapter::registered(),
         medprice_adapter::registered(),
         midpoint_adapter::registered(),
         midprice_adapter::registered(),
         min_adapter::registered(),
+        minindex_adapter::registered(),
         minmax_adapter::registered(),
+        minmaxindex_adapter::registered(),
         minus_di_adapter::registered(),
         minus_dm_adapter::registered(),
         mom_adapter::registered(),

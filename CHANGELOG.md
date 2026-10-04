@@ -37,6 +37,9 @@ Before 1.0, minor versions may break the API; every break is listed under
 - `wma`, `trange`, `atr` and `natr` are callable from Python.
 - Indicators `dema`, `tema`, `roc` and `macd`. `macd` is the first with
   several outputs, returned as a tuple or, from a DataFrame, as a frame.
+- `maxindex`, `minindex`, `minmaxindex`, `aroon` and `aroonosc`.
+- Row-index outputs carry an `absolute_index` flag: they index the caller's own
+  array, so skipping leading warm-up rows shifts them.
 - The directional movement family: `plus_di`, `minus_di`, `dx`, `adx`, `adxr`.
 - `plus_di` and `minus_di` stay a percentage at `period = 1`, where TA-Lib
   returns the raw fraction (`CONVENTIONS.md` deviation 7).

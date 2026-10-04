@@ -2,8 +2,8 @@
 
 # Progress
 
-**63 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 141 not started.
+**68 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 136 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -17,14 +17,14 @@ something is done that is not. CI checks it is current.
 | Group | Shipped | Total |
 | --- | --- | --- |
 | Overlap studies | 9 | 25 |
-| Momentum | 18 | 47 |
+| Momentum | 20 | 47 |
 | Volatility | 3 | 7 |
 | Volume | 2 | 12 |
 | Price transforms | 5 | 6 |
 | Cycle | 0 | 5 |
 | Statistics | 2 | 11 |
 | Math transforms | 15 | 15 |
-| Math operators | 9 | 12 |
+| Math operators | 12 | 12 |
 | Candlestick patterns | 0 | 61 |
 | Levels | 0 | 3 |
 
@@ -56,15 +56,15 @@ something is done that is not. CI checks it is current.
 - [x] `wma` (`WMA`) -- Weighted Moving Average *
 - [ ] `zlema` (`ZLEMA`)
 
-## Momentum (18 of 47)
+## Momentum (20 of 47)
 
 - [ ] `ac` (`AC`)
 - [x] `adx` (`ADX`) -- Average Directional Movement Index *
 - [x] `adxr` (`ADXR`) -- Average Directional Movement Index Rating
 - [ ] `ao` (`AO`)
 - [ ] `apo` (`APO`)
-- [ ] `aroon` (`AROON`)
-- [ ] `aroonosc` (`AROONOSC`)
+- [x] `aroon` (`AROON`) -- Aroon
+- [x] `aroonosc` (`AROONOSC`) -- Aroon Oscillator
 - [x] `bop` (`BOP`) -- Balance of Power
 - [x] `cci` (`CCI`) -- Commodity Channel Index *
 - [x] `cmo` (`CMO`) -- Chande Momentum Oscillator
@@ -180,17 +180,17 @@ something is done that is not. CI checks it is current.
 - [x] `tan` (`TAN`) -- Vector Tangent
 - [x] `tanh` (`TANH`) -- Vector Hyperbolic Tangent
 
-## Math operators (9 of 12)
+## Math operators (12 of 12)
 
 - [x] `add` (`ADD`) -- Vector Addition
 - [x] `cumsum` (`CUMSUM`) -- Cumulative Sum
 - [x] `div` (`DIV`) -- Vector Division
 - [x] `max` (`MAX`) -- Rolling Maximum
-- [ ] `maxindex` (`MAXINDEX`)
+- [x] `maxindex` (`MAXINDEX`) -- Index of the Rolling Maximum
 - [x] `min` (`MIN`) -- Rolling Minimum
-- [ ] `minindex` (`MININDEX`)
+- [x] `minindex` (`MININDEX`) -- Index of the Rolling Minimum
 - [x] `minmax` (`MINMAX`) -- Rolling Minimum and Maximum
-- [ ] `minmaxindex` (`MINMAXINDEX`)
+- [x] `minmaxindex` (`MINMAXINDEX`) -- Indices of the Rolling Minimum and Maximum
 - [x] `mult` (`MULT`) -- Vector Multiplication
 - [x] `sub` (`SUB`) -- Vector Subtraction
 - [x] `sum` (`SUM`) -- Summation

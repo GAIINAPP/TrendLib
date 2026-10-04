@@ -6,6 +6,7 @@ written once and holds for all of them.
 
 import numpy as np
 import pytest
+from conftest import warm_up
 
 import trendlib as tl
 
@@ -160,8 +161,14 @@ def test_leading_nan_rows_are_skipped(bars, indicator):
         *[np.concatenate([[np.nan] * 4, column]) for column in indicator.columns(bars, 300)]
     )
     for shifted, plain in zip(outputs_of(padded, indicator), trimmed, strict=True):
-        assert np.isnan(shifted[:4]).all()
-        assert np.array_equal(shifted[4:], plain, equal_nan=True)
+        assert warm_up(shifted[:4]).all()
+        if indicator.absolute_index:
+            # A row index points into the caller's own array, so a warm-up
+            # prefix moves it by exactly its own length.
+            expected = np.where(warm_up(plain), plain, plain + 4)
+            assert np.array_equal(shifted[4:], expected, equal_nan=True)
+        else:
+            assert np.array_equal(shifted[4:], plain, equal_nan=True)
 
 
 def test_empty_input_returns_empty_output(indicator):

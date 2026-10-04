@@ -242,6 +242,14 @@ impl Ema {
 #[derive(Clone, Debug)]
 pub struct RollingExtreme {
     window: Box<[f64]>,
+    /// Which bar wins when two tie. TA-Lib is not consistent about this, so
+    /// each consumer says what it needs: `maxindex` keeps the earliest tying
+    /// bar and walks its index forward only as the record leaves the window,
+    /// while `aroon` keeps the latest and reads 100 across a flat stretch.
+    prefer_recent: bool,
+    /// The absolute row each slot was written from, so the extreme can say
+    /// where it came from and not merely what it was.
+    rows: Box<[u64]>,
     head: usize,
     seen: usize,
     best: usize,
@@ -261,11 +269,19 @@ impl RollingExtreme {
         assert!(period > 0, "period must be at least 1");
         Self {
             window: vec![0.0; period].into_boxed_slice(),
+            prefer_recent: false,
+            rows: vec![0; period].into_boxed_slice(),
             head: 0,
             seen: 0,
             best: 0,
             want_max,
         }
+    }
+
+    /// Keep the most recent of two tying bars instead of the earliest.
+    pub fn preferring_recent(mut self) -> Self {
+        self.prefer_recent = true;
+        self
     }
 
     fn beats(&self, candidate: f64, incumbent: f64) -> bool {
@@ -274,6 +290,12 @@ impl RollingExtreme {
         } else {
             candidate < incumbent
         }
+    }
+
+    /// Whether an arriving bar displaces the record, ties included or not
+    /// according to this kernel's preference.
+    fn displaces(&self, candidate: f64, incumbent: f64) -> bool {
+        self.beats(candidate, incumbent) || (self.prefer_recent && candidate == incumbent)
     }
 
     /// The best of the written slots, ignoring one. `None` when every slot was
@@ -285,15 +307,30 @@ impl RollingExtreme {
             if Some(slot) == skip {
                 continue;
             }
-            match best {
-                None => best = Some(slot),
-                Some(current) if self.beats(self.window[slot], self.window[current]) => {
-                    best = Some(slot)
+            let better = match best {
+                None => true,
+                Some(current) => {
+                    self.beats(self.window[slot], self.window[current])
+                        // Slots are not scanned in time order, so a tie has
+                        // to be settled by comparing the rows themselves.
+                        || (self.window[slot] == self.window[current]
+                            && if self.prefer_recent {
+                                self.rows[slot] > self.rows[current]
+                            } else {
+                                self.rows[slot] < self.rows[current]
+                            })
                 }
-                _ => {}
+            };
+            if better {
+                best = Some(slot);
             }
         }
         best
+    }
+
+    /// Bars given to this kernel so far.
+    pub fn seen(&self) -> usize {
+        self.seen
     }
 
     pub fn push(&mut self, value: f64) -> Option<f64> {
@@ -302,23 +339,48 @@ impl RollingExtreme {
         let dropped_record = self.seen >= period && slot == self.best;
 
         self.window[slot] = value;
+        self.rows[slot] = self.seen as u64;
         self.head = (self.head + 1) % period;
         self.seen += 1;
 
         if dropped_record {
             self.best = self.scan(period, None).expect("a full window has a best");
-        } else if self.seen == 1 || self.beats(value, self.window[self.best]) {
+        } else if self.seen == 1 || self.displaces(value, self.window[self.best]) {
             self.best = slot;
         }
 
         (self.seen >= period).then(|| self.window[self.best])
     }
 
+    /// The absolute row the current extreme came from, counting from zero at
+    /// the first bar the kernel was given.
+    pub fn best_row(&self) -> Option<u64> {
+        (self.seen >= self.window.len()).then(|| self.rows[self.best])
+    }
+
+    /// How many bars ago the current extreme was set.
+    pub fn bars_since_best(&self) -> Option<u64> {
+        self.best_row().map(|row| self.seen as u64 - 1 - row)
+    }
+
     pub fn preview(&self, value: f64) -> Option<f64> {
+        self.preview_best(value).map(|(value, _)| value)
+    }
+
+    /// How many bars ago the extreme would be after pushing `value`.
+    pub fn preview_bars_since_best(&self, value: f64) -> Option<u64> {
+        self.preview_best(value)
+            .map(|(_, row)| self.seen as u64 - row)
+    }
+
+    /// What the extreme and the row it came from would be after pushing
+    /// `value`, without pushing it.
+    fn preview_best(&self, value: f64) -> Option<(f64, u64)> {
         let period = self.window.len();
         if self.seen + 1 < period {
             return None;
         }
+        let arriving = self.seen as u64;
         let incumbent = if self.seen < period {
             // The window fills exactly on this bar, so nothing drops out.
             self.scan(self.seen, None)
@@ -327,14 +389,14 @@ impl RollingExtreme {
         } else {
             Some(self.best)
         };
-        let Some(incumbent) = incumbent.map(|slot| self.window[slot]) else {
-            return Some(value);
+        let Some(slot) = incumbent else {
+            return Some((value, arriving));
         };
-        Some(if self.beats(value, incumbent) {
-            value
+        if self.displaces(value, self.window[slot]) {
+            Some((value, arriving))
         } else {
-            incumbent
-        })
+            Some((self.window[slot], self.rows[slot]))
+        }
     }
 }
 
@@ -740,6 +802,50 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn rolling_extreme_settles_a_tie_the_way_it_was_asked_to() {
+        // Keeping the earliest: the record is the oldest bar still in the
+        // window, so its row crawls forward only as the window slides.
+        let mut earliest = RollingExtreme::highest(3);
+        for row in 0..6u64 {
+            earliest.push(5.0);
+            if row >= 2 {
+                assert_eq!(earliest.best_row(), Some(row - 2), "row {row}");
+            }
+        }
+
+        // Keeping the latest: the record is always this bar.
+        let mut latest = RollingExtreme::highest(3).preferring_recent();
+        for row in 0..6u64 {
+            latest.push(5.0);
+            if row >= 2 {
+                assert_eq!(latest.best_row(), Some(row), "row {row}");
+                assert_eq!(latest.bars_since_best(), Some(0));
+            }
+        }
+    }
+
+    #[test]
+    fn rolling_extreme_reports_where_its_record_came_from() {
+        let mut highest = RollingExtreme::highest(3);
+        assert_eq!(highest.push(5.0), None);
+        assert_eq!(highest.push(9.0), None);
+
+        // Window rows 0..2, the record is the 9.0 written at row 1.
+        assert_eq!(highest.push(3.0), Some(9.0));
+        assert_eq!(highest.best_row(), Some(1));
+        assert_eq!(highest.bars_since_best(), Some(1));
+
+        // Rows 1..3, still the 9.0, now two bars back.
+        assert_eq!(highest.push(4.0), Some(9.0));
+        assert_eq!(highest.bars_since_best(), Some(2));
+
+        // Rows 2..4: the 9.0 has left, so the 4.0 at row 3 takes over.
+        assert_eq!(highest.push(2.0), Some(4.0));
+        assert_eq!(highest.best_row(), Some(3));
+        assert_eq!(highest.bars_since_best(), Some(1));
     }
 
     #[test]

@@ -14,7 +14,7 @@ where $x$ is `source` and $n$ is `period`.
 ## Conventions
 
 - Lookback is $n - 1$.
-- Ties keep the earlier bar, which matters only for `minindex`.
+- Ties keep the most recent bar, which matters only for `minindex`.
 - Not recursive: each row depends only on the last $n$ bars.
 - Leading `NaN` rows are skipped; a `NaN` or infinity after the first valid bar
   raises `InvalidInput` (Deviation 1).

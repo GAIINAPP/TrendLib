@@ -633,6 +633,273 @@ impl PyAdxrStream {
     }
 }
 
+type AroonOutputs<'py> = (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>);
+
+#[pyfunction]
+#[pyo3(name = "aroon", signature = (high, low, *, period))]
+pub fn aroon<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    period: i64,
+) -> PyResult<AroonOutputs<'py>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let period = int_param("aroon", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::aroon::Params { period };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::aroon::Aroon as Kernel<2, 2>>::batch([high, low], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok((
+        std::mem::take(&mut out[0]).into_pyarray(py),
+        std::mem::take(&mut out[1]).into_pyarray(py),
+    ))
+}
+
+#[pyclass(module = "trendlib._core", name = "AroonStream", skip_from_py_object)]
+#[derive(Clone, Debug)]
+pub struct PyAroonStream {
+    inner: BarStream<trendlib::indicators::aroon::Aroon, 2, 2>,
+}
+
+#[pymethods]
+impl PyAroonStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, period))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let period =
+            int_param("aroon", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::aroon::Params { period };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::aroon::Aroon, 2, 2> as Stream>::open(
+                    [high, low],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, period))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<(Self, AroonOutputs<'py>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let period =
+            int_param("aroon", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::aroon::Params { period };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::aroon::Aroon as Kernel<2, 2>>::open_and_fill(
+                    [high, low],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            (
+                std::mem::take(&mut out[0]).into_pyarray(py),
+                std::mem::take(&mut out[1]).into_pyarray(py),
+            )
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64) -> PyResult<(f64, f64)> {
+        let row = self
+            .inner
+            .update([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1]))
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64) -> PyResult<(f64, f64)> {
+        let row = self
+            .inner
+            .peek([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1]))
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64)> {
+        self.inner.value().map(|row| (row[0], row[1]))
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "aroon"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream aroon bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "aroonosc", signature = (high, low, *, period))]
+pub fn aroonosc<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    period: i64,
+) -> PyResult<Bound<'py, PyArray1<f64>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let period =
+        int_param("aroonosc", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::aroonosc::Params { period };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::aroonosc::Aroonosc as Kernel<2, 1>>::batch([high, low], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok(std::mem::take(&mut out[0]).into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "AroonoscStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyAroonoscStream {
+    inner: BarStream<trendlib::indicators::aroonosc::Aroonosc, 2, 1>,
+}
+
+#[pymethods]
+impl PyAroonoscStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, period))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let period =
+            int_param("aroonosc", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::aroonosc::Params { period };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::aroonosc::Aroonosc, 2, 1> as Stream>::open(
+                    [high, low],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, period))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let period =
+            int_param("aroonosc", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::aroonosc::Params { period };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::aroonosc::Aroonosc as Kernel<2, 1>>::open_and_fill(
+                    [high, low],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            std::mem::take(&mut out[0]).into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64) -> PyResult<f64> {
+        let row = self
+            .inner
+            .update([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64) -> PyResult<f64> {
+        let row = self
+            .inner
+            .peek([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value().map(|row| row[0])
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "aroonosc"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream aroonosc bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
 #[pyfunction]
 #[pyo3(name = "asin", signature = (source))]
 pub fn asin<'py>(
@@ -3125,6 +3392,132 @@ impl PyMaxStream {
 }
 
 #[pyfunction]
+#[pyo3(name = "maxindex", signature = (source, *, period))]
+pub fn maxindex<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+    period: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let source = as_slice(&source, "source")?;
+    let period =
+        int_param("maxindex", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::maxindex::Params { period };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::maxindex::Maxindex as Kernel<1, 1>>::batch([source], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "MaxindexStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyMaxindexStream {
+    inner: BarStream<trendlib::indicators::maxindex::Maxindex, 1, 1>,
+}
+
+#[pymethods]
+impl PyMaxindexStream {
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("maxindex", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::maxindex::Params { period };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::maxindex::Maxindex, 1, 1> as Stream>::open(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("maxindex", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::maxindex::Params { period };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::maxindex::Maxindex as Kernel<1, 1>>::open_and_fill(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(&mut self, py: Python<'_>, source: f64) -> PyResult<i32> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(&self, py: Python<'_>, source: f64) -> PyResult<i32> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "maxindex"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream maxindex bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
 #[pyo3(name = "medprice", signature = (high, low))]
 pub fn medprice<'py>(
     py: Python<'py>,
@@ -3606,6 +3999,132 @@ impl PyMinStream {
     }
 }
 
+#[pyfunction]
+#[pyo3(name = "minindex", signature = (source, *, period))]
+pub fn minindex<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+    period: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let source = as_slice(&source, "source")?;
+    let period =
+        int_param("minindex", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::minindex::Params { period };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::minindex::Minindex as Kernel<1, 1>>::batch([source], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "MinindexStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyMinindexStream {
+    inner: BarStream<trendlib::indicators::minindex::Minindex, 1, 1>,
+}
+
+#[pymethods]
+impl PyMinindexStream {
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("minindex", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::minindex::Params { period };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::minindex::Minindex, 1, 1> as Stream>::open(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("minindex", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::minindex::Params { period };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::minindex::Minindex as Kernel<1, 1>>::open_and_fill(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(&mut self, py: Python<'_>, source: f64) -> PyResult<i32> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(&self, py: Python<'_>, source: f64) -> PyResult<i32> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "minindex"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream minindex bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
 type MinmaxOutputs<'py> = (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>);
 
 #[pyfunction]
@@ -3721,6 +4240,151 @@ impl PyMinmaxStream {
     fn __repr__(&self) -> String {
         format!(
             "<trendlib stream minmax bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+type MinmaxindexOutputs<'py> = (Bound<'py, PyArray1<i32>>, Bound<'py, PyArray1<i32>>);
+
+#[pyfunction]
+#[pyo3(name = "minmaxindex", signature = (source, *, period))]
+pub fn minmaxindex<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+    period: i64,
+) -> PyResult<MinmaxindexOutputs<'py>> {
+    let source = as_slice(&source, "source")?;
+    let period =
+        int_param("minmaxindex", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::minmaxindex::Params { period };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::minmaxindex::Minmaxindex as Kernel<1, 2>>::batch(
+                [source],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok((
+        out[0]
+            .iter()
+            .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+            .collect::<Vec<i32>>()
+            .into_pyarray(py),
+        out[1]
+            .iter()
+            .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+            .collect::<Vec<i32>>()
+            .into_pyarray(py),
+    ))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "MinmaxindexStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyMinmaxindexStream {
+    inner: BarStream<trendlib::indicators::minmaxindex::Minmaxindex, 1, 2>,
+}
+
+#[pymethods]
+impl PyMinmaxindexStream {
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("minmaxindex", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::minmaxindex::Params { period };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::minmaxindex::Minmaxindex, 1, 2> as Stream>::open(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<(Self, MinmaxindexOutputs<'py>)> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("minmaxindex", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::minmaxindex::Params { period };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::minmaxindex::Minmaxindex as Kernel<1, 2>>::open_and_fill(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            (
+                out[0]
+                    .iter()
+                    .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                    .collect::<Vec<i32>>()
+                    .into_pyarray(py),
+                out[1]
+                    .iter()
+                    .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                    .collect::<Vec<i32>>()
+                    .into_pyarray(py),
+            )
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(&mut self, py: Python<'_>, source: f64) -> PyResult<(i32, i32)> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0] as i32, row[1] as i32))
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(&self, py: Python<'_>, source: f64) -> PyResult<(i32, i32)> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0] as i32, row[1] as i32))
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(i32, i32)> {
+        self.inner.value().map(|row| (row[0] as i32, row[1] as i32))
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "minmaxindex"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream minmaxindex bars_seen={} value={:?}>",
             self.inner.bars_seen(),
             self.inner.value()
         )
@@ -7313,6 +7977,8 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(add, m)?)?;
     m.add_function(wrap_pyfunction!(adx, m)?)?;
     m.add_function(wrap_pyfunction!(adxr, m)?)?;
+    m.add_function(wrap_pyfunction!(aroon, m)?)?;
+    m.add_function(wrap_pyfunction!(aroonosc, m)?)?;
     m.add_function(wrap_pyfunction!(asin, m)?)?;
     m.add_function(wrap_pyfunction!(atan, m)?)?;
     m.add_function(wrap_pyfunction!(atr, m)?)?;
@@ -7335,11 +8001,14 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(log10, m)?)?;
     m.add_function(wrap_pyfunction!(macd, m)?)?;
     m.add_function(wrap_pyfunction!(max, m)?)?;
+    m.add_function(wrap_pyfunction!(maxindex, m)?)?;
     m.add_function(wrap_pyfunction!(medprice, m)?)?;
     m.add_function(wrap_pyfunction!(midpoint, m)?)?;
     m.add_function(wrap_pyfunction!(midprice, m)?)?;
     m.add_function(wrap_pyfunction!(min, m)?)?;
+    m.add_function(wrap_pyfunction!(minindex, m)?)?;
     m.add_function(wrap_pyfunction!(minmax, m)?)?;
+    m.add_function(wrap_pyfunction!(minmaxindex, m)?)?;
     m.add_function(wrap_pyfunction!(minus_di, m)?)?;
     m.add_function(wrap_pyfunction!(minus_dm, m)?)?;
     m.add_function(wrap_pyfunction!(mom, m)?)?;
@@ -7376,6 +8045,8 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyAddStream>()?;
     m.add_class::<PyAdxStream>()?;
     m.add_class::<PyAdxrStream>()?;
+    m.add_class::<PyAroonStream>()?;
+    m.add_class::<PyAroonoscStream>()?;
     m.add_class::<PyAsinStream>()?;
     m.add_class::<PyAtanStream>()?;
     m.add_class::<PyAtrStream>()?;
@@ -7398,11 +8069,14 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyLog10Stream>()?;
     m.add_class::<PyMacdStream>()?;
     m.add_class::<PyMaxStream>()?;
+    m.add_class::<PyMaxindexStream>()?;
     m.add_class::<PyMedpriceStream>()?;
     m.add_class::<PyMidpointStream>()?;
     m.add_class::<PyMidpriceStream>()?;
     m.add_class::<PyMinStream>()?;
+    m.add_class::<PyMinindexStream>()?;
     m.add_class::<PyMinmaxStream>()?;
+    m.add_class::<PyMinmaxindexStream>()?;
     m.add_class::<PyMinusDiStream>()?;
     m.add_class::<PyMinusDmStream>()?;
     m.add_class::<PyMomStream>()?;
@@ -7438,6 +8112,8 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add("INPUTS", inputs_table(m.py())?)?;
     m.add("OUTPUTS", outputs_table(m.py())?)?;
     m.add("GROUPS", groups_table(m.py())?)?;
+    m.add("FLAGS", flags_table(m.py())?)?;
+    m.add("DTYPES", dtypes_table(m.py())?)?;
     Ok(())
 }
 
@@ -7477,6 +8153,28 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
             params.set_item("period", entry)?;
         }
         table.set_item("adxr", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 14)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            params.set_item("period", entry)?;
+        }
+        table.set_item("aroon", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 14)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            params.set_item("period", entry)?;
+        }
+        table.set_item("aroonosc", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -7645,6 +8343,17 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     }
     {
         let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 30)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            params.set_item("period", entry)?;
+        }
+        table.set_item("maxindex", params)?;
+    }
+    {
+        let params = PyDict::new(py);
         table.set_item("medprice", params)?;
     }
     {
@@ -7689,7 +8398,29 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
             entry.set_item("max", 100000)?;
             params.set_item("period", entry)?;
         }
+        table.set_item("minindex", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 30)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            params.set_item("period", entry)?;
+        }
         table.set_item("minmax", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 30)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            params.set_item("period", entry)?;
+        }
+        table.set_item("minmaxindex", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -7980,6 +8711,8 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("add", vec!["source0", "source1"])?;
     table.set_item("adx", vec!["high", "low", "close"])?;
     table.set_item("adxr", vec!["high", "low", "close"])?;
+    table.set_item("aroon", vec!["high", "low"])?;
+    table.set_item("aroonosc", vec!["high", "low"])?;
     table.set_item("asin", vec!["source"])?;
     table.set_item("atan", vec!["source"])?;
     table.set_item("atr", vec!["high", "low", "close"])?;
@@ -8002,11 +8735,14 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("log10", vec!["source"])?;
     table.set_item("macd", vec!["source"])?;
     table.set_item("max", vec!["source"])?;
+    table.set_item("maxindex", vec!["source"])?;
     table.set_item("medprice", vec!["high", "low"])?;
     table.set_item("midpoint", vec!["source"])?;
     table.set_item("midprice", vec!["high", "low"])?;
     table.set_item("min", vec!["source"])?;
+    table.set_item("minindex", vec!["source"])?;
     table.set_item("minmax", vec!["source"])?;
+    table.set_item("minmaxindex", vec!["source"])?;
     table.set_item("minus_di", vec!["high", "low", "close"])?;
     table.set_item("minus_dm", vec!["high", "low"])?;
     table.set_item("mom", vec!["source"])?;
@@ -8049,6 +8785,8 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("add", vec!["add"])?;
     table.set_item("adx", vec!["adx"])?;
     table.set_item("adxr", vec!["adxr"])?;
+    table.set_item("aroon", vec!["aroon_down", "aroon_up"])?;
+    table.set_item("aroonosc", vec!["aroonosc"])?;
     table.set_item("asin", vec!["asin"])?;
     table.set_item("atan", vec!["atan"])?;
     table.set_item("atr", vec!["atr"])?;
@@ -8071,11 +8809,17 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("log10", vec!["log10"])?;
     table.set_item("macd", vec!["macd", "macd_signal", "macd_hist"])?;
     table.set_item("max", vec!["max"])?;
+    table.set_item("maxindex", vec!["maxindex"])?;
     table.set_item("medprice", vec!["medprice"])?;
     table.set_item("midpoint", vec!["midpoint"])?;
     table.set_item("midprice", vec!["midprice"])?;
     table.set_item("min", vec!["min"])?;
+    table.set_item("minindex", vec!["minindex"])?;
     table.set_item("minmax", vec!["minmax_min", "minmax_max"])?;
+    table.set_item(
+        "minmaxindex",
+        vec!["minmaxindex_min_index", "minmaxindex_max_index"],
+    )?;
     table.set_item("minus_di", vec!["minus_di"])?;
     table.set_item("minus_dm", vec!["minus_dm"])?;
     table.set_item("mom", vec!["mom"])?;
@@ -8110,6 +8854,154 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     Ok(table)
 }
 
+/// The declared dtype of each output, in spec order.
+fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
+    let table = PyDict::new(py);
+    table.set_item("acos", vec!["float64"])?;
+    table.set_item("ad", vec!["float64"])?;
+    table.set_item("add", vec!["float64"])?;
+    table.set_item("adx", vec!["float64"])?;
+    table.set_item("adxr", vec!["float64"])?;
+    table.set_item("aroon", vec!["float64", "float64"])?;
+    table.set_item("aroonosc", vec!["float64"])?;
+    table.set_item("asin", vec!["float64"])?;
+    table.set_item("atan", vec!["float64"])?;
+    table.set_item("atr", vec!["float64"])?;
+    table.set_item("avgdev", vec!["float64"])?;
+    table.set_item("avgprice", vec!["float64"])?;
+    table.set_item("bop", vec!["float64"])?;
+    table.set_item("cci", vec!["float64"])?;
+    table.set_item("ceil", vec!["float64"])?;
+    table.set_item("cmo", vec!["float64"])?;
+    table.set_item("cos", vec!["float64"])?;
+    table.set_item("cosh", vec!["float64"])?;
+    table.set_item("cumsum", vec!["float64"])?;
+    table.set_item("dema", vec!["float64"])?;
+    table.set_item("div", vec!["float64"])?;
+    table.set_item("dx", vec!["float64"])?;
+    table.set_item("ema", vec!["float64"])?;
+    table.set_item("exp", vec!["float64"])?;
+    table.set_item("floor", vec!["float64"])?;
+    table.set_item("ln", vec!["float64"])?;
+    table.set_item("log10", vec!["float64"])?;
+    table.set_item("macd", vec!["float64", "float64", "float64"])?;
+    table.set_item("max", vec!["float64"])?;
+    table.set_item("maxindex", vec!["int32"])?;
+    table.set_item("medprice", vec!["float64"])?;
+    table.set_item("midpoint", vec!["float64"])?;
+    table.set_item("midprice", vec!["float64"])?;
+    table.set_item("min", vec!["float64"])?;
+    table.set_item("minindex", vec!["int32"])?;
+    table.set_item("minmax", vec!["float64", "float64"])?;
+    table.set_item("minmaxindex", vec!["int32", "int32"])?;
+    table.set_item("minus_di", vec!["float64"])?;
+    table.set_item("minus_dm", vec!["float64"])?;
+    table.set_item("mom", vec!["float64"])?;
+    table.set_item("mult", vec!["float64"])?;
+    table.set_item("natr", vec!["float64"])?;
+    table.set_item("obv", vec!["float64"])?;
+    table.set_item("plus_di", vec!["float64"])?;
+    table.set_item("plus_dm", vec!["float64"])?;
+    table.set_item("rma", vec!["float64"])?;
+    table.set_item("roc", vec!["float64"])?;
+    table.set_item("rocp", vec!["float64"])?;
+    table.set_item("rocr", vec!["float64"])?;
+    table.set_item("rocr100", vec!["float64"])?;
+    table.set_item("rsi", vec!["float64"])?;
+    table.set_item("sin", vec!["float64"])?;
+    table.set_item("sinh", vec!["float64"])?;
+    table.set_item("sma", vec!["float64"])?;
+    table.set_item("sqrt", vec!["float64"])?;
+    table.set_item("stddev", vec!["float64"])?;
+    table.set_item("sub", vec!["float64"])?;
+    table.set_item("sum", vec!["float64"])?;
+    table.set_item("tan", vec!["float64"])?;
+    table.set_item("tanh", vec!["float64"])?;
+    table.set_item("tema", vec!["float64"])?;
+    table.set_item("trange", vec!["float64"])?;
+    table.set_item("trima", vec!["float64"])?;
+    table.set_item("typprice", vec!["float64"])?;
+    table.set_item("var", vec!["float64"])?;
+    table.set_item("wclprice", vec!["float64"])?;
+    table.set_item("willr", vec!["float64"])?;
+    table.set_item("wma", vec!["float64"])?;
+    Ok(table)
+}
+
+/// The spec flags each indicator carries.
+fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
+    let table = PyDict::new(py);
+    table.set_item("acos", vec!["nan_inf_output"])?;
+    table.set_item("ad", vec!["path_dependent"])?;
+    table.set_item("add", Vec::<&str>::new())?;
+    table.set_item("adx", vec!["unstable"])?;
+    table.set_item("adxr", vec!["unstable"])?;
+    table.set_item("aroon", Vec::<&str>::new())?;
+    table.set_item("aroonosc", Vec::<&str>::new())?;
+    table.set_item("asin", vec!["nan_inf_output"])?;
+    table.set_item("atan", vec!["nan_inf_output"])?;
+    table.set_item("atr", vec!["unstable"])?;
+    table.set_item("avgdev", Vec::<&str>::new())?;
+    table.set_item("avgprice", vec!["overlap"])?;
+    table.set_item("bop", Vec::<&str>::new())?;
+    table.set_item("cci", Vec::<&str>::new())?;
+    table.set_item("ceil", vec!["nan_inf_output"])?;
+    table.set_item("cmo", vec!["unstable"])?;
+    table.set_item("cos", vec!["nan_inf_output"])?;
+    table.set_item("cosh", vec!["nan_inf_output"])?;
+    table.set_item("cumsum", vec!["path_dependent"])?;
+    table.set_item("dema", vec!["overlap", "unstable"])?;
+    table.set_item("div", vec!["nan_inf_output"])?;
+    table.set_item("dx", vec!["unstable"])?;
+    table.set_item("ema", vec!["overlap", "unstable"])?;
+    table.set_item("exp", vec!["nan_inf_output"])?;
+    table.set_item("floor", vec!["nan_inf_output"])?;
+    table.set_item("ln", vec!["nan_inf_output"])?;
+    table.set_item("log10", vec!["nan_inf_output"])?;
+    table.set_item("macd", vec!["unstable"])?;
+    table.set_item("max", Vec::<&str>::new())?;
+    table.set_item("maxindex", vec!["absolute_index"])?;
+    table.set_item("medprice", vec!["overlap"])?;
+    table.set_item("midpoint", vec!["overlap"])?;
+    table.set_item("midprice", vec!["overlap"])?;
+    table.set_item("min", Vec::<&str>::new())?;
+    table.set_item("minindex", vec!["absolute_index"])?;
+    table.set_item("minmax", Vec::<&str>::new())?;
+    table.set_item("minmaxindex", vec!["absolute_index"])?;
+    table.set_item("minus_di", vec!["unstable"])?;
+    table.set_item("minus_dm", vec!["unstable"])?;
+    table.set_item("mom", Vec::<&str>::new())?;
+    table.set_item("mult", vec!["nan_inf_output"])?;
+    table.set_item("natr", vec!["unstable"])?;
+    table.set_item("obv", vec!["path_dependent"])?;
+    table.set_item("plus_di", vec!["unstable"])?;
+    table.set_item("plus_dm", vec!["unstable"])?;
+    table.set_item("rma", vec!["overlap", "unstable"])?;
+    table.set_item("roc", Vec::<&str>::new())?;
+    table.set_item("rocp", Vec::<&str>::new())?;
+    table.set_item("rocr", Vec::<&str>::new())?;
+    table.set_item("rocr100", Vec::<&str>::new())?;
+    table.set_item("rsi", Vec::<&str>::new())?;
+    table.set_item("sin", vec!["nan_inf_output"])?;
+    table.set_item("sinh", vec!["nan_inf_output"])?;
+    table.set_item("sma", vec!["overlap"])?;
+    table.set_item("sqrt", vec!["nan_inf_output"])?;
+    table.set_item("stddev", vec!["nan_inf_output"])?;
+    table.set_item("sub", Vec::<&str>::new())?;
+    table.set_item("sum", Vec::<&str>::new())?;
+    table.set_item("tan", vec!["nan_inf_output"])?;
+    table.set_item("tanh", vec!["nan_inf_output"])?;
+    table.set_item("tema", vec!["overlap", "unstable"])?;
+    table.set_item("trange", Vec::<&str>::new())?;
+    table.set_item("trima", vec!["overlap"])?;
+    table.set_item("typprice", vec!["overlap"])?;
+    table.set_item("var", vec!["nan_inf_output"])?;
+    table.set_item("wclprice", vec!["overlap"])?;
+    table.set_item("willr", Vec::<&str>::new())?;
+    table.set_item("wma", vec!["overlap"])?;
+    Ok(table)
+}
+
 /// The group each indicator belongs to.
 fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     let table = PyDict::new(py);
@@ -8118,6 +9010,8 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("add", "operator")?;
     table.set_item("adx", "momentum")?;
     table.set_item("adxr", "momentum")?;
+    table.set_item("aroon", "momentum")?;
+    table.set_item("aroonosc", "momentum")?;
     table.set_item("asin", "math")?;
     table.set_item("atan", "math")?;
     table.set_item("atr", "volatility")?;
@@ -8140,11 +9034,14 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("log10", "math")?;
     table.set_item("macd", "momentum")?;
     table.set_item("max", "statistic")?;
+    table.set_item("maxindex", "statistic")?;
     table.set_item("medprice", "price")?;
     table.set_item("midpoint", "overlap")?;
     table.set_item("midprice", "overlap")?;
     table.set_item("min", "statistic")?;
+    table.set_item("minindex", "statistic")?;
     table.set_item("minmax", "statistic")?;
+    table.set_item("minmaxindex", "statistic")?;
     table.set_item("minus_di", "momentum")?;
     table.set_item("minus_dm", "momentum")?;
     table.set_item("mom", "momentum")?;
@@ -8223,6 +9120,31 @@ pub fn lookback_of(
             Ok(
                 <trendlib::indicators::adxr::Adxr as Kernel<3, 1>>::lookback(
                     &trendlib::indicators::adxr::Params { period },
+                ),
+            )
+        }
+        "aroon" => {
+            let period = match get("period")? {
+                Some(value) => {
+                    int_param("aroon", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?
+                }
+                None => 14,
+            };
+            Ok(
+                <trendlib::indicators::aroon::Aroon as Kernel<2, 2>>::lookback(
+                    &trendlib::indicators::aroon::Params { period },
+                ),
+            )
+        }
+        "aroonosc" => {
+            let period = match get("period")? {
+                Some(value) => int_param("aroonosc", "period", value, 2, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 14,
+            };
+            Ok(
+                <trendlib::indicators::aroonosc::Aroonosc as Kernel<2, 1>>::lookback(
+                    &trendlib::indicators::aroonosc::Params { period },
                 ),
             )
         }
@@ -8398,6 +9320,18 @@ pub fn lookback_of(
                 &trendlib::indicators::max::Params { period },
             ))
         }
+        "maxindex" => {
+            let period = match get("period")? {
+                Some(value) => int_param("maxindex", "period", value, 2, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 30,
+            };
+            Ok(
+                <trendlib::indicators::maxindex::Maxindex as Kernel<1, 1>>::lookback(
+                    &trendlib::indicators::maxindex::Params { period },
+                ),
+            )
+        }
         "medprice" => Ok(
             <trendlib::indicators::medprice::Medprice as Kernel<2, 1>>::lookback(
                 &trendlib::indicators::medprice::Params {},
@@ -8438,6 +9372,18 @@ pub fn lookback_of(
                 &trendlib::indicators::min::Params { period },
             ))
         }
+        "minindex" => {
+            let period = match get("period")? {
+                Some(value) => int_param("minindex", "period", value, 2, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 30,
+            };
+            Ok(
+                <trendlib::indicators::minindex::Minindex as Kernel<1, 1>>::lookback(
+                    &trendlib::indicators::minindex::Params { period },
+                ),
+            )
+        }
         "minmax" => {
             let period = match get("period")? {
                 Some(value) => int_param("minmax", "period", value, 2, 100000)
@@ -8449,6 +9395,19 @@ pub fn lookback_of(
                     &trendlib::indicators::minmax::Params { period },
                 ),
             )
+        }
+        "minmaxindex" => {
+            let period = match get("period")? {
+                Some(value) => int_param("minmaxindex", "period", value, 2, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 30,
+            };
+            Ok(<trendlib::indicators::minmaxindex::Minmaxindex as Kernel<
+                1,
+                2,
+            >>::lookback(
+                &trendlib::indicators::minmaxindex::Params { period },
+            ))
         }
         "minus_di" => {
             let period = match get("period")? {

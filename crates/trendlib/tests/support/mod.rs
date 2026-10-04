@@ -95,6 +95,13 @@ pub struct Registered {
     /// `true` when the value carries everything before it, so a constant input
     /// does not imply a constant output (`CONVENTIONS.md` section 5).
     pub path_dependent: bool,
+    /// `true` when the outputs are row indices into the input, so a leading
+    /// warm-up prefix shifts them by its own length.
+    pub absolute_index: bool,
+    /// Per output, whether `spec.yaml` declares it `int32`. Those warm up with
+    /// `0` rather than `NaN` (`CONVENTIONS.md` section 2), which is what the
+    /// oracle writes and what the Python layer hands back.
+    pub integer_outputs: &'static [bool],
     pub batch: BatchFn,
     pub lookback: LookbackFn,
     pub open_and_fill: OpenAndFillFn,

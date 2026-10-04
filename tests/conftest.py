@@ -42,6 +42,19 @@ def bitwise_equal(left, right) -> bool:
     return bool(np.all(both_nan | same_bits))
 
 
+def warm_up(column) -> np.ndarray:
+    """Rows an indicator has not produced a value for yet.
+
+    Float outputs warm up with NaN and integer ones with zero
+    (`docs/CONVENTIONS.md` section 2), so `np.isnan` alone answers False for
+    every row of an integer output and would quietly assert nothing.
+    """
+    column = np.asarray(column)
+    if column.dtype.kind in "iu":
+        return column == 0
+    return np.isnan(column)
+
+
 def _daily() -> dict[str, np.ndarray]:
     with (TESTDATA / "daily_2000.csv").open(newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle))
@@ -78,6 +91,13 @@ class Indicator:
         self.outputs: list[str] = list(_core.OUTPUTS[name])
         self.params: dict = dict(_core.PARAMS[name])
         self.group: str = _core.GROUPS[name]
+        self.flags: list[str] = list(_core.FLAGS[name])
+        self.dtypes: list[str] = list(_core.DTYPES[name])
+
+    @property
+    def absolute_index(self) -> bool:
+        """Outputs are row indices, so a warm-up prefix shifts them."""
+        return "absolute_index" in self.flags
 
     @property
     def multi_output(self) -> bool:

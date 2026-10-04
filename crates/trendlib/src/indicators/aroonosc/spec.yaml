@@ -1,0 +1,27 @@
+name: aroonosc
+title: Aroon Oscillator
+group: momentum
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 2
+    max: 100000
+    doc: Number of bars back the window reaches
+outputs:
+  - name: aroonosc
+    dtype: float64
+    plot: line
+    doc: How much fresher the highest high is than the lowest low, from -100 to 100
+talib:
+  name: AROONOSC
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Tushar S. Chande, Aroon, Technical Analysis of Stocks and Commodities, September 1995
+see_also: [aroon]

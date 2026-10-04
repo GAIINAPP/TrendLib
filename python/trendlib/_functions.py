@@ -18,6 +18,8 @@ __all__ = [
     "ADD",
     "ADX",
     "ADXR",
+    "AROON",
+    "AROONOSC",
     "ASIN",
     "ATAN",
     "ATR",
@@ -40,11 +42,14 @@ __all__ = [
     "LOG10",
     "MACD",
     "MAX",
+    "MAXINDEX",
     "MEDPRICE",
     "MIDPOINT",
     "MIDPRICE",
     "MIN",
+    "MININDEX",
     "MINMAX",
+    "MINMAXINDEX",
     "MINUS_DI",
     "MINUS_DM",
     "MOM",
@@ -81,6 +86,8 @@ __all__ = [
     "add",
     "adx",
     "adxr",
+    "aroon",
+    "aroonosc",
     "asin",
     "atan",
     "atr",
@@ -104,11 +111,14 @@ __all__ = [
     "lookback",
     "macd",
     "max",
+    "maxindex",
     "medprice",
     "midpoint",
     "midprice",
     "min",
+    "minindex",
     "minmax",
+    "minmaxindex",
     "minus_di",
     "minus_dm",
     "mom",
@@ -276,6 +286,74 @@ def adxr(
     )
     out = _core.adxr(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("adxr",))
+
+
+def aroon(high=None, low=None, *, period: int = _PARAMS["aroon"]["period"]["default"]) -> Any:
+    """Aroon.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars back the window reaches, from 2 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        aroon_down: How recently the lowest low was set, from 0 to 100.
+        aroon_up: How recently the highest high was set, from 0 to 100.
+    """
+    period = _convert.as_int("aroon", "period", period)
+    columns, carrier = _convert.bars(
+        "aroon",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.aroon(*columns, period=period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "aroon_down",
+            "aroon_up",
+        ),
+    )
+
+
+def aroonosc(high=None, low=None, *, period: int = _PARAMS["aroonosc"]["period"]["default"]) -> Any:
+    """Aroon Oscillator.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars back the window reaches, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        How much fresher the highest high is than the lowest low, from -100 to 100.
+    """
+    period = _convert.as_int("aroonosc", "period", period)
+    columns, carrier = _convert.bars(
+        "aroonosc",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.aroonosc(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("aroonosc",))
 
 
 def asin(source=None) -> Any:
@@ -726,6 +804,25 @@ def max(source=None, *, period: int = _PARAMS["max"]["period"]["default"]) -> An
     return _convert.wrap_outputs(out, carrier, ("max",))
 
 
+def maxindex(source=None, *, period: int = _PARAMS["maxindex"]["period"]["default"]) -> Any:
+    """Index of the Rolling Maximum.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the extreme is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Row of the input holding the highest value of the last period bars.
+    """
+    period = _convert.as_int("maxindex", "period", period)
+    columns, carrier = _convert.bars("maxindex", (source,), ("source",), ("series",))
+    out = _core.maxindex(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("maxindex",))
+
+
 def medprice(high=None, low=None) -> Any:
     """Median Price.
 
@@ -818,6 +915,25 @@ def min(source=None, *, period: int = _PARAMS["min"]["period"]["default"]) -> An
     return _convert.wrap_outputs(out, carrier, ("min",))
 
 
+def minindex(source=None, *, period: int = _PARAMS["minindex"]["period"]["default"]) -> Any:
+    """Index of the Rolling Minimum.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the extreme is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Row of the input holding the lowest value of the last period bars.
+    """
+    period = _convert.as_int("minindex", "period", period)
+    columns, carrier = _convert.bars("minindex", (source,), ("source",), ("series",))
+    out = _core.minindex(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("minindex",))
+
+
 def minmax(source=None, *, period: int = _PARAMS["minmax"]["period"]["default"]) -> Any:
     """Rolling Minimum and Maximum.
 
@@ -841,6 +957,33 @@ def minmax(source=None, *, period: int = _PARAMS["minmax"]["period"]["default"])
         (
             "minmax_min",
             "minmax_max",
+        ),
+    )
+
+
+def minmaxindex(source=None, *, period: int = _PARAMS["minmaxindex"]["period"]["default"]) -> Any:
+    """Indices of the Rolling Minimum and Maximum.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the extremes are taken over, from 2 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        minmaxindex_min_index: Row of the input holding the lowest value of the last period bars.
+        minmaxindex_max_index: Row of the input holding the highest value of the last period bars.
+    """
+    period = _convert.as_int("minmaxindex", "period", period)
+    columns, carrier = _convert.bars("minmaxindex", (source,), ("source",), ("series",))
+    out = _core.minmaxindex(*columns, period=period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "minmaxindex_min_index",
+            "minmaxindex_max_index",
         ),
     )
 
@@ -1574,6 +1717,16 @@ def ADXR(high, low, close, timeperiod: int = _PARAMS["adxr"]["period"]["default"
     return adxr(high, low, close, period=timeperiod)
 
 
+def AROON(high, low, timeperiod: int = _PARAMS["aroon"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`aroon`."""
+    return aroon(high, low, period=timeperiod)
+
+
+def AROONOSC(high, low, timeperiod: int = _PARAMS["aroonosc"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`aroonosc`."""
+    return aroonosc(high, low, period=timeperiod)
+
+
 def ASIN(source) -> Any:
     """TA-Lib-style alias for :func:`asin`."""
     return asin(source)
@@ -1689,6 +1842,11 @@ def MAX(source, timeperiod: int = _PARAMS["max"]["period"]["default"]) -> Any:
     return max(source, period=timeperiod)
 
 
+def MAXINDEX(source, timeperiod: int = _PARAMS["maxindex"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`maxindex`."""
+    return maxindex(source, period=timeperiod)
+
+
 def MEDPRICE(high, low) -> Any:
     """TA-Lib-style alias for :func:`medprice`."""
     return medprice(high, low)
@@ -1709,9 +1867,19 @@ def MIN(source, timeperiod: int = _PARAMS["min"]["period"]["default"]) -> Any:
     return min(source, period=timeperiod)
 
 
+def MININDEX(source, timeperiod: int = _PARAMS["minindex"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`minindex`."""
+    return minindex(source, period=timeperiod)
+
+
 def MINMAX(source, timeperiod: int = _PARAMS["minmax"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`minmax`."""
     return minmax(source, period=timeperiod)
+
+
+def MINMAXINDEX(source, timeperiod: int = _PARAMS["minmaxindex"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`minmaxindex`."""
+    return minmaxindex(source, period=timeperiod)
 
 
 def MINUS_DI(high, low, close, timeperiod: int = _PARAMS["minus_di"]["period"]["default"]) -> Any:

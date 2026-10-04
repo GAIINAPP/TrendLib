@@ -62,8 +62,10 @@ fn short_input_is_all_warm_up_until_one_bar_past_the_lookback() {
 fn a_constant_series_gives_a_constant_result() {
     for indicator in registered() {
         // A running total keeps climbing on a flat series, which is the whole
-        // point of it, so the law applies to the rest.
-        if indicator.path_dependent {
+        // point of it. A row index moves too: every bar ties, so the record
+        // holder keeps falling out of the window and being replaced. The law
+        // applies to the rest.
+        if indicator.path_dependent || indicator.absolute_index {
             continue;
         }
         let base = vec![5.0; 200];
@@ -112,6 +114,20 @@ fn leading_warm_up_rows_are_skipped() {
             let shifted = (indicator.batch)(&as_slices(&padded), &indicator.defaults()).unwrap();
             for (index, column) in shifted.iter().enumerate() {
                 assert!(column[..leading].iter().all(|v| v.is_nan()));
+                if indicator.absolute_index {
+                    // A row index is an index into the caller's own array, so
+                    // a warm-up prefix moves it by exactly its own length.
+                    let moved: Vec<f64> = trimmed[index]
+                        .iter()
+                        .map(|v| if v.is_nan() { *v } else { v + leading as f64 })
+                        .collect();
+                    assert!(
+                        bitwise_equal(&column[leading..], &moved),
+                        "{} with {leading} leading NaN rows did not shift its index",
+                        indicator.name
+                    );
+                    continue;
+                }
                 assert!(
                     bitwise_equal(&column[leading..], &trimmed[index]),
                     "{} with {leading} leading NaN rows",

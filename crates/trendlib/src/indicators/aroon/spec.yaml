@@ -1,0 +1,31 @@
+name: aroon
+title: Aroon
+group: momentum
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 2
+    max: 100000
+    doc: Number of bars back the window reaches
+outputs:
+  - name: aroon_down
+    dtype: float64
+    plot: line
+    doc: How recently the lowest low was set, from 0 to 100
+  - name: aroon_up
+    dtype: float64
+    plot: line
+    doc: How recently the highest high was set, from 0 to 100
+talib:
+  name: AROON
+  params: {period: timeperiod}
+  outputs: [aroondown, aroonup]
+references:
+  - Tushar S. Chande, Aroon, Technical Analysis of Stocks and Commodities, September 1995
+see_also: [aroonosc, willr]

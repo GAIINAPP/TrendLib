@@ -137,8 +137,17 @@ proptest! {
             for (index, column) in shifted.iter().enumerate() {
                 prop_assert_eq!(column.len(), base.len() + leading);
                 prop_assert!(column[..leading].iter().all(|v| v.is_nan()));
+                // A row index moves with the prefix; everything else does not.
+                let expected: Vec<f64> = if indicator.absolute_index {
+                    trimmed[index]
+                        .iter()
+                        .map(|v| if v.is_nan() { *v } else { v + leading as f64 })
+                        .collect()
+                } else {
+                    trimmed[index].clone()
+                };
                 prop_assert!(
-                    bitwise_equal(&column[leading..], &trimmed[index]),
+                    bitwise_equal(&column[leading..], &expected),
                     "{}: padding changed the values",
                     indicator.name
                 );

@@ -19,6 +19,8 @@ __all__ = [
     "add",
     "adx",
     "adxr",
+    "aroon",
+    "aroonosc",
     "asin",
     "atan",
     "atr",
@@ -41,11 +43,14 @@ __all__ = [
     "log10",
     "macd",
     "max",
+    "maxindex",
     "medprice",
     "midpoint",
     "midprice",
     "min",
+    "minindex",
     "minmax",
+    "minmaxindex",
     "minus_di",
     "minus_dm",
     "mom",
@@ -139,6 +144,35 @@ adxr = Factory(
         "close",
     ),
     ("adxr",),
+)
+aroon = Factory(
+    "aroon",
+    _core.AroonStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "aroon_down",
+        "aroon_up",
+    ),
+)
+aroonosc = Factory(
+    "aroonosc",
+    _core.AroonoscStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("aroonosc",),
 )
 asin = Factory("asin", _core.AsinStream, ("source",), ("series",), ("asin",))
 atan = Factory("atan", _core.AtanStream, ("source",), ("series",), ("atan",))
@@ -258,6 +292,7 @@ macd = Factory(
     ),
 )
 max = Factory("max", _core.MaxStream, ("source",), ("series",), ("max",))
+maxindex = Factory("maxindex", _core.MaxindexStream, ("source",), ("series",), ("maxindex",))
 medprice = Factory(
     "medprice",
     _core.MedpriceStream,
@@ -286,6 +321,7 @@ midprice = Factory(
     ("midprice",),
 )
 min = Factory("min", _core.MinStream, ("source",), ("series",), ("min",))
+minindex = Factory("minindex", _core.MinindexStream, ("source",), ("series",), ("minindex",))
 minmax = Factory(
     "minmax",
     _core.MinmaxStream,
@@ -294,6 +330,16 @@ minmax = Factory(
     (
         "minmax_min",
         "minmax_max",
+    ),
+)
+minmaxindex = Factory(
+    "minmaxindex",
+    _core.MinmaxindexStream,
+    ("source",),
+    ("series",),
+    (
+        "minmaxindex_min_index",
+        "minmaxindex_max_index",
     ),
 )
 minus_di = Factory(

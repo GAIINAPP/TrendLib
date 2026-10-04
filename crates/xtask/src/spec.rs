@@ -41,6 +41,9 @@ pub const FLAGS: &[&str] = &[
     // The output can legitimately be NaN or infinite for finite input: a
     // logarithm of zero, an arc cosine outside [-1, 1], a division by zero.
     "nan_inf_output",
+    // An int32 output is a row index into the input, so skipping leading
+    // warm-up rows shifts it rather than leaving it unchanged.
+    "absolute_index",
 ];
 
 #[derive(Debug, Clone)]

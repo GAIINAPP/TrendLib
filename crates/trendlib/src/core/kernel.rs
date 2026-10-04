@@ -26,6 +26,13 @@ use crate::core::traits::Stream;
 pub trait Step<const I: usize, const O: usize>: Clone {
     fn push(&mut self, bar: [f64; I]) -> Option<[f64; O]>;
     fn preview(&self, bar: [f64; I]) -> Option<[f64; O]>;
+
+    /// The row the first bar will come from, given once before any `push`.
+    ///
+    /// Only indicators that report a row index need this. Leading warm-up rows
+    /// are skipped, so without it such an indicator would count from the first
+    /// valid bar and report an index into a series the caller never passed.
+    fn start_at(&mut self, _row: usize) {}
 }
 
 /// What an indicator has to supply. The rest of its public surface is derived.
@@ -87,6 +94,7 @@ pub fn batch<K: Kernel<I, O>, const I: usize, const O: usize>(
     let prepared = validated::<K, I, O>(&inputs, params)?;
     let mut out: [Vec<f64>; O] = std::array::from_fn(|_| nan_filled(prepared.len));
     let mut state = K::state(params);
+    state.start_at(prepared.first_valid);
     for row in prepared.first_valid..prepared.len {
         if let Some(values) = state.push(bar_at(&inputs, row)) {
             for (column, value) in out.iter_mut().zip(values) {
@@ -114,6 +122,7 @@ pub fn open_and_fill<K: Kernel<I, O>, const I: usize, const O: usize>(
 
     let mut out: [Vec<f64>; O] = std::array::from_fn(|_| nan_filled(prepared.len));
     let mut state = K::state(params);
+    state.start_at(prepared.first_valid);
     let mut last = None;
     for row in prepared.first_valid..prepared.len {
         if let Some(values) = state.push(bar_at(&inputs, row)) {

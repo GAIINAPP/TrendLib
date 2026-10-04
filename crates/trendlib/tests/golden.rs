@@ -40,7 +40,23 @@ fn every_golden_file_matches_the_implementation() {
         let mut skipped = 0usize;
         for (index, name) in indicator.outputs.iter().enumerate() {
             let expected = golden.column(name);
-            let got = &actual[index];
+            // An integer output's warm-up rows are 0, not NaN, which is what
+            // the oracle wrote and what callers are handed.
+            let narrowed: Vec<f64>;
+            let got = if indicator
+                .integer_outputs
+                .get(index)
+                .copied()
+                .unwrap_or(false)
+            {
+                narrowed = actual[index]
+                    .iter()
+                    .map(|v| if v.is_nan() { 0.0 } else { *v })
+                    .collect();
+                &narrowed
+            } else {
+                &actual[index]
+            };
             assert_eq!(got.len(), expected.len(), "{shown}: {name} length");
             for (row, (&value, &want)) in got.iter().zip(&expected).enumerate() {
                 if golden.is_excluded(row) {
