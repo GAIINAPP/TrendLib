@@ -73,6 +73,29 @@ fn golden(args: &[String]) -> ExitCode {
     }
 }
 
+/// Show the first few lines that differ, so a failing check says what changed
+/// rather than only that something did.
+fn report_difference(committed: &str, regenerated: &str) {
+    let committed: Vec<&str> = committed.lines().collect();
+    let regenerated: Vec<&str> = regenerated.lines().collect();
+    let mut shown = 0;
+    for row in 0..committed.len().max(regenerated.len()) {
+        let left = committed.get(row);
+        let right = regenerated.get(row);
+        if left == right {
+            continue;
+        }
+        eprintln!("  line {}:", row + 1);
+        eprintln!("    committed:   {:?}", left.unwrap_or(&"<missing>"));
+        eprintln!("    regenerated: {:?}", right.unwrap_or(&"<missing>"));
+        shown += 1;
+        if shown == 5 {
+            eprintln!("  ... further differences not shown");
+            break;
+        }
+    }
+}
+
 /// Write every generated file, or, with `check`, report the ones that drifted.
 fn run_generate(check: bool) -> ExitCode {
     let root = repo_root();
@@ -97,12 +120,11 @@ fn run_generate(check: bool) -> ExitCode {
             return ExitCode::SUCCESS;
         }
         for item in &stale {
-            eprintln!(
-                "out of date: {}",
-                item.path
-                    .strip_prefix(&root)
-                    .unwrap_or(&item.path)
-                    .display()
+            let shown = item.path.strip_prefix(&root).unwrap_or(&item.path);
+            eprintln!("out of date: {}", shown.display());
+            report_difference(
+                &std::fs::read_to_string(&item.path).unwrap_or_default(),
+                &item.text,
             );
         }
         eprintln!("\nrun `cargo xtask generate` and commit the result");
