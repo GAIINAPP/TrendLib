@@ -69,7 +69,7 @@ impl Step<3, 3> for State {
     fn preview(&self, bar: [f64; 3]) -> Option<[f64; 3]> {
         let middle = self.middle.preview(typical(bar))?;
         let range = self.range.preview(bar[0], bar[1])?;
-        if self.seen + 1 <= self.skip {
+        if self.seen < self.skip {
             return None;
         }
         let width = self.average_range.preview(range)?;
