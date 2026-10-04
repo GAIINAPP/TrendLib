@@ -1,0 +1,25 @@
+name: cdl_hammer
+title: Hammer
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_hammer
+    dtype: int32
+    plot: pattern
+    doc: A short body with a long tail below it, sitting near the previous low
+talib:
+  name: CDLHAMMER
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_hangingman, cdl_invertedhammer, cdl_takuri]

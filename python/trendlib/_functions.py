@@ -30,6 +30,9 @@ __all__ = [
     "BBANDS",
     "BOP",
     "CCI",
+    "CDLDOJI",
+    "CDLENGULFING",
+    "CDLHAMMER",
     "CEIL",
     "CMO",
     "COS",
@@ -127,6 +130,9 @@ __all__ = [
     "bbands",
     "bop",
     "cci",
+    "cdl_doji",
+    "cdl_engulfing",
+    "cdl_hammer",
     "ceil",
     "cmo",
     "cos",
@@ -703,6 +709,90 @@ def cci(
     )
     out = _core.cci(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("cci",))
+
+
+def cdl_doji(open=None, high=None, low=None, close=None) -> Any:
+    """Doji.
+
+    Returns
+    -------
+    ndarray or Series
+        A bar whose open and close are close enough together to count as the same price.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_doji",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_doji(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_doji",))
+
+
+def cdl_engulfing(open=None, high=None, low=None, close=None) -> Any:
+    """Engulfing Pattern.
+
+    Returns
+    -------
+    ndarray or Series
+        A body that covers the whole of the previous one, in the other colour.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_engulfing",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_engulfing(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_engulfing",))
+
+
+def cdl_hammer(open=None, high=None, low=None, close=None) -> Any:
+    """Hammer.
+
+    Returns
+    -------
+    ndarray or Series
+        A short body with a long tail below it, sitting near the previous low.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_hammer",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_hammer(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_hammer",))
 
 
 def ceil(source=None) -> Any:
@@ -2812,6 +2902,21 @@ def BOP(open, high, low, close) -> Any:
 def CCI(high, low, close, timeperiod: int = _PARAMS["cci"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`cci`."""
     return cci(high, low, close, period=timeperiod)
+
+
+def CDLDOJI(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_doji`."""
+    return cdl_doji(open, high, low, close)
+
+
+def CDLENGULFING(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_engulfing`."""
+    return cdl_engulfing(open, high, low, close)
+
+
+def CDLHAMMER(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_hammer`."""
+    return cdl_hammer(open, high, low, close)
 
 
 def CEIL(source) -> Any:

@@ -2,8 +2,8 @@
 
 # Progress
 
-**97 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 107 not started.
+**100 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 104 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -25,7 +25,7 @@ something is done that is not. CI checks it is current.
 | Statistics | 9 | 11 |
 | Math transforms | 15 | 15 |
 | Math operators | 12 | 12 |
-| Candlestick patterns | 0 | 61 |
+| Candlestick patterns | 3 | 61 |
 | Levels | 0 | 3 |
 
 ## Overlap studies (19 of 25)
@@ -195,7 +195,7 @@ something is done that is not. CI checks it is current.
 - [x] `sub` (`SUB`) -- Vector Subtraction
 - [x] `sum` (`SUM`) -- Summation
 
-## Candlestick patterns (0 of 61)
+## Candlestick patterns (3 of 61)
 
 - [ ] `cdl_2crows` (`CDL2CROWS`)
 - [ ] `cdl_3blackcrows` (`CDL3BLACKCROWS`)
@@ -212,15 +212,15 @@ something is done that is not. CI checks it is current.
 - [ ] `cdl_concealbabyswall` (`CDLCONCEALBABYSWALL`)
 - [ ] `cdl_counterattack` (`CDLCOUNTERATTACK`)
 - [ ] `cdl_darkcloudcover` (`CDLDARKCLOUDCOVER`)
-- [ ] `cdl_doji` (`CDLDOJI`) *
+- [x] `cdl_doji` (`CDLDOJI`) -- Doji *
 - [ ] `cdl_dojistar` (`CDLDOJISTAR`)
 - [ ] `cdl_dragonflydoji` (`CDLDRAGONFLYDOJI`)
-- [ ] `cdl_engulfing` (`CDLENGULFING`) *
+- [x] `cdl_engulfing` (`CDLENGULFING`) -- Engulfing Pattern *
 - [ ] `cdl_eveningdojistar` (`CDLEVENINGDOJISTAR`)
 - [ ] `cdl_eveningstar` (`CDLEVENINGSTAR`)
 - [ ] `cdl_gapsidesidewhite` (`CDLGAPSIDESIDEWHITE`)
 - [ ] `cdl_gravestonedoji` (`CDLGRAVESTONEDOJI`)
-- [ ] `cdl_hammer` (`CDLHAMMER`) *
+- [x] `cdl_hammer` (`CDLHAMMER`) -- Hammer *
 - [ ] `cdl_hangingman` (`CDLHANGINGMAN`)
 - [ ] `cdl_harami` (`CDLHARAMI`)
 - [ ] `cdl_haramicross` (`CDLHARAMICROSS`)

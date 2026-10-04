@@ -31,6 +31,9 @@ __all__ = [
     "bbands",
     "bop",
     "cci",
+    "cdl_doji",
+    "cdl_engulfing",
+    "cdl_hammer",
     "ceil",
     "cmo",
     "cos",
@@ -300,6 +303,57 @@ cci = Factory(
         "close",
     ),
     ("cci",),
+)
+cdl_doji = Factory(
+    "cdl_doji",
+    _core.CdlDojiStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_doji",),
+)
+cdl_engulfing = Factory(
+    "cdl_engulfing",
+    _core.CdlEngulfingStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_engulfing",),
+)
+cdl_hammer = Factory(
+    "cdl_hammer",
+    _core.CdlHammerStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_hammer",),
 )
 ceil = Factory("ceil", _core.CeilStream, ("source",), ("series",), ("ceil",))
 cmo = Factory("cmo", _core.CmoStream, ("source",), ("series",), ("cmo",))

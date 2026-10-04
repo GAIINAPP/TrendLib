@@ -1,3 +1,4 @@
+pub mod candles;
 pub mod error;
 pub mod input;
 pub mod kernel;
