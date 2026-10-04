@@ -59,6 +59,29 @@ jobs:
         with:
           command: check
 
+  regen:
+    name: regen
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      # The generator formats its output, so the formatters have to be present
+      # or it would emit different bytes here than on a developer's machine.
+      - name: install ruff
+        run: pip install ruff
+
+      - name: generated files are up to date
+        run: cargo xtask regen-check
+
+      - name: generating twice changes nothing
+        run: |
+          cargo xtask generate
+          git diff --exit-code
+
   rust:
     name: rust (${{ matrix.os }})
     runs-on: ${{ matrix.os }}

@@ -19,7 +19,7 @@ import numpy as np
 
 from trendlib.errors import InvalidInput
 
-__all__ = ["as_series", "carrier_of", "wrap"]
+__all__ = ["as_series", "bars", "carrier_of", "wrap", "wrap_outputs"]
 
 OHLCV = ("open", "high", "low", "close", "volume")
 TIMESTAMP_COLUMNS = ("timestamp", "datetime", "date", "time")
@@ -128,3 +128,89 @@ def as_int(indicator: str, param: str, value: Any) -> int:
         kind = type(value).__name__
         raise InvalidInput(f"{indicator}: {param} must be an integer, got {kind}")
     return int(value)
+
+
+def _frame_of(indicator: str, value: Any) -> tuple[Any, list[Any], str] | None:
+    """`(frame, columns, kind)` when `value` is a DataFrame, else None."""
+    if _is_pandas(value, "DataFrame"):
+        return value, list(value.columns), "pandas"
+    if _is_polars(value, "DataFrame"):
+        return value, list(value.columns), "polars"
+    return None
+
+
+def bars(
+    indicator: str,
+    values: tuple[Any, ...],
+    names: tuple[str, ...],
+    kinds: tuple[str, ...],
+) -> tuple[list[np.ndarray], Carrier]:
+    """Resolve an indicator's inputs, however the caller supplied them.
+
+    A single DataFrame may stand in for every bar input, with columns matched
+    case-insensitively (`docs/PYTHON_API.md` section 1). Otherwise each input is
+    given separately and they must all be present and the same length.
+    """
+    frame = _frame_of(indicator, values[0]) if values else None
+    if frame is not None and all(value is None for value in values[1:]):
+        held, columns, kind = frame
+        index = held.index if kind == "pandas" else None
+        resolved = []
+        for name, wanted in zip(names, kinds, strict=True):
+            column = "close" if wanted == "series" else wanted
+            series = _frame_column(indicator, held, column, columns)
+            resolved.append(_to_float64(f"{indicator}: {name}", series.to_numpy()))
+        _equal_lengths(indicator, names, resolved)
+        return resolved, Carrier(kind, index)
+
+    missing = [name for name, value in zip(names, values, strict=True) if value is None]
+    if missing:
+        raise InvalidInput(
+            f"{indicator}: missing input {missing[0]!r}; "
+            f"give every input, or one DataFrame holding {', '.join(names)}"
+        )
+
+    carrier = as_series(indicator, values[0], "close" if kinds[0] == "series" else kinds[0])[1]
+    resolved = [
+        as_series(f"{indicator}: {name}", value, "close" if kind == "series" else kind)[0]
+        for name, kind, value in zip(names, kinds, values, strict=True)
+    ]
+    _equal_lengths(indicator, names, resolved)
+    return resolved, carrier
+
+
+def _equal_lengths(indicator: str, names: tuple[str, ...], columns: list[np.ndarray]) -> None:
+    first = len(columns[0])
+    for name, column in zip(names, columns, strict=True):
+        if len(column) != first:
+            raise InvalidInput(
+                f"{indicator}: inputs must have equal length; {names[0]} has {first} rows, "
+                f"{name} has {len(column)}"
+            )
+
+
+def wrap_outputs(values: Any, carrier: Carrier, names: tuple[str, ...]) -> Any:
+    """Give one or several outputs back in the caller's container type."""
+    if len(names) == 1:
+        return wrap(values, carrier, names[0])
+
+    columns = dict(zip(names, values, strict=True))
+    if carrier.kind == "pandas":
+        pd = _pandas()
+        return pd.DataFrame(columns, index=carrier.index)
+    if carrier.kind == "polars":
+        pl = _polars()
+        return pl.DataFrame(columns)
+    return tuple(values)
+
+
+def as_float(indicator: str, param: str, value: Any) -> float:
+    """Accept anything that is a real number and nothing else.
+
+    Range checking stays in Rust, which owns the documented bounds and writes
+    the message `docs/PYTHON_API.md` specifies.
+    """
+    if isinstance(value, bool) or not isinstance(value, (int, float, np.integer, np.floating)):
+        kind = type(value).__name__
+        raise InvalidInput(f"{indicator}: {param} must be a number, got {kind}")
+    return float(value)

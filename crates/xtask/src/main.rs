@@ -1,5 +1,9 @@
 #![forbid(unsafe_code)]
 
+mod generate;
+mod spec;
+mod yaml;
+
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};
 
@@ -14,7 +18,7 @@ Commands:
 ";
 
 /// The milestone that is going to implement each command, per docs/MILESTONES.md.
-const PENDING: &[(&str, &str)] = &[("generate", "M2"), ("regen-check", "M2"), ("bench", "M4")];
+const PENDING: &[(&str, &str)] = &[("bench", "M4")];
 
 fn repo_root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -69,6 +73,63 @@ fn golden(args: &[String]) -> ExitCode {
     }
 }
 
+/// Write every generated file, or, with `check`, report the ones that drifted.
+fn run_generate(check: bool) -> ExitCode {
+    let root = repo_root();
+    let generated = match generate::generate(&root) {
+        Ok(generated) => generated,
+        Err(errors) => {
+            for error in &errors {
+                eprintln!("{error}");
+            }
+            eprintln!("\n{} spec error(s); nothing was written", errors.len());
+            return ExitCode::FAILURE;
+        }
+    };
+
+    if check {
+        let stale: Vec<&generate::Generated> = generated
+            .iter()
+            .filter(|item| std::fs::read_to_string(&item.path).unwrap_or_default() != item.text)
+            .collect();
+        if stale.is_empty() {
+            println!("{} generated file(s) are up to date", generated.len());
+            return ExitCode::SUCCESS;
+        }
+        for item in &stale {
+            eprintln!(
+                "out of date: {}",
+                item.path
+                    .strip_prefix(&root)
+                    .unwrap_or(&item.path)
+                    .display()
+            );
+        }
+        eprintln!("\nrun `cargo xtask generate` and commit the result");
+        return ExitCode::FAILURE;
+    }
+
+    match generate::write_all(&generated) {
+        Ok(written) if written.is_empty() => {
+            println!("{} generated file(s) already up to date", generated.len());
+            ExitCode::SUCCESS
+        }
+        Ok(written) => {
+            for path in &written {
+                println!(
+                    "wrote {}",
+                    path.strip_prefix(&root).unwrap_or(path).display()
+                );
+            }
+            ExitCode::SUCCESS
+        }
+        Err(error) => {
+            eprintln!("xtask generate: {error}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let Some(command) = args.first() else {
@@ -83,6 +144,14 @@ fn main() -> ExitCode {
 
     if command == "golden" {
         return golden(&args[1..]);
+    }
+
+    if command == "generate" {
+        return run_generate(false);
+    }
+
+    if command == "regen-check" {
+        return run_generate(true);
     }
 
     match PENDING.iter().find(|(name, _)| name == command) {

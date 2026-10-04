@@ -2,7 +2,7 @@
 
 # Progress
 
-**3 of 204 shipped**, 4 more written in the Rust core and waiting
+**7 of 204 shipped**, 0 more written in the Rust core and waiting
 for a Python binding, 197 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
@@ -16,9 +16,9 @@ something is done that is not. CI checks it is current.
 
 | Group | Shipped | Total |
 | --- | --- | --- |
-| Overlap studies | 2 | 25 |
+| Overlap studies | 3 | 25 |
 | Momentum | 1 | 47 |
-| Volatility | 0 | 7 |
+| Volatility | 3 | 7 |
 | Volume | 0 | 12 |
 | Price transforms | 0 | 6 |
 | Cycle | 0 | 5 |
@@ -28,7 +28,7 @@ something is done that is not. CI checks it is current.
 | Candlestick patterns | 0 | 61 |
 | Levels | 0 | 3 |
 
-## Overlap studies (2 of 25)
+## Overlap studies (3 of 25)
 
 - [ ] `accbands` (`ACCBANDS`)
 - [ ] `bbands` (`BBANDS`) *
@@ -53,7 +53,7 @@ something is done that is not. CI checks it is current.
 - [ ] `tema` (`TEMA`) *
 - [ ] `trima` (`TRIMA`)
 - [ ] `vwma` (`VWMA`)
-- [~] `wma` (`WMA`) -- Weighted Moving Average * -- core only, no Python binding yet
+- [x] `wma` (`WMA`) -- Weighted Moving Average *
 - [ ] `zlema` (`ZLEMA`)
 
 ## Momentum (1 of 47)
@@ -106,15 +106,15 @@ something is done that is not. CI checks it is current.
 - [ ] `wad` (`WAD`)
 - [ ] `willr` (`WILLR`) *
 
-## Volatility (0 of 7)
+## Volatility (3 of 7)
 
 - [ ] `adr` (`ADR`)
-- [~] `atr` (`ATR`) -- Average True Range * -- core only, no Python binding yet
+- [x] `atr` (`ATR`) -- Average True Range *
 - [ ] `cvi` (`CVI`)
 - [ ] `massi` (`MASSI`)
-- [~] `natr` (`NATR`) -- Normalized Average True Range * -- core only, no Python binding yet
+- [x] `natr` (`NATR`) -- Normalized Average True Range *
 - [ ] `rvi` (`RVI`)
-- [~] `trange` (`TRANGE`) -- True Range * -- core only, no Python binding yet
+- [x] `trange` (`TRANGE`) -- True Range *
 
 ## Volume (0 of 12)
 

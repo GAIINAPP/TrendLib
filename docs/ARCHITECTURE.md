@@ -213,9 +213,15 @@ Rules:
   Running it twice changes nothing.
 - Validates specs strictly (unknown keys, bad ranges, defaults outside range,
   duplicate names, input/output name clash) and fails with file:line messages.
-- Generated Rust is passed through `rustfmt`; generated Python through
-  `ruff format` if available (CI has it).
-- Use a maintained YAML crate (`serde_yaml` is unmaintained).
+- Generated Rust is passed through `rustfmt` and generated Python through
+  `ruff format`. Both are **required**, not best-effort: a machine without one
+  would emit different bytes from a machine with it, and `regen-check` would
+  then fail for everyone downstream. `rustfmt` comes with the pinned toolchain
+  and `ruff` is in the `dev` extra.
+- Uses `yaml-rust2`, which is maintained and, unlike the serde-based readers,
+  exposes the parser's event stream with position markers. `xtask` builds its
+  own small tree from that stream so every spec error can name a line; a
+  validator whose errors cannot be clicked is half a validator.
 
 `regen-check` = run `generate`, then fail if `git status --porcelain` is non-empty.
 CI runs it on every PR.

@@ -159,21 +159,25 @@ def test_lookback_rejects_an_unknown_parameter():
 
 
 def test_public_surface_matches_the_contract():
-    assert set(tl.__all__) == {
-        "EMA",
-        "RSI",
-        "SMA",
-        "InsufficientHistory",
-        "InvalidInput",
+    """Errors, versions, the stream namespace, and every generated function."""
+    from trendlib import _functions
+
+    fixed = {
         "TrendLibError",
+        "InvalidInput",
+        "InsufficientHistory",
         "__version__",
         "__version_info__",
-        "ema",
-        "lookback",
-        "rsi",
-        "sma",
         "stream",
     }
+    assert set(tl.__all__) == fixed | set(_functions.__all__)
+    for name in tl.__all__:
+        assert hasattr(tl, name), name
+
+
+def test_the_extension_module_is_not_public():
+    assert "_core" not in tl.__all__
+    assert not any(name.startswith("_") and not name.startswith("__") for name in tl.__all__)
 
 
 def test_nothing_in_the_docs_reads_as_a_trade_instruction():

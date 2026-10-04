@@ -30,5 +30,12 @@ Before 1.0, minor versions may break the API; every break is listed under
 - Indicators `wma`, `trange`, `atr` and `natr` in the Rust core, with golden,
   parity and edge-case coverage. They reach the Python API when the M2
   generator writes the bindings.
+- `cargo xtask generate` writes the indicator module list, the PyO3 bindings,
+  the Python wrappers and aliases, the stream factories and the type stubs from
+  every `spec.yaml`; `cargo xtask regen-check` fails when any of them is stale.
+  Adding an indicator is now its own folder plus generated files.
+- `wma`, `trange`, `atr` and `natr` are callable from Python.
+- `docs/PROGRESS.md` tracks all 204 approved indicators, ticked from the
+  repository rather than by hand.
 - `natr` normalises at every period, including `period = 1` where TA-Lib
   returns the raw true range instead (`CONVENTIONS.md` deviation 6).

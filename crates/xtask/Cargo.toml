@@ -10,6 +10,7 @@ authors.workspace = true
 publish = false
 
 [dependencies]
+yaml-rust2 = "0.13"
 
 [lints.rust]
 unsafe_code = "forbid"
