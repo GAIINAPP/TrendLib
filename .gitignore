@@ -218,3 +218,13 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ---------------------------------------------------------------- Rust / build
+/target/
+**/*.rs.bk
+
+# The compiled extension module, dropped in place by `maturin develop`
+/python/trendlib/_core.*
+
+# MkDocs output (M5)
+/site/
