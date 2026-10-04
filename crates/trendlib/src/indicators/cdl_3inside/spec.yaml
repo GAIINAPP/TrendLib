@@ -1,0 +1,25 @@
+name: cdl_3inside
+title: Three Inside Up/Down
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_3inside
+    dtype: int32
+    plot: pattern
+    doc: A harami carried on by a third bar closing past the first bar's open
+talib:
+  name: CDL3INSIDE
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_harami, cdl_3outside, cdl_homingpigeon]

@@ -30,20 +30,30 @@ __all__ = [
     "BBANDS",
     "BOP",
     "CCI",
+    "CDL2CROWS",
+    "CDL3BLACKCROWS",
+    "CDL3INSIDE",
+    "CDL3OUTSIDE",
+    "CDL3WHITESOLDIERS",
     "CDLBELTHOLD",
     "CDLCLOSINGMARUBOZU",
     "CDLCOUNTERATTACK",
     "CDLDARKCLOUDCOVER",
     "CDLDOJI",
+    "CDLDOJISTAR",
     "CDLDRAGONFLYDOJI",
     "CDLENGULFING",
+    "CDLGAPSIDESIDEWHITE",
     "CDLGRAVESTONEDOJI",
     "CDLHAMMER",
+    "CDLHANGINGMAN",
     "CDLHARAMI",
     "CDLHARAMICROSS",
     "CDLHIGHWAVE",
     "CDLHOMINGPIGEON",
+    "CDLIDENTICAL3CROWS",
     "CDLINNECK",
+    "CDLINVERTEDHAMMER",
     "CDLKICKING",
     "CDLKICKINGBYLENGTH",
     "CDLLONGLEGGEDDOJI",
@@ -52,11 +62,16 @@ __all__ = [
     "CDLMATCHINGLOW",
     "CDLONNECK",
     "CDLPIERCING",
+    "CDLRICKSHAWMAN",
     "CDLSEPARATINGLINES",
+    "CDLSHOOTINGSTAR",
     "CDLSHORTLINE",
     "CDLSPINNINGTOP",
+    "CDLSTICKSANDWICH",
     "CDLTAKURI",
+    "CDLTASUKIGAP",
     "CDLTHRUSTING",
+    "CDLUPSIDEGAP2CROWS",
     "CDLXSIDEGAP3METHODS",
     "CEIL",
     "CMO",
@@ -155,20 +170,30 @@ __all__ = [
     "bbands",
     "bop",
     "cci",
+    "cdl_2crows",
+    "cdl_3blackcrows",
+    "cdl_3inside",
+    "cdl_3outside",
+    "cdl_3whitesoldiers",
     "cdl_belthold",
     "cdl_closingmarubozu",
     "cdl_counterattack",
     "cdl_darkcloudcover",
     "cdl_doji",
+    "cdl_dojistar",
     "cdl_dragonflydoji",
     "cdl_engulfing",
+    "cdl_gapsidesidewhite",
     "cdl_gravestonedoji",
     "cdl_hammer",
+    "cdl_hangingman",
     "cdl_harami",
     "cdl_haramicross",
     "cdl_highwave",
     "cdl_homingpigeon",
+    "cdl_identical3crows",
     "cdl_inneck",
+    "cdl_invertedhammer",
     "cdl_kicking",
     "cdl_kickingbylength",
     "cdl_longleggeddoji",
@@ -177,11 +202,16 @@ __all__ = [
     "cdl_matchinglow",
     "cdl_onneck",
     "cdl_piercing",
+    "cdl_rickshawman",
     "cdl_separatinglines",
+    "cdl_shootingstar",
     "cdl_shortline",
     "cdl_spinningtop",
+    "cdl_sticksandwich",
     "cdl_takuri",
+    "cdl_tasukigap",
     "cdl_thrusting",
+    "cdl_upsidegap2crows",
     "cdl_xsidegap3methods",
     "ceil",
     "cmo",
@@ -761,6 +791,146 @@ def cci(
     return _convert.wrap_outputs(out, carrier, ("cci",))
 
 
+def cdl_2crows(open=None, high=None, low=None, close=None) -> Any:
+    """Two Crows.
+
+    Returns
+    -------
+    ndarray or Series
+        A long white bar, a black one gapping above it, then a black one closing back inside it.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_2crows",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_2crows(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_2crows",))
+
+
+def cdl_3blackcrows(open=None, high=None, low=None, close=None) -> Any:
+    """Three Black Crows.
+
+    Returns
+    -------
+    ndarray or Series
+        Three black bars each opening inside the last body and closing lower, after a white one.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_3blackcrows",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_3blackcrows(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_3blackcrows",))
+
+
+def cdl_3inside(open=None, high=None, low=None, close=None) -> Any:
+    """Three Inside Up/Down.
+
+    Returns
+    -------
+    ndarray or Series
+        A harami carried on by a third bar closing past the first bar's open.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_3inside",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_3inside(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_3inside",))
+
+
+def cdl_3outside(open=None, high=None, low=None, close=None) -> Any:
+    """Three Outside Up/Down.
+
+    Returns
+    -------
+    ndarray or Series
+        An engulfing pattern carried on by a third bar closing further in the same direction.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_3outside",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_3outside(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_3outside",))
+
+
+def cdl_3whitesoldiers(open=None, high=None, low=None, close=None) -> Any:
+    """Three Advancing White Soldiers.
+
+    Returns
+    -------
+    ndarray or Series
+        Three white bars each opening inside the last body and closing higher without shortening.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_3whitesoldiers",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_3whitesoldiers(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_3whitesoldiers",))
+
+
 def cdl_belthold(open=None, high=None, low=None, close=None) -> Any:
     """Belt Hold.
 
@@ -914,6 +1084,34 @@ def cdl_doji(open=None, high=None, low=None, close=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("cdl_doji",))
 
 
+def cdl_dojistar(open=None, high=None, low=None, close=None) -> Any:
+    """Doji Star.
+
+    Returns
+    -------
+    ndarray or Series
+        A doji whose body gaps clear of the long body before it.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_dojistar",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_dojistar(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_dojistar",))
+
+
 def cdl_dragonflydoji(open=None, high=None, low=None, close=None) -> Any:
     """Dragonfly Doji.
 
@@ -970,6 +1168,34 @@ def cdl_engulfing(open=None, high=None, low=None, close=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("cdl_engulfing",))
 
 
+def cdl_gapsidesidewhite(open=None, high=None, low=None, close=None) -> Any:
+    """Up/Down-gap Side-by-side White Lines.
+
+    Returns
+    -------
+    ndarray or Series
+        Two white bars of the same size opening at the same price, both on the far side of a gap.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_gapsidesidewhite",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_gapsidesidewhite(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_gapsidesidewhite",))
+
+
 def cdl_gravestonedoji(open=None, high=None, low=None, close=None) -> Any:
     """Gravestone Doji.
 
@@ -1024,6 +1250,34 @@ def cdl_hammer(open=None, high=None, low=None, close=None) -> Any:
     )
     out = _core.cdl_hammer(*columns)
     return _convert.wrap_outputs(out, carrier, ("cdl_hammer",))
+
+
+def cdl_hangingman(open=None, high=None, low=None, close=None) -> Any:
+    """Hanging Man.
+
+    Returns
+    -------
+    ndarray or Series
+        A short body with a long tail below it, sitting near the previous high.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_hangingman",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_hangingman(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_hangingman",))
 
 
 def cdl_harami(open=None, high=None, low=None, close=None) -> Any:
@@ -1138,6 +1392,34 @@ def cdl_homingpigeon(open=None, high=None, low=None, close=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("cdl_homingpigeon",))
 
 
+def cdl_identical3crows(open=None, high=None, low=None, close=None) -> Any:
+    """Identical Three Crows.
+
+    Returns
+    -------
+    ndarray or Series
+        Three black bars each opening where the last one closed and closing lower.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_identical3crows",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_identical3crows(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_identical3crows",))
+
+
 def cdl_inneck(open=None, high=None, low=None, close=None) -> Any:
     """In Neck Pattern.
 
@@ -1164,6 +1446,34 @@ def cdl_inneck(open=None, high=None, low=None, close=None) -> Any:
     )
     out = _core.cdl_inneck(*columns)
     return _convert.wrap_outputs(out, carrier, ("cdl_inneck",))
+
+
+def cdl_invertedhammer(open=None, high=None, low=None, close=None) -> Any:
+    """Inverted Hammer.
+
+    Returns
+    -------
+    ndarray or Series
+        A short body with a long wick above it, opening below the previous body.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_invertedhammer",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_invertedhammer(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_invertedhammer",))
 
 
 def cdl_kicking(open=None, high=None, low=None, close=None) -> Any:
@@ -1390,6 +1700,34 @@ def cdl_piercing(open=None, high=None, low=None, close=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("cdl_piercing",))
 
 
+def cdl_rickshawman(open=None, high=None, low=None, close=None) -> Any:
+    """Rickshaw Man.
+
+    Returns
+    -------
+    ndarray or Series
+        A doji with a long wick on each side and its body near the middle of the range.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_rickshawman",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_rickshawman(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_rickshawman",))
+
+
 def cdl_separatinglines(open=None, high=None, low=None, close=None) -> Any:
     """Separating Lines.
 
@@ -1416,6 +1754,34 @@ def cdl_separatinglines(open=None, high=None, low=None, close=None) -> Any:
     )
     out = _core.cdl_separatinglines(*columns)
     return _convert.wrap_outputs(out, carrier, ("cdl_separatinglines",))
+
+
+def cdl_shootingstar(open=None, high=None, low=None, close=None) -> Any:
+    """Shooting Star.
+
+    Returns
+    -------
+    ndarray or Series
+        A short body with a long wick above it, opening above the previous body.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_shootingstar",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_shootingstar(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_shootingstar",))
 
 
 def cdl_shortline(open=None, high=None, low=None, close=None) -> Any:
@@ -1474,6 +1840,34 @@ def cdl_spinningtop(open=None, high=None, low=None, close=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("cdl_spinningtop",))
 
 
+def cdl_sticksandwich(open=None, high=None, low=None, close=None) -> Any:
+    """Stick Sandwich.
+
+    Returns
+    -------
+    ndarray or Series
+        Two black bars closing at the same price with a white one between them.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_sticksandwich",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_sticksandwich(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_sticksandwich",))
+
+
 def cdl_takuri(open=None, high=None, low=None, close=None) -> Any:
     """Takuri Line.
 
@@ -1502,6 +1896,34 @@ def cdl_takuri(open=None, high=None, low=None, close=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("cdl_takuri",))
 
 
+def cdl_tasukigap(open=None, high=None, low=None, close=None) -> Any:
+    """Tasuki Gap.
+
+    Returns
+    -------
+    ndarray or Series
+        A gap, then a bar of the other colour that opens inside the gapping body and closes into the gap without filling it.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_tasukigap",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_tasukigap(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_tasukigap",))
+
+
 def cdl_thrusting(open=None, high=None, low=None, close=None) -> Any:
     """Thrusting Pattern.
 
@@ -1528,6 +1950,34 @@ def cdl_thrusting(open=None, high=None, low=None, close=None) -> Any:
     )
     out = _core.cdl_thrusting(*columns)
     return _convert.wrap_outputs(out, carrier, ("cdl_thrusting",))
+
+
+def cdl_upsidegap2crows(open=None, high=None, low=None, close=None) -> Any:
+    """Upside Gap Two Crows.
+
+    Returns
+    -------
+    ndarray or Series
+        A long white bar, then two black ones above it, the second swallowing the first without closing the gap.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_upsidegap2crows",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_upsidegap2crows(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_upsidegap2crows",))
 
 
 def cdl_xsidegap3methods(open=None, high=None, low=None, close=None) -> Any:
@@ -3667,6 +4117,31 @@ def CCI(high, low, close, timeperiod: int = _PARAMS["cci"]["period"]["default"])
     return cci(high, low, close, period=timeperiod)
 
 
+def CDL2CROWS(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_2crows`."""
+    return cdl_2crows(open, high, low, close)
+
+
+def CDL3BLACKCROWS(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_3blackcrows`."""
+    return cdl_3blackcrows(open, high, low, close)
+
+
+def CDL3INSIDE(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_3inside`."""
+    return cdl_3inside(open, high, low, close)
+
+
+def CDL3OUTSIDE(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_3outside`."""
+    return cdl_3outside(open, high, low, close)
+
+
+def CDL3WHITESOLDIERS(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_3whitesoldiers`."""
+    return cdl_3whitesoldiers(open, high, low, close)
+
+
 def CDLBELTHOLD(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`cdl_belthold`."""
     return cdl_belthold(open, high, low, close)
@@ -3698,6 +4173,11 @@ def CDLDOJI(open, high, low, close) -> Any:
     return cdl_doji(open, high, low, close)
 
 
+def CDLDOJISTAR(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_dojistar`."""
+    return cdl_dojistar(open, high, low, close)
+
+
 def CDLDRAGONFLYDOJI(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`cdl_dragonflydoji`."""
     return cdl_dragonflydoji(open, high, low, close)
@@ -3708,6 +4188,11 @@ def CDLENGULFING(open, high, low, close) -> Any:
     return cdl_engulfing(open, high, low, close)
 
 
+def CDLGAPSIDESIDEWHITE(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_gapsidesidewhite`."""
+    return cdl_gapsidesidewhite(open, high, low, close)
+
+
 def CDLGRAVESTONEDOJI(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`cdl_gravestonedoji`."""
     return cdl_gravestonedoji(open, high, low, close)
@@ -3716,6 +4201,11 @@ def CDLGRAVESTONEDOJI(open, high, low, close) -> Any:
 def CDLHAMMER(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`cdl_hammer`."""
     return cdl_hammer(open, high, low, close)
+
+
+def CDLHANGINGMAN(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_hangingman`."""
+    return cdl_hangingman(open, high, low, close)
 
 
 def CDLHARAMI(open, high, low, close) -> Any:
@@ -3738,9 +4228,19 @@ def CDLHOMINGPIGEON(open, high, low, close) -> Any:
     return cdl_homingpigeon(open, high, low, close)
 
 
+def CDLIDENTICAL3CROWS(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_identical3crows`."""
+    return cdl_identical3crows(open, high, low, close)
+
+
 def CDLINNECK(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`cdl_inneck`."""
     return cdl_inneck(open, high, low, close)
+
+
+def CDLINVERTEDHAMMER(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_invertedhammer`."""
+    return cdl_invertedhammer(open, high, low, close)
 
 
 def CDLKICKING(open, high, low, close) -> Any:
@@ -3783,9 +4283,19 @@ def CDLPIERCING(open, high, low, close) -> Any:
     return cdl_piercing(open, high, low, close)
 
 
+def CDLRICKSHAWMAN(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_rickshawman`."""
+    return cdl_rickshawman(open, high, low, close)
+
+
 def CDLSEPARATINGLINES(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`cdl_separatinglines`."""
     return cdl_separatinglines(open, high, low, close)
+
+
+def CDLSHOOTINGSTAR(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_shootingstar`."""
+    return cdl_shootingstar(open, high, low, close)
 
 
 def CDLSHORTLINE(open, high, low, close) -> Any:
@@ -3798,14 +4308,29 @@ def CDLSPINNINGTOP(open, high, low, close) -> Any:
     return cdl_spinningtop(open, high, low, close)
 
 
+def CDLSTICKSANDWICH(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_sticksandwich`."""
+    return cdl_sticksandwich(open, high, low, close)
+
+
 def CDLTAKURI(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`cdl_takuri`."""
     return cdl_takuri(open, high, low, close)
 
 
+def CDLTASUKIGAP(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_tasukigap`."""
+    return cdl_tasukigap(open, high, low, close)
+
+
 def CDLTHRUSTING(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`cdl_thrusting`."""
     return cdl_thrusting(open, high, low, close)
+
+
+def CDLUPSIDEGAP2CROWS(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_upsidegap2crows`."""
+    return cdl_upsidegap2crows(open, high, low, close)
 
 
 def CDLXSIDEGAP3METHODS(open, high, low, close) -> Any:

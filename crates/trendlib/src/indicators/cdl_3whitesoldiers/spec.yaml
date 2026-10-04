@@ -1,0 +1,25 @@
+name: cdl_3whitesoldiers
+title: Three Advancing White Soldiers
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_3whitesoldiers
+    dtype: int32
+    plot: pattern
+    doc: Three white bars each opening inside the last body and closing higher without shortening
+talib:
+  name: CDL3WHITESOLDIERS
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_3blackcrows, cdl_advanceblock, cdl_identical3crows]

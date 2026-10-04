@@ -1,0 +1,25 @@
+name: cdl_rickshawman
+title: Rickshaw Man
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_rickshawman
+    dtype: int32
+    plot: pattern
+    doc: A doji with a long wick on each side and its body near the middle of the range
+talib:
+  name: CDLRICKSHAWMAN
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_longleggeddoji, cdl_doji, cdl_highwave]

@@ -31,20 +31,30 @@ __all__ = [
     "bbands",
     "bop",
     "cci",
+    "cdl_2crows",
+    "cdl_3blackcrows",
+    "cdl_3inside",
+    "cdl_3outside",
+    "cdl_3whitesoldiers",
     "cdl_belthold",
     "cdl_closingmarubozu",
     "cdl_counterattack",
     "cdl_darkcloudcover",
     "cdl_doji",
+    "cdl_dojistar",
     "cdl_dragonflydoji",
     "cdl_engulfing",
+    "cdl_gapsidesidewhite",
     "cdl_gravestonedoji",
     "cdl_hammer",
+    "cdl_hangingman",
     "cdl_harami",
     "cdl_haramicross",
     "cdl_highwave",
     "cdl_homingpigeon",
+    "cdl_identical3crows",
     "cdl_inneck",
+    "cdl_invertedhammer",
     "cdl_kicking",
     "cdl_kickingbylength",
     "cdl_longleggeddoji",
@@ -53,11 +63,16 @@ __all__ = [
     "cdl_matchinglow",
     "cdl_onneck",
     "cdl_piercing",
+    "cdl_rickshawman",
     "cdl_separatinglines",
+    "cdl_shootingstar",
     "cdl_shortline",
     "cdl_spinningtop",
+    "cdl_sticksandwich",
     "cdl_takuri",
+    "cdl_tasukigap",
     "cdl_thrusting",
+    "cdl_upsidegap2crows",
     "cdl_xsidegap3methods",
     "ceil",
     "cmo",
@@ -329,6 +344,91 @@ cci = Factory(
     ),
     ("cci",),
 )
+cdl_2crows = Factory(
+    "cdl_2crows",
+    _core.Cdl2crowsStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_2crows",),
+)
+cdl_3blackcrows = Factory(
+    "cdl_3blackcrows",
+    _core.Cdl3blackcrowsStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_3blackcrows",),
+)
+cdl_3inside = Factory(
+    "cdl_3inside",
+    _core.Cdl3insideStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_3inside",),
+)
+cdl_3outside = Factory(
+    "cdl_3outside",
+    _core.Cdl3outsideStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_3outside",),
+)
+cdl_3whitesoldiers = Factory(
+    "cdl_3whitesoldiers",
+    _core.Cdl3whitesoldiersStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_3whitesoldiers",),
+)
 cdl_belthold = Factory(
     "cdl_belthold",
     _core.CdlBeltholdStream,
@@ -414,6 +514,23 @@ cdl_doji = Factory(
     ),
     ("cdl_doji",),
 )
+cdl_dojistar = Factory(
+    "cdl_dojistar",
+    _core.CdlDojistarStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_dojistar",),
+)
 cdl_dragonflydoji = Factory(
     "cdl_dragonflydoji",
     _core.CdlDragonflydojiStream,
@@ -448,6 +565,23 @@ cdl_engulfing = Factory(
     ),
     ("cdl_engulfing",),
 )
+cdl_gapsidesidewhite = Factory(
+    "cdl_gapsidesidewhite",
+    _core.CdlGapsidesidewhiteStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_gapsidesidewhite",),
+)
 cdl_gravestonedoji = Factory(
     "cdl_gravestonedoji",
     _core.CdlGravestonedojiStream,
@@ -481,6 +615,23 @@ cdl_hammer = Factory(
         "close",
     ),
     ("cdl_hammer",),
+)
+cdl_hangingman = Factory(
+    "cdl_hangingman",
+    _core.CdlHangingmanStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_hangingman",),
 )
 cdl_harami = Factory(
     "cdl_harami",
@@ -550,6 +701,23 @@ cdl_homingpigeon = Factory(
     ),
     ("cdl_homingpigeon",),
 )
+cdl_identical3crows = Factory(
+    "cdl_identical3crows",
+    _core.CdlIdentical3crowsStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_identical3crows",),
+)
 cdl_inneck = Factory(
     "cdl_inneck",
     _core.CdlInneckStream,
@@ -566,6 +734,23 @@ cdl_inneck = Factory(
         "close",
     ),
     ("cdl_inneck",),
+)
+cdl_invertedhammer = Factory(
+    "cdl_invertedhammer",
+    _core.CdlInvertedhammerStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_invertedhammer",),
 )
 cdl_kicking = Factory(
     "cdl_kicking",
@@ -703,6 +888,23 @@ cdl_piercing = Factory(
     ),
     ("cdl_piercing",),
 )
+cdl_rickshawman = Factory(
+    "cdl_rickshawman",
+    _core.CdlRickshawmanStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_rickshawman",),
+)
 cdl_separatinglines = Factory(
     "cdl_separatinglines",
     _core.CdlSeparatinglinesStream,
@@ -719,6 +921,23 @@ cdl_separatinglines = Factory(
         "close",
     ),
     ("cdl_separatinglines",),
+)
+cdl_shootingstar = Factory(
+    "cdl_shootingstar",
+    _core.CdlShootingstarStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_shootingstar",),
 )
 cdl_shortline = Factory(
     "cdl_shortline",
@@ -754,6 +973,23 @@ cdl_spinningtop = Factory(
     ),
     ("cdl_spinningtop",),
 )
+cdl_sticksandwich = Factory(
+    "cdl_sticksandwich",
+    _core.CdlSticksandwichStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_sticksandwich",),
+)
 cdl_takuri = Factory(
     "cdl_takuri",
     _core.CdlTakuriStream,
@@ -771,6 +1007,23 @@ cdl_takuri = Factory(
     ),
     ("cdl_takuri",),
 )
+cdl_tasukigap = Factory(
+    "cdl_tasukigap",
+    _core.CdlTasukigapStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_tasukigap",),
+)
 cdl_thrusting = Factory(
     "cdl_thrusting",
     _core.CdlThrustingStream,
@@ -787,6 +1040,23 @@ cdl_thrusting = Factory(
         "close",
     ),
     ("cdl_thrusting",),
+)
+cdl_upsidegap2crows = Factory(
+    "cdl_upsidegap2crows",
+    _core.CdlUpsidegap2crowsStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_upsidegap2crows",),
 )
 cdl_xsidegap3methods = Factory(
     "cdl_xsidegap3methods",

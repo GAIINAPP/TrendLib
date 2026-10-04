@@ -1,0 +1,25 @@
+name: cdl_gapsidesidewhite
+title: Up/Down-gap Side-by-side White Lines
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_gapsidesidewhite
+    dtype: int32
+    plot: pattern
+    doc: Two white bars of the same size opening at the same price, both on the far side of a gap
+talib:
+  name: CDLGAPSIDESIDEWHITE
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_tasukigap, cdl_xsidegap3methods, cdl_risefall3methods]

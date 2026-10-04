@@ -2,8 +2,8 @@
 
 # Progress
 
-**125 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 79 not started.
+**140 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 64 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -25,7 +25,7 @@ something is done that is not. CI checks it is current.
 | Statistics | 9 | 11 |
 | Math transforms | 15 | 15 |
 | Math operators | 12 | 12 |
-| Candlestick patterns | 28 | 61 |
+| Candlestick patterns | 43 | 61 |
 | Levels | 0 | 3 |
 
 ## Overlap studies (19 of 25)
@@ -195,15 +195,15 @@ something is done that is not. CI checks it is current.
 - [x] `sub` (`SUB`) -- Vector Subtraction
 - [x] `sum` (`SUM`) -- Summation
 
-## Candlestick patterns (28 of 61)
+## Candlestick patterns (43 of 61)
 
-- [ ] `cdl_2crows` (`CDL2CROWS`)
-- [ ] `cdl_3blackcrows` (`CDL3BLACKCROWS`)
-- [ ] `cdl_3inside` (`CDL3INSIDE`)
+- [x] `cdl_2crows` (`CDL2CROWS`) -- Two Crows
+- [x] `cdl_3blackcrows` (`CDL3BLACKCROWS`) -- Three Black Crows
+- [x] `cdl_3inside` (`CDL3INSIDE`) -- Three Inside Up/Down
 - [ ] `cdl_3linestrike` (`CDL3LINESTRIKE`)
-- [ ] `cdl_3outside` (`CDL3OUTSIDE`)
+- [x] `cdl_3outside` (`CDL3OUTSIDE`) -- Three Outside Up/Down
 - [ ] `cdl_3starsinsouth` (`CDL3STARSINSOUTH`)
-- [ ] `cdl_3whitesoldiers` (`CDL3WHITESOLDIERS`)
+- [x] `cdl_3whitesoldiers` (`CDL3WHITESOLDIERS`) -- Three Advancing White Soldiers
 - [ ] `cdl_abandonedbaby` (`CDLABANDONEDBABY`)
 - [ ] `cdl_advanceblock` (`CDLADVANCEBLOCK`)
 - [x] `cdl_belthold` (`CDLBELTHOLD`) -- Belt Hold
@@ -213,24 +213,24 @@ something is done that is not. CI checks it is current.
 - [x] `cdl_counterattack` (`CDLCOUNTERATTACK`) -- Counterattack
 - [x] `cdl_darkcloudcover` (`CDLDARKCLOUDCOVER`) -- Dark Cloud Cover
 - [x] `cdl_doji` (`CDLDOJI`) -- Doji *
-- [ ] `cdl_dojistar` (`CDLDOJISTAR`)
+- [x] `cdl_dojistar` (`CDLDOJISTAR`) -- Doji Star
 - [x] `cdl_dragonflydoji` (`CDLDRAGONFLYDOJI`) -- Dragonfly Doji
 - [x] `cdl_engulfing` (`CDLENGULFING`) -- Engulfing Pattern *
 - [ ] `cdl_eveningdojistar` (`CDLEVENINGDOJISTAR`)
 - [ ] `cdl_eveningstar` (`CDLEVENINGSTAR`)
-- [ ] `cdl_gapsidesidewhite` (`CDLGAPSIDESIDEWHITE`)
+- [x] `cdl_gapsidesidewhite` (`CDLGAPSIDESIDEWHITE`) -- Up/Down-gap Side-by-side White Lines
 - [x] `cdl_gravestonedoji` (`CDLGRAVESTONEDOJI`) -- Gravestone Doji
 - [x] `cdl_hammer` (`CDLHAMMER`) -- Hammer *
-- [ ] `cdl_hangingman` (`CDLHANGINGMAN`)
+- [x] `cdl_hangingman` (`CDLHANGINGMAN`) -- Hanging Man
 - [x] `cdl_harami` (`CDLHARAMI`) -- Harami Pattern
 - [x] `cdl_haramicross` (`CDLHARAMICROSS`) -- Harami Cross Pattern
 - [x] `cdl_highwave` (`CDLHIGHWAVE`) -- High Wave Candle
 - [ ] `cdl_hikkake` (`CDLHIKKAKE`)
 - [ ] `cdl_hikkakemod` (`CDLHIKKAKEMOD`)
 - [x] `cdl_homingpigeon` (`CDLHOMINGPIGEON`) -- Homing Pigeon
-- [ ] `cdl_identical3crows` (`CDLIDENTICAL3CROWS`)
+- [x] `cdl_identical3crows` (`CDLIDENTICAL3CROWS`) -- Identical Three Crows
 - [x] `cdl_inneck` (`CDLINNECK`) -- In Neck Pattern
-- [ ] `cdl_invertedhammer` (`CDLINVERTEDHAMMER`)
+- [x] `cdl_invertedhammer` (`CDLINVERTEDHAMMER`) -- Inverted Hammer
 - [x] `cdl_kicking` (`CDLKICKING`) -- Kicking
 - [x] `cdl_kickingbylength` (`CDLKICKINGBYLENGTH`) -- Kicking by Length
 - [ ] `cdl_ladderbottom` (`CDLLADDERBOTTOM`)
@@ -243,20 +243,20 @@ something is done that is not. CI checks it is current.
 - [ ] `cdl_morningstar` (`CDLMORNINGSTAR`)
 - [x] `cdl_onneck` (`CDLONNECK`) -- On Neck Pattern
 - [x] `cdl_piercing` (`CDLPIERCING`) -- Piercing Pattern
-- [ ] `cdl_rickshawman` (`CDLRICKSHAWMAN`)
+- [x] `cdl_rickshawman` (`CDLRICKSHAWMAN`) -- Rickshaw Man
 - [ ] `cdl_risefall3methods` (`CDLRISEFALL3METHODS`)
 - [x] `cdl_separatinglines` (`CDLSEPARATINGLINES`) -- Separating Lines
-- [ ] `cdl_shootingstar` (`CDLSHOOTINGSTAR`)
+- [x] `cdl_shootingstar` (`CDLSHOOTINGSTAR`) -- Shooting Star
 - [x] `cdl_shortline` (`CDLSHORTLINE`) -- Short Line Candle
 - [x] `cdl_spinningtop` (`CDLSPINNINGTOP`) -- Spinning Top
 - [ ] `cdl_stalledpattern` (`CDLSTALLEDPATTERN`)
-- [ ] `cdl_sticksandwich` (`CDLSTICKSANDWICH`)
+- [x] `cdl_sticksandwich` (`CDLSTICKSANDWICH`) -- Stick Sandwich
 - [x] `cdl_takuri` (`CDLTAKURI`) -- Takuri Line
-- [ ] `cdl_tasukigap` (`CDLTASUKIGAP`)
+- [x] `cdl_tasukigap` (`CDLTASUKIGAP`) -- Tasuki Gap
 - [x] `cdl_thrusting` (`CDLTHRUSTING`) -- Thrusting Pattern
 - [ ] `cdl_tristar` (`CDLTRISTAR`)
 - [ ] `cdl_unique3river` (`CDLUNIQUE3RIVER`)
-- [ ] `cdl_upsidegap2crows` (`CDLUPSIDEGAP2CROWS`)
+- [x] `cdl_upsidegap2crows` (`CDLUPSIDEGAP2CROWS`) -- Upside Gap Two Crows
 - [x] `cdl_xsidegap3methods` (`CDLXSIDEGAP3METHODS`) -- Upside/Downside Gap Three Methods
 
 ## Levels (0 of 3)

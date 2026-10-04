@@ -1,0 +1,25 @@
+name: cdl_2crows
+title: Two Crows
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_2crows
+    dtype: int32
+    plot: pattern
+    doc: A long white bar, a black one gapping above it, then a black one closing back inside it
+talib:
+  name: CDL2CROWS
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_upsidegap2crows, cdl_darkcloudcover, cdl_eveningstar]

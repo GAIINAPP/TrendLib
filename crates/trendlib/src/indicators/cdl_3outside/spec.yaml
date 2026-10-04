@@ -1,0 +1,25 @@
+name: cdl_3outside
+title: Three Outside Up/Down
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_3outside
+    dtype: int32
+    plot: pattern
+    doc: An engulfing pattern carried on by a third bar closing further in the same direction
+talib:
+  name: CDL3OUTSIDE
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_engulfing, cdl_3inside, cdl_harami]

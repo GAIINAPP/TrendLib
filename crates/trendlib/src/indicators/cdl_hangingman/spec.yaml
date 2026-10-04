@@ -1,0 +1,25 @@
+name: cdl_hangingman
+title: Hanging Man
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_hangingman
+    dtype: int32
+    plot: pattern
+    doc: A short body with a long tail below it, sitting near the previous high
+talib:
+  name: CDLHANGINGMAN
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_hammer, cdl_shootingstar, cdl_invertedhammer]

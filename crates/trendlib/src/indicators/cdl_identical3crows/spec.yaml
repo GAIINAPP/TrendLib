@@ -1,0 +1,25 @@
+name: cdl_identical3crows
+title: Identical Three Crows
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_identical3crows
+    dtype: int32
+    plot: pattern
+    doc: Three black bars each opening where the last one closed and closing lower
+talib:
+  name: CDLIDENTICAL3CROWS
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_3blackcrows, cdl_2crows, cdl_3whitesoldiers]

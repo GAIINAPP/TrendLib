@@ -1,0 +1,25 @@
+name: cdl_shootingstar
+title: Shooting Star
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_shootingstar
+    dtype: int32
+    plot: pattern
+    doc: A short body with a long wick above it, opening above the previous body
+talib:
+  name: CDLSHOOTINGSTAR
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_invertedhammer, cdl_hangingman, cdl_gravestonedoji]
