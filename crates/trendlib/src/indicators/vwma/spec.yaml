@@ -1,0 +1,28 @@
+name: vwma
+title: Volume Weighted Moving Average
+group: overlap
+flags: [overlap, nan_inf_output]
+inputs:
+  - name: close
+    kind: close
+  - name: volume
+    kind: volume
+params:
+  - name: period
+    type: int
+    default: 30
+    min: 1
+    max: 100000
+    doc: Number of bars the average is taken over
+outputs:
+  - name: vwma
+    dtype: float64
+    plot: line
+    doc: Average close over the window, each bar weighted by its volume
+talib:
+  name: VWMA
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - TA-Lib, ta_VWMA.c
+see_also: [sma, vwap]

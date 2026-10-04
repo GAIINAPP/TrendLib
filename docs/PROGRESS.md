@@ -2,8 +2,8 @@
 
 # Progress
 
-**80 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 124 not started.
+**84 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 120 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -16,11 +16,11 @@ something is done that is not. CI checks it is current.
 
 | Group | Shipped | Total |
 | --- | --- | --- |
-| Overlap studies | 11 | 25 |
-| Momentum | 25 | 47 |
+| Overlap studies | 13 | 25 |
+| Momentum | 26 | 47 |
 | Volatility | 3 | 7 |
 | Volume | 2 | 12 |
-| Price transforms | 5 | 6 |
+| Price transforms | 6 | 6 |
 | Cycle | 0 | 5 |
 | Statistics | 7 | 11 |
 | Math transforms | 15 | 15 |
@@ -28,12 +28,12 @@ something is done that is not. CI checks it is current.
 | Candlestick patterns | 0 | 61 |
 | Levels | 0 | 3 |
 
-## Overlap studies (11 of 25)
+## Overlap studies (13 of 25)
 
 - [ ] `accbands` (`ACCBANDS`)
 - [x] `bbands` (`BBANDS`) -- Bollinger Bands *
 - [x] `dema` (`DEMA`) -- Double Exponential Moving Average *
-- [ ] `donchian` (`DONCHIAN`)
+- [x] `donchian` (`DONCHIAN`) -- Donchian Channel
 - [x] `ema` (`EMA`) -- Exponential Moving Average *
 - [ ] `hma` (`HMA`)
 - [ ] `ht_trendline` (`HT_TRENDLINE`)
@@ -42,8 +42,8 @@ something is done that is not. CI checks it is current.
 - [x] `ma` (`MA`) -- Moving Average
 - [ ] `mama` (`MAMA`)
 - [ ] `mavp` (`MAVP`)
-- [x] `midpoint` (`MIDPOINT`) -- Midpoint over Period
-- [x] `midprice` (`MIDPRICE`) -- Midpoint Price over Period
+- [x] `midpoint` (`MIDPOINT`) -- Midpoint
+- [x] `midprice` (`MIDPRICE`) -- Midprice
 - [x] `rma` (`RMA`) -- Wilder Smoothed Moving Average
 - [ ] `sar` (`SAR`)
 - [ ] `sarext` (`SAREXT`)
@@ -52,11 +52,11 @@ something is done that is not. CI checks it is current.
 - [ ] `t3` (`T3`)
 - [x] `tema` (`TEMA`) -- Triple Exponential Moving Average *
 - [x] `trima` (`TRIMA`) -- Triangular Moving Average
-- [ ] `vwma` (`VWMA`)
+- [x] `vwma` (`VWMA`) -- Volume Weighted Moving Average
 - [x] `wma` (`WMA`) -- Weighted Moving Average *
 - [ ] `zlema` (`ZLEMA`)
 
-## Momentum (25 of 47)
+## Momentum (26 of 47)
 
 - [ ] `ac` (`AC`)
 - [x] `adx` (`ADX`) -- Average Directional Movement Index *
@@ -98,7 +98,7 @@ something is done that is not. CI checks it is current.
 - [x] `stoch` (`STOCH`) -- Slow Stochastic *
 - [x] `stochf` (`STOCHF`) -- Fast Stochastic
 - [x] `stochrsi` (`STOCHRSI`) -- Stochastic RSI
-- [ ] `trix` (`TRIX`)
+- [x] `trix` (`TRIX`) -- Triple Exponential Average
 - [ ] `tsi` (`TSI`)
 - [ ] `ultosc` (`ULTOSC`)
 - [ ] `vhf` (`VHF`)
@@ -131,11 +131,11 @@ something is done that is not. CI checks it is current.
 - [ ] `rvol` (`RVOL`)
 - [ ] `vwap` (`VWAP`) *
 
-## Price transforms (5 of 6)
+## Price transforms (6 of 6)
 
 - [x] `avgdev` (`AVGDEV`) -- Average Deviation
 - [x] `avgprice` (`AVGPRICE`) -- Average Price
-- [ ] `ha` (`HA`)
+- [x] `ha` (`HA`) -- Heikin-Ashi Candles
 - [x] `medprice` (`MEDPRICE`) -- Median Price
 - [x] `typprice` (`TYPPRICE`) -- Typical Price
 - [x] `wclprice` (`WCLPRICE`) -- Weighted Close Price

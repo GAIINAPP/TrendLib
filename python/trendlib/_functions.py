@@ -36,10 +36,12 @@ __all__ = [
     "CUMSUM",
     "DEMA",
     "DIV",
+    "DONCHIAN",
     "DX",
     "EMA",
     "EXP",
     "FLOOR",
+    "HA",
     "LINEARREG",
     "LINEARREG_ANGLE",
     "LINEARREG_INTERCEPT",
@@ -87,9 +89,11 @@ __all__ = [
     "TEMA",
     "TRANGE",
     "TRIMA",
+    "TRIX",
     "TSF",
     "TYPPRICE",
     "VAR",
+    "VWMA",
     "WCLPRICE",
     "WILLR",
     "WMA",
@@ -116,10 +120,12 @@ __all__ = [
     "cumsum",
     "dema",
     "div",
+    "donchian",
     "dx",
     "ema",
     "exp",
     "floor",
+    "ha",
     "linearreg",
     "linearreg_angle",
     "linearreg_intercept",
@@ -168,9 +174,11 @@ __all__ = [
     "tema",
     "trange",
     "trima",
+    "trix",
     "tsf",
     "typprice",
     "var",
+    "vwma",
     "wclprice",
     "willr",
     "wma",
@@ -741,6 +749,46 @@ def div(source0=None, source1=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("div",))
 
 
+def donchian(high=None, low=None, *, period: int = _PARAMS["donchian"]["period"]["default"]) -> Any:
+    """Donchian Channel.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Number of bars the channel is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        donchian_upper: Highest high of the last period bars.
+        donchian_middle: Halfway between the upper and lower bands.
+        donchian_lower: Lowest low of the last period bars.
+    """
+    period = _convert.as_int("donchian", "period", period)
+    columns, carrier = _convert.bars(
+        "donchian",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.donchian(*columns, period=period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "donchian_upper",
+            "donchian_middle",
+            "donchian_lower",
+        ),
+    )
+
+
 def dx(high=None, low=None, close=None, *, period: int = _PARAMS["dx"]["period"]["default"]) -> Any:
     """Directional Movement Index.
 
@@ -816,6 +864,46 @@ def floor(source=None) -> Any:
     columns, carrier = _convert.bars("floor", (source,), ("source",), ("series",))
     out = _core.floor(*columns)
     return _convert.wrap_outputs(out, carrier, ("floor",))
+
+
+def ha(open=None, high=None, low=None, close=None) -> Any:
+    """Heikin-Ashi Candles.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        ha_open: Midpoint of the previous Heikin-Ashi candle.
+        ha_high: Highest of the bar's high and the two Heikin-Ashi ends.
+        ha_low: Lowest of the bar's low and the two Heikin-Ashi ends.
+        ha_close: Average of the bar's open, high, low and close.
+    """
+    columns, carrier = _convert.bars(
+        "ha",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.ha(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "ha_open",
+            "ha_high",
+            "ha_low",
+            "ha_close",
+        ),
+    )
 
 
 def linearreg(source=None, *, period: int = _PARAMS["linearreg"]["period"]["default"]) -> Any:
@@ -1059,17 +1147,17 @@ def medprice(high=None, low=None) -> Any:
 
 
 def midpoint(source=None, *, period: int = _PARAMS["midpoint"]["period"]["default"]) -> Any:
-    """Midpoint over Period.
+    """Midpoint.
 
     Parameters
     ----------
     period : int, default 14
-        Number of bars the range is taken over, from 2 to 100000.
+        Number of bars the highest and lowest values are taken from, from 2 to 100000.
 
     Returns
     -------
     ndarray or Series
-        Halfway between the highest and lowest value of the last period bars.
+        Halfway between the highest and lowest value in the window.
     """
     period = _convert.as_int("midpoint", "period", period)
     columns, carrier = _convert.bars("midpoint", (source,), ("source",), ("series",))
@@ -1078,17 +1166,17 @@ def midpoint(source=None, *, period: int = _PARAMS["midpoint"]["period"]["defaul
 
 
 def midprice(high=None, low=None, *, period: int = _PARAMS["midprice"]["period"]["default"]) -> Any:
-    """Midpoint Price over Period.
+    """Midprice.
 
     Parameters
     ----------
     period : int, default 14
-        Number of bars the range is taken over, from 2 to 100000.
+        Number of bars the highest high and lowest low are taken from, from 2 to 100000.
 
     Returns
     -------
     ndarray or Series
-        Halfway between the highest high and the lowest low of the last period bars.
+        Halfway between the highest high and the lowest low in the window.
     """
     period = _convert.as_int("midprice", "period", period)
     columns, carrier = _convert.bars(
@@ -1965,6 +2053,25 @@ def trima(source=None, *, period: int = _PARAMS["trima"]["period"]["default"]) -
     return _convert.wrap_outputs(out, carrier, ("trima",))
 
 
+def trix(source=None, *, period: int = _PARAMS["trix"]["period"]["default"]) -> Any:
+    """Triple Exponential Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars each of the three exponential stages uses, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Bar-to-bar percentage change of the triple exponential average.
+    """
+    period = _convert.as_int("trix", "period", period)
+    columns, carrier = _convert.bars("trix", (source,), ("source",), ("series",))
+    out = _core.trix(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("trix",))
+
+
 def tsf(source=None, *, period: int = _PARAMS["tsf"]["period"]["default"]) -> Any:
     """Time Series Forecast.
 
@@ -2035,6 +2142,36 @@ def var(
     columns, carrier = _convert.bars("var", (source,), ("source",), ("series",))
     out = _core.var(*columns, period=period, nbdev=nbdev)
     return _convert.wrap_outputs(out, carrier, ("var",))
+
+
+def vwma(close=None, volume=None, *, period: int = _PARAMS["vwma"]["period"]["default"]) -> Any:
+    """Volume Weighted Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the average is taken over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Average close over the window, each bar weighted by its volume.
+    """
+    period = _convert.as_int("vwma", "period", period)
+    columns, carrier = _convert.bars(
+        "vwma",
+        (close, volume),
+        (
+            "close",
+            "volume",
+        ),
+        (
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.vwma(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("vwma",))
 
 
 def wclprice(high=None, low=None, close=None) -> Any:
@@ -2253,6 +2390,11 @@ def DIV(source0, source1) -> Any:
     return div(source0, source1)
 
 
+def DONCHIAN(high, low, timeperiod: int = _PARAMS["donchian"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`donchian`."""
+    return donchian(high, low, period=timeperiod)
+
+
 def DX(high, low, close, timeperiod: int = _PARAMS["dx"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`dx`."""
     return dx(high, low, close, period=timeperiod)
@@ -2271,6 +2413,11 @@ def EXP(source) -> Any:
 def FLOOR(source) -> Any:
     """TA-Lib-style alias for :func:`floor`."""
     return floor(source)
+
+
+def HA(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`ha`."""
+    return ha(open, high, low, close)
 
 
 def LINEARREG(source, timeperiod: int = _PARAMS["linearreg"]["period"]["default"]) -> Any:
@@ -2576,6 +2723,11 @@ def TRIMA(source, timeperiod: int = _PARAMS["trima"]["period"]["default"]) -> An
     return trima(source, period=timeperiod)
 
 
+def TRIX(source, timeperiod: int = _PARAMS["trix"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`trix`."""
+    return trix(source, period=timeperiod)
+
+
 def TSF(source, timeperiod: int = _PARAMS["tsf"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`tsf`."""
     return tsf(source, period=timeperiod)
@@ -2593,6 +2745,11 @@ def VAR(
 ) -> Any:
     """TA-Lib-style alias for :func:`var`."""
     return var(source, period=timeperiod, nbdev=nbdev)
+
+
+def VWMA(close, volume, timeperiod: int = _PARAMS["vwma"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`vwma`."""
+    return vwma(close, volume, period=timeperiod)
 
 
 def WCLPRICE(high, low, close) -> Any:

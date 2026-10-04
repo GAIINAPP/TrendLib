@@ -2,9 +2,9 @@ use crate::core::error::TlError;
 use crate::core::kernel::{BarStream, Kernel, Step};
 use crate::core::math::RollingExtreme;
 
-pub const NAME: &str = "midpoint";
+pub const NAME: &str = "donchian";
 
-pub const PERIOD_DEFAULT: usize = 14;
+pub const PERIOD_DEFAULT: usize = 20;
 pub const PERIOD_MIN: usize = 2;
 pub const PERIOD_MAX: usize = 100_000;
 
@@ -27,29 +27,33 @@ pub struct State {
     lowest: RollingExtreme,
 }
 
-impl Step<1, 1> for State {
-    fn push(&mut self, bar: [f64; 1]) -> Option<[f64; 1]> {
+fn channel(top: f64, bottom: f64) -> [f64; 3] {
+    [top, (top + bottom) / 2.0, bottom]
+}
+
+impl Step<2, 3> for State {
+    fn push(&mut self, bar: [f64; 2]) -> Option<[f64; 3]> {
         let top = self.highest.push(bar[0]);
-        let bottom = self.lowest.push(bar[0])?;
-        Some([(top? + bottom) / 2.0])
+        let bottom = self.lowest.push(bar[1])?;
+        Some(channel(top?, bottom))
     }
 
-    fn preview(&self, bar: [f64; 1]) -> Option<[f64; 1]> {
+    fn preview(&self, bar: [f64; 2]) -> Option<[f64; 3]> {
         let top = self.highest.preview(bar[0])?;
-        let bottom = self.lowest.preview(bar[0])?;
-        Some([(top + bottom) / 2.0])
+        let bottom = self.lowest.preview(bar[1])?;
+        Some(channel(top, bottom))
     }
 }
 
 #[derive(Clone, Copy, Debug)]
-pub struct Midpoint;
+pub struct Donchian;
 
-pub type MidpointStream = BarStream<Midpoint, 1, 1>;
+pub type DonchianStream = BarStream<Donchian, 2, 3>;
 
-impl Kernel<1, 1> for Midpoint {
+impl Kernel<2, 3> for Donchian {
     const NAME: &'static str = NAME;
-    const INPUTS: [&'static str; 1] = ["source"];
-    const OUTPUTS: [&'static str; 1] = ["midpoint"];
+    const INPUTS: [&'static str; 2] = ["high", "low"];
+    const OUTPUTS: [&'static str; 3] = ["donchian_upper", "donchian_middle", "donchian_lower"];
 
     type Params = Params;
     type State = State;

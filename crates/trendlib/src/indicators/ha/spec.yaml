@@ -1,0 +1,37 @@
+name: ha
+title: Heikin-Ashi Candles
+group: overlap
+flags: [overlap, path_dependent]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: ha_open
+    dtype: float64
+    plot: line
+    doc: Midpoint of the previous Heikin-Ashi candle
+  - name: ha_high
+    dtype: float64
+    plot: line
+    doc: Highest of the bar's high and the two Heikin-Ashi ends
+  - name: ha_low
+    dtype: float64
+    plot: line
+    doc: Lowest of the bar's low and the two Heikin-Ashi ends
+  - name: ha_close
+    dtype: float64
+    plot: line
+    doc: Average of the bar's open, high, low and close
+talib:
+  name: HA
+  params: {}
+  outputs: [haopen, hahigh, halow, haclose]
+references:
+  - Dan Valcu, Heikin-Ashi How to, Technical Analysis of Stocks and Commodities, February 2004
+see_also: [typprice, avgprice]

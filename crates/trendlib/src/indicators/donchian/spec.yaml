@@ -1,0 +1,36 @@
+name: donchian
+title: Donchian Channel
+group: overlap
+flags: [overlap]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+params:
+  - name: period
+    type: int
+    default: 20
+    min: 2
+    max: 100000
+    doc: Number of bars the channel is taken over
+outputs:
+  - name: donchian_upper
+    dtype: float64
+    plot: upper_band
+    doc: Highest high of the last period bars
+  - name: donchian_middle
+    dtype: float64
+    plot: middle_band
+    doc: Halfway between the upper and lower bands
+  - name: donchian_lower
+    dtype: float64
+    plot: lower_band
+    doc: Lowest low of the last period bars
+talib:
+  name: DONCHIAN
+  params: {period: timeperiod}
+  outputs: [upperband, middleband, lowerband]
+references:
+  - Richard Donchian, Trend Following Methods in Commodity Price Analysis, Commodity Year Book, 1957
+see_also: [midprice, kc]

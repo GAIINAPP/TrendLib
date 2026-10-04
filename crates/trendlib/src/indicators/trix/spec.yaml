@@ -1,0 +1,26 @@
+name: trix
+title: Triple Exponential Average
+group: momentum
+flags: [unstable, path_dependent, nan_inf_output]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 30
+    min: 1
+    max: 100000
+    doc: Number of bars each of the three exponential stages uses
+outputs:
+  - name: trix
+    dtype: float64
+    plot: line
+    doc: Bar-to-bar percentage change of the triple exponential average
+talib:
+  name: TRIX
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Jack K. Hutson, Good Trix, Technical Analysis of Stocks and Commodities, July 1983
+see_also: [tema, rocp, macd]

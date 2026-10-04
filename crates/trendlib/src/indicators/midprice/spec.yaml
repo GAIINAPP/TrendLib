@@ -1,5 +1,5 @@
 name: midprice
-title: Midpoint Price over Period
+title: Midprice
 group: overlap
 flags: [overlap]
 inputs:
@@ -13,16 +13,16 @@ params:
     default: 14
     min: 2
     max: 100000
-    doc: Number of bars the range is taken over
+    doc: Number of bars the highest high and lowest low are taken from
 outputs:
   - name: midprice
     dtype: float64
     plot: line
-    doc: Halfway between the highest high and the lowest low of the last period bars
+    doc: Halfway between the highest high and the lowest low in the window
 talib:
   name: MIDPRICE
   params: {period: timeperiod}
   outputs: [real]
 references:
-  - Steven B. Achelis, Technical Analysis from A to Z, McGraw-Hill, 2000
-see_also: [midpoint, minmax]
+  - TA-Lib, ta_MIDPRICE.c
+see_also: [midpoint, donchian]

@@ -29,15 +29,15 @@ pub struct State {
 
 impl Step<2, 1> for State {
     fn push(&mut self, bar: [f64; 2]) -> Option<[f64; 1]> {
-        let highest = self.highest.push(bar[0]);
-        let lowest = self.lowest.push(bar[1]);
-        Some([(highest? + lowest?) / 2.0])
+        let top = self.highest.push(bar[0]);
+        let bottom = self.lowest.push(bar[1])?;
+        Some([(top? + bottom) / 2.0])
     }
 
     fn preview(&self, bar: [f64; 2]) -> Option<[f64; 1]> {
-        let highest = self.highest.preview(bar[0])?;
-        let lowest = self.lowest.preview(bar[1])?;
-        Some([(highest + lowest) / 2.0])
+        let top = self.highest.preview(bar[0])?;
+        let bottom = self.lowest.preview(bar[1])?;
+        Some([(top + bottom) / 2.0])
     }
 }
 

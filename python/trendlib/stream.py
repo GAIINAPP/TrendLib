@@ -37,10 +37,12 @@ __all__ = [
     "cumsum",
     "dema",
     "div",
+    "donchian",
     "dx",
     "ema",
     "exp",
     "floor",
+    "ha",
     "linearreg",
     "linearreg_angle",
     "linearreg_intercept",
@@ -88,9 +90,11 @@ __all__ = [
     "tema",
     "trange",
     "trima",
+    "trix",
     "tsf",
     "typprice",
     "var",
+    "vwma",
     "wclprice",
     "willr",
     "wma",
@@ -284,6 +288,23 @@ div = Factory(
     ),
     ("div",),
 )
+donchian = Factory(
+    "donchian",
+    _core.DonchianStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "donchian_upper",
+        "donchian_middle",
+        "donchian_lower",
+    ),
+)
 dx = Factory(
     "dx",
     _core.DxStream,
@@ -302,6 +323,28 @@ dx = Factory(
 ema = Factory("ema", _core.EmaStream, ("source",), ("series",), ("ema",))
 exp = Factory("exp", _core.ExpStream, ("source",), ("series",), ("exp",))
 floor = Factory("floor", _core.FloorStream, ("source",), ("series",), ("floor",))
+ha = Factory(
+    "ha",
+    _core.HaStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "ha_open",
+        "ha_high",
+        "ha_low",
+        "ha_close",
+    ),
+)
 linearreg = Factory("linearreg", _core.LinearregStream, ("source",), ("series",), ("linearreg",))
 linearreg_angle = Factory(
     "linearreg_angle", _core.LinearregAngleStream, ("source",), ("series",), ("linearreg_angle",)
@@ -570,6 +613,7 @@ trange = Factory(
     ("trange",),
 )
 trima = Factory("trima", _core.TrimaStream, ("source",), ("series",), ("trima",))
+trix = Factory("trix", _core.TrixStream, ("source",), ("series",), ("trix",))
 tsf = Factory("tsf", _core.TsfStream, ("source",), ("series",), ("tsf",))
 typprice = Factory(
     "typprice",
@@ -587,6 +631,19 @@ typprice = Factory(
     ("typprice",),
 )
 var = Factory("var", _core.VarStream, ("source",), ("series",), ("var",))
+vwma = Factory(
+    "vwma",
+    _core.VwmaStream,
+    (
+        "close",
+        "volume",
+    ),
+    (
+        "close",
+        "volume",
+    ),
+    ("vwma",),
+)
 wclprice = Factory(
     "wclprice",
     _core.WclpriceStream,

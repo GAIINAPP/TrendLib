@@ -1365,6 +1365,67 @@ mod div_adapter {
     }
 }
 
+mod donchian_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::donchian::Donchian;
+    const INPUTS: usize = 2;
+    const OUTPUTS: usize = 3;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "period",
+        default: 20.0,
+        min: 2.0,
+        max: 100000.0,
+        integral: true,
+        choices: &[],
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::donchian::Params {
+        trendlib::indicators::donchian::Params {
+            period: values[0] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "donchian takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::donchian::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false, false, false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod dx_adapter {
     use super::*;
 
@@ -1586,6 +1647,59 @@ mod floor_adapter {
             path_dependent: false,
             absolute_index: false,
             integer_outputs: &[false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod ha_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::ha::Ha;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 4;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::ha::Params {
+        let _ = values;
+        trendlib::indicators::ha::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "ha takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::ha::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[false, false, false, false],
             batch,
             lookback,
             open_and_fill,
@@ -4525,6 +4639,67 @@ mod trima_adapter {
     }
 }
 
+mod trix_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::trix::Trix;
+    const INPUTS: usize = 1;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "period",
+        default: 30.0,
+        min: 1.0,
+        max: 100000.0,
+        integral: true,
+        choices: &[],
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::trix::Params {
+        trendlib::indicators::trix::Params {
+            period: values[0] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "trix takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::trix::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: true,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod tsf_adapter {
     use super::*;
 
@@ -4697,6 +4872,67 @@ mod var_adapter {
     pub fn registered() -> Registered {
         Registered {
             name: trendlib::indicators::var::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: true,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod vwma_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::vwma::Vwma;
+    const INPUTS: usize = 2;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "period",
+        default: 30.0,
+        min: 1.0,
+        max: 100000.0,
+        integral: true,
+        choices: &[],
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::vwma::Params {
+        trendlib::indicators::vwma::Params {
+            period: values[0] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "vwma takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::vwma::NAME,
             inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
             outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
             params: PARAMS,
@@ -4911,10 +5147,12 @@ pub fn registered() -> Vec<Registered> {
         cumsum_adapter::registered(),
         dema_adapter::registered(),
         div_adapter::registered(),
+        donchian_adapter::registered(),
         dx_adapter::registered(),
         ema_adapter::registered(),
         exp_adapter::registered(),
         floor_adapter::registered(),
+        ha_adapter::registered(),
         linearreg_adapter::registered(),
         linearreg_angle_adapter::registered(),
         linearreg_intercept_adapter::registered(),
@@ -4962,9 +5200,11 @@ pub fn registered() -> Vec<Registered> {
         tema_adapter::registered(),
         trange_adapter::registered(),
         trima_adapter::registered(),
+        trix_adapter::registered(),
         tsf_adapter::registered(),
         typprice_adapter::registered(),
         var_adapter::registered(),
+        vwma_adapter::registered(),
         wclprice_adapter::registered(),
         willr_adapter::registered(),
         wma_adapter::registered(),
