@@ -402,7 +402,8 @@ fn var_of_two_bars_is_the_square_of_half_their_difference() {
 #[test]
 fn fitting_a_line_to_a_line_reproduces_it_exactly() {
     let series: Vec<f64> = (0..60).map(|i| 100.0 + 0.5 * i as f64).collect();
-    let expected: [(&str, fn(usize) -> f64); 4] = [
+    type Expected = (&'static str, fn(usize) -> f64);
+    let expected: [Expected; 4] = [
         ("linearreg_slope", |_| 0.5),
         ("linearreg_angle", |_| {
             0.5f64.atan() * (180.0 / std::f64::consts::PI)
