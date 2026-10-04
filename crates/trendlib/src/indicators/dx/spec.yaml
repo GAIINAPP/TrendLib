@@ -1,0 +1,30 @@
+name: dx
+title: Directional Movement Index
+group: momentum
+flags: [unstable]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 2
+    max: 100000
+    doc: Number of bars the movement is accumulated over
+outputs:
+  - name: dx
+    dtype: float64
+    plot: line
+    doc: How one-sided the directional movement has been, from 0 to 100
+talib:
+  name: DX
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - J. Welles Wilder Jr., New Concepts in Technical Trading Systems, Trend Research, 1978
+see_also: [adx, atr]

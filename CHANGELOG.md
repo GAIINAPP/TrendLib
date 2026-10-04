@@ -37,6 +37,9 @@ Before 1.0, minor versions may break the API; every break is listed under
 - `wma`, `trange`, `atr` and `natr` are callable from Python.
 - Indicators `dema`, `tema`, `roc` and `macd`. `macd` is the first with
   several outputs, returned as a tuple or, from a DataFrame, as a frame.
+- The directional movement family: `plus_di`, `minus_di`, `dx`, `adx`, `adxr`.
+- `plus_di` and `minus_di` stay a percentage at `period = 1`, where TA-Lib
+  returns the raw fraction (`CONVENTIONS.md` deviation 7).
 - 6 more indicators: `bop`, `rma`, `trima`, `plus_dm`, `minus_dm` and `cmo`.
 - 13 more indicators: `mom`, `rocp`, `rocr`, `rocr100`, `midpoint`, `midprice`,
   `sum`, `avgdev`, `stddev`, `var`, `max`, `min` and `minmax`. `stddev` and

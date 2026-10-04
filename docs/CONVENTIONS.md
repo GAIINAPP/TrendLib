@@ -139,6 +139,7 @@ where the computation starts. Their `spec.yaml` carries the `path_dependent` fla
 | 3 | VWAP reset | Never resets; caller slices sessions | `anchor="day"` by default; alias `tl.VWAP` uses `anchor="none"` | Session VWAP is what Indian intraday users mean |
 | 4 | Unstable-period setting | Global `TA_SetUnstablePeriod` | Not supported; equals TA-Lib default 0 | D9 |
 | 5 | Candle settings | Globally configurable | Fixed at defaults (v0.1) | D9; configurable per call in M6 |
+| 7 | `plus_di` and `minus_di` with `period = 1` | Return the raw fraction, not scaled to a percentage | Scale at every period: `100 * movement / range` | Both are measured by factor exactly 100 at period 1 and exactly 1 everywhere else. A fraction reported under a name that means percent is the same hazard as deviation 6. |
 | 6 | `natr` with `period = 1` | Returns the raw true range, not normalised | Normalises at every period: `100 * atr / close` | A price span is not a percentage. TA-Lib's value is in price units under a name that means percent, which is the kind of plausible wrong number this project exists to avoid. Every other period agrees exactly. |
 
 Golden tests against TA-Lib exclude only the rows a listed deviation affects, and

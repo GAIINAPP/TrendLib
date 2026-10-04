@@ -376,3 +376,29 @@ fn var_of_two_bars_is_the_square_of_half_their_difference() {
         );
     }
 }
+
+/// Deviation 7: the directional indicators stay a percentage at every period,
+/// including the one where TA-Lib returns the raw fraction, so the oracle
+/// cannot pin those rows and a test must.
+#[test]
+fn directional_indicators_scale_to_percent_even_at_period_one() {
+    let columns = head(&daily_inputs(&support::find("plus_di").unwrap()), 200);
+    let inputs = as_slices(&columns);
+
+    for name in ["plus_di", "minus_di"] {
+        let indicator = support::find(name).expect("registered");
+        let at_one = (indicator.batch)(&inputs, &indicator.with("period", 1.0)).unwrap();
+        // Every defined row is a percentage: the raw fraction would never
+        // exceed 100 but would also never reach it on this data.
+        let defined: Vec<f64> = at_one[0].iter().copied().filter(|v| !v.is_nan()).collect();
+        assert!(!defined.is_empty(), "{name} produced nothing at period 1");
+        assert!(
+            defined.iter().any(|v| *v > 1.0),
+            "{name} at period 1 looks like a raw fraction, not a percentage"
+        );
+        assert!(
+            defined.iter().all(|v| (0.0..=100.0).contains(v)),
+            "{name} at period 1 left the 0 to 100 range"
+        );
+    }
+}

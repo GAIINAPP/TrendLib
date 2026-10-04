@@ -16,6 +16,8 @@ __all__ = [
     "ACOS",
     "AD",
     "ADD",
+    "ADX",
+    "ADXR",
     "ASIN",
     "ATAN",
     "ATR",
@@ -30,6 +32,7 @@ __all__ = [
     "CUMSUM",
     "DEMA",
     "DIV",
+    "DX",
     "EMA",
     "EXP",
     "FLOOR",
@@ -42,11 +45,13 @@ __all__ = [
     "MIDPRICE",
     "MIN",
     "MINMAX",
+    "MINUS_DI",
     "MINUS_DM",
     "MOM",
     "MULT",
     "NATR",
     "OBV",
+    "PLUS_DI",
     "PLUS_DM",
     "RMA",
     "ROC",
@@ -74,6 +79,8 @@ __all__ = [
     "acos",
     "ad",
     "add",
+    "adx",
+    "adxr",
     "asin",
     "atan",
     "atr",
@@ -88,6 +95,7 @@ __all__ = [
     "cumsum",
     "dema",
     "div",
+    "dx",
     "ema",
     "exp",
     "floor",
@@ -101,11 +109,13 @@ __all__ = [
     "midprice",
     "min",
     "minmax",
+    "minus_di",
     "minus_dm",
     "mom",
     "mult",
     "natr",
     "obv",
+    "plus_di",
     "plus_dm",
     "rma",
     "roc",
@@ -198,6 +208,74 @@ def add(source0=None, source1=None) -> Any:
     )
     out = _core.add(*columns)
     return _convert.wrap_outputs(out, carrier, ("add",))
+
+
+def adx(
+    high=None, low=None, close=None, *, period: int = _PARAMS["adx"]["period"]["default"]
+) -> Any:
+    """Average Directional Movement Index.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the movement is accumulated over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Wilder average of the directional movement index.
+    """
+    period = _convert.as_int("adx", "period", period)
+    columns, carrier = _convert.bars(
+        "adx",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.adx(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("adx",))
+
+
+def adxr(
+    high=None, low=None, close=None, *, period: int = _PARAMS["adxr"]["period"]["default"]
+) -> Any:
+    """Average Directional Movement Index Rating.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the movement is accumulated over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        The average index now and as it stood period minus one bars ago, averaged.
+    """
+    period = _convert.as_int("adxr", "period", period)
+    columns, carrier = _convert.bars(
+        "adxr",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.adxr(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("adxr",))
 
 
 def asin(source=None) -> Any:
@@ -483,6 +561,38 @@ def div(source0=None, source1=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("div",))
 
 
+def dx(high=None, low=None, close=None, *, period: int = _PARAMS["dx"]["period"]["default"]) -> Any:
+    """Directional Movement Index.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the movement is accumulated over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        How one-sided the directional movement has been, from 0 to 100.
+    """
+    period = _convert.as_int("dx", "period", period)
+    columns, carrier = _convert.bars(
+        "dx",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.dx(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("dx",))
+
+
 def ema(source=None, *, period: int = _PARAMS["ema"]["period"]["default"]) -> Any:
     """Exponential Moving Average.
 
@@ -735,6 +845,40 @@ def minmax(source=None, *, period: int = _PARAMS["minmax"]["period"]["default"])
     )
 
 
+def minus_di(
+    high=None, low=None, close=None, *, period: int = _PARAMS["minus_di"]["period"]["default"]
+) -> Any:
+    """Minus Directional Indicator.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the movement is accumulated over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Share of recent range that was covered downward, from 0 to 100.
+    """
+    period = _convert.as_int("minus_di", "period", period)
+    columns, carrier = _convert.bars(
+        "minus_di",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.minus_di(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("minus_di",))
+
+
 def minus_dm(high=None, low=None, *, period: int = _PARAMS["minus_dm"]["period"]["default"]) -> Any:
     """Minus Directional Movement.
 
@@ -864,6 +1008,40 @@ def obv(close=None, volume=None) -> Any:
     )
     out = _core.obv(*columns)
     return _convert.wrap_outputs(out, carrier, ("obv",))
+
+
+def plus_di(
+    high=None, low=None, close=None, *, period: int = _PARAMS["plus_di"]["period"]["default"]
+) -> Any:
+    """Plus Directional Indicator.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the movement is accumulated over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Share of recent range that was covered upward, from 0 to 100.
+    """
+    period = _convert.as_int("plus_di", "period", period)
+    columns, carrier = _convert.bars(
+        "plus_di",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.plus_di(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("plus_di",))
 
 
 def plus_dm(high=None, low=None, *, period: int = _PARAMS["plus_dm"]["period"]["default"]) -> Any:
@@ -1386,6 +1564,16 @@ def ADD(source0, source1) -> Any:
     return add(source0, source1)
 
 
+def ADX(high, low, close, timeperiod: int = _PARAMS["adx"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`adx`."""
+    return adx(high, low, close, period=timeperiod)
+
+
+def ADXR(high, low, close, timeperiod: int = _PARAMS["adxr"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`adxr`."""
+    return adxr(high, low, close, period=timeperiod)
+
+
 def ASIN(source) -> Any:
     """TA-Lib-style alias for :func:`asin`."""
     return asin(source)
@@ -1456,6 +1644,11 @@ def DIV(source0, source1) -> Any:
     return div(source0, source1)
 
 
+def DX(high, low, close, timeperiod: int = _PARAMS["dx"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`dx`."""
+    return dx(high, low, close, period=timeperiod)
+
+
 def EMA(source, timeperiod: int = _PARAMS["ema"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`ema`."""
     return ema(source, period=timeperiod)
@@ -1521,6 +1714,11 @@ def MINMAX(source, timeperiod: int = _PARAMS["minmax"]["period"]["default"]) -> 
     return minmax(source, period=timeperiod)
 
 
+def MINUS_DI(high, low, close, timeperiod: int = _PARAMS["minus_di"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`minus_di`."""
+    return minus_di(high, low, close, period=timeperiod)
+
+
 def MINUS_DM(high, low, timeperiod: int = _PARAMS["minus_dm"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`minus_dm`."""
     return minus_dm(high, low, period=timeperiod)
@@ -1544,6 +1742,11 @@ def NATR(high, low, close, timeperiod: int = _PARAMS["natr"]["period"]["default"
 def OBV(close, volume) -> Any:
     """TA-Lib-style alias for :func:`obv`."""
     return obv(close, volume)
+
+
+def PLUS_DI(high, low, close, timeperiod: int = _PARAMS["plus_di"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`plus_di`."""
+    return plus_di(high, low, close, period=timeperiod)
 
 
 def PLUS_DM(high, low, timeperiod: int = _PARAMS["plus_dm"]["period"]["default"]) -> Any:

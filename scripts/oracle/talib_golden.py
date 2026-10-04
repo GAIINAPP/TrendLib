@@ -65,6 +65,18 @@ def defaults(spec: dict) -> dict:
 # The value is the period to use instead and the reason, which goes in the file
 # header so the substitution is visible where the numbers are.
 CASE_OVERRIDES = {
+    ("plus_di", "min_period"): (
+        2,
+        "TA-Lib returns the raw fraction at period=1 rather than scaling it to a "
+        "percentage (CONVENTIONS.md deviation 7), so the oracle is only usable from "
+        "period=2",
+    ),
+    ("minus_di", "min_period"): (
+        2,
+        "TA-Lib returns the raw fraction at period=1 rather than scaling it to a "
+        "percentage (CONVENTIONS.md deviation 7), so the oracle is only usable from "
+        "period=2",
+    ),
     ("natr", "min_period"): (
         2,
         "TA-Lib returns the raw true range at period=1 rather than normalising it "

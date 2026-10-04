@@ -2,8 +2,8 @@
 
 # Progress
 
-**58 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 146 not started.
+**63 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 141 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -17,7 +17,7 @@ something is done that is not. CI checks it is current.
 | Group | Shipped | Total |
 | --- | --- | --- |
 | Overlap studies | 9 | 25 |
-| Momentum | 13 | 47 |
+| Momentum | 18 | 47 |
 | Volatility | 3 | 7 |
 | Volume | 2 | 12 |
 | Price transforms | 5 | 6 |
@@ -56,11 +56,11 @@ something is done that is not. CI checks it is current.
 - [x] `wma` (`WMA`) -- Weighted Moving Average *
 - [ ] `zlema` (`ZLEMA`)
 
-## Momentum (13 of 47)
+## Momentum (18 of 47)
 
 - [ ] `ac` (`AC`)
-- [ ] `adx` (`ADX`) *
-- [ ] `adxr` (`ADXR`)
+- [x] `adx` (`ADX`) -- Average Directional Movement Index *
+- [x] `adxr` (`ADXR`) -- Average Directional Movement Index Rating
 - [ ] `ao` (`AO`)
 - [ ] `apo` (`APO`)
 - [ ] `aroon` (`AROON`)
@@ -71,7 +71,7 @@ something is done that is not. CI checks it is current.
 - [ ] `cmou` (`CMOU`)
 - [ ] `coppock` (`COPPOCK`)
 - [ ] `dpo` (`DPO`)
-- [ ] `dx` (`DX`)
+- [x] `dx` (`DX`) -- Directional Movement Index
 - [ ] `er` (`ER`)
 - [ ] `eri` (`ERI`)
 - [ ] `fosc` (`FOSC`)
@@ -82,10 +82,10 @@ something is done that is not. CI checks it is current.
 - [ ] `macdext` (`MACDEXT`)
 - [ ] `macdfix` (`MACDFIX`)
 - [ ] `mfi` (`MFI`)
-- [ ] `minus_di` (`MINUS_DI`)
+- [x] `minus_di` (`MINUS_DI`) -- Minus Directional Indicator
 - [x] `minus_dm` (`MINUS_DM`) -- Minus Directional Movement
 - [x] `mom` (`MOM`) -- Momentum
-- [ ] `plus_di` (`PLUS_DI`)
+- [x] `plus_di` (`PLUS_DI`) -- Plus Directional Indicator
 - [x] `plus_dm` (`PLUS_DM`) -- Plus Directional Movement
 - [ ] `ppo` (`PPO`)
 - [ ] `qstick` (`QSTICK`)

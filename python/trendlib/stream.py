@@ -17,6 +17,8 @@ __all__ = [
     "acos",
     "ad",
     "add",
+    "adx",
+    "adxr",
     "asin",
     "atan",
     "atr",
@@ -31,6 +33,7 @@ __all__ = [
     "cumsum",
     "dema",
     "div",
+    "dx",
     "ema",
     "exp",
     "floor",
@@ -43,11 +46,13 @@ __all__ = [
     "midprice",
     "min",
     "minmax",
+    "minus_di",
     "minus_dm",
     "mom",
     "mult",
     "natr",
     "obv",
+    "plus_di",
     "plus_dm",
     "rma",
     "roc",
@@ -104,6 +109,36 @@ add = Factory(
         "series",
     ),
     ("add",),
+)
+adx = Factory(
+    "adx",
+    _core.AdxStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("adx",),
+)
+adxr = Factory(
+    "adxr",
+    _core.AdxrStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("adxr",),
 )
 asin = Factory("asin", _core.AsinStream, ("source",), ("series",), ("asin",))
 atan = Factory("atan", _core.AtanStream, ("source",), ("series",), ("atan",))
@@ -191,6 +226,21 @@ div = Factory(
     ),
     ("div",),
 )
+dx = Factory(
+    "dx",
+    _core.DxStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("dx",),
+)
 ema = Factory("ema", _core.EmaStream, ("source",), ("series",), ("ema",))
 exp = Factory("exp", _core.ExpStream, ("source",), ("series",), ("exp",))
 floor = Factory("floor", _core.FloorStream, ("source",), ("series",), ("floor",))
@@ -246,6 +296,21 @@ minmax = Factory(
         "minmax_max",
     ),
 )
+minus_di = Factory(
+    "minus_di",
+    _core.MinusDiStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("minus_di",),
+)
 minus_dm = Factory(
     "minus_dm",
     _core.MinusDmStream,
@@ -300,6 +365,21 @@ obv = Factory(
         "volume",
     ),
     ("obv",),
+)
+plus_di = Factory(
+    "plus_di",
+    _core.PlusDiStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("plus_di",),
 )
 plus_dm = Factory(
     "plus_dm",

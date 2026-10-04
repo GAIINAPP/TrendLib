@@ -1,0 +1,30 @@
+name: plus_di
+title: Plus Directional Indicator
+group: momentum
+flags: [unstable]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 1
+    max: 100000
+    doc: Number of bars the movement is accumulated over
+outputs:
+  - name: plus_di
+    dtype: float64
+    plot: line
+    doc: Share of recent range that was covered upward, from 0 to 100
+talib:
+  name: PLUS_DI
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - J. Welles Wilder Jr., New Concepts in Technical Trading Systems, Trend Research, 1978
+see_also: [adx, atr]

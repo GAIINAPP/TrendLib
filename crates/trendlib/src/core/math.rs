@@ -155,7 +155,7 @@ impl TrueRange {
         Self::default()
     }
 
-    fn range(high: f64, low: f64, previous_close: f64) -> f64 {
+    pub(crate) fn range(high: f64, low: f64, previous_close: f64) -> f64 {
         let span = high - low;
         let up = (high - previous_close).abs();
         let down = (low - previous_close).abs();
@@ -488,6 +488,99 @@ impl WilderSum {
             std::cmp::Ordering::Equal => Some(self.total + value),
             std::cmp::Ordering::Greater => Some(Self::advance(self.total, self.n, value)),
         }
+    }
+}
+
+/// Wilder's directional indicators, `+DI` and `-DI`.
+///
+/// Both are the running total of movement in one direction as a percentage of
+/// the running total of true range, so they answer "how much of the ground
+/// covered was in this direction". The movement and the range totals are both
+/// seeded over `period - 1` bars and decayed by `period`, but the ratio is not
+/// reported on the bar they first exist: TA-Lib starts a bar later, which is
+/// why the lookback is `period` rather than `period - 1`.
+#[derive(Clone, Debug)]
+pub struct Directional {
+    previous: Option<(f64, f64, f64)>,
+    plus: WilderSum,
+    minus: WilderSum,
+    range: WilderSum,
+    seen: usize,
+    period: usize,
+}
+
+impl Directional {
+    pub fn new(period: usize) -> Self {
+        assert!(period > 0, "period must be at least 1");
+        let seed = period.saturating_sub(1).max(1);
+        Self {
+            previous: None,
+            plus: WilderSum::with_seed(seed, period),
+            minus: WilderSum::with_seed(seed, period),
+            range: WilderSum::with_seed(seed, period),
+            seen: 0,
+            period,
+        }
+    }
+
+    /// The movement a bar contributes in each direction. Only the larger of the
+    /// two edge extensions counts, and only if it extended at all, so a bar
+    /// inside the previous one contributes to neither.
+    fn movement(previous: (f64, f64, f64), high: f64, low: f64) -> (f64, f64) {
+        let up = high - previous.0;
+        let down = previous.1 - low;
+        let plus = if up > down && up > 0.0 { up } else { 0.0 };
+        let minus = if down > up && down > 0.0 { down } else { 0.0 };
+        (plus, minus)
+    }
+
+    fn indicators(plus: f64, minus: f64, range: f64) -> (f64, f64) {
+        if range == 0.0 {
+            (0.0, 0.0)
+        } else {
+            (100.0 * plus / range, 100.0 * minus / range)
+        }
+    }
+
+    pub fn push(&mut self, high: f64, low: f64, close: f64) -> Option<(f64, f64)> {
+        let previous = self.previous.replace((high, low, close))?;
+        let (up, down) = Self::movement(previous, high, low);
+        let range = TrueRange::range(high, low, previous.2);
+        let plus = self.plus.push(up);
+        let minus = self.minus.push(down);
+        let range = self.range.push(range);
+        self.seen += 1;
+        // The totals exist a bar before the ratio is reported.
+        if self.seen < self.period {
+            return None;
+        }
+        Some(Self::indicators(plus?, minus?, range?))
+    }
+
+    /// `close` is taken for symmetry with `push`; the range this bar adds is
+    /// measured against the *previous* close, which is already held.
+    pub fn preview(&self, high: f64, low: f64, _close: f64) -> Option<(f64, f64)> {
+        let previous = self.previous?;
+        if self.seen + 1 < self.period {
+            return None;
+        }
+        let (up, down) = Self::movement(previous, high, low);
+        let range = TrueRange::range(high, low, previous.2);
+        Some(Self::indicators(
+            self.plus.preview(up)?,
+            self.minus.preview(down)?,
+            self.range.preview(range)?,
+        ))
+    }
+}
+
+/// The spread between the two directional indicators, as a share of their sum.
+pub fn directional_index(plus: f64, minus: f64) -> f64 {
+    let total = plus + minus;
+    if total == 0.0 {
+        0.0
+    } else {
+        100.0 * (plus - minus).abs() / total
     }
 }
 
