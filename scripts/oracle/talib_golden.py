@@ -425,9 +425,7 @@ def level_oracle(name: str, bound: dict):
         ]
     reach = talib.MULT(np.full(len(close), 1.1), span)
     steps = [talib.DIV(reach, np.full(len(close), divisor)) for divisor in (12.0, 6.0, 4.0, 2.0)]
-    return [talib.ADD(close, step) for step in steps] + [
-        talib.SUB(close, step) for step in steps
-    ]
+    return [talib.ADD(close, step) for step in steps] + [talib.SUB(close, step) for step in steps]
 
 
 def run_oracle(spec: dict, bound: dict, params: dict):
