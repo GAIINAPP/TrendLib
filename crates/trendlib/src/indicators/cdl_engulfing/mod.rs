@@ -1,4 +1,4 @@
-use crate::core::candles::{CandleSetting, PatternState};
+use crate::core::candles::PatternState;
 use crate::core::error::TlError;
 use crate::core::kernel::{BarStream, Kernel};
 
