@@ -103,6 +103,7 @@ __all__ = [
     "COS",
     "COSH",
     "CUMSUM",
+    "CVI",
     "DEMA",
     "DIV",
     "DONCHIAN",
@@ -131,6 +132,7 @@ __all__ = [
     "MACDEXT",
     "MACDFIX",
     "MARKETFI",
+    "MASSI",
     "MAX",
     "MAXINDEX",
     "MEDPRICE",
@@ -181,10 +183,12 @@ __all__ = [
     "TRIMA",
     "TRIX",
     "TSF",
+    "TSI",
     "TYPPRICE",
     "ULTOSC",
     "VAR",
     "VHF",
+    "VORTEX",
     "VWMA",
     "WAD",
     "WCLPRICE",
@@ -281,6 +285,7 @@ __all__ = [
     "cos",
     "cosh",
     "cumsum",
+    "cvi",
     "dema",
     "div",
     "donchian",
@@ -310,6 +315,7 @@ __all__ = [
     "macdext",
     "macdfix",
     "marketfi",
+    "massi",
     "max",
     "maxindex",
     "medprice",
@@ -360,10 +366,12 @@ __all__ = [
     "trima",
     "trix",
     "tsf",
+    "tsi",
     "typprice",
     "ultosc",
     "var",
     "vhf",
+    "vortex",
     "vwma",
     "wad",
     "wclprice",
@@ -2999,6 +3007,45 @@ def cumsum(source=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("cumsum",))
 
 
+def cvi(
+    high=None,
+    low=None,
+    *,
+    period: int = _PARAMS["cvi"]["period"]["default"],
+    roc_period: int = _PARAMS["cvi"]["roc_period"]["default"],
+) -> Any:
+    """Chaikin Volatility.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Number of bars the range is smoothed over, from 2 to 100000.
+    roc_period : int, default 10
+        Bars back the smoothed range is compared with, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Percentage change in the smoothed high-low range.
+    """
+    period = _convert.as_int("cvi", "period", period)
+    roc_period = _convert.as_int("cvi", "roc_period", roc_period)
+    columns, carrier = _convert.bars(
+        "cvi",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.cvi(*columns, period=period, roc_period=roc_period)
+    return _convert.wrap_outputs(out, carrier, ("cvi",))
+
+
 def dema(source=None, *, period: int = _PARAMS["dema"]["period"]["default"]) -> Any:
     """Double Exponential Moving Average.
 
@@ -3746,6 +3793,45 @@ def marketfi(high=None, low=None, volume=None) -> Any:
     )
     out = _core.marketfi(*columns)
     return _convert.wrap_outputs(out, carrier, ("marketfi",))
+
+
+def massi(
+    high=None,
+    low=None,
+    *,
+    fast_period: int = _PARAMS["massi"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["massi"]["slow_period"]["default"],
+) -> Any:
+    """Mass Index.
+
+    Parameters
+    ----------
+    fast_period : int, default 9
+        Number of bars each exponential stage uses, from 2 to 100000.
+    slow_period : int, default 25
+        Number of ratios summed, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Sum of the ratio between a smoothed range and a twice-smoothed one.
+    """
+    fast_period = _convert.as_int("massi", "fast_period", fast_period)
+    slow_period = _convert.as_int("massi", "slow_period", slow_period)
+    columns, carrier = _convert.bars(
+        "massi",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.massi(*columns, fast_period=fast_period, slow_period=slow_period)
+    return _convert.wrap_outputs(out, carrier, ("massi",))
 
 
 def max(source=None, *, period: int = _PARAMS["max"]["period"]["default"]) -> Any:
@@ -4990,6 +5076,33 @@ def tsf(source=None, *, period: int = _PARAMS["tsf"]["period"]["default"]) -> An
     return _convert.wrap_outputs(out, carrier, ("tsf",))
 
 
+def tsi(
+    source=None,
+    *,
+    first_period: int = _PARAMS["tsi"]["first_period"]["default"],
+    second_period: int = _PARAMS["tsi"]["second_period"]["default"],
+) -> Any:
+    """True Strength Index.
+
+    Parameters
+    ----------
+    first_period : int, default 25
+        Number of bars in the first exponential stage, from 2 to 100000.
+    second_period : int, default 13
+        Number of bars in the second exponential stage, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Twice-smoothed movement as a percentage of twice-smoothed absolute movement.
+    """
+    first_period = _convert.as_int("tsi", "first_period", first_period)
+    second_period = _convert.as_int("tsi", "second_period", second_period)
+    columns, carrier = _convert.bars("tsi", (source,), ("source",), ("series",))
+    out = _core.tsi(*columns, first_period=first_period, second_period=second_period)
+    return _convert.wrap_outputs(out, carrier, ("tsi",))
+
+
 def typprice(high=None, low=None, close=None) -> Any:
     """Typical Price.
 
@@ -5106,6 +5219,48 @@ def vhf(source=None, *, period: int = _PARAMS["vhf"]["period"]["default"]) -> An
     columns, carrier = _convert.bars("vhf", (source,), ("source",), ("series",))
     out = _core.vhf(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("vhf",))
+
+
+def vortex(
+    high=None, low=None, close=None, *, period: int = _PARAMS["vortex"]["period"]["default"]
+) -> Any:
+    """Vortex Indicator.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the movements are summed over, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        vortex_plusvi: Upward movement as a share of the true range.
+        vortex_minusvi: Downward movement as a share of the true range.
+    """
+    period = _convert.as_int("vortex", "period", period)
+    columns, carrier = _convert.bars(
+        "vortex",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.vortex(*columns, period=period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "vortex_plusvi",
+            "vortex_minusvi",
+        ),
+    )
 
 
 def vwma(close=None, volume=None, *, period: int = _PARAMS["vwma"]["period"]["default"]) -> Any:
@@ -5795,6 +5950,16 @@ def CUMSUM(source) -> Any:
     return cumsum(source)
 
 
+def CVI(
+    high,
+    low,
+    timeperiod: int = _PARAMS["cvi"]["period"]["default"],
+    rocperiod: int = _PARAMS["cvi"]["roc_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`cvi`."""
+    return cvi(high, low, period=timeperiod, roc_period=rocperiod)
+
+
 def DEMA(source, timeperiod: int = _PARAMS["dema"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`dema`."""
     return dema(source, period=timeperiod)
@@ -5971,6 +6136,16 @@ def MACDFIX(source, signalperiod: int = _PARAMS["macdfix"]["signal_period"]["def
 def MARKETFI(high, low, volume) -> Any:
     """TA-Lib-style alias for :func:`marketfi`."""
     return marketfi(high, low, volume)
+
+
+def MASSI(
+    high,
+    low,
+    fastperiod: int = _PARAMS["massi"]["fast_period"]["default"],
+    slowperiod: int = _PARAMS["massi"]["slow_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`massi`."""
+    return massi(high, low, fast_period=fastperiod, slow_period=slowperiod)
 
 
 def MAX(source, timeperiod: int = _PARAMS["max"]["period"]["default"]) -> Any:
@@ -6288,6 +6463,15 @@ def TSF(source, timeperiod: int = _PARAMS["tsf"]["period"]["default"]) -> Any:
     return tsf(source, period=timeperiod)
 
 
+def TSI(
+    source,
+    firstperiod: int = _PARAMS["tsi"]["first_period"]["default"],
+    secondperiod: int = _PARAMS["tsi"]["second_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`tsi`."""
+    return tsi(source, first_period=firstperiod, second_period=secondperiod)
+
+
 def TYPPRICE(high, low, close) -> Any:
     """TA-Lib-style alias for :func:`typprice`."""
     return typprice(high, low, close)
@@ -6317,6 +6501,11 @@ def VAR(
 def VHF(source, timeperiod: int = _PARAMS["vhf"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`vhf`."""
     return vhf(source, period=timeperiod)
+
+
+def VORTEX(high, low, close, timeperiod: int = _PARAMS["vortex"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`vortex`."""
+    return vortex(high, low, close, period=timeperiod)
 
 
 def VWMA(close, volume, timeperiod: int = _PARAMS["vwma"]["period"]["default"]) -> Any:

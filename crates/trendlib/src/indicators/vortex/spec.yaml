@@ -1,0 +1,33 @@
+name: vortex
+title: Vortex Indicator
+group: momentum
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 1
+    max: 100000
+    doc: Number of bars the movements are summed over
+outputs:
+  - name: vortex_plusvi
+    dtype: float64
+    plot: line
+    doc: Upward movement as a share of the true range
+  - name: vortex_minusvi
+    dtype: float64
+    plot: line
+    doc: Downward movement as a share of the true range
+talib:
+  name: VORTEX
+  params: {period: timeperiod}
+  outputs: [plusvi, minusvi]
+references:
+  - Etienne Botes and Douglas Siepman, The Vortex Indicator, Technical Analysis of Stocks and Commodities, January 2010
+see_also: [plus_di, minus_di, adx]

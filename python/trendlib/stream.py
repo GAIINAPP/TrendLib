@@ -104,6 +104,7 @@ __all__ = [
     "cos",
     "cosh",
     "cumsum",
+    "cvi",
     "dema",
     "div",
     "donchian",
@@ -132,6 +133,7 @@ __all__ = [
     "macdext",
     "macdfix",
     "marketfi",
+    "massi",
     "max",
     "maxindex",
     "medprice",
@@ -182,10 +184,12 @@ __all__ = [
     "trima",
     "trix",
     "tsf",
+    "tsi",
     "typprice",
     "ultosc",
     "var",
     "vhf",
+    "vortex",
     "vwma",
     "wad",
     "wclprice",
@@ -1499,6 +1503,19 @@ coppock = Factory("coppock", _core.CoppockStream, ("source",), ("series",), ("co
 cos = Factory("cos", _core.CosStream, ("source",), ("series",), ("cos",))
 cosh = Factory("cosh", _core.CoshStream, ("source",), ("series",), ("cosh",))
 cumsum = Factory("cumsum", _core.CumsumStream, ("source",), ("series",), ("cumsum",))
+cvi = Factory(
+    "cvi",
+    _core.CviStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("cvi",),
+)
 dema = Factory("dema", _core.DemaStream, ("source",), ("series",), ("dema",))
 div = Factory(
     "div",
@@ -1702,6 +1719,19 @@ marketfi = Factory(
         "volume",
     ),
     ("marketfi",),
+)
+massi = Factory(
+    "massi",
+    _core.MassiStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("massi",),
 )
 max = Factory("max", _core.MaxStream, ("source",), ("series",), ("max",))
 maxindex = Factory("maxindex", _core.MaxindexStream, ("source",), ("series",), ("maxindex",))
@@ -2022,6 +2052,7 @@ trange = Factory(
 trima = Factory("trima", _core.TrimaStream, ("source",), ("series",), ("trima",))
 trix = Factory("trix", _core.TrixStream, ("source",), ("series",), ("trix",))
 tsf = Factory("tsf", _core.TsfStream, ("source",), ("series",), ("tsf",))
+tsi = Factory("tsi", _core.TsiStream, ("source",), ("series",), ("tsi",))
 typprice = Factory(
     "typprice",
     _core.TyppriceStream,
@@ -2054,6 +2085,24 @@ ultosc = Factory(
 )
 var = Factory("var", _core.VarStream, ("source",), ("series",), ("var",))
 vhf = Factory("vhf", _core.VhfStream, ("source",), ("series",), ("vhf",))
+vortex = Factory(
+    "vortex",
+    _core.VortexStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "vortex_plusvi",
+        "vortex_minusvi",
+    ),
+)
 vwma = Factory(
     "vwma",
     _core.VwmaStream,

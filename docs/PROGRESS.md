@@ -2,8 +2,8 @@
 
 # Progress
 
-**178 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 26 not started.
+**182 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 22 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -17,8 +17,8 @@ something is done that is not. CI checks it is current.
 | Group | Shipped | Total |
 | --- | --- | --- |
 | Overlap studies | 19 | 25 |
-| Momentum | 42 | 47 |
-| Volatility | 4 | 7 |
+| Momentum | 44 | 47 |
+| Volatility | 6 | 7 |
 | Volume | 10 | 12 |
 | Price transforms | 6 | 6 |
 | Cycle | 0 | 5 |
@@ -56,7 +56,7 @@ something is done that is not. CI checks it is current.
 - [x] `wma` (`WMA`) -- Weighted Moving Average *
 - [x] `zlema` (`ZLEMA`) -- Zero Lag Exponential Moving Average
 
-## Momentum (42 of 47)
+## Momentum (44 of 47)
 
 - [x] `ac` (`AC`) -- Accelerator Oscillator
 - [x] `adx` (`ADX`) -- Average Directional Movement Index *
@@ -99,19 +99,19 @@ something is done that is not. CI checks it is current.
 - [x] `stochf` (`STOCHF`) -- Fast Stochastic
 - [x] `stochrsi` (`STOCHRSI`) -- Stochastic RSI
 - [x] `trix` (`TRIX`) -- Triple Exponential Average
-- [ ] `tsi` (`TSI`)
+- [x] `tsi` (`TSI`) -- True Strength Index
 - [x] `ultosc` (`ULTOSC`) -- Ultimate Oscillator
 - [x] `vhf` (`VHF`) -- Vertical Horizontal Filter
-- [ ] `vortex` (`VORTEX`)
+- [x] `vortex` (`VORTEX`) -- Vortex Indicator
 - [x] `wad` (`WAD`) -- Williams Accumulation/Distribution
 - [x] `willr` (`WILLR`) -- Williams Percent Range *
 
-## Volatility (4 of 7)
+## Volatility (6 of 7)
 
 - [x] `adr` (`ADR`) -- Average Day Range
 - [x] `atr` (`ATR`) -- Average True Range *
-- [ ] `cvi` (`CVI`)
-- [ ] `massi` (`MASSI`)
+- [x] `cvi` (`CVI`) -- Chaikin Volatility
+- [x] `massi` (`MASSI`) -- Mass Index
 - [x] `natr` (`NATR`) -- Normalized Average True Range *
 - [ ] `rvi` (`RVI`)
 - [x] `trange` (`TRANGE`) -- True Range *

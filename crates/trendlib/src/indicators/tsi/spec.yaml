@@ -1,0 +1,32 @@
+name: tsi
+title: True Strength Index
+group: momentum
+flags: [unstable, path_dependent]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: first_period
+    type: int
+    default: 25
+    min: 2
+    max: 100000
+    doc: Number of bars in the first exponential stage
+  - name: second_period
+    type: int
+    default: 13
+    min: 2
+    max: 100000
+    doc: Number of bars in the second exponential stage
+outputs:
+  - name: tsi
+    dtype: float64
+    plot: line
+    doc: Twice-smoothed movement as a percentage of twice-smoothed absolute movement
+talib:
+  name: TSI
+  params: {first_period: firstperiod, second_period: secondperiod}
+  outputs: [real]
+references:
+  - William Blau, Momentum, Direction and Divergence, Wiley, 1995
+see_also: [rsi, cmo, coppock]
