@@ -153,6 +153,15 @@ def bars(
     """
     frame = _frame_of(indicator, values[0]) if values else None
     if frame is not None and all(value is None for value in values[1:]):
+        # A frame can say which column is the high and which is the close, but
+        # it cannot say which of two interchangeable series is which. Mapping
+        # both to `close` would make `sub` return zeros on every row, which is
+        # the kind of plausible wrong number a loud error is worth avoiding.
+        if sum(1 for kind in kinds if kind == "series") > 1:
+            raise InvalidInput(
+                f"{indicator}: a DataFrame cannot say which column is "
+                f"{names[0]} and which is {names[1]}; pass them separately"
+            )
         held, columns, kind = frame
         index = held.index if kind == "pandas" else None
         resolved = []

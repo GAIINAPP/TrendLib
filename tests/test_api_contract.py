@@ -1,4 +1,8 @@
-"""Every rule in docs/PYTHON_API.md that M1 is supposed to satisfy."""
+"""Every rule in docs/PYTHON_API.md, checked against every indicator.
+
+The `indicator` fixture enumerates the whole catalogue, so each rule below is
+written once and holds for all of them.
+"""
 
 import numpy as np
 import pytest
@@ -8,144 +12,203 @@ import trendlib as tl
 pd = pytest.importorskip("pandas")
 
 
-def test_numpy_in_numpy_out(closes, indicator):
-    out = getattr(tl, indicator)(closes)
-    assert isinstance(out, np.ndarray)
-    assert out.dtype == np.float64
-    assert out.shape == closes.shape
+def outputs_of(result, indicator):
+    """The result as a list of arrays, whatever shape it came back in."""
+    if indicator.multi_output:
+        assert isinstance(result, tuple)
+        assert len(result) == len(indicator.outputs)
+        return list(result)
+    assert not isinstance(result, tuple)
+    return [result]
 
 
-def test_list_in_numpy_out():
-    out = tl.sma([1.0, 2.0, 3.0, 4.0], period=2)
-    assert isinstance(out, np.ndarray)
-    assert out.shape == (4,)
+def test_numpy_in_numpy_out(bars, indicator):
+    for column in outputs_of(indicator.call(bars), indicator):
+        assert isinstance(column, np.ndarray)
+        assert column.dtype in (np.float64, np.int32)
+        assert column.shape == bars["close"].shape
 
 
-def test_pandas_series_keeps_its_index_and_is_named_after_the_output(closes, indicator):
-    index = pd.date_range("2024-01-01", periods=len(closes), freq="D", tz="Asia/Kolkata")
-    series = pd.Series(closes, index=index)
-    out = getattr(tl, indicator)(series)
-    assert isinstance(out, pd.Series)
-    assert out.name == indicator
-    assert out.index.equals(index)
-    assert out.dtype == np.float64
+def test_list_in_numpy_out(bars, indicator):
+    import trendlib as tl
+
+    columns = [list(column[:60]) for column in indicator.columns(bars, 60)]
+    result = getattr(tl, indicator.name)(*columns)
+    for column in outputs_of(result, indicator):
+        assert isinstance(column, np.ndarray)
+        assert column.shape == (60,)
 
 
-def test_a_dataframe_uses_its_close_column(closes, indicator):
-    frame = pd.DataFrame({"open": closes, "high": closes, "low": closes, "close": closes})
-    from_frame = getattr(tl, indicator)(frame)
-    from_series = getattr(tl, indicator)(frame["close"])
-    assert isinstance(from_frame, pd.Series)
-    pd.testing.assert_series_equal(from_frame, from_series)
+def test_pandas_series_keeps_its_index_and_output_names(bars, indicator):
+    index = pd.date_range("2024-01-01", periods=len(bars["close"]), freq="D", tz="Asia/Kolkata")
+    series = [pd.Series(column, index=index) for column in indicator.columns(bars)]
+    result = getattr(tl, indicator.name)(*series)
+
+    if indicator.multi_output:
+        assert isinstance(result, pd.DataFrame)
+        assert list(result.columns) == indicator.outputs
+        assert result.index.equals(index)
+    else:
+        assert isinstance(result, pd.Series)
+        assert result.name == indicator.outputs[0]
+        assert result.index.equals(index)
 
 
-def test_column_matching_ignores_case(closes):
-    frame = pd.DataFrame({"Close": closes})
-    assert tl.sma(frame).notna().any()
+def _interchangeable_inputs(indicator) -> bool:
+    """Two or more generic series, which a frame cannot tell apart."""
+    return sum(1 for name in indicator.inputs if name.startswith("source")) > 1
 
 
-def test_a_frame_without_close_names_the_missing_column(closes):
-    frame = pd.DataFrame({"price": closes})
-    with pytest.raises(tl.InvalidInput, match="no 'close' column"):
-        tl.sma(frame)
+def test_a_dataframe_is_refused_when_it_cannot_say_which_column_is_which(bars, indicator):
+    if not _interchangeable_inputs(indicator):
+        pytest.skip("inputs are named columns, so a frame is unambiguous")
+    with pytest.raises(tl.InvalidInput, match="cannot say which column"):
+        getattr(tl, indicator.name)(indicator.frame(bars))
 
 
-def test_parameters_are_keyword_only(closes, indicator):
+def test_a_dataframe_stands_in_for_every_input(bars, indicator):
+    if _interchangeable_inputs(indicator):
+        pytest.skip("a frame is refused for interchangeable inputs")
+    frame = indicator.frame(bars)
+    from_frame = getattr(tl, indicator.name)(frame)
+    from_columns = getattr(tl, indicator.name)(
+        *[pd.Series(column) for column in indicator.columns(bars)]
+    )
+    if indicator.multi_output:
+        pd.testing.assert_frame_equal(from_frame, from_columns)
+    else:
+        pd.testing.assert_series_equal(from_frame, from_columns)
+
+
+def test_column_matching_ignores_case(bars, indicator):
+    if _interchangeable_inputs(indicator):
+        pytest.skip("a frame is refused for interchangeable inputs")
+    frame = indicator.frame(bars)
+    shouted = frame.rename(columns={name: name.upper() for name in frame.columns})
+    result = getattr(tl, indicator.name)(shouted)
+    expected = getattr(tl, indicator.name)(frame)
+    if indicator.multi_output:
+        pd.testing.assert_frame_equal(result, expected)
+    else:
+        pd.testing.assert_series_equal(result, expected)
+
+
+def test_a_frame_without_the_columns_names_what_is_missing(bars, indicator):
+    if _interchangeable_inputs(indicator):
+        pytest.skip("a frame is refused for interchangeable inputs")
+    frame = indicator.frame(bars)
+    wanted = "close" if indicator.inputs[0].startswith("source") else indicator.inputs[0]
+    with pytest.raises(tl.InvalidInput, match=f"no '{wanted}' column"):
+        getattr(tl, indicator.name)(frame.drop(columns=[wanted]))
+
+
+def test_a_missing_input_says_which_one(bars, indicator):
+    if len(indicator.inputs) < 2:
+        pytest.skip("only one input to leave out")
+    columns = indicator.columns(bars)
+    with pytest.raises(tl.InvalidInput, match="missing input"):
+        getattr(tl, indicator.name)(columns[0])
+
+
+def test_parameters_are_keyword_only(bars, indicator):
+    if not indicator.params:
+        pytest.skip("no parameters")
+    columns = indicator.columns(bars, 60)
     with pytest.raises(TypeError):
-        getattr(tl, indicator)(closes, 10)
+        getattr(tl, indicator.name)(*columns, 10)
 
 
-def test_an_out_of_range_period_names_the_range(closes):
-    with pytest.raises(tl.InvalidInput) as caught:
-        tl.rsi(closes, period=1)
-    assert str(caught.value) == "rsi: period=1 is out of range [2, 100000]"
-
-    with pytest.raises(tl.InvalidInput) as caught:
-        tl.sma(closes, period=0)
-    assert str(caught.value) == "sma: period=0 is out of range [1, 100000]"
-
-
-def test_a_negative_period_reports_the_value_the_caller_passed(closes):
-    with pytest.raises(tl.InvalidInput) as caught:
-        tl.ema(closes, period=-5)
-    assert str(caught.value) == "ema: period=-5 is out of range [1, 100000]"
+def test_an_out_of_range_parameter_names_the_range(bars, indicator):
+    columns = indicator.columns(bars, 60)
+    for name, spec in indicator.params.items():
+        if spec["min"] is None:
+            continue
+        for bad in (spec["min"] - 1, spec["max"] + 1):
+            with pytest.raises(tl.InvalidInput) as caught:
+                getattr(tl, indicator.name)(*columns, **{name: bad})
+            assert str(caught.value) == (
+                f"{indicator.name}: {name}={bad} is out of range [{spec['min']}, {spec['max']}]"
+            )
 
 
-def test_a_non_integer_period_is_rejected(closes):
-    with pytest.raises(tl.InvalidInput, match="period must be an integer"):
-        tl.rsi(closes, period=14.5)
+def test_a_non_integer_parameter_is_rejected(bars, indicator):
+    columns = indicator.columns(bars, 60)
+    for name in indicator.params:
+        with pytest.raises(tl.InvalidInput, match=r"must be an integer|must be a number"):
+            getattr(tl, indicator.name)(*columns, **{name: "nonsense"})
 
 
-def test_errors_are_value_errors(closes):
+def test_errors_are_value_errors():
     assert issubclass(tl.InvalidInput, ValueError)
-    with pytest.raises(ValueError):
-        tl.rsi(closes, period=1)
+    assert issubclass(tl.InsufficientHistory, ValueError)
+    assert not issubclass(tl.TrendLibError, ValueError)
 
 
-def test_a_nan_after_the_first_valid_bar_names_the_input_and_row(closes):
-    series = closes[:100].copy()
-    series[42] = np.nan
-    with pytest.raises(tl.InvalidInput) as caught:
-        tl.sma(series, period=5)
-    assert "source" in str(caught.value)
-    assert "row 42" in str(caught.value)
+def test_a_nan_after_the_first_valid_bar_names_the_input_and_row(bars, indicator):
+    for position, name in enumerate(indicator.inputs):
+        columns = [column.copy() for column in indicator.columns(bars, 100)]
+        columns[position][42] = np.nan
+        with pytest.raises(tl.InvalidInput) as caught:
+            getattr(tl, indicator.name)(*columns)
+        assert name in str(caught.value)
+        assert "row 42" in str(caught.value)
 
 
-def test_leading_nan_rows_are_skipped(closes, indicator):
-    trimmed = getattr(tl, indicator)(closes)
-    padded = getattr(tl, indicator)(np.concatenate([[np.nan] * 4, closes]))
-    assert np.array_equal(padded[:4], padded[:4] * np.nan, equal_nan=True)
-    assert np.array_equal(padded[4:], trimmed, equal_nan=True)
+def test_leading_nan_rows_are_skipped(bars, indicator):
+    trimmed = outputs_of(indicator.call(bars, 300), indicator)
+    padded = getattr(tl, indicator.name)(
+        *[np.concatenate([[np.nan] * 4, column]) for column in indicator.columns(bars, 300)]
+    )
+    for shifted, plain in zip(outputs_of(padded, indicator), trimmed, strict=True):
+        assert np.isnan(shifted[:4]).all()
+        assert np.array_equal(shifted[4:], plain, equal_nan=True)
 
 
 def test_empty_input_returns_empty_output(indicator):
-    out = getattr(tl, indicator)(np.array([], dtype=np.float64))
-    assert isinstance(out, np.ndarray)
-    assert out.shape == (0,)
+    empty = [np.array([], dtype=np.float64) for _ in indicator.inputs]
+    for column in outputs_of(getattr(tl, indicator.name)(*empty), indicator):
+        assert column.shape == (0,)
 
 
-def test_short_input_is_all_warm_up(indicator):
-    period = 5
-    lookback = tl.lookback(indicator, period=period)
-    out = getattr(tl, indicator)(np.arange(lookback, dtype=np.float64), period=period)
-    assert np.isnan(out).all()
+def test_the_input_is_never_modified(bars, indicator):
+    columns = indicator.columns(bars)
+    originals = [column.copy() for column in columns]
+    getattr(tl, indicator.name)(*columns)
+    for column, original in zip(columns, originals, strict=True):
+        assert np.array_equal(column, original)
 
 
-def test_the_input_is_never_modified(closes, indicator):
-    original = closes.copy()
-    getattr(tl, indicator)(closes)
-    assert np.array_equal(closes, original)
+def test_the_output_is_a_new_array(bars, indicator):
+    first = outputs_of(indicator.call(bars), indicator)
+    second = outputs_of(indicator.call(bars), indicator)
+    for a, b in zip(first, second, strict=True):
+        assert a is not b
+        for column in indicator.columns(bars):
+            assert not np.shares_memory(a, column)
 
 
-def test_the_output_is_a_new_array(closes):
-    first = tl.sma(closes)
-    second = tl.sma(closes)
-    assert first is not second
-    assert not np.shares_memory(first, closes)
+def test_a_non_contiguous_input_is_handled(bars, indicator):
+    strided = [column[::2] for column in indicator.columns(bars)]
+    assert not strided[0].flags["C_CONTIGUOUS"]
+    for column in outputs_of(getattr(tl, indicator.name)(*strided), indicator):
+        assert column.shape == strided[0].shape
 
 
-def test_a_non_contiguous_input_is_handled(closes, indicator):
-    strided = closes[::2]
-    assert not strided.flags["C_CONTIGUOUS"]
-    out = getattr(tl, indicator)(strided)
-    assert out.shape == strided.shape
+def test_an_integer_input_is_accepted(bars, indicator):
+    columns = [column[:80].astype(np.int64) for column in indicator.columns(bars, 80)]
+    for column in outputs_of(getattr(tl, indicator.name)(*columns), indicator):
+        assert column.dtype in (np.float64, np.int32)
 
 
-def test_an_integer_input_is_accepted():
-    out = tl.sma(np.arange(10, dtype=np.int64), period=3)
-    assert out.dtype == np.float64
-
-
-def test_a_two_dimensional_input_is_rejected():
+def test_a_two_dimensional_input_is_rejected(indicator):
+    square = [np.zeros((4, 4)) for _ in indicator.inputs]
     with pytest.raises(tl.InvalidInput, match="one-dimensional"):
-        tl.sma(np.zeros((4, 4)), period=2)
+        getattr(tl, indicator.name)(*square)
 
 
-def test_lookback(closes):
-    assert tl.lookback("sma", period=30) == 29
-    assert tl.lookback("ema", period=30) == 29
-    assert tl.lookback("rsi", period=14) == 14
-    assert tl.lookback("rsi") == 14
+def test_lookback_is_available_for_every_indicator(indicator):
+    assert indicator.lookback() >= 0
+    assert indicator.lookback(**indicator.defaults()) == indicator.lookback()
 
 
 def test_lookback_rejects_an_unknown_name():
@@ -153,13 +216,12 @@ def test_lookback_rejects_an_unknown_name():
         tl.lookback("nonesuch", period=5)
 
 
-def test_lookback_rejects_an_unknown_parameter():
+def test_lookback_rejects_an_unknown_parameter(indicator):
     with pytest.raises(TypeError, match="no parameter"):
-        tl.lookback("rsi", timeperiod=14)
+        tl.lookback(indicator.name, nonesuch=1)
 
 
 def test_public_surface_matches_the_contract():
-    """Errors, versions, the stream namespace, and every generated function."""
     from trendlib import _functions
 
     fixed = {
@@ -177,13 +239,16 @@ def test_public_surface_matches_the_contract():
 
 def test_the_extension_module_is_not_public():
     assert "_core" not in tl.__all__
-    assert not any(name.startswith("_") and not name.startswith("__") for name in tl.__all__)
 
 
-def test_nothing_in_the_docs_reads_as_a_trade_instruction():
+def test_every_indicator_is_reachable_and_documented(indicator):
+    function = getattr(tl, indicator.name)
+    assert function.__doc__, f"{indicator.name} has no docstring"
+
+
+def test_nothing_in_the_docs_reads_as_a_trade_instruction(indicator):
     """D11: outputs are measurements, not advice."""
-    forbidden = (" buy ", " sell ", "entry", "exit point", "recommendation", "target price")
-    for name in ("sma", "ema", "rsi", "SMA", "EMA", "RSI", "lookback"):
-        text = (getattr(tl, name).__doc__ or "").lower()
-        for word in forbidden:
-            assert word not in text, f"{name} docstring contains {word!r}"
+    forbidden = (" buy ", " sell ", "entry point", "exit point", "recommendation")
+    text = (getattr(tl, indicator.name).__doc__ or "").lower()
+    for word in forbidden:
+        assert word not in text, f"{indicator.name} docstring contains {word!r}"

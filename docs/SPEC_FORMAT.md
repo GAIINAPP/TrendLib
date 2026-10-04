@@ -83,6 +83,7 @@ Rules:
 | `unstable` | Recursive, converges over time (EMA family) | Docs note on discarding early rows |
 | `requires_timestamps` | Needs timestamps for some params | Python layer converts timestamps and offsets |
 | `pattern` | Candlestick pattern, int32 ±100 output | Registry grouping, docs |
+| `nan_inf_output` | A finite input may produce `NaN` or infinity | The edge-case suite checks the indicator answered, not that it answered finitely |
 
 ### 1.2 Plot hints
 
@@ -99,6 +100,11 @@ they never change computation.
 - { key: momentum,   title: Momentum }
 - { key: volatility, title: Volatility }
 - { key: volume,     title: Volume }
+- { key: price,      title: Price transforms }
+- { key: cycle,      title: Cycle }
+- { key: statistic,  title: Statistics }
+- { key: math,       title: Math transforms }
+- { key: operator,   title: Math operators }
 - { key: levels,     title: Levels }
 - { key: patterns,   title: Candlestick patterns }
 ```

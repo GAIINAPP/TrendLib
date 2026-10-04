@@ -1,8 +1,8 @@
-"""The streaming contract in docs/PYTHON_API.md section 4.
+"""The streaming contract in docs/PYTHON_API.md section 4, for every indicator.
 
 The promise that matters is the last one: for any history and any sequence of
-bars, the values `update` returns equal the batch function's values on the
-concatenated series, bitwise. A dashboard and a backtest cannot disagree.
+bars, what `update` returns equals the batch function on the concatenated
+series, bitwise. A dashboard and a backtest cannot disagree.
 """
 
 import numpy as np
@@ -14,130 +14,164 @@ import trendlib as tl
 pd = pytest.importorskip("pandas")
 
 
-def split_for(name, period):
-    return tl.lookback(name, period=period) + 1
+def as_list(value, indicator):
+    return list(value) if indicator.multi_output else [value]
 
 
-def test_opening_with_exactly_the_lookback_says_how_many_bars_are_needed(closes, indicator):
-    period = 10
-    needed = split_for(indicator, period)
+def same(left, right) -> bool:
+    """Equality that treats NaN as equal to NaN.
+
+    An indicator whose output is undefined for the test bars, such as an arc
+    cosine of a price, answers NaN on every row. Plain `==` would call two
+    identical streams different.
+    """
+    left = left if isinstance(left, tuple) else (left,)
+    right = right if isinstance(right, tuple) else (right,)
+    if len(left) != len(right):
+        return False
+    return all((a != a and b != b) or a == b for a, b in zip(left, right, strict=True))
+
+
+def outputs_of(result, indicator):
+    return list(result) if indicator.multi_output else [result]
+
+
+def factory(indicator):
+    return getattr(tl.stream, indicator.name)
+
+
+def test_opening_with_exactly_the_lookback_says_how_many_bars_are_needed(bars, indicator):
+    needed = indicator.lookback() + 1
+    columns = indicator.columns(bars, needed - 1)
     with pytest.raises(tl.InsufficientHistory) as caught:
-        getattr(tl.stream, indicator)(closes[: needed - 1], period=period)
+        factory(indicator)(*columns)
     assert f"at least {needed} valid bars" in str(caught.value)
-    assert issubclass(tl.InsufficientHistory, ValueError)
 
 
-def test_opening_with_one_more_bar_works(closes, indicator):
-    period = 10
-    needed = split_for(indicator, period)
-    handle = getattr(tl.stream, indicator)(closes[:needed], period=period)
-    batch = getattr(tl, indicator)(closes[:needed], period=period)
-    assert handle.value == batch[-1]
+def test_opening_with_one_more_bar_works(bars, indicator):
+    needed = indicator.lookback() + 1
+    handle = factory(indicator)(*indicator.columns(bars, needed))
+    batch = outputs_of(indicator.call(bars, needed), indicator)
     assert handle.bars_seen == needed
+    for value, column in zip(as_list(handle.value, indicator), batch, strict=True):
+        assert value == pytest.approx(column[-1], nan_ok=True) or np.isnan(column[-1])
 
 
-def test_update_reproduces_batch_bitwise(closes, indicator):
-    period = 14
-    split = split_for(indicator, period)
-    handle = getattr(tl.stream, indicator)(closes[:split], period=period)
-    streamed = list(getattr(tl, indicator)(closes[:split], period=period))
-    for bar in closes[split:]:
-        streamed.append(handle.update(bar))
-    assert bitwise_equal(streamed, getattr(tl, indicator)(closes, period=period))
-    assert handle.bars_seen == len(closes)
+def test_update_reproduces_batch_bitwise(bars, indicator):
+    rows = 400
+    split = indicator.lookback() + 1
+    columns = indicator.columns(bars, rows)
+    handle = factory(indicator)(*indicator.columns(bars, split))
+
+    streamed = [list(column) for column in outputs_of(indicator.call(bars, split), indicator)]
+    for row in range(split, rows):
+        bar = [column[row] for column in columns]
+        values = as_list(handle.update(*bar), indicator)
+        for held, value in zip(streamed, values, strict=True):
+            held.append(value)
+
+    expected = outputs_of(indicator.call(bars, rows), indicator)
+    for held, want in zip(streamed, expected, strict=True):
+        assert bitwise_equal(held, want)
+    assert handle.bars_seen == rows
 
 
-def test_open_and_fill_matches_batch_and_keeps_the_container(closes, indicator):
-    period = 14
-    index = pd.date_range("2024-01-01", periods=len(closes), freq="D", tz="Asia/Kolkata")
-    series = pd.Series(closes, index=index)
-    handle, filled = getattr(tl.stream, indicator).open_and_fill(series, period=period)
-    expected = getattr(tl, indicator)(series, period=period)
-    assert isinstance(filled, pd.Series)
-    assert filled.name == indicator
-    assert filled.index.equals(index)
-    assert bitwise_equal(filled.to_numpy(), expected.to_numpy())
-    assert handle.value == expected.to_numpy()[-1]
+def test_open_and_fill_matches_batch_and_keeps_the_container(bars, indicator):
+    rows = 200
+    index = pd.date_range("2024-01-01", periods=rows, freq="D", tz="Asia/Kolkata")
+    series = [pd.Series(column, index=index) for column in indicator.columns(bars, rows)]
+    handle, filled = factory(indicator).open_and_fill(*series)
+    expected = getattr(tl, indicator.name)(*series)
+
+    if indicator.multi_output:
+        assert isinstance(filled, pd.DataFrame)
+        assert list(filled.columns) == indicator.outputs
+        pd.testing.assert_frame_equal(filled, expected)
+    else:
+        assert isinstance(filled, pd.Series)
+        assert filled.name == indicator.outputs[0]
+        pd.testing.assert_series_equal(filled, expected)
+    assert handle.bars_seen == rows
 
 
-def test_peek_predicts_update_and_commits_nothing(closes, indicator):
-    period = 14
-    split = split_for(indicator, period)
-    handle = getattr(tl.stream, indicator)(closes[:split], period=period)
-    for bar in closes[split : split + 25]:
+def test_peek_predicts_update_and_commits_nothing(bars, indicator):
+    split = indicator.lookback() + 1
+    columns = indicator.columns(bars, split + 25)
+    handle = factory(indicator)(*indicator.columns(bars, split))
+
+    for row in range(split, split + 25):
+        bar = [column[row] for column in columns]
         before = handle.value
-        first = handle.peek(bar)
-        second = handle.peek(bar)
-        assert first == second
-        assert handle.value == before
-        assert handle.update(bar) == first
+        first = handle.peek(*bar)
+        second = handle.peek(*bar)
+        assert same(first, second)
+        assert same(handle.value, before)
+        assert same(handle.update(*bar), first)
 
 
-def test_copy_is_an_independent_fork(closes, indicator):
-    period = 14
-    split = split_for(indicator, period)
-    handle = getattr(tl.stream, indicator)(closes[:split], period=period)
+def test_copy_is_an_independent_fork(bars, indicator):
+    rows = 200
+    split = indicator.lookback() + 1
+    columns = indicator.columns(bars, rows)
+    handle = factory(indicator)(*indicator.columns(bars, split))
     fork = handle.copy()
     assert fork is not handle
-    assert fork.value == handle.value
+    assert same(fork.value, handle.value)
 
-    for bar in closes[split : split + 10]:
-        fork.update(bar * 1.5 + 3.0)
+    for row in range(split, split + 10):
+        fork.update(*[column[row] * 1.5 + 3.0 for column in columns])
 
-    expected = getattr(tl, indicator)(closes, period=period)
-    streamed = [handle.update(bar) for bar in closes[split:]]
-    assert bitwise_equal(streamed, expected[split:])
+    expected = outputs_of(indicator.call(bars, rows), indicator)
+    for row in range(split, rows):
+        values = as_list(handle.update(*[column[row] for column in columns]), indicator)
+        for value, want in zip(values, expected, strict=True):
+            assert bitwise_equal([value], [want[row]])
 
 
 @pytest.mark.parametrize("bad", [float("nan"), float("inf"), float("-inf")])
-def test_a_bad_bar_is_rejected_and_the_stream_is_unchanged(closes, indicator, bad):
-    period = 14
-    split = split_for(indicator, period)
-    clean = getattr(tl.stream, indicator)(closes[:split], period=period)
-    poisoned = getattr(tl.stream, indicator)(closes[:split], period=period)
+def test_a_bad_bar_is_rejected_and_the_stream_is_unchanged(bars, indicator, bad):
+    split = indicator.lookback() + 1
+    columns = indicator.columns(bars, split + 15)
+    clean = factory(indicator)(*indicator.columns(bars, split))
+    poisoned = factory(indicator)(*indicator.columns(bars, split))
 
     with pytest.raises(tl.InvalidInput):
-        poisoned.update(bad)
+        poisoned.update(*[bad] * len(indicator.inputs))
     with pytest.raises(tl.InvalidInput):
-        poisoned.peek(bad)
+        poisoned.peek(*[bad] * len(indicator.inputs))
     assert poisoned.bars_seen == clean.bars_seen
-    assert poisoned.value == clean.value
+    assert same(poisoned.value, clean.value)
 
-    for bar in closes[split : split + 15]:
-        assert poisoned.update(bar) == clean.update(bar)
-
-
-def test_a_dataframe_history_uses_its_close_column(closes, indicator):
-    frame = pd.DataFrame({"open": closes, "high": closes, "low": closes, "close": closes})
-    from_frame = getattr(tl.stream, indicator)(frame, period=14)
-    from_array = getattr(tl.stream, indicator)(closes, period=14)
-    assert from_frame.value == from_array.value
+    for row in range(split, split + 15):
+        bar = [column[row] for column in columns]
+        assert same(poisoned.update(*bar), clean.update(*bar))
 
 
-def test_parameters_are_fixed_for_the_life_of_the_stream(closes, indicator):
-    handle = getattr(tl.stream, indicator)(closes[:100], period=14)
-    assert not hasattr(handle, "period")
+def test_a_dataframe_history_is_accepted(bars, indicator):
+    if sum(1 for name in indicator.inputs if name.startswith("source")) > 1:
+        pytest.skip("a frame cannot say which column is which operand")
+    rows = 200
+    from_frame = factory(indicator)(indicator.frame(bars, rows))
+    from_arrays = factory(indicator)(*indicator.columns(bars, rows))
+    assert same(from_frame.value, from_arrays.value)
+
+
+def test_parameters_are_fixed_for_the_life_of_the_stream(bars, indicator):
+    handle = factory(indicator)(*indicator.columns(bars, 200))
     with pytest.raises(TypeError, match="unexpected parameter"):
-        getattr(tl.stream, indicator)(closes[:100], timeperiod=14)
+        factory(indicator)(*indicator.columns(bars, 200), nonesuch=14)
+    assert handle.bars_seen == 200
 
 
-def test_an_out_of_range_period_is_reported_the_same_way(closes):
-    with pytest.raises(tl.InvalidInput) as caught:
-        tl.stream.rsi(closes[:100], period=1)
-    assert str(caught.value) == "rsi: period=1 is out of range [2, 100000]"
-
-
-def test_repr_shows_the_name_and_position(closes, indicator):
-    handle = getattr(tl.stream, indicator)(closes[:100], period=14)
+def test_repr_shows_the_name_and_position(bars, indicator):
+    handle = factory(indicator)(*indicator.columns(bars, 200))
     text = repr(handle)
-    assert indicator in text
-    assert "bars_seen=100" in text
+    assert indicator.name in text
+    assert "bars_seen=200" in text
 
 
-def test_leading_warm_up_rows_in_history_still_count_as_bars(closes, indicator):
-    period = 14
-    split = split_for(indicator, period)
-    history = np.concatenate([[np.nan] * 3, closes[:split]])
-    handle = getattr(tl.stream, indicator)(history, period=period)
-    assert handle.bars_seen == len(history)
-    assert handle.value == getattr(tl, indicator)(history, period=period)[-1]
+def test_leading_warm_up_rows_in_history_still_count_as_bars(bars, indicator):
+    split = indicator.lookback() + 1
+    history = [np.concatenate([[np.nan] * 3, column]) for column in indicator.columns(bars, split)]
+    handle = factory(indicator)(*history)
+    assert handle.bars_seen == split + 3

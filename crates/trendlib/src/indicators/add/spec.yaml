@@ -1,0 +1,19 @@
+name: add
+title: Vector Addition
+group: operator
+inputs:
+  - name: source0
+    kind: series
+  - name: source1
+    kind: series
+outputs:
+  - name: add
+    dtype: float64
+    plot: line
+    doc: Addition of the two inputs
+talib:
+  name: ADD
+  params: {}
+  outputs: [real]
+references:
+  - ISO/IEC 9899, the C standard library, section 7.12 (mathematical functions)

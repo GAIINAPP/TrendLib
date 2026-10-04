@@ -38,6 +38,9 @@ pub const FLAGS: &[&str] = &[
     "unstable",
     "requires_timestamps",
     "pattern",
+    // The output can legitimately be NaN or infinite for finite input: a
+    // logarithm of zero, an arc cosine outside [-1, 1], a division by zero.
+    "nan_inf_output",
 ];
 
 #[derive(Debug, Clone)]

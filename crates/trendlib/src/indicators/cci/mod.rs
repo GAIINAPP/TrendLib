@@ -35,11 +35,27 @@ fn typical_price(bar: [f64; 3]) -> f64 {
 
 // A window that never moved has no mean deviation to measure against, so the
 // index is reported as 0 rather than as a division by zero, as TA-Lib does.
-fn index(now: f64, mean: f64, deviation: f64) -> f64 {
-    if deviation == 0.0 {
+fn index(now: f64, mean: f64, deviation: f64, flat: bool) -> f64 {
+    if flat || deviation == 0.0 {
         0.0
     } else {
         (now - mean) / (SCALE * deviation)
+    }
+}
+
+/// `true` when every value in the window is the same number.
+///
+/// This cannot be recognised from the deviation alone. Summing `n` copies of a
+/// value and dividing by `n` does not always give that value back, so a window
+/// that never moved can still produce a mean a unit or two in the last place
+/// away from it. The numerator and the denominator of the index are then both
+/// that same rounding residue, and their ratio is a large number conjured out
+/// of nothing: a flat window at 90391.77490280448 answered -66.7 instead of 0.
+/// Asking the window directly is exact and needs no tolerance.
+fn is_flat(mut values: impl Iterator<Item = f64>) -> bool {
+    match values.next() {
+        None => true,
+        Some(first) => values.all(|value| value == first),
     }
 }
 
@@ -52,7 +68,7 @@ impl Step<3, 1> for State {
         let mean = self.typical.exact_mean();
         let period = self.typical.period() as f64;
         let deviation = self.typical.values().map(|v| (v - mean).abs()).sum::<f64>() / period;
-        Some([index(now, mean, deviation)])
+        Some([index(now, mean, deviation, is_flat(self.typical.values()))])
     }
 
     fn preview(&self, bar: [f64; 3]) -> Option<[f64; 1]> {
@@ -68,7 +84,12 @@ impl Step<3, 1> for State {
             .map(|v| (v - mean).abs())
             .sum::<f64>()
             / period;
-        Some([index(now, mean, deviation)])
+        Some([index(
+            now,
+            mean,
+            deviation,
+            is_flat(self.typical.preview_values(now)),
+        )])
     }
 }
 

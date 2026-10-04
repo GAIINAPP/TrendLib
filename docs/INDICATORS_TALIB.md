@@ -44,30 +44,30 @@ Total: **201 functions**.
 | Function | Alias | Inputs | Parameters (default, range) | Outputs |
 | --- | --- | --- | --- | --- |
 | `accbands` | `ACCBANDS` | `high`, `low`, `close` | `period` 20 [2, 100000] | `accbands_upper`, `accbands_middle`, `accbands_lower` |
-| `bbands` | `BBANDS` | `close` | `period` 20 [2, 100000]; `nbdev_up` 2.0 any; `nbdev_dn` 2.0 any; `ma_type` "sma" (MaType) | `bbands_upper`, `bbands_middle`, `bbands_lower` |
-| `dema` | `DEMA` | `close` | `period` 30 [1, 100000] | `dema` |
+| `bbands` | `BBANDS` | `source` | `period` 20 [2, 100000]; `nbdev_up` 2.0 any; `nbdev_dn` 2.0 any; `ma_type` "sma" (MaType) | `bbands_upper`, `bbands_middle`, `bbands_lower` |
+| `dema` | `DEMA` | `source` | `period` 30 [1, 100000] | `dema` |
 | `donchian` | `DONCHIAN` | `high`, `low` | `period` 20 [2, 100000] | `donchian_upper`, `donchian_middle`, `donchian_lower` |
-| `ema` | `EMA` | `close` | `period` 30 [1, 100000] | `ema` |
-| `hma` | `HMA` | `close` | `period` 20 [1, 100000] | `hma` |
-| `ht_trendline` | `HT_TRENDLINE` | `close` | -- | `ht_trendline` |
-| `kama` | `KAMA` | `close` | `period` 30 [1, 100000] | `kama` |
+| `ema` | `EMA` | `source` | `period` 30 [1, 100000] | `ema` |
+| `hma` | `HMA` | `source` | `period` 20 [1, 100000] | `hma` |
+| `ht_trendline` | `HT_TRENDLINE` | `source` | -- | `ht_trendline` |
+| `kama` | `KAMA` | `source` | `period` 30 [1, 100000] | `kama` |
 | `kc` | `KC` | `high`, `low`, `close` | `period` 20 [2, 100000]; `atr_period` 10 [1, 100000]; `nbdev` 2.0 any | `kc_upper`, `kc_middle`, `kc_lower` |
-| `ma` | `MA` | `close` | `period` 30 [1, 100000]; `ma_type` "sma" (MaType) | `ma` |
-| `mama` | `MAMA` | `close` | `fast_limit` 0.5 any; `slow_limit` 0.05 any | `mama`, `mama_fama` |
+| `ma` | `MA` | `source` | `period` 30 [1, 100000]; `ma_type` "sma" (MaType) | `ma` |
+| `mama` | `MAMA` | `source` | `fast_limit` 0.5 any; `slow_limit` 0.05 any | `mama`, `mama_fama` |
 | `mavp` | `MAVP` | `close`, `periods` | `min_period` 2 [1, 30]; `max_period` 30 [2, 100000]; `ma_type` "sma" (MaType) | `mavp` |
-| `midpoint` | `MIDPOINT` | `close` | `period` 14 [2, 100000] | `midpoint` |
+| `midpoint` | `MIDPOINT` | `source` | `period` 14 [2, 100000] | `midpoint` |
 | `midprice` | `MIDPRICE` | `high`, `low` | `period` 14 [2, 100000] | `midprice` |
-| `rma` | `RMA` | `close` | `period` 30 [1, 100000] | `rma` |
+| `rma` | `RMA` | `source` | `period` 30 [1, 100000] | `rma` |
 | `sar` | `SAR` | `high`, `low` | `acceleration` 0.02 any; `maximum` 0.2 any | `sar` |
 | `sarext` | `SAREXT` | `high`, `low` | `start_value` 0.0 any; `offset_on_reverse` 0.0 any; `acceleration_init_long` 0.02 any; `acceleration_long` 0.02 any; `acceleration_max_long` 0.2 any; `acceleration_init_short` 0.02 any; `acceleration_short` 0.02 any; `acceleration_max_short` 0.2 any | `sarext` |
-| `sma` | `SMA` | `close` | `period` 30 [1, 100000] | `sma` |
+| `sma` | `SMA` | `source` | `period` 30 [1, 100000] | `sma` |
 | `supertrend` | `SUPERTREND` | `high`, `low`, `close` | `period` 10 [2, 100000]; `multiplier` 3.0 any | `supertrend`, `supertrend_direction` |
-| `t3` | `T3` | `close` | `period` 5 [1, 100000]; `v_factor` 0.7 any | `t3` |
-| `tema` | `TEMA` | `close` | `period` 30 [1, 100000] | `tema` |
-| `trima` | `TRIMA` | `close` | `period` 30 [1, 100000] | `trima` |
+| `t3` | `T3` | `source` | `period` 5 [1, 100000]; `v_factor` 0.7 any | `t3` |
+| `tema` | `TEMA` | `source` | `period` 30 [1, 100000] | `tema` |
+| `trima` | `TRIMA` | `source` | `period` 30 [1, 100000] | `trima` |
 | `vwma` | `VWMA` | `close`, `volume` | `period` 30 [1, 100000] | `vwma` |
-| `wma` | `WMA` | `close` | `period` 30 [1, 100000] | `wma` |
-| `zlema` | `ZLEMA` | `close` | `period` 30 [1, 100000] | `zlema` |
+| `wma` | `WMA` | `source` | `period` 30 [1, 100000] | `wma` |
+| `zlema` | `ZLEMA` | `source` | `period` 30 [1, 100000] | `zlema` |
 
 ## Momentum
 
@@ -79,46 +79,46 @@ Total: **201 functions**.
 | `adx` | `ADX` | `high`, `low`, `close` | `period` 14 [2, 100000] | `adx` |
 | `adxr` | `ADXR` | `high`, `low`, `close` | `period` 14 [2, 100000] | `adxr` |
 | `ao` | `AO` | `high`, `low` | `fast_period` 5 [2, 100000]; `slow_period` 34 [2, 100000] | `ao` |
-| `apo` | `APO` | `close` | `fast_period` 12 [2, 100000]; `slow_period` 26 [2, 100000]; `ma_type` "<int 1>" (MaType) | `apo` |
+| `apo` | `APO` | `source` | `fast_period` 12 [2, 100000]; `slow_period` 26 [2, 100000]; `ma_type` "<int 1>" (MaType) | `apo` |
 | `aroon` | `AROON` | `high`, `low` | `period` 14 [2, 100000] | `aroon_down`, `aroon_up` |
 | `aroonosc` | `AROONOSC` | `high`, `low` | `period` 14 [2, 100000] | `aroonosc` |
 | `bop` | `BOP` | `open`, `high`, `low`, `close` | -- | `bop` |
 | `cci` | `CCI` | `high`, `low`, `close` | `period` 14 [2, 100000] | `cci` |
-| `cmo` | `CMO` | `close` | `period` 14 [2, 100000] | `cmo` |
-| `cmou` | `CMOU` | `close` | `period` 14 [2, 100000] | `cmou` |
-| `coppock` | `COPPOCK` | `close` | `wma_period` 10 [1, 100000]; `roc1_period` 11 [1, 100000]; `roc2_period` 14 [1, 100000] | `coppock` |
-| `dpo` | `DPO` | `close` | `period` 20 [2, 100000] | `dpo` |
+| `cmo` | `CMO` | `source` | `period` 14 [2, 100000] | `cmo` |
+| `cmou` | `CMOU` | `source` | `period` 14 [2, 100000] | `cmou` |
+| `coppock` | `COPPOCK` | `source` | `wma_period` 10 [1, 100000]; `roc1_period` 11 [1, 100000]; `roc2_period` 14 [1, 100000] | `coppock` |
+| `dpo` | `DPO` | `source` | `period` 20 [2, 100000] | `dpo` |
 | `dx` | `DX` | `high`, `low`, `close` | `period` 14 [2, 100000] | `dx` |
-| `er` | `ER` | `close` | `period` 10 [2, 100000] | `er` |
+| `er` | `ER` | `source` | `period` 10 [2, 100000] | `er` |
 | `eri` | `ERI` | `high`, `low`, `close` | `period` 13 [1, 100000] | `eri_bull_power`, `eri_bear_power` |
-| `fosc` | `FOSC` | `close` | `period` 5 [2, 100000] | `fosc` |
+| `fosc` | `FOSC` | `source` | `period` 5 [2, 100000] | `fosc` |
 | `fractal` | `FRACTAL` | `high`, `low` | `left_bars` 2 [1, 100000]; `right_bars` 2 [1, 100000] | `fractal_swing_high`, `fractal_swing_low` |
 | `imi` | `IMI` | `open`, `close` | `period` 14 [2, 100000] | `imi` |
 | `kdj` | `KDJ` | `high`, `low`, `close` | `fastk_period` 9 [1, 100000]; `slowk_period` 3 [1, 100000]; `slowk_ma_type` "<int 13>" (MaType); `slowd_period` 3 [1, 100000]; `slowd_ma_type` "<int 13>" (MaType) | `kdj_k`, `kdj_d`, `kdj_j` |
-| `macd` | `MACD` | `close` | `fast_period` 12 [2, 100000]; `slow_period` 26 [2, 100000]; `signal_period` 9 [1, 100000] | `macd`, `macd_signal`, `macd_hist` |
-| `macdext` | `MACDEXT` | `close` | `fast_period` 12 [2, 100000]; `fast_ma_type` "sma" (MaType); `slow_period` 26 [2, 100000]; `slow_ma_type` "sma" (MaType); `signal_period` 9 [1, 100000]; `signal_ma_type` "sma" (MaType) | `macdext_macd`, `macdext_signal`, `macdext_hist` |
-| `macdfix` | `MACDFIX` | `close` | `signal_period` 9 [1, 100000] | `macdfix_macd`, `macdfix_signal`, `macdfix_hist` |
+| `macd` | `MACD` | `source` | `fast_period` 12 [2, 100000]; `slow_period` 26 [2, 100000]; `signal_period` 9 [1, 100000] | `macd`, `macd_signal`, `macd_hist` |
+| `macdext` | `MACDEXT` | `source` | `fast_period` 12 [2, 100000]; `fast_ma_type` "sma" (MaType); `slow_period` 26 [2, 100000]; `slow_ma_type` "sma" (MaType); `signal_period` 9 [1, 100000]; `signal_ma_type` "sma" (MaType) | `macdext_macd`, `macdext_signal`, `macdext_hist` |
+| `macdfix` | `MACDFIX` | `source` | `signal_period` 9 [1, 100000] | `macdfix_macd`, `macdfix_signal`, `macdfix_hist` |
 | `mfi` | `MFI` | `high`, `low`, `close`, `volume` | `period` 14 [2, 100000] | `mfi` |
 | `minus_di` | `MINUS_DI` | `high`, `low`, `close` | `period` 14 [1, 100000] | `minus_di` |
 | `minus_dm` | `MINUS_DM` | `high`, `low` | `period` 14 [1, 100000] | `minus_dm` |
-| `mom` | `MOM` | `close` | `period` 10 [1, 100000] | `mom` |
+| `mom` | `MOM` | `source` | `period` 10 [1, 100000] | `mom` |
 | `plus_di` | `PLUS_DI` | `high`, `low`, `close` | `period` 14 [1, 100000] | `plus_di` |
 | `plus_dm` | `PLUS_DM` | `high`, `low` | `period` 14 [1, 100000] | `plus_dm` |
-| `ppo` | `PPO` | `close` | `fast_period` 12 [2, 100000]; `slow_period` 26 [2, 100000]; `ma_type` "<int 1>" (MaType) | `ppo` |
+| `ppo` | `PPO` | `source` | `fast_period` 12 [2, 100000]; `slow_period` 26 [2, 100000]; `ma_type` "<int 1>" (MaType) | `ppo` |
 | `qstick` | `QSTICK` | `open`, `close` | `period` 10 [1, 100000] | `qstick` |
-| `roc` | `ROC` | `close` | `period` 10 [1, 100000] | `roc` |
-| `rocp` | `ROCP` | `close` | `period` 10 [1, 100000] | `rocp` |
-| `rocr` | `ROCR` | `close` | `period` 10 [1, 100000] | `rocr` |
-| `rocr100` | `ROCR100` | `close` | `period` 10 [1, 100000] | `rocr100` |
-| `rsi` | `RSI` | `close` | `period` 14 [2, 100000] | `rsi` |
+| `roc` | `ROC` | `source` | `period` 10 [1, 100000] | `roc` |
+| `rocp` | `ROCP` | `source` | `period` 10 [1, 100000] | `rocp` |
+| `rocr` | `ROCR` | `source` | `period` 10 [1, 100000] | `rocr` |
+| `rocr100` | `ROCR100` | `source` | `period` 10 [1, 100000] | `rocr100` |
+| `rsi` | `RSI` | `source` | `period` 14 [2, 100000] | `rsi` |
 | `smi` | `SMI` | `high`, `low`, `close` | `period` 13 [2, 100000]; `fast_period` 2 [2, 100000]; `slow_period` 25 [2, 100000]; `signal_period` 9 [2, 100000] | `smi`, `smi_smisignal` |
 | `stoch` | `STOCH` | `high`, `low`, `close` | `fastk_period` 5 [1, 100000]; `slowk_period` 3 [1, 100000]; `slowk_ma_type` "sma" (MaType); `slowd_period` 3 [1, 100000]; `slowd_ma_type` "sma" (MaType) | `stoch_k`, `stoch_d` |
 | `stochf` | `STOCHF` | `high`, `low`, `close` | `fastk_period` 5 [1, 100000]; `fastd_period` 3 [1, 100000]; `fastd_ma_type` "sma" (MaType) | `stochf_k`, `stochf_d` |
-| `stochrsi` | `STOCHRSI` | `close` | `period` 14 [2, 100000]; `fastk_period` 5 [1, 100000]; `fastd_period` 3 [1, 100000]; `fastd_ma_type` "sma" (MaType) | `stochrsi_k`, `stochrsi_d` |
-| `trix` | `TRIX` | `close` | `period` 30 [1, 100000] | `trix` |
-| `tsi` | `TSI` | `close` | `first_period` 25 [2, 100000]; `second_period` 13 [2, 100000] | `tsi` |
+| `stochrsi` | `STOCHRSI` | `source` | `period` 14 [2, 100000]; `fastk_period` 5 [1, 100000]; `fastd_period` 3 [1, 100000]; `fastd_ma_type` "sma" (MaType) | `stochrsi_k`, `stochrsi_d` |
+| `trix` | `TRIX` | `source` | `period` 30 [1, 100000] | `trix` |
+| `tsi` | `TSI` | `source` | `first_period` 25 [2, 100000]; `second_period` 13 [2, 100000] | `tsi` |
 | `ultosc` | `ULTOSC` | `high`, `low`, `close` | `period1` 7 [1, 100000]; `period2` 14 [1, 100000]; `period3` 28 [1, 100000] | `ultosc` |
-| `vhf` | `VHF` | `close` | `period` 28 [2, 100000] | `vhf` |
+| `vhf` | `VHF` | `source` | `period` 28 [2, 100000] | `vhf` |
 | `vortex` | `VORTEX` | `high`, `low`, `close` | `period` 14 [1, 100000] | `vortex_plusvi`, `vortex_minusvi` |
 | `wad` | `WAD` | `high`, `low`, `close` | -- | `wad` |
 | `willr` | `WILLR` | `high`, `low`, `close` | `period` 14 [2, 100000] | `willr` |
@@ -134,7 +134,7 @@ Total: **201 functions**.
 | `cvi` | `CVI` | `high`, `low` | `period` 10 [2, 100000]; `roc_period` 10 [1, 100000] | `cvi` |
 | `massi` | `MASSI` | `high`, `low` | `fast_period` 9 [2, 100000]; `slow_period` 25 [2, 100000] | `massi` |
 | `natr` | `NATR` | `high`, `low`, `close` | `period` 14 [1, 100000] | `natr` |
-| `rvi` | `RVI` | `close` | `period` 14 [1, 100000]; `stddev_period` 10 [2, 100000] | `rvi` |
+| `rvi` | `RVI` | `source` | `period` 14 [1, 100000]; `stddev_period` 10 [2, 100000] | `rvi` |
 | `trange` | `TRANGE` | `high`, `low`, `close` | -- | `trange` |
 
 ## Volume
@@ -164,7 +164,7 @@ Total: **201 functions**.
 
 | Function | Alias | Inputs | Parameters (default, range) | Outputs |
 | --- | --- | --- | --- | --- |
-| `avgdev` | `AVGDEV` | `close` | `period` 14 [2, 100000] | `avgdev` |
+| `avgdev` | `AVGDEV` | `source` | `period` 14 [2, 100000] | `avgdev` |
 | `avgprice` | `AVGPRICE` | `open`, `high`, `low`, `close` | -- | `avgprice` |
 | `ha` | `HA` | `open`, `high`, `low`, `close` | -- | `ha_open`, `ha_high`, `ha_low`, `ha_close` |
 | `medprice` | `MEDPRICE` | `high`, `low` | -- | `medprice` |
@@ -177,11 +177,11 @@ Total: **201 functions**.
 
 | Function | Alias | Inputs | Parameters (default, range) | Outputs |
 | --- | --- | --- | --- | --- |
-| `ht_dcperiod` | `HT_DCPERIOD` | `close` | -- | `ht_dcperiod` |
-| `ht_dcphase` | `HT_DCPHASE` | `close` | -- | `ht_dcphase` |
-| `ht_phasor` | `HT_PHASOR` | `close` | -- | `ht_phasor_in_phase`, `ht_phasor_quadrature` |
-| `ht_sine` | `HT_SINE` | `close` | -- | `ht_sine_sine`, `ht_sine_lead_sine` |
-| `ht_trendmode` | `HT_TRENDMODE` | `close` | -- | `ht_trendmode` (int32) |
+| `ht_dcperiod` | `HT_DCPERIOD` | `source` | -- | `ht_dcperiod` |
+| `ht_dcphase` | `HT_DCPHASE` | `source` | -- | `ht_dcphase` |
+| `ht_phasor` | `HT_PHASOR` | `source` | -- | `ht_phasor_in_phase`, `ht_phasor_quadrature` |
+| `ht_sine` | `HT_SINE` | `source` | -- | `ht_sine_sine`, `ht_sine_lead_sine` |
+| `ht_trendmode` | `HT_TRENDMODE` | `source` | -- | `ht_trendmode` (int32) |
 
 ## Statistics
 
@@ -191,15 +191,15 @@ Total: **201 functions**.
 | --- | --- | --- | --- | --- |
 | `beta` | `BETA` | `high`, `low` | `period` 5 [1, 100000] | `beta` |
 | `correl` | `CORREL` | `high`, `low` | `period` 30 [1, 100000] | `correl` |
-| `linearreg` | `LINEARREG` | `close` | `period` 14 [2, 100000] | `linearreg` |
-| `linearreg_angle` | `LINEARREG_ANGLE` | `close` | `period` 14 [2, 100000] | `linearreg_angle` |
-| `linearreg_intercept` | `LINEARREG_INTERCEPT` | `close` | `period` 14 [2, 100000] | `linearreg_intercept` |
-| `linearreg_slope` | `LINEARREG_SLOPE` | `close` | `period` 14 [2, 100000] | `linearreg_slope` |
-| `percentile` | `PERCENTILE` | `close` | `period` 30 [2, 100000]; `percentile` 50.0 any | `percentile` |
-| `percentrank` | `PERCENTRANK` | `close` | `period` 100 [2, 100000] | `percentrank` |
-| `stddev` | `STDDEV` | `close` | `period` 5 [2, 100000]; `nbdev` 1.0 any | `stddev` |
-| `tsf` | `TSF` | `close` | `period` 14 [2, 100000] | `tsf` |
-| `var` | `VAR` | `close` | `period` 5 [1, 100000]; `nbdev` 1.0 any | `var` |
+| `linearreg` | `LINEARREG` | `source` | `period` 14 [2, 100000] | `linearreg` |
+| `linearreg_angle` | `LINEARREG_ANGLE` | `source` | `period` 14 [2, 100000] | `linearreg_angle` |
+| `linearreg_intercept` | `LINEARREG_INTERCEPT` | `source` | `period` 14 [2, 100000] | `linearreg_intercept` |
+| `linearreg_slope` | `LINEARREG_SLOPE` | `source` | `period` 14 [2, 100000] | `linearreg_slope` |
+| `percentile` | `PERCENTILE` | `source` | `period` 30 [2, 100000]; `percentile` 50.0 any | `percentile` |
+| `percentrank` | `PERCENTRANK` | `source` | `period` 100 [2, 100000] | `percentrank` |
+| `stddev` | `STDDEV` | `source` | `period` 5 [2, 100000]; `nbdev` 1.0 any | `stddev` |
+| `tsf` | `TSF` | `source` | `period` 14 [2, 100000] | `tsf` |
+| `var` | `VAR` | `source` | `period` 5 [1, 100000]; `nbdev` 1.0 any | `var` |
 
 ## Math transforms
 
@@ -207,21 +207,21 @@ Total: **201 functions**.
 
 | Function | Alias | Inputs | Parameters (default, range) | Outputs |
 | --- | --- | --- | --- | --- |
-| `acos` | `ACOS` | `close` | -- | `acos` |
-| `asin` | `ASIN` | `close` | -- | `asin` |
-| `atan` | `ATAN` | `close` | -- | `atan` |
-| `ceil` | `CEIL` | `close` | -- | `ceil` |
-| `cos` | `COS` | `close` | -- | `cos` |
-| `cosh` | `COSH` | `close` | -- | `cosh` |
-| `exp` | `EXP` | `close` | -- | `exp` |
-| `floor` | `FLOOR` | `close` | -- | `floor` |
-| `ln` | `LN` | `close` | -- | `ln` |
-| `log10` | `LOG10` | `close` | -- | `log10` |
-| `sin` | `SIN` | `close` | -- | `sin` |
-| `sinh` | `SINH` | `close` | -- | `sinh` |
-| `sqrt` | `SQRT` | `close` | -- | `sqrt` |
-| `tan` | `TAN` | `close` | -- | `tan` |
-| `tanh` | `TANH` | `close` | -- | `tanh` |
+| `acos` | `ACOS` | `source` | -- | `acos` |
+| `asin` | `ASIN` | `source` | -- | `asin` |
+| `atan` | `ATAN` | `source` | -- | `atan` |
+| `ceil` | `CEIL` | `source` | -- | `ceil` |
+| `cos` | `COS` | `source` | -- | `cos` |
+| `cosh` | `COSH` | `source` | -- | `cosh` |
+| `exp` | `EXP` | `source` | -- | `exp` |
+| `floor` | `FLOOR` | `source` | -- | `floor` |
+| `ln` | `LN` | `source` | -- | `ln` |
+| `log10` | `LOG10` | `source` | -- | `log10` |
+| `sin` | `SIN` | `source` | -- | `sin` |
+| `sinh` | `SINH` | `source` | -- | `sinh` |
+| `sqrt` | `SQRT` | `source` | -- | `sqrt` |
+| `tan` | `TAN` | `source` | -- | `tan` |
+| `tanh` | `TANH` | `source` | -- | `tanh` |
 
 ## Math operators
 
@@ -229,18 +229,18 @@ Total: **201 functions**.
 
 | Function | Alias | Inputs | Parameters (default, range) | Outputs |
 | --- | --- | --- | --- | --- |
-| `add` | `ADD` | `high`, `low` | -- | `add` |
-| `cumsum` | `CUMSUM` | `close` | -- | `cumsum` |
-| `div` | `DIV` | `high`, `low` | -- | `div` |
-| `max` | `MAX` | `close` | `period` 30 [2, 100000] | `max` |
-| `maxindex` | `MAXINDEX` | `close` | `period` 30 [2, 100000] | `maxindex` (int32) |
-| `min` | `MIN` | `close` | `period` 30 [2, 100000] | `min` |
-| `minindex` | `MININDEX` | `close` | `period` 30 [2, 100000] | `minindex` (int32) |
-| `minmax` | `MINMAX` | `close` | `period` 30 [2, 100000] | `minmax_min`, `minmax_max` |
-| `minmaxindex` | `MINMAXINDEX` | `close` | `period` 30 [2, 100000] | `minmaxindex_min_index`, `minmaxindex_max_index` |
-| `mult` | `MULT` | `high`, `low` | -- | `mult` |
-| `sub` | `SUB` | `high`, `low` | -- | `sub` |
-| `sum` | `SUM` | `close` | `period` 30 [2, 100000] | `sum` |
+| `add` | `ADD` | `source0`, `source1` | -- | `add` |
+| `cumsum` | `CUMSUM` | `source` | -- | `cumsum` |
+| `div` | `DIV` | `source0`, `source1` | -- | `div` |
+| `max` | `MAX` | `source` | `period` 30 [2, 100000] | `max` |
+| `maxindex` | `MAXINDEX` | `source` | `period` 30 [2, 100000] | `maxindex` (int32) |
+| `min` | `MIN` | `source` | `period` 30 [2, 100000] | `min` |
+| `minindex` | `MININDEX` | `source` | `period` 30 [2, 100000] | `minindex` (int32) |
+| `minmax` | `MINMAX` | `source` | `period` 30 [2, 100000] | `minmax_min`, `minmax_max` |
+| `minmaxindex` | `MINMAXINDEX` | `source` | `period` 30 [2, 100000] | `minmaxindex_min_index`, `minmaxindex_max_index` |
+| `mult` | `MULT` | `source0`, `source1` | -- | `mult` |
+| `sub` | `SUB` | `source0`, `source1` | -- | `sub` |
+| `sum` | `SUM` | `source` | `period` 30 [2, 100000] | `sum` |
 
 ## Candlestick patterns
 

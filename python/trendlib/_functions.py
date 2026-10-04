@@ -13,40 +13,101 @@ from typing import Any
 from trendlib import _convert, _core
 
 __all__ = [
+    "ACOS",
     "AD",
+    "ADD",
+    "ASIN",
+    "ATAN",
     "ATR",
+    "AVGPRICE",
     "CCI",
+    "CEIL",
+    "COS",
+    "COSH",
+    "CUMSUM",
     "DEMA",
+    "DIV",
     "EMA",
+    "EXP",
+    "FLOOR",
+    "LN",
+    "LOG10",
     "MACD",
+    "MEDPRICE",
+    "MULT",
     "NATR",
     "OBV",
     "ROC",
     "RSI",
+    "SIN",
+    "SINH",
     "SMA",
+    "SQRT",
+    "SUB",
+    "TAN",
+    "TANH",
     "TEMA",
     "TRANGE",
+    "TYPPRICE",
+    "WCLPRICE",
     "WILLR",
     "WMA",
+    "acos",
     "ad",
+    "add",
+    "asin",
+    "atan",
     "atr",
+    "avgprice",
     "cci",
+    "ceil",
+    "cos",
+    "cosh",
+    "cumsum",
     "dema",
+    "div",
     "ema",
+    "exp",
+    "floor",
+    "ln",
+    "log10",
     "lookback",
     "macd",
+    "medprice",
+    "mult",
     "natr",
     "obv",
     "roc",
     "rsi",
+    "sin",
+    "sinh",
     "sma",
+    "sqrt",
+    "sub",
+    "tan",
+    "tanh",
     "tema",
     "trange",
+    "typprice",
+    "wclprice",
     "willr",
     "wma",
 ]
 
 _PARAMS = _core.PARAMS
+
+
+def acos(source=None) -> Any:
+    """Vector Arc Cosine.
+
+    Returns
+    -------
+    ndarray or Series
+        Arc Cosine of source, element by element.
+    """
+    columns, carrier = _convert.bars("acos", (source,), ("source",), ("series",))
+    out = _core.acos(*columns)
+    return _convert.wrap_outputs(out, carrier, ("acos",))
 
 
 def ad(high=None, low=None, close=None, volume=None) -> Any:
@@ -75,6 +136,56 @@ def ad(high=None, low=None, close=None, volume=None) -> Any:
     )
     out = _core.ad(*columns)
     return _convert.wrap_outputs(out, carrier, ("ad",))
+
+
+def add(source0=None, source1=None) -> Any:
+    """Vector Addition.
+
+    Returns
+    -------
+    ndarray or Series
+        Addition of the two inputs.
+    """
+    columns, carrier = _convert.bars(
+        "add",
+        (source0, source1),
+        (
+            "source0",
+            "source1",
+        ),
+        (
+            "series",
+            "series",
+        ),
+    )
+    out = _core.add(*columns)
+    return _convert.wrap_outputs(out, carrier, ("add",))
+
+
+def asin(source=None) -> Any:
+    """Vector Arc Sine.
+
+    Returns
+    -------
+    ndarray or Series
+        Arc Sine of source, element by element.
+    """
+    columns, carrier = _convert.bars("asin", (source,), ("source",), ("series",))
+    out = _core.asin(*columns)
+    return _convert.wrap_outputs(out, carrier, ("asin",))
+
+
+def atan(source=None) -> Any:
+    """Vector Arc Tangent.
+
+    Returns
+    -------
+    ndarray or Series
+        Arc Tangent of source, element by element.
+    """
+    columns, carrier = _convert.bars("atan", (source,), ("source",), ("series",))
+    out = _core.atan(*columns)
+    return _convert.wrap_outputs(out, carrier, ("atan",))
 
 
 def atr(
@@ -111,6 +222,34 @@ def atr(
     return _convert.wrap_outputs(out, carrier, ("atr",))
 
 
+def avgprice(open=None, high=None, low=None, close=None) -> Any:
+    """Average Price.
+
+    Returns
+    -------
+    ndarray or Series
+        The four prices a bar records, averaged equally.
+    """
+    columns, carrier = _convert.bars(
+        "avgprice",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.avgprice(*columns)
+    return _convert.wrap_outputs(out, carrier, ("avgprice",))
+
+
 def cci(
     high=None, low=None, close=None, *, period: int = _PARAMS["cci"]["period"]["default"]
 ) -> Any:
@@ -145,6 +284,58 @@ def cci(
     return _convert.wrap_outputs(out, carrier, ("cci",))
 
 
+def ceil(source=None) -> Any:
+    """Vector Ceiling.
+
+    Returns
+    -------
+    ndarray or Series
+        Ceiling of source, element by element.
+    """
+    columns, carrier = _convert.bars("ceil", (source,), ("source",), ("series",))
+    out = _core.ceil(*columns)
+    return _convert.wrap_outputs(out, carrier, ("ceil",))
+
+
+def cos(source=None) -> Any:
+    """Vector Cosine.
+
+    Returns
+    -------
+    ndarray or Series
+        Cosine of source, element by element.
+    """
+    columns, carrier = _convert.bars("cos", (source,), ("source",), ("series",))
+    out = _core.cos(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cos",))
+
+
+def cosh(source=None) -> Any:
+    """Vector Hyperbolic Cosine.
+
+    Returns
+    -------
+    ndarray or Series
+        Hyperbolic Cosine of source, element by element.
+    """
+    columns, carrier = _convert.bars("cosh", (source,), ("source",), ("series",))
+    out = _core.cosh(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cosh",))
+
+
+def cumsum(source=None) -> Any:
+    """Cumulative Sum.
+
+    Returns
+    -------
+    ndarray or Series
+        Running total of source from the first valid bar.
+    """
+    columns, carrier = _convert.bars("cumsum", (source,), ("source",), ("series",))
+    out = _core.cumsum(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cumsum",))
+
+
 def dema(source=None, *, period: int = _PARAMS["dema"]["period"]["default"]) -> Any:
     """Double Exponential Moving Average.
 
@@ -164,6 +355,30 @@ def dema(source=None, *, period: int = _PARAMS["dema"]["period"]["default"]) -> 
     return _convert.wrap_outputs(out, carrier, ("dema",))
 
 
+def div(source0=None, source1=None) -> Any:
+    """Vector Division.
+
+    Returns
+    -------
+    ndarray or Series
+        Division of the two inputs.
+    """
+    columns, carrier = _convert.bars(
+        "div",
+        (source0, source1),
+        (
+            "source0",
+            "source1",
+        ),
+        (
+            "series",
+            "series",
+        ),
+    )
+    out = _core.div(*columns)
+    return _convert.wrap_outputs(out, carrier, ("div",))
+
+
 def ema(source=None, *, period: int = _PARAMS["ema"]["period"]["default"]) -> Any:
     """Exponential Moving Average.
 
@@ -181,6 +396,58 @@ def ema(source=None, *, period: int = _PARAMS["ema"]["period"]["default"]) -> An
     columns, carrier = _convert.bars("ema", (source,), ("source",), ("series",))
     out = _core.ema(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("ema",))
+
+
+def exp(source=None) -> Any:
+    """Vector Exponential.
+
+    Returns
+    -------
+    ndarray or Series
+        Exponential of source, element by element.
+    """
+    columns, carrier = _convert.bars("exp", (source,), ("source",), ("series",))
+    out = _core.exp(*columns)
+    return _convert.wrap_outputs(out, carrier, ("exp",))
+
+
+def floor(source=None) -> Any:
+    """Vector Floor.
+
+    Returns
+    -------
+    ndarray or Series
+        Floor of source, element by element.
+    """
+    columns, carrier = _convert.bars("floor", (source,), ("source",), ("series",))
+    out = _core.floor(*columns)
+    return _convert.wrap_outputs(out, carrier, ("floor",))
+
+
+def ln(source=None) -> Any:
+    """Vector Natural Logarithm.
+
+    Returns
+    -------
+    ndarray or Series
+        Natural Logarithm of source, element by element.
+    """
+    columns, carrier = _convert.bars("ln", (source,), ("source",), ("series",))
+    out = _core.ln(*columns)
+    return _convert.wrap_outputs(out, carrier, ("ln",))
+
+
+def log10(source=None) -> Any:
+    """Vector Base 10 Logarithm.
+
+    Returns
+    -------
+    ndarray or Series
+        Base 10 Logarithm of source, element by element.
+    """
+    columns, carrier = _convert.bars("log10", (source,), ("source",), ("series",))
+    out = _core.log10(*columns)
+    return _convert.wrap_outputs(out, carrier, ("log10",))
 
 
 def macd(
@@ -224,6 +491,54 @@ def macd(
             "macd_hist",
         ),
     )
+
+
+def medprice(high=None, low=None) -> Any:
+    """Median Price.
+
+    Returns
+    -------
+    ndarray or Series
+        The midpoint of the bar's range.
+    """
+    columns, carrier = _convert.bars(
+        "medprice",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.medprice(*columns)
+    return _convert.wrap_outputs(out, carrier, ("medprice",))
+
+
+def mult(source0=None, source1=None) -> Any:
+    """Vector Multiplication.
+
+    Returns
+    -------
+    ndarray or Series
+        Multiplication of the two inputs.
+    """
+    columns, carrier = _convert.bars(
+        "mult",
+        (source0, source1),
+        (
+            "source0",
+            "source1",
+        ),
+        (
+            "series",
+            "series",
+        ),
+    )
+    out = _core.mult(*columns)
+    return _convert.wrap_outputs(out, carrier, ("mult",))
 
 
 def natr(
@@ -322,6 +637,32 @@ def rsi(source=None, *, period: int = _PARAMS["rsi"]["period"]["default"]) -> An
     return _convert.wrap_outputs(out, carrier, ("rsi",))
 
 
+def sin(source=None) -> Any:
+    """Vector Sine.
+
+    Returns
+    -------
+    ndarray or Series
+        Sine of source, element by element.
+    """
+    columns, carrier = _convert.bars("sin", (source,), ("source",), ("series",))
+    out = _core.sin(*columns)
+    return _convert.wrap_outputs(out, carrier, ("sin",))
+
+
+def sinh(source=None) -> Any:
+    """Vector Hyperbolic Sine.
+
+    Returns
+    -------
+    ndarray or Series
+        Hyperbolic Sine of source, element by element.
+    """
+    columns, carrier = _convert.bars("sinh", (source,), ("source",), ("series",))
+    out = _core.sinh(*columns)
+    return _convert.wrap_outputs(out, carrier, ("sinh",))
+
+
 def sma(source=None, *, period: int = _PARAMS["sma"]["period"]["default"]) -> Any:
     """Simple Moving Average.
 
@@ -339,6 +680,69 @@ def sma(source=None, *, period: int = _PARAMS["sma"]["period"]["default"]) -> An
     columns, carrier = _convert.bars("sma", (source,), ("source",), ("series",))
     out = _core.sma(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("sma",))
+
+
+def sqrt(source=None) -> Any:
+    """Vector Square Root.
+
+    Returns
+    -------
+    ndarray or Series
+        Square Root of source, element by element.
+    """
+    columns, carrier = _convert.bars("sqrt", (source,), ("source",), ("series",))
+    out = _core.sqrt(*columns)
+    return _convert.wrap_outputs(out, carrier, ("sqrt",))
+
+
+def sub(source0=None, source1=None) -> Any:
+    """Vector Subtraction.
+
+    Returns
+    -------
+    ndarray or Series
+        Subtraction of the two inputs.
+    """
+    columns, carrier = _convert.bars(
+        "sub",
+        (source0, source1),
+        (
+            "source0",
+            "source1",
+        ),
+        (
+            "series",
+            "series",
+        ),
+    )
+    out = _core.sub(*columns)
+    return _convert.wrap_outputs(out, carrier, ("sub",))
+
+
+def tan(source=None) -> Any:
+    """Vector Tangent.
+
+    Returns
+    -------
+    ndarray or Series
+        Tangent of source, element by element.
+    """
+    columns, carrier = _convert.bars("tan", (source,), ("source",), ("series",))
+    out = _core.tan(*columns)
+    return _convert.wrap_outputs(out, carrier, ("tan",))
+
+
+def tanh(source=None) -> Any:
+    """Vector Hyperbolic Tangent.
+
+    Returns
+    -------
+    ndarray or Series
+        Hyperbolic Tangent of source, element by element.
+    """
+    columns, carrier = _convert.bars("tanh", (source,), ("source",), ("series",))
+    out = _core.tanh(*columns)
+    return _convert.wrap_outputs(out, carrier, ("tanh",))
 
 
 def tema(source=None, *, period: int = _PARAMS["tema"]["period"]["default"]) -> Any:
@@ -384,6 +788,58 @@ def trange(high=None, low=None, close=None) -> Any:
     )
     out = _core.trange(*columns)
     return _convert.wrap_outputs(out, carrier, ("trange",))
+
+
+def typprice(high=None, low=None, close=None) -> Any:
+    """Typical Price.
+
+    Returns
+    -------
+    ndarray or Series
+        The average of the high, the low and the close.
+    """
+    columns, carrier = _convert.bars(
+        "typprice",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.typprice(*columns)
+    return _convert.wrap_outputs(out, carrier, ("typprice",))
+
+
+def wclprice(high=None, low=None, close=None) -> Any:
+    """Weighted Close Price.
+
+    Returns
+    -------
+    ndarray or Series
+        The bar's range and its close, with the close counted twice.
+    """
+    columns, carrier = _convert.bars(
+        "wclprice",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.wclprice(*columns)
+    return _convert.wrap_outputs(out, carrier, ("wclprice",))
 
 
 def willr(
@@ -450,9 +906,29 @@ def lookback(name: str, **params: Any) -> int:
     return _core.lookback(name, **params)
 
 
+def ACOS(source) -> Any:
+    """TA-Lib-style alias for :func:`acos`."""
+    return acos(source)
+
+
 def AD(high, low, close, volume) -> Any:
     """TA-Lib-style alias for :func:`ad`."""
     return ad(high, low, close, volume)
+
+
+def ADD(source0, source1) -> Any:
+    """TA-Lib-style alias for :func:`add`."""
+    return add(source0, source1)
+
+
+def ASIN(source) -> Any:
+    """TA-Lib-style alias for :func:`asin`."""
+    return asin(source)
+
+
+def ATAN(source) -> Any:
+    """TA-Lib-style alias for :func:`atan`."""
+    return atan(source)
 
 
 def ATR(high, low, close, timeperiod: int = _PARAMS["atr"]["period"]["default"]) -> Any:
@@ -460,9 +936,34 @@ def ATR(high, low, close, timeperiod: int = _PARAMS["atr"]["period"]["default"])
     return atr(high, low, close, period=timeperiod)
 
 
+def AVGPRICE(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`avgprice`."""
+    return avgprice(open, high, low, close)
+
+
 def CCI(high, low, close, timeperiod: int = _PARAMS["cci"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`cci`."""
     return cci(high, low, close, period=timeperiod)
+
+
+def CEIL(source) -> Any:
+    """TA-Lib-style alias for :func:`ceil`."""
+    return ceil(source)
+
+
+def COS(source) -> Any:
+    """TA-Lib-style alias for :func:`cos`."""
+    return cos(source)
+
+
+def COSH(source) -> Any:
+    """TA-Lib-style alias for :func:`cosh`."""
+    return cosh(source)
+
+
+def CUMSUM(source) -> Any:
+    """TA-Lib-style alias for :func:`cumsum`."""
+    return cumsum(source)
 
 
 def DEMA(source, timeperiod: int = _PARAMS["dema"]["period"]["default"]) -> Any:
@@ -470,9 +971,34 @@ def DEMA(source, timeperiod: int = _PARAMS["dema"]["period"]["default"]) -> Any:
     return dema(source, period=timeperiod)
 
 
+def DIV(source0, source1) -> Any:
+    """TA-Lib-style alias for :func:`div`."""
+    return div(source0, source1)
+
+
 def EMA(source, timeperiod: int = _PARAMS["ema"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`ema`."""
     return ema(source, period=timeperiod)
+
+
+def EXP(source) -> Any:
+    """TA-Lib-style alias for :func:`exp`."""
+    return exp(source)
+
+
+def FLOOR(source) -> Any:
+    """TA-Lib-style alias for :func:`floor`."""
+    return floor(source)
+
+
+def LN(source) -> Any:
+    """TA-Lib-style alias for :func:`ln`."""
+    return ln(source)
+
+
+def LOG10(source) -> Any:
+    """TA-Lib-style alias for :func:`log10`."""
+    return log10(source)
 
 
 def MACD(
@@ -483,6 +1009,16 @@ def MACD(
 ) -> Any:
     """TA-Lib-style alias for :func:`macd`."""
     return macd(source, fast_period=fastperiod, slow_period=slowperiod, signal_period=signalperiod)
+
+
+def MEDPRICE(high, low) -> Any:
+    """TA-Lib-style alias for :func:`medprice`."""
+    return medprice(high, low)
+
+
+def MULT(source0, source1) -> Any:
+    """TA-Lib-style alias for :func:`mult`."""
+    return mult(source0, source1)
 
 
 def NATR(high, low, close, timeperiod: int = _PARAMS["natr"]["period"]["default"]) -> Any:
@@ -505,9 +1041,39 @@ def RSI(source, timeperiod: int = _PARAMS["rsi"]["period"]["default"]) -> Any:
     return rsi(source, period=timeperiod)
 
 
+def SIN(source) -> Any:
+    """TA-Lib-style alias for :func:`sin`."""
+    return sin(source)
+
+
+def SINH(source) -> Any:
+    """TA-Lib-style alias for :func:`sinh`."""
+    return sinh(source)
+
+
 def SMA(source, timeperiod: int = _PARAMS["sma"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`sma`."""
     return sma(source, period=timeperiod)
+
+
+def SQRT(source) -> Any:
+    """TA-Lib-style alias for :func:`sqrt`."""
+    return sqrt(source)
+
+
+def SUB(source0, source1) -> Any:
+    """TA-Lib-style alias for :func:`sub`."""
+    return sub(source0, source1)
+
+
+def TAN(source) -> Any:
+    """TA-Lib-style alias for :func:`tan`."""
+    return tan(source)
+
+
+def TANH(source) -> Any:
+    """TA-Lib-style alias for :func:`tanh`."""
+    return tanh(source)
 
 
 def TEMA(source, timeperiod: int = _PARAMS["tema"]["period"]["default"]) -> Any:
@@ -518,6 +1084,16 @@ def TEMA(source, timeperiod: int = _PARAMS["tema"]["period"]["default"]) -> Any:
 def TRANGE(high, low, close) -> Any:
     """TA-Lib-style alias for :func:`trange`."""
     return trange(high, low, close)
+
+
+def TYPPRICE(high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`typprice`."""
+    return typprice(high, low, close)
+
+
+def WCLPRICE(high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`wclprice`."""
+    return wclprice(high, low, close)
 
 
 def WILLR(high, low, close, timeperiod: int = _PARAMS["willr"]["period"]["default"]) -> Any:

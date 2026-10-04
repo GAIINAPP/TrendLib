@@ -1,0 +1,22 @@
+name: wclprice
+title: Weighted Close Price
+group: price
+flags: [overlap]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: wclprice
+    dtype: float64
+    plot: line
+    doc: The bar's range and its close, with the close counted twice
+talib:
+  name: WCLPRICE
+  params: {}
+  outputs: [real]
+references:
+  - Steven B. Achelis, Technical Analysis from A to Z, McGraw-Hill, 2000

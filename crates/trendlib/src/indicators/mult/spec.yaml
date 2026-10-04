@@ -1,0 +1,20 @@
+name: mult
+title: Vector Multiplication
+group: operator
+flags: [nan_inf_output]
+inputs:
+  - name: source0
+    kind: series
+  - name: source1
+    kind: series
+outputs:
+  - name: mult
+    dtype: float64
+    plot: line
+    doc: Multiplication of the two inputs
+talib:
+  name: MULT
+  params: {}
+  outputs: [real]
+references:
+  - ISO/IEC 9899, the C standard library, section 7.12 (mathematical functions)

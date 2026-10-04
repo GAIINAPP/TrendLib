@@ -1,0 +1,18 @@
+name: sin
+title: Vector Sine
+group: math
+flags: [nan_inf_output]
+inputs:
+  - name: source
+    kind: series
+outputs:
+  - name: sin
+    dtype: float64
+    plot: line
+    doc: Sine of source, element by element
+talib:
+  name: SIN
+  params: {}
+  outputs: [real]
+references:
+  - ISO/IEC 9899, the C standard library, section 7.12 (mathematical functions)

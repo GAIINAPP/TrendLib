@@ -43,6 +43,16 @@ GROUPS = [
 ]
 GROUP_OF = {talib_group: key for key, _, talib_group in GROUPS}
 
+# ta-lib-python labels the two operands of an arithmetic operator `high` and
+# `low`, which is an artifact of its abstract API rather than a meaning: `add`
+# adds any two series. These get honest names.
+INPUT_OVERRIDES = {
+    "ADD": ["source0", "source1"],
+    "SUB": ["source0", "source1"],
+    "MULT": ["source0", "source1"],
+    "DIV": ["source0", "source1"],
+}
+
 # ta-lib-python input name -> TrendLib input name.
 INPUTS = {
     "real": "source",
@@ -272,10 +282,9 @@ def describe(talib_name: str, arrays) -> dict:
     info = abstract.Function(talib_name).info
     name = function_name(talib_name)
 
-    inputs = []
-    for value in info["input_names"].values():
-        for raw in value if isinstance(value, list) else [value]:
-            inputs.append(INPUTS[raw])
+    inputs = INPUT_OVERRIDES.get(talib_name)
+    if inputs is None:
+        inputs = _input_names(info)
 
     function = getattr(talib, talib_name)
     sample = [arrays[raw] for raw in _raw_inputs(info)]
@@ -306,6 +315,27 @@ def describe(talib_name: str, arrays) -> dict:
         "integer_output": info["output_names"] == ["integer"],
         "flags": list(info["function_flags"] or []),
     }
+
+
+def _input_names(info) -> list[str]:
+    """TrendLib names for a function's inputs.
+
+    ta-lib-python reports a lone generic series as `price: close` because close
+    is what it defaults to, not because the function is about closing prices:
+    `sma` averages whatever it is handed. A function with only that key gets
+    `source`; one that also carries a `prices` list is genuinely reading bars,
+    so there `price` really is the close.
+    """
+    keys = set(info["input_names"])
+    generic = keys == {"price"}
+    names = []
+    for key, value in info["input_names"].items():
+        if key == "price" and generic:
+            names.append("source")
+        else:
+            for raw in value if isinstance(value, list) else [value]:
+                names.append(INPUTS[raw])
+    return names
 
 
 def _raw_inputs(info) -> list[str]:

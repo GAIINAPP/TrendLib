@@ -1,0 +1,20 @@
+name: medprice
+title: Median Price
+group: price
+flags: [overlap]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+outputs:
+  - name: medprice
+    dtype: float64
+    plot: line
+    doc: The midpoint of the bar's range
+talib:
+  name: MEDPRICE
+  params: {}
+  outputs: [real]
+references:
+  - Steven B. Achelis, Technical Analysis from A to Z, McGraw-Hill, 2000

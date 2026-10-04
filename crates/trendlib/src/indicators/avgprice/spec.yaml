@@ -1,0 +1,24 @@
+name: avgprice
+title: Average Price
+group: price
+flags: [overlap]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: avgprice
+    dtype: float64
+    plot: line
+    doc: The four prices a bar records, averaged equally
+talib:
+  name: AVGPRICE
+  params: {}
+  outputs: [real]
+references:
+  - Steven B. Achelis, Technical Analysis from A to Z, McGraw-Hill, 2000

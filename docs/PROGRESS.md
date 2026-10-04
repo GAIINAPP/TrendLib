@@ -2,8 +2,8 @@
 
 # Progress
 
-**15 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 189 not started.
+**39 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 165 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -20,11 +20,11 @@ something is done that is not. CI checks it is current.
 | Momentum | 5 | 47 |
 | Volatility | 3 | 7 |
 | Volume | 2 | 12 |
-| Price transforms | 0 | 6 |
+| Price transforms | 4 | 6 |
 | Cycle | 0 | 5 |
 | Statistics | 0 | 11 |
-| Math transforms | 0 | 15 |
-| Math operators | 0 | 12 |
+| Math transforms | 15 | 15 |
+| Math operators | 5 | 12 |
 | Candlestick patterns | 0 | 61 |
 | Levels | 0 | 3 |
 
@@ -131,14 +131,14 @@ something is done that is not. CI checks it is current.
 - [ ] `rvol` (`RVOL`)
 - [ ] `vwap` (`VWAP`) *
 
-## Price transforms (0 of 6)
+## Price transforms (4 of 6)
 
 - [ ] `avgdev` (`AVGDEV`)
-- [ ] `avgprice` (`AVGPRICE`)
+- [x] `avgprice` (`AVGPRICE`) -- Average Price
 - [ ] `ha` (`HA`)
-- [ ] `medprice` (`MEDPRICE`)
-- [ ] `typprice` (`TYPPRICE`)
-- [ ] `wclprice` (`WCLPRICE`)
+- [x] `medprice` (`MEDPRICE`) -- Median Price
+- [x] `typprice` (`TYPPRICE`) -- Typical Price
+- [x] `wclprice` (`WCLPRICE`) -- Weighted Close Price
 
 ## Cycle (0 of 5)
 
@@ -162,37 +162,37 @@ something is done that is not. CI checks it is current.
 - [ ] `tsf` (`TSF`)
 - [ ] `var` (`VAR`)
 
-## Math transforms (0 of 15)
+## Math transforms (15 of 15)
 
-- [ ] `acos` (`ACOS`)
-- [ ] `asin` (`ASIN`)
-- [ ] `atan` (`ATAN`)
-- [ ] `ceil` (`CEIL`)
-- [ ] `cos` (`COS`)
-- [ ] `cosh` (`COSH`)
-- [ ] `exp` (`EXP`)
-- [ ] `floor` (`FLOOR`)
-- [ ] `ln` (`LN`)
-- [ ] `log10` (`LOG10`)
-- [ ] `sin` (`SIN`)
-- [ ] `sinh` (`SINH`)
-- [ ] `sqrt` (`SQRT`)
-- [ ] `tan` (`TAN`)
-- [ ] `tanh` (`TANH`)
+- [x] `acos` (`ACOS`) -- Vector Arc Cosine
+- [x] `asin` (`ASIN`) -- Vector Arc Sine
+- [x] `atan` (`ATAN`) -- Vector Arc Tangent
+- [x] `ceil` (`CEIL`) -- Vector Ceiling
+- [x] `cos` (`COS`) -- Vector Cosine
+- [x] `cosh` (`COSH`) -- Vector Hyperbolic Cosine
+- [x] `exp` (`EXP`) -- Vector Exponential
+- [x] `floor` (`FLOOR`) -- Vector Floor
+- [x] `ln` (`LN`) -- Vector Natural Logarithm
+- [x] `log10` (`LOG10`) -- Vector Base 10 Logarithm
+- [x] `sin` (`SIN`) -- Vector Sine
+- [x] `sinh` (`SINH`) -- Vector Hyperbolic Sine
+- [x] `sqrt` (`SQRT`) -- Vector Square Root
+- [x] `tan` (`TAN`) -- Vector Tangent
+- [x] `tanh` (`TANH`) -- Vector Hyperbolic Tangent
 
-## Math operators (0 of 12)
+## Math operators (5 of 12)
 
-- [ ] `add` (`ADD`)
-- [ ] `cumsum` (`CUMSUM`)
-- [ ] `div` (`DIV`)
+- [x] `add` (`ADD`) -- Vector Addition
+- [x] `cumsum` (`CUMSUM`) -- Cumulative Sum
+- [x] `div` (`DIV`) -- Vector Division
 - [ ] `max` (`MAX`)
 - [ ] `maxindex` (`MAXINDEX`)
 - [ ] `min` (`MIN`)
 - [ ] `minindex` (`MININDEX`)
 - [ ] `minmax` (`MINMAX`)
 - [ ] `minmaxindex` (`MINMAXINDEX`)
-- [ ] `mult` (`MULT`)
-- [ ] `sub` (`SUB`)
+- [x] `mult` (`MULT`) -- Vector Multiplication
+- [x] `sub` (`SUB`) -- Vector Subtraction
 - [ ] `sum` (`SUM`)
 
 ## Candlestick patterns (0 of 61)

@@ -49,7 +49,7 @@ fn short_input_is_all_warm_up_until_one_bar_past_the_lookback() {
                 indicator.name
             );
             assert!(
-                column[lookback].is_finite(),
+                !column[lookback].is_nan() || indicator.may_be_non_finite,
                 "{} has no {} at row {lookback}",
                 indicator.name,
                 indicator.outputs[index]
@@ -61,18 +61,25 @@ fn short_input_is_all_warm_up_until_one_bar_past_the_lookback() {
 #[test]
 fn a_constant_series_gives_a_constant_result() {
     for indicator in registered() {
+        // A running total keeps climbing on a flat series, which is the whole
+        // point of it, so the law applies to the rest.
+        if indicator.path_dependent {
+            continue;
+        }
         let base = vec![5.0; 200];
         let columns = bars_from(&base, indicator.inputs);
         let lookback = (indicator.lookback)(&indicator.defaults());
         let out = (indicator.batch)(&as_slices(&columns), &indicator.defaults()).unwrap();
         for (index, column) in out.iter().enumerate() {
             let settled = column[lookback];
-            assert!(
-                settled.is_finite(),
-                "{} {}",
-                indicator.name,
-                indicator.outputs[index]
-            );
+            if !settled.is_finite() {
+                assert!(
+                    indicator.may_be_non_finite,
+                    "{} {} is not finite on a constant series",
+                    indicator.name, indicator.outputs[index]
+                );
+                continue;
+            }
             for (row, value) in column.iter().enumerate().skip(lookback) {
                 assert_eq!(
                     *value, settled,
@@ -153,8 +160,11 @@ fn extreme_magnitudes_do_not_panic() {
             let lookback = (indicator.lookback)(&indicator.defaults());
             for (index, column) in out.iter().enumerate() {
                 assert_eq!(column.len(), base.len(), "{}", indicator.name);
+                // An indicator flagged nan_inf_output may legitimately answer
+                // infinity or NaN here; what matters is that it answered at all
+                // rather than panicking or dropping rows.
                 assert!(
-                    column[lookback..].iter().all(|v| v.is_finite()),
+                    indicator.may_be_non_finite || column[lookback..].iter().all(|v| v.is_finite()),
                     "{} {} produced a non-finite value at scale {scale}",
                     indicator.name,
                     indicator.outputs[index]

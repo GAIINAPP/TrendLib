@@ -37,6 +37,12 @@ Before 1.0, minor versions may break the API; every break is listed under
 - `wma`, `trange`, `atr` and `natr` are callable from Python.
 - Indicators `dema`, `tema`, `roc` and `macd`. `macd` is the first with
   several outputs, returned as a tuple or, from a DataFrame, as a frame.
+- 24 more indicators: the four price transforms, the fifteen math transforms
+  and the five arithmetic operators.
+- A DataFrame is refused where it cannot say which column is which operand,
+  instead of quietly using `close` twice.
+- `cci` and `wma` rebuild their window each bar rather than carrying a running
+  total, which the measured drift required.
 - Indicators `willr`, `cci`, `obv` and `ad`. `obv` and `ad` are the first
   path-dependent ones and the first to reject a negative volume.
 - The Rust test registry is generated too, so every indicator is covered by

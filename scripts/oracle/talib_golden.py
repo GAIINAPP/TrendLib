@@ -96,6 +96,26 @@ def read_dataset(filename: str) -> dict[str, list]:
     return columns
 
 
+# Functions whose domain the raw close prices fall outside of. An arc cosine of
+# 1000 is NaN on every row and an exponential of 1000 is infinity on every row;
+# either way the file would prove nothing, so the source is scaled into [-1, 1]
+# first. The header records that it was.
+SCALED_SOURCE = {"acos", "asin", "exp", "cosh", "sinh"}
+
+# The two operands of an arithmetic operator want to be different series, or
+# `div` is 1.0 on every row and `sub` is 0.0 on every row.
+SECOND_OPERAND = "open"
+
+
+def scale_to_unit(values):
+    import numpy as np
+
+    low, high = float(np.min(values)), float(np.max(values))
+    if high == low:
+        return np.zeros_like(values)
+    return (values - low) / (high - low) * 2.0 - 1.0
+
+
 def bind_inputs(spec: dict, columns: dict[str, list]):
     """Map the spec's input names onto dataset columns."""
     import numpy as np
@@ -104,7 +124,7 @@ def bind_inputs(spec: dict, columns: dict[str, list]):
     for spec_input in spec["inputs"]:
         name, kind = spec_input["name"], spec_input["kind"]
         if kind == "series":
-            source = "close"
+            source = SECOND_OPERAND if name == "source1" else "close"
         elif kind == "timestamps":
             source = "timestamp"
         else:
@@ -114,7 +134,10 @@ def bind_inputs(spec: dict, columns: dict[str, list]):
         if kind == "timestamps":
             bound[name] = np.array([int(v) for v in columns[source]], dtype=np.int64)
         else:
-            bound[name] = np.array([float(v) for v in columns[source]], dtype=np.float64)
+            values = np.array([float(v) for v in columns[source]], dtype=np.float64)
+            if spec["name"] in SCALED_SOURCE:
+                values = scale_to_unit(values)
+            bound[name] = values
     return bound
 
 
@@ -158,7 +181,8 @@ def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
         f"# oracle: ta-lib-python {talib.__version__} "
         f"(TA-Lib C {talib.__ta_version__.decode().split()[0]}), talib.{spec['talib']['name']}",
         f"# produced_by: python scripts/oracle/talib_golden.py {name} --case {case}",
-        f"# input: testdata/{dataset} (all rows)",
+        f"# input: testdata/{dataset} (all rows)"
+        + (", source scaled into [-1, 1]" if name in SCALED_SOURCE else ""),
         f"# tolerance: {TOLERANCE}",
         "# excluded_rows: none",
         *([f"# note: {CASE_OVERRIDES[(name, case)][1]}"] if (name, case) in CASE_OVERRIDES else []),

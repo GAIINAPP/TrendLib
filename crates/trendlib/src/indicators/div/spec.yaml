@@ -1,0 +1,20 @@
+name: div
+title: Vector Division
+group: operator
+flags: [nan_inf_output]
+inputs:
+  - name: source0
+    kind: series
+  - name: source1
+    kind: series
+outputs:
+  - name: div
+    dtype: float64
+    plot: line
+    doc: Division of the two inputs
+talib:
+  name: DIV
+  params: {}
+  outputs: [real]
+references:
+  - ISO/IEC 9899, the C standard library, section 7.12 (mathematical functions)

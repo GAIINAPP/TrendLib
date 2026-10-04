@@ -1,0 +1,18 @@
+name: acos
+title: Vector Arc Cosine
+group: math
+flags: [nan_inf_output]
+inputs:
+  - name: source
+    kind: series
+outputs:
+  - name: acos
+    dtype: float64
+    plot: line
+    doc: Arc Cosine of source, element by element
+talib:
+  name: ACOS
+  params: {}
+  outputs: [real]
+references:
+  - ISO/IEC 9899, the C standard library, section 7.12 (mathematical functions)

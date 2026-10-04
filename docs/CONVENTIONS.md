@@ -18,6 +18,22 @@ every exception must also appear in § 9.
   (add newest, subtract oldest), do the same. Do not add Kahan or pairwise
   summation to a shared indicator unless parity with TA-Lib still holds within
   tolerance; if you do, document it.
+- **A running total is only safe when nothing later subtracts it from a number
+  of its own size.** `sma` advances a window sum and matches the oracle
+  exactly, because the sum is divided and then reported. `cci` subtracts the
+  window mean from a value of the same size and `wma` subtracts the window sum
+  from the weighted sum, and in both the subtraction cancels almost every
+  significant digit, so a running total's accumulated drift becomes the answer:
+  measured at 1e-10 and 1e-9 relative respectively, against a 1e-10 contract.
+  Both now rebuild from the window each bar, which costs one pass and is what
+  TA-Lib spends there too. Where an indicator subtracts two quantities of
+  similar size, rebuild.
+- **A window that never moved is recognised by asking the window, not the
+  result.** Summing `n` copies of a value and dividing by `n` does not reliably
+  return that value, so a flat window can leave a residue of a unit or two in
+  the last place. Where that residue lands in both the numerator and the
+  denominator, as it does in `cci`, their ratio is a large number conjured out
+  of nothing. Test the window for equality; never introduce an epsilon.
 - **Bitwise agreement with TA-Lib is not a goal and for some indicators is not
   reachable.** The contract against the oracle is the tolerance in `SPEC.md`
   § 6. Matching the arithmetic order gets SMA there exactly, because it has no

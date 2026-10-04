@@ -438,7 +438,12 @@ fn registration(specs: &[Spec]) -> String {
     for spec in specs {
         let _ = writeln!(out, "    m.add_class::<Py{}>()?;", spec.py_stream_class());
     }
-    out.push_str("    m.add(\"PARAMS\", params_table(m.py())?)?;\n    Ok(())\n}\n\n");
+    out.push_str(
+        "    m.add(\"PARAMS\", params_table(m.py())?)?;\n\
+         \x20   m.add(\"INPUTS\", inputs_table(m.py())?)?;\n\
+         \x20   m.add(\"OUTPUTS\", outputs_table(m.py())?)?;\n\
+         \x20   m.add(\"GROUPS\", groups_table(m.py())?)?;\n    Ok(())\n}\n\n",
+    );
 
     out.push_str(
         "/// Parameter metadata, so the Python layer never repeats a default or a range.\n\
@@ -472,6 +477,63 @@ fn registration(specs: &[Spec]) -> String {
         );
     }
     out.push_str("    Ok(table)\n}\n\n");
+
+    for (table, doc, entries) in [
+        (
+            "inputs_table",
+            "Input names in spec order, so callers and tests never guess them.",
+            specs
+                .iter()
+                .map(|s| {
+                    (
+                        s.name.clone(),
+                        s.inputs.iter().map(|i| i.name.clone()).collect(),
+                    )
+                })
+                .collect::<Vec<(String, Vec<String>)>>(),
+        ),
+        (
+            "outputs_table",
+            "Output names in spec order, which is also the returned tuple order.",
+            specs
+                .iter()
+                .map(|s| {
+                    (
+                        s.name.clone(),
+                        s.outputs.iter().map(|o| o.name.clone()).collect(),
+                    )
+                })
+                .collect(),
+        ),
+        (
+            "groups_table",
+            "The group each indicator belongs to.",
+            specs
+                .iter()
+                .map(|s| (s.name.clone(), vec![s.group.clone()]))
+                .collect(),
+        ),
+    ] {
+        let single = table == "groups_table";
+        let _ = write!(
+            out,
+            "/// {doc}\nfn {table}<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {{\n    let table = PyDict::new(py);\n"
+        );
+        for (name, values) in entries {
+            let rendered: Vec<String> = values.iter().map(|v| format!("{v:?}")).collect();
+            if single {
+                let _ = writeln!(out, "    table.set_item({name:?}, {})?;", rendered[0]);
+            } else {
+                let _ = writeln!(
+                    out,
+                    "    table.set_item({name:?}, vec![{}])?;",
+                    rendered.join(", ")
+                );
+            }
+        }
+        out.push_str("    Ok(table)\n}\n\n");
+    }
+
     out.push_str(&lookback_table(specs));
     out
 }
@@ -972,8 +1034,12 @@ fn test_registry(specs: &[Spec]) -> String {
              \x20           inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,\n\
              \x20           outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,\n\
              \x20           params: PARAMS,\n\
+             \x20           may_be_non_finite: {non_finite},\n\
+             \x20           path_dependent: {path_dependent},\n\
              \x20           batch,\n            lookback,\n            open_and_fill,\n        }}\n    }}\n}}\n\n",
             ty = spec.type_name(),
+            non_finite = spec.flags.iter().any(|f| f == "nan_inf_output"),
+            path_dependent = spec.flags.iter().any(|f| f == "path_dependent"),
         );
     }
 

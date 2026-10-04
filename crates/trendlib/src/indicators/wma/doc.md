@@ -16,9 +16,14 @@ where $x$ is `source` and $n$ is `period`.
 ## Conventions
 
 - Lookback is $n - 1$, as in TA-Lib.
-- The weighted sum is advanced, not rebuilt: adding $n\,x_{t+1}$ and subtracting
-  the plain window sum shifts every older weight down by one. Recomputing the
-  sum each bar would make a batch run quadratic in the period.
+- The weighted sum is rebuilt from the window each bar rather than advanced.
+  Advancing it is algebraically exact, but the step subtracts two numbers of the
+  window's own size to leave a much smaller difference, and the residue never
+  washes out: a window of 1.0 reached after a few values near 1e5 answered
+  1.000000001 instead of 1.0, ten times the tolerance this project allows.
+- A window whose values are all the same number returns that number directly.
+  Summing multiples of it and dividing by the weight total does not always give
+  it back.
 - `period = 1` performs no smoothing and returns `source` unchanged.
 - Leading `NaN` rows are skipped and the lookback counts from the first valid
   bar; a `NaN` or infinity after it raises `InvalidInput` (Deviation 1).

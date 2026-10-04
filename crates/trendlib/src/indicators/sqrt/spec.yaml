@@ -1,0 +1,18 @@
+name: sqrt
+title: Vector Square Root
+group: math
+flags: [nan_inf_output]
+inputs:
+  - name: source
+    kind: series
+outputs:
+  - name: sqrt
+    dtype: float64
+    plot: line
+    doc: Square Root of source, element by element
+talib:
+  name: SQRT
+  params: {}
+  outputs: [real]
+references:
+  - ISO/IEC 9899, the C standard library, section 7.12 (mathematical functions)

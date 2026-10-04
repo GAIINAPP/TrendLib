@@ -1,0 +1,18 @@
+name: log10
+title: Vector Base 10 Logarithm
+group: math
+flags: [nan_inf_output]
+inputs:
+  - name: source
+    kind: series
+outputs:
+  - name: log10
+    dtype: float64
+    plot: line
+    doc: Base 10 Logarithm of source, element by element
+talib:
+  name: LOG10
+  params: {}
+  outputs: [real]
+references:
+  - ISO/IEC 9899, the C standard library, section 7.12 (mathematical functions)

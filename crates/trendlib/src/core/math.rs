@@ -54,58 +54,91 @@ impl RollingMean {
 
 /// Mean of the last `period` values weighted 1, 2, ... `period`, newest heaviest.
 ///
-/// The weighted sum is advanced rather than rebuilt: adding `period * newest`
-/// and then subtracting the plain window sum shifts every older weight down by
-/// one, which is the identity `W(t+1) = period * x(t+1) + W(t) - S(t)`. Without
-/// it a batch run would be O(bars * period) and could not meet the speed
-/// requirement in `SPEC.md` § 6.
+/// The weighted sum is rebuilt from the window on every bar rather than
+/// advanced. Advancing it is algebraically exact - adding `period * newest` and
+/// subtracting the plain window sum shifts every older weight down by one - but
+/// that subtraction takes two numbers of the window's own magnitude to leave a
+/// difference much smaller than either, and the residue never washes out. A
+/// window of 1.0 reached after a few values near 1e5 answered 1.000000001
+/// instead of 1.0, ten times the tolerance this project allows. Rebuilding
+/// costs one pass over the window, which is the same pass `RollingWindow`
+/// spends for the same reason.
 #[derive(Clone, Debug)]
 pub struct WeightedMean {
     window: Box<[f64]>,
-    period: f64,
-    divider: f64,
     head: usize,
     seen: usize,
-    weighted: f64,
-    total: f64,
+    divider: f64,
 }
 
 impl WeightedMean {
     pub fn new(period: usize) -> Self {
         assert!(period > 0, "period must be at least 1");
-        let period_f64 = period as f64;
+        let period = period as f64;
         Self {
-            window: vec![0.0; period].into_boxed_slice(),
-            period: period_f64,
-            divider: period_f64 * (period_f64 + 1.0) / 2.0,
+            window: vec![0.0; period as usize].into_boxed_slice(),
             head: 0,
             seen: 0,
-            weighted: 0.0,
-            total: 0.0,
+            divider: period * (period + 1.0) / 2.0,
+        }
+    }
+
+    /// Oldest value first, so the weights run 1, 2, ... period.
+    ///
+    /// Returns `None` when every value in the window is the same number. Any
+    /// weighted mean of identical values is that value, but computing it as a
+    /// sum of multiples divided by the weight total does not always give it
+    /// back, so the caller answers directly instead of through the division.
+    fn weighted(&self, oldest: usize, replacing: Option<(usize, f64)>) -> Option<f64> {
+        let period = self.window.len();
+        let at = |offset: usize| {
+            let slot = (oldest + offset) % period;
+            match replacing {
+                Some((replaced, with)) if replaced == slot => with,
+                _ => self.window[slot],
+            }
+        };
+        let first = at(0);
+        let mut total = 0.0;
+        let mut flat = true;
+        for offset in 0..period {
+            let value = at(offset);
+            flat &= value == first;
+            total += value * (offset + 1) as f64;
+        }
+        (!flat).then_some(total)
+    }
+
+    fn mean(&self, oldest: usize, replacing: Option<(usize, f64)>) -> f64 {
+        match self.weighted(oldest, replacing) {
+            Some(total) => total / self.divider,
+            None => match replacing {
+                Some((_, value)) => value,
+                None => self.window[oldest],
+            },
         }
     }
 
     pub fn push(&mut self, value: f64) -> Option<f64> {
-        self.total += value;
-        self.seen += 1;
+        let period = self.window.len();
         self.window[self.head] = value;
-        self.head = (self.head + 1) % self.window.len();
-        if self.seen < self.window.len() {
-            self.weighted += value * self.seen as f64;
+        self.head = (self.head + 1) % period;
+        self.seen += 1;
+        if self.seen < period {
             return None;
         }
-        self.weighted += value * self.period;
-        let mean = self.weighted / self.divider;
-        self.weighted -= self.total;
-        self.total -= self.window[self.head];
-        Some(mean)
+        Some(self.mean(self.head, None))
     }
 
     pub fn preview(&self, value: f64) -> Option<f64> {
-        if self.seen + 1 < self.window.len() {
+        let period = self.window.len();
+        if self.seen + 1 < period {
             return None;
         }
-        Some((self.weighted + value * self.period) / self.divider)
+        // The bar being offered would land in the slot the oldest occupies, and
+        // the window would then start one slot further on.
+        let oldest = (self.head + 1) % period;
+        Some(self.mean(oldest, Some((self.head, value))))
     }
 }
 

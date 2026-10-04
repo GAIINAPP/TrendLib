@@ -89,6 +89,12 @@ pub struct Registered {
     pub inputs: &'static [&'static str],
     pub outputs: &'static [&'static str],
     pub params: &'static [ParamSpec],
+    /// `true` when a finite input may legitimately produce NaN or infinity, so
+    /// the suites check for a value rather than for a finite value.
+    pub may_be_non_finite: bool,
+    /// `true` when the value carries everything before it, so a constant input
+    /// does not imply a constant output (`CONVENTIONS.md` section 5).
+    pub path_dependent: bool,
     pub batch: BatchFn,
     pub lookback: LookbackFn,
     pub open_and_fill: OpenAndFillFn,
@@ -380,7 +386,14 @@ pub fn daily_column(name: &str) -> Vec<f64> {
     let path = repo_root().join("testdata/daily_2000.csv");
     let text = fs::read_to_string(&path).expect("testdata/daily_2000.csv");
     let mut lines = text.lines();
-    let wanted = if name == "source" { "close" } else { name };
+    // The same mapping the oracle script uses, so a suite and a golden file are
+    // looking at the same bars: a lone generic series is the close, and the two
+    // operands of an arithmetic operator are two different series.
+    let wanted = match name {
+        "source" | "source0" => "close",
+        "source1" => "open",
+        other => other,
+    };
     let header: Vec<&str> = lines.next().expect("header").split(',').collect();
     let column = header
         .iter()
@@ -422,6 +435,7 @@ pub fn bars_from(base: &[f64], names: &[&str]) -> Vec<Vec<f64>> {
             "high" => base.iter().map(|v| v + v.abs() * 0.005 + 0.5).collect(),
             "low" => base.iter().map(|v| v - v.abs() * 0.005 - 0.5).collect(),
             "volume" => base.iter().map(|v| v.abs() * 10.0).collect(),
+            "source1" => base.iter().map(|v| v * 0.75 + 1.0).collect(),
             _ => base.to_vec(),
         })
         .collect()

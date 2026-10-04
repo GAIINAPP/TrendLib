@@ -1,0 +1,18 @@
+name: ln
+title: Vector Natural Logarithm
+group: math
+flags: [nan_inf_output]
+inputs:
+  - name: source
+    kind: series
+outputs:
+  - name: ln
+    dtype: float64
+    plot: line
+    doc: Natural Logarithm of source, element by element
+talib:
+  name: LN
+  params: {}
+  outputs: [real]
+references:
+  - ISO/IEC 9899, the C standard library, section 7.12 (mathematical functions)

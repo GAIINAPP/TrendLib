@@ -14,23 +14,48 @@ from trendlib import _convert, _core
 from trendlib._stream_base import Factory
 
 __all__ = [
+    "acos",
     "ad",
+    "add",
+    "asin",
+    "atan",
     "atr",
+    "avgprice",
     "cci",
+    "ceil",
+    "cos",
+    "cosh",
+    "cumsum",
     "dema",
+    "div",
     "ema",
+    "exp",
+    "floor",
+    "ln",
+    "log10",
     "macd",
+    "medprice",
+    "mult",
     "natr",
     "obv",
     "roc",
     "rsi",
+    "sin",
+    "sinh",
     "sma",
+    "sqrt",
+    "sub",
+    "tan",
+    "tanh",
     "tema",
     "trange",
+    "typprice",
+    "wclprice",
     "willr",
     "wma",
 ]
 
+acos = Factory("acos", _core.AcosStream, ("source",), ("series",), ("acos",))
 ad = Factory(
     "ad",
     _core.AdStream,
@@ -48,6 +73,21 @@ ad = Factory(
     ),
     ("ad",),
 )
+add = Factory(
+    "add",
+    _core.AddStream,
+    (
+        "source0",
+        "source1",
+    ),
+    (
+        "series",
+        "series",
+    ),
+    ("add",),
+)
+asin = Factory("asin", _core.AsinStream, ("source",), ("series",), ("asin",))
+atan = Factory("atan", _core.AtanStream, ("source",), ("series",), ("atan",))
 atr = Factory(
     "atr",
     _core.AtrStream,
@@ -62,6 +102,23 @@ atr = Factory(
         "close",
     ),
     ("atr",),
+)
+avgprice = Factory(
+    "avgprice",
+    _core.AvgpriceStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("avgprice",),
 )
 cci = Factory(
     "cci",
@@ -78,8 +135,29 @@ cci = Factory(
     ),
     ("cci",),
 )
+ceil = Factory("ceil", _core.CeilStream, ("source",), ("series",), ("ceil",))
+cos = Factory("cos", _core.CosStream, ("source",), ("series",), ("cos",))
+cosh = Factory("cosh", _core.CoshStream, ("source",), ("series",), ("cosh",))
+cumsum = Factory("cumsum", _core.CumsumStream, ("source",), ("series",), ("cumsum",))
 dema = Factory("dema", _core.DemaStream, ("source",), ("series",), ("dema",))
+div = Factory(
+    "div",
+    _core.DivStream,
+    (
+        "source0",
+        "source1",
+    ),
+    (
+        "series",
+        "series",
+    ),
+    ("div",),
+)
 ema = Factory("ema", _core.EmaStream, ("source",), ("series",), ("ema",))
+exp = Factory("exp", _core.ExpStream, ("source",), ("series",), ("exp",))
+floor = Factory("floor", _core.FloorStream, ("source",), ("series",), ("floor",))
+ln = Factory("ln", _core.LnStream, ("source",), ("series",), ("ln",))
+log10 = Factory("log10", _core.Log10Stream, ("source",), ("series",), ("log10",))
 macd = Factory(
     "macd",
     _core.MacdStream,
@@ -90,6 +168,32 @@ macd = Factory(
         "macd_signal",
         "macd_hist",
     ),
+)
+medprice = Factory(
+    "medprice",
+    _core.MedpriceStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("medprice",),
+)
+mult = Factory(
+    "mult",
+    _core.MultStream,
+    (
+        "source0",
+        "source1",
+    ),
+    (
+        "series",
+        "series",
+    ),
+    ("mult",),
 )
 natr = Factory(
     "natr",
@@ -121,7 +225,25 @@ obv = Factory(
 )
 roc = Factory("roc", _core.RocStream, ("source",), ("series",), ("roc",))
 rsi = Factory("rsi", _core.RsiStream, ("source",), ("series",), ("rsi",))
+sin = Factory("sin", _core.SinStream, ("source",), ("series",), ("sin",))
+sinh = Factory("sinh", _core.SinhStream, ("source",), ("series",), ("sinh",))
 sma = Factory("sma", _core.SmaStream, ("source",), ("series",), ("sma",))
+sqrt = Factory("sqrt", _core.SqrtStream, ("source",), ("series",), ("sqrt",))
+sub = Factory(
+    "sub",
+    _core.SubStream,
+    (
+        "source0",
+        "source1",
+    ),
+    (
+        "series",
+        "series",
+    ),
+    ("sub",),
+)
+tan = Factory("tan", _core.TanStream, ("source",), ("series",), ("tan",))
+tanh = Factory("tanh", _core.TanhStream, ("source",), ("series",), ("tanh",))
 tema = Factory("tema", _core.TemaStream, ("source",), ("series",), ("tema",))
 trange = Factory(
     "trange",
@@ -137,6 +259,36 @@ trange = Factory(
         "close",
     ),
     ("trange",),
+)
+typprice = Factory(
+    "typprice",
+    _core.TyppriceStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("typprice",),
+)
+wclprice = Factory(
+    "wclprice",
+    _core.WclpriceStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("wclprice",),
 )
 willr = Factory(
     "willr",

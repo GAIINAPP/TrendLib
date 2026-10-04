@@ -1,0 +1,18 @@
+name: cumsum
+title: Cumulative Sum
+group: operator
+flags: [path_dependent]
+inputs:
+  - name: source
+    kind: series
+outputs:
+  - name: cumsum
+    dtype: float64
+    plot: line
+    doc: Running total of source from the first valid bar
+talib:
+  name: CUMSUM
+  params: {}
+  outputs: [real]
+references:
+  - Standard running total; TA-Lib exposes it as CUMSUM

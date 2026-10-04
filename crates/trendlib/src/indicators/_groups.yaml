@@ -2,5 +2,10 @@
 - { key: momentum,   title: Momentum }
 - { key: volatility, title: Volatility }
 - { key: volume,     title: Volume }
+- { key: price,      title: Price transforms }
+- { key: cycle,      title: Cycle }
+- { key: statistic,  title: Statistics }
+- { key: math,       title: Math transforms }
+- { key: operator,   title: Math operators }
 - { key: levels,     title: Levels }
 - { key: patterns,   title: Candlestick patterns }

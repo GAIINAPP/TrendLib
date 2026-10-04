@@ -1,0 +1,18 @@
+name: tan
+title: Vector Tangent
+group: math
+flags: [nan_inf_output]
+inputs:
+  - name: source
+    kind: series
+outputs:
+  - name: tan
+    dtype: float64
+    plot: line
+    doc: Tangent of source, element by element
+talib:
+  name: TAN
+  params: {}
+  outputs: [real]
+references:
+  - ISO/IEC 9899, the C standard library, section 7.12 (mathematical functions)
