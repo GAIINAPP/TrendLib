@@ -184,7 +184,9 @@ def test_an_unknown_choice_lists_the_ones_that_work(bars, indicator):
 def test_an_average_that_is_not_built_yet_is_refused_by_name(repo_root, bars, indicator):
     """INDICATORS.md section 1: a value the contract has but the code does not
     is an error that says so, never a quiet stand-in for a different average."""
-    import yaml
+    # The same convention as `test_spec_drift.py`: the spec files are YAML and
+    # not every environment that runs the API tests has a parser.
+    yaml = pytest.importorskip("yaml")
 
     columns = indicator.columns(bars, 60)
     enums = yaml.safe_load((repo_root / "crates/trendlib/src/indicators/_enums.yaml").read_text())
