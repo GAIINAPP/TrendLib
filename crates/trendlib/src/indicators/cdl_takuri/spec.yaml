@@ -1,0 +1,25 @@
+name: cdl_takuri
+title: Takuri Line
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_takuri
+    dtype: int32
+    plot: pattern
+    doc: A dragonfly doji whose tail is very long rather than merely long
+talib:
+  name: CDLTAKURI
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_dragonflydoji, cdl_hammer, cdl_doji]

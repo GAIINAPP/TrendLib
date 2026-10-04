@@ -1,0 +1,25 @@
+name: cdl_marubozu
+title: Marubozu
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_marubozu
+    dtype: int32
+    plot: pattern
+    doc: A long body with almost no wick at either end
+talib:
+  name: CDLMARUBOZU
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_closingmarubozu, cdl_longline, cdl_belthold]

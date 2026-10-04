@@ -1,0 +1,25 @@
+name: cdl_kicking
+title: Kicking
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_kicking
+    dtype: int32
+    plot: pattern
+    doc: Two marubozu of opposite colours with a gap between them
+talib:
+  name: CDLKICKING
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_kickingbylength, cdl_marubozu, cdl_separatinglines]

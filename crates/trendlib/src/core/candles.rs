@@ -81,6 +81,26 @@ impl Candle {
         if self.is_white() { 1.0 } else { -1.0 }
     }
 
+    /// The body sits entirely above the earlier one's, wicks ignored.
+    pub fn body_gaps_above(self, earlier: Candle) -> bool {
+        self.body_bottom() > earlier.body_top()
+    }
+
+    /// The body sits entirely below the earlier one's, wicks ignored.
+    pub fn body_gaps_below(self, earlier: Candle) -> bool {
+        self.body_top() < earlier.body_bottom()
+    }
+
+    /// The whole bar sits above the earlier one, wicks included.
+    pub fn gaps_above(self, earlier: Candle) -> bool {
+        self.low > earlier.high
+    }
+
+    /// The whole bar sits below the earlier one, wicks included.
+    pub fn gaps_below(self, earlier: Candle) -> bool {
+        self.high < earlier.low
+    }
+
     fn measured(self, range: RangeType) -> f64 {
         match range {
             RangeType::RealBody => self.body(),

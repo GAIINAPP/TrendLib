@@ -1,0 +1,25 @@
+name: cdl_haramicross
+title: Harami Cross Pattern
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_haramicross
+    dtype: int32
+    plot: pattern
+    doc: A harami whose second bar is a doji rather than merely a short body
+talib:
+  name: CDLHARAMICROSS
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_harami, cdl_doji, cdl_engulfing]

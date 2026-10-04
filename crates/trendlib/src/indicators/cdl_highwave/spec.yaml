@@ -1,0 +1,25 @@
+name: cdl_highwave
+title: High Wave Candle
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_highwave
+    dtype: int32
+    plot: pattern
+    doc: A short body with a very long wick on each side
+talib:
+  name: CDLHIGHWAVE
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_spinningtop, cdl_longleggeddoji, cdl_doji]

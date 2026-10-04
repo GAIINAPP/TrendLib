@@ -1,0 +1,25 @@
+name: cdl_gravestonedoji
+title: Gravestone Doji
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_gravestonedoji
+    dtype: int32
+    plot: pattern
+    doc: A doji that opened and closed at the bottom of its range, with a long wick above
+talib:
+  name: CDLGRAVESTONEDOJI
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_dragonflydoji, cdl_doji, cdl_shootingstar]

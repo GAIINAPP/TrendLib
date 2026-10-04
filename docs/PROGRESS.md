@@ -2,8 +2,8 @@
 
 # Progress
 
-**100 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 104 not started.
+**125 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 79 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -25,7 +25,7 @@ something is done that is not. CI checks it is current.
 | Statistics | 9 | 11 |
 | Math transforms | 15 | 15 |
 | Math operators | 12 | 12 |
-| Candlestick patterns | 3 | 61 |
+| Candlestick patterns | 28 | 61 |
 | Levels | 0 | 3 |
 
 ## Overlap studies (19 of 25)
@@ -195,7 +195,7 @@ something is done that is not. CI checks it is current.
 - [x] `sub` (`SUB`) -- Vector Subtraction
 - [x] `sum` (`SUM`) -- Summation
 
-## Candlestick patterns (3 of 61)
+## Candlestick patterns (28 of 61)
 
 - [ ] `cdl_2crows` (`CDL2CROWS`)
 - [ ] `cdl_3blackcrows` (`CDL3BLACKCROWS`)
@@ -206,58 +206,58 @@ something is done that is not. CI checks it is current.
 - [ ] `cdl_3whitesoldiers` (`CDL3WHITESOLDIERS`)
 - [ ] `cdl_abandonedbaby` (`CDLABANDONEDBABY`)
 - [ ] `cdl_advanceblock` (`CDLADVANCEBLOCK`)
-- [ ] `cdl_belthold` (`CDLBELTHOLD`)
+- [x] `cdl_belthold` (`CDLBELTHOLD`) -- Belt Hold
 - [ ] `cdl_breakaway` (`CDLBREAKAWAY`)
-- [ ] `cdl_closingmarubozu` (`CDLCLOSINGMARUBOZU`)
+- [x] `cdl_closingmarubozu` (`CDLCLOSINGMARUBOZU`) -- Closing Marubozu
 - [ ] `cdl_concealbabyswall` (`CDLCONCEALBABYSWALL`)
-- [ ] `cdl_counterattack` (`CDLCOUNTERATTACK`)
-- [ ] `cdl_darkcloudcover` (`CDLDARKCLOUDCOVER`)
+- [x] `cdl_counterattack` (`CDLCOUNTERATTACK`) -- Counterattack
+- [x] `cdl_darkcloudcover` (`CDLDARKCLOUDCOVER`) -- Dark Cloud Cover
 - [x] `cdl_doji` (`CDLDOJI`) -- Doji *
 - [ ] `cdl_dojistar` (`CDLDOJISTAR`)
-- [ ] `cdl_dragonflydoji` (`CDLDRAGONFLYDOJI`)
+- [x] `cdl_dragonflydoji` (`CDLDRAGONFLYDOJI`) -- Dragonfly Doji
 - [x] `cdl_engulfing` (`CDLENGULFING`) -- Engulfing Pattern *
 - [ ] `cdl_eveningdojistar` (`CDLEVENINGDOJISTAR`)
 - [ ] `cdl_eveningstar` (`CDLEVENINGSTAR`)
 - [ ] `cdl_gapsidesidewhite` (`CDLGAPSIDESIDEWHITE`)
-- [ ] `cdl_gravestonedoji` (`CDLGRAVESTONEDOJI`)
+- [x] `cdl_gravestonedoji` (`CDLGRAVESTONEDOJI`) -- Gravestone Doji
 - [x] `cdl_hammer` (`CDLHAMMER`) -- Hammer *
 - [ ] `cdl_hangingman` (`CDLHANGINGMAN`)
-- [ ] `cdl_harami` (`CDLHARAMI`)
-- [ ] `cdl_haramicross` (`CDLHARAMICROSS`)
-- [ ] `cdl_highwave` (`CDLHIGHWAVE`)
+- [x] `cdl_harami` (`CDLHARAMI`) -- Harami Pattern
+- [x] `cdl_haramicross` (`CDLHARAMICROSS`) -- Harami Cross Pattern
+- [x] `cdl_highwave` (`CDLHIGHWAVE`) -- High Wave Candle
 - [ ] `cdl_hikkake` (`CDLHIKKAKE`)
 - [ ] `cdl_hikkakemod` (`CDLHIKKAKEMOD`)
-- [ ] `cdl_homingpigeon` (`CDLHOMINGPIGEON`)
+- [x] `cdl_homingpigeon` (`CDLHOMINGPIGEON`) -- Homing Pigeon
 - [ ] `cdl_identical3crows` (`CDLIDENTICAL3CROWS`)
-- [ ] `cdl_inneck` (`CDLINNECK`)
+- [x] `cdl_inneck` (`CDLINNECK`) -- In Neck Pattern
 - [ ] `cdl_invertedhammer` (`CDLINVERTEDHAMMER`)
-- [ ] `cdl_kicking` (`CDLKICKING`)
-- [ ] `cdl_kickingbylength` (`CDLKICKINGBYLENGTH`)
+- [x] `cdl_kicking` (`CDLKICKING`) -- Kicking
+- [x] `cdl_kickingbylength` (`CDLKICKINGBYLENGTH`) -- Kicking by Length
 - [ ] `cdl_ladderbottom` (`CDLLADDERBOTTOM`)
-- [ ] `cdl_longleggeddoji` (`CDLLONGLEGGEDDOJI`)
-- [ ] `cdl_longline` (`CDLLONGLINE`)
-- [ ] `cdl_marubozu` (`CDLMARUBOZU`)
-- [ ] `cdl_matchinglow` (`CDLMATCHINGLOW`)
+- [x] `cdl_longleggeddoji` (`CDLLONGLEGGEDDOJI`) -- Long Legged Doji
+- [x] `cdl_longline` (`CDLLONGLINE`) -- Long Line Candle
+- [x] `cdl_marubozu` (`CDLMARUBOZU`) -- Marubozu
+- [x] `cdl_matchinglow` (`CDLMATCHINGLOW`) -- Matching Low
 - [ ] `cdl_mathold` (`CDLMATHOLD`)
 - [ ] `cdl_morningdojistar` (`CDLMORNINGDOJISTAR`)
 - [ ] `cdl_morningstar` (`CDLMORNINGSTAR`)
-- [ ] `cdl_onneck` (`CDLONNECK`)
-- [ ] `cdl_piercing` (`CDLPIERCING`)
+- [x] `cdl_onneck` (`CDLONNECK`) -- On Neck Pattern
+- [x] `cdl_piercing` (`CDLPIERCING`) -- Piercing Pattern
 - [ ] `cdl_rickshawman` (`CDLRICKSHAWMAN`)
 - [ ] `cdl_risefall3methods` (`CDLRISEFALL3METHODS`)
-- [ ] `cdl_separatinglines` (`CDLSEPARATINGLINES`)
+- [x] `cdl_separatinglines` (`CDLSEPARATINGLINES`) -- Separating Lines
 - [ ] `cdl_shootingstar` (`CDLSHOOTINGSTAR`)
-- [ ] `cdl_shortline` (`CDLSHORTLINE`)
-- [ ] `cdl_spinningtop` (`CDLSPINNINGTOP`)
+- [x] `cdl_shortline` (`CDLSHORTLINE`) -- Short Line Candle
+- [x] `cdl_spinningtop` (`CDLSPINNINGTOP`) -- Spinning Top
 - [ ] `cdl_stalledpattern` (`CDLSTALLEDPATTERN`)
 - [ ] `cdl_sticksandwich` (`CDLSTICKSANDWICH`)
-- [ ] `cdl_takuri` (`CDLTAKURI`)
+- [x] `cdl_takuri` (`CDLTAKURI`) -- Takuri Line
 - [ ] `cdl_tasukigap` (`CDLTASUKIGAP`)
-- [ ] `cdl_thrusting` (`CDLTHRUSTING`)
+- [x] `cdl_thrusting` (`CDLTHRUSTING`) -- Thrusting Pattern
 - [ ] `cdl_tristar` (`CDLTRISTAR`)
 - [ ] `cdl_unique3river` (`CDLUNIQUE3RIVER`)
 - [ ] `cdl_upsidegap2crows` (`CDLUPSIDEGAP2CROWS`)
-- [ ] `cdl_xsidegap3methods` (`CDLXSIDEGAP3METHODS`)
+- [x] `cdl_xsidegap3methods` (`CDLXSIDEGAP3METHODS`) -- Upside/Downside Gap Three Methods
 
 ## Levels (0 of 3)
 

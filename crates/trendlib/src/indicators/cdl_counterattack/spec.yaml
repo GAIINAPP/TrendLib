@@ -1,0 +1,25 @@
+name: cdl_counterattack
+title: Counterattack
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_counterattack
+    dtype: int32
+    plot: pattern
+    doc: Two long bars of opposite colours that closed at the same price
+talib:
+  name: CDLCOUNTERATTACK
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_separatinglines, cdl_matchinglow, cdl_kicking]

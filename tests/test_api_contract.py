@@ -120,15 +120,25 @@ def test_parameters_are_keyword_only(bars, indicator):
 
 
 def test_an_out_of_range_parameter_names_the_range(bars, indicator):
+    """Only the sides the oracle actually checks are tested.
+
+    A candlestick `penetration` has a floor and no ceiling, so there is no
+    value above it to refuse.
+    """
     columns = indicator.columns(bars, 60)
     for name, spec in indicator.params.items():
-        if spec["min"] is None:
-            continue
-        for bad in (spec["min"] - 1, spec["max"] + 1):
+        bad_values = []
+        if spec["min"] is not None:
+            bad_values.append(spec["min"] - 1)
+        if spec["max"] is not None:
+            bad_values.append(spec["max"] + 1)
+        low = spec["min"] if spec["min"] is not None else -float("inf")
+        high = spec["max"] if spec["max"] is not None else float("inf")
+        for bad in bad_values:
             with pytest.raises(tl.InvalidInput) as caught:
                 getattr(tl, indicator.name)(*columns, **{name: bad})
             assert str(caught.value) == (
-                f"{indicator.name}: {name}={bad} is out of range [{spec['min']}, {spec['max']}]"
+                f"{indicator.name}: {name}={bad} is out of range [{low}, {high}]"
             )
 
 

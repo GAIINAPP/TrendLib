@@ -1,0 +1,25 @@
+name: cdl_longleggeddoji
+title: Long Legged Doji
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_longleggeddoji
+    dtype: int32
+    plot: pattern
+    doc: A doji with a long wick on at least one side
+talib:
+  name: CDLLONGLEGGEDDOJI
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_rickshawman, cdl_doji, cdl_highwave]

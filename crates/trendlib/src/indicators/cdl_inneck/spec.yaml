@@ -1,0 +1,25 @@
+name: cdl_inneck
+title: In Neck Pattern
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_inneck
+    dtype: int32
+    plot: pattern
+    doc: A white bar that opened under the previous low and closed barely past its close
+talib:
+  name: CDLINNECK
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_onneck, cdl_thrusting, cdl_piercing]

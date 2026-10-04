@@ -1,0 +1,25 @@
+name: cdl_shortline
+title: Short Line Candle
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_shortline
+    dtype: int32
+    plot: pattern
+    doc: A short body with both wicks short, so the bar barely moved at all
+talib:
+  name: CDLSHORTLINE
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_longline, cdl_spinningtop, cdl_doji]

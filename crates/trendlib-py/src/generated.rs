@@ -2263,6 +2263,607 @@ impl PyCciStream {
 }
 
 #[pyfunction]
+#[pyo3(name = "cdl_belthold", signature = (open, high, low, close))]
+pub fn cdl_belthold<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_belthold::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_belthold::CdlBelthold as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlBeltholdStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlBeltholdStream {
+    inner: BarStream<trendlib::indicators::cdl_belthold::CdlBelthold, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlBeltholdStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_belthold::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::cdl_belthold::CdlBelthold, 4, 1> as Stream>::open(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_belthold::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::cdl_belthold::CdlBelthold as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_belthold"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_belthold bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_closingmarubozu", signature = (open, high, low, close))]
+pub fn cdl_closingmarubozu<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_closingmarubozu::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_closingmarubozu::CdlClosingmarubozu as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlClosingmarubozuStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlClosingmarubozuStream {
+    inner: BarStream<trendlib::indicators::cdl_closingmarubozu::CdlClosingmarubozu, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlClosingmarubozuStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_closingmarubozu::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_closingmarubozu::CdlClosingmarubozu, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_closingmarubozu::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_closingmarubozu::CdlClosingmarubozu as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_closingmarubozu"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_closingmarubozu bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_counterattack", signature = (open, high, low, close))]
+pub fn cdl_counterattack<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_counterattack::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_counterattack::CdlCounterattack as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlCounterattackStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlCounterattackStream {
+    inner: BarStream<trendlib::indicators::cdl_counterattack::CdlCounterattack, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlCounterattackStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_counterattack::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_counterattack::CdlCounterattack, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_counterattack::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_counterattack::CdlCounterattack as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_counterattack"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_counterattack bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_darkcloudcover", signature = (open, high, low, close, *, penetration))]
+pub fn cdl_darkcloudcover<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    penetration: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let penetration = float_param(
+        "cdl_darkcloudcover",
+        "penetration",
+        penetration,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::cdl_darkcloudcover::Params { penetration };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_darkcloudcover::CdlDarkcloudcover as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlDarkcloudcoverStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlDarkcloudcoverStream {
+    inner: BarStream<trendlib::indicators::cdl_darkcloudcover::CdlDarkcloudcover, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlDarkcloudcoverStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, penetration))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        penetration: f64,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let penetration = float_param(
+            "cdl_darkcloudcover",
+            "penetration",
+            penetration,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::cdl_darkcloudcover::Params { penetration };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_darkcloudcover::CdlDarkcloudcover, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, penetration))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        penetration: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let penetration = float_param(
+            "cdl_darkcloudcover",
+            "penetration",
+            penetration,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::cdl_darkcloudcover::Params { penetration };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_darkcloudcover::CdlDarkcloudcover as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_darkcloudcover"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_darkcloudcover bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
 #[pyo3(name = "cdl_doji", signature = (open, high, low, close))]
 pub fn cdl_doji<'py>(
     py: Python<'py>,
@@ -2403,6 +3004,147 @@ impl PyCdlDojiStream {
     fn __repr__(&self) -> String {
         format!(
             "<trendlib stream cdl_doji bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_dragonflydoji", signature = (open, high, low, close))]
+pub fn cdl_dragonflydoji<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_dragonflydoji::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_dragonflydoji::CdlDragonflydoji as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlDragonflydojiStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlDragonflydojiStream {
+    inner: BarStream<trendlib::indicators::cdl_dragonflydoji::CdlDragonflydoji, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlDragonflydojiStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_dragonflydoji::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_dragonflydoji::CdlDragonflydoji, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_dragonflydoji::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_dragonflydoji::CdlDragonflydoji as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_dragonflydoji"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_dragonflydoji bars_seen={} value={:?}>",
             self.inner.bars_seen(),
             self.inner.value()
         )
@@ -2556,6 +3298,147 @@ impl PyCdlEngulfingStream {
 }
 
 #[pyfunction]
+#[pyo3(name = "cdl_gravestonedoji", signature = (open, high, low, close))]
+pub fn cdl_gravestonedoji<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_gravestonedoji::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_gravestonedoji::CdlGravestonedoji as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlGravestonedojiStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlGravestonedojiStream {
+    inner: BarStream<trendlib::indicators::cdl_gravestonedoji::CdlGravestonedoji, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlGravestonedojiStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_gravestonedoji::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_gravestonedoji::CdlGravestonedoji, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_gravestonedoji::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_gravestonedoji::CdlGravestonedoji as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_gravestonedoji"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_gravestonedoji bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
 #[pyo3(name = "cdl_hammer", signature = (open, high, low, close))]
 pub fn cdl_hammer<'py>(
     py: Python<'py>,
@@ -2700,6 +3583,2780 @@ impl PyCdlHammerStream {
     fn __repr__(&self) -> String {
         format!(
             "<trendlib stream cdl_hammer bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_harami", signature = (open, high, low, close))]
+pub fn cdl_harami<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_harami::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_harami::CdlHarami as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlHaramiStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlHaramiStream {
+    inner: BarStream<trendlib::indicators::cdl_harami::CdlHarami, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlHaramiStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_harami::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::cdl_harami::CdlHarami, 4, 1> as Stream>::open(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_harami::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::cdl_harami::CdlHarami as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_harami"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_harami bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_haramicross", signature = (open, high, low, close))]
+pub fn cdl_haramicross<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_haramicross::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_haramicross::CdlHaramicross as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlHaramicrossStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlHaramicrossStream {
+    inner: BarStream<trendlib::indicators::cdl_haramicross::CdlHaramicross, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlHaramicrossStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_haramicross::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_haramicross::CdlHaramicross, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_haramicross::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_haramicross::CdlHaramicross as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_haramicross"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_haramicross bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_highwave", signature = (open, high, low, close))]
+pub fn cdl_highwave<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_highwave::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_highwave::CdlHighwave as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlHighwaveStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlHighwaveStream {
+    inner: BarStream<trendlib::indicators::cdl_highwave::CdlHighwave, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlHighwaveStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_highwave::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::cdl_highwave::CdlHighwave, 4, 1> as Stream>::open(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_highwave::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::cdl_highwave::CdlHighwave as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_highwave"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_highwave bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_homingpigeon", signature = (open, high, low, close))]
+pub fn cdl_homingpigeon<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_homingpigeon::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_homingpigeon::CdlHomingpigeon as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlHomingpigeonStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlHomingpigeonStream {
+    inner: BarStream<trendlib::indicators::cdl_homingpigeon::CdlHomingpigeon, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlHomingpigeonStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_homingpigeon::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_homingpigeon::CdlHomingpigeon, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_homingpigeon::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_homingpigeon::CdlHomingpigeon as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_homingpigeon"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_homingpigeon bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_inneck", signature = (open, high, low, close))]
+pub fn cdl_inneck<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_inneck::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_inneck::CdlInneck as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlInneckStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlInneckStream {
+    inner: BarStream<trendlib::indicators::cdl_inneck::CdlInneck, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlInneckStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_inneck::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::cdl_inneck::CdlInneck, 4, 1> as Stream>::open(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_inneck::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::cdl_inneck::CdlInneck as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_inneck"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_inneck bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_kicking", signature = (open, high, low, close))]
+pub fn cdl_kicking<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_kicking::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_kicking::CdlKicking as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlKickingStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlKickingStream {
+    inner: BarStream<trendlib::indicators::cdl_kicking::CdlKicking, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlKickingStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_kicking::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::cdl_kicking::CdlKicking, 4, 1> as Stream>::open(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_kicking::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::cdl_kicking::CdlKicking as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_kicking"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_kicking bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_kickingbylength", signature = (open, high, low, close))]
+pub fn cdl_kickingbylength<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_kickingbylength::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_kickingbylength::CdlKickingbylength as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlKickingbylengthStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlKickingbylengthStream {
+    inner: BarStream<trendlib::indicators::cdl_kickingbylength::CdlKickingbylength, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlKickingbylengthStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_kickingbylength::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_kickingbylength::CdlKickingbylength, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_kickingbylength::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_kickingbylength::CdlKickingbylength as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_kickingbylength"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_kickingbylength bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_longleggeddoji", signature = (open, high, low, close))]
+pub fn cdl_longleggeddoji<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_longleggeddoji::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_longleggeddoji::CdlLongleggeddoji as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlLongleggeddojiStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlLongleggeddojiStream {
+    inner: BarStream<trendlib::indicators::cdl_longleggeddoji::CdlLongleggeddoji, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlLongleggeddojiStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_longleggeddoji::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_longleggeddoji::CdlLongleggeddoji, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_longleggeddoji::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_longleggeddoji::CdlLongleggeddoji as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_longleggeddoji"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_longleggeddoji bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_longline", signature = (open, high, low, close))]
+pub fn cdl_longline<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_longline::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_longline::CdlLongline as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlLonglineStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlLonglineStream {
+    inner: BarStream<trendlib::indicators::cdl_longline::CdlLongline, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlLonglineStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_longline::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::cdl_longline::CdlLongline, 4, 1> as Stream>::open(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_longline::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::cdl_longline::CdlLongline as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_longline"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_longline bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_marubozu", signature = (open, high, low, close))]
+pub fn cdl_marubozu<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_marubozu::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_marubozu::CdlMarubozu as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlMarubozuStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlMarubozuStream {
+    inner: BarStream<trendlib::indicators::cdl_marubozu::CdlMarubozu, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlMarubozuStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_marubozu::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::cdl_marubozu::CdlMarubozu, 4, 1> as Stream>::open(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_marubozu::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::cdl_marubozu::CdlMarubozu as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_marubozu"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_marubozu bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_matchinglow", signature = (open, high, low, close))]
+pub fn cdl_matchinglow<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_matchinglow::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_matchinglow::CdlMatchinglow as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlMatchinglowStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlMatchinglowStream {
+    inner: BarStream<trendlib::indicators::cdl_matchinglow::CdlMatchinglow, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlMatchinglowStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_matchinglow::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_matchinglow::CdlMatchinglow, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_matchinglow::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_matchinglow::CdlMatchinglow as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_matchinglow"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_matchinglow bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_onneck", signature = (open, high, low, close))]
+pub fn cdl_onneck<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_onneck::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_onneck::CdlOnneck as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlOnneckStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlOnneckStream {
+    inner: BarStream<trendlib::indicators::cdl_onneck::CdlOnneck, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlOnneckStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_onneck::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::cdl_onneck::CdlOnneck, 4, 1> as Stream>::open(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_onneck::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::cdl_onneck::CdlOnneck as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_onneck"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_onneck bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_piercing", signature = (open, high, low, close))]
+pub fn cdl_piercing<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_piercing::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_piercing::CdlPiercing as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlPiercingStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlPiercingStream {
+    inner: BarStream<trendlib::indicators::cdl_piercing::CdlPiercing, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlPiercingStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_piercing::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::cdl_piercing::CdlPiercing, 4, 1> as Stream>::open(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_piercing::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::cdl_piercing::CdlPiercing as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_piercing"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_piercing bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_separatinglines", signature = (open, high, low, close))]
+pub fn cdl_separatinglines<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_separatinglines::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_separatinglines::CdlSeparatinglines as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlSeparatinglinesStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlSeparatinglinesStream {
+    inner: BarStream<trendlib::indicators::cdl_separatinglines::CdlSeparatinglines, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlSeparatinglinesStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_separatinglines::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_separatinglines::CdlSeparatinglines, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_separatinglines::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_separatinglines::CdlSeparatinglines as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_separatinglines"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_separatinglines bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_shortline", signature = (open, high, low, close))]
+pub fn cdl_shortline<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_shortline::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_shortline::CdlShortline as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlShortlineStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlShortlineStream {
+    inner: BarStream<trendlib::indicators::cdl_shortline::CdlShortline, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlShortlineStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_shortline::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_shortline::CdlShortline, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_shortline::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::cdl_shortline::CdlShortline as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_shortline"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_shortline bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_spinningtop", signature = (open, high, low, close))]
+pub fn cdl_spinningtop<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_spinningtop::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_spinningtop::CdlSpinningtop as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlSpinningtopStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlSpinningtopStream {
+    inner: BarStream<trendlib::indicators::cdl_spinningtop::CdlSpinningtop, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlSpinningtopStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_spinningtop::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_spinningtop::CdlSpinningtop, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_spinningtop::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_spinningtop::CdlSpinningtop as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_spinningtop"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_spinningtop bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_takuri", signature = (open, high, low, close))]
+pub fn cdl_takuri<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_takuri::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_takuri::CdlTakuri as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlTakuriStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlTakuriStream {
+    inner: BarStream<trendlib::indicators::cdl_takuri::CdlTakuri, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlTakuriStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_takuri::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::cdl_takuri::CdlTakuri, 4, 1> as Stream>::open(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_takuri::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::cdl_takuri::CdlTakuri as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_takuri"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_takuri bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_thrusting", signature = (open, high, low, close))]
+pub fn cdl_thrusting<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_thrusting::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_thrusting::CdlThrusting as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlThrustingStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlThrustingStream {
+    inner: BarStream<trendlib::indicators::cdl_thrusting::CdlThrusting, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlThrustingStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_thrusting::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_thrusting::CdlThrusting, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_thrusting::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::cdl_thrusting::CdlThrusting as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_thrusting"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_thrusting bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_xsidegap3methods", signature = (open, high, low, close))]
+pub fn cdl_xsidegap3methods<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_xsidegap3methods::Params;
+    let out = py
+        .detach(|| <trendlib::indicators::cdl_xsidegap3methods::CdlXsidegap3methods as Kernel<4, 1>>::batch([open, high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlXsidegap3methodsStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlXsidegap3methodsStream {
+    inner: BarStream<trendlib::indicators::cdl_xsidegap3methods::CdlXsidegap3methods, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlXsidegap3methodsStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_xsidegap3methods::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_xsidegap3methods::CdlXsidegap3methods, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_xsidegap3methods::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_xsidegap3methods::CdlXsidegap3methods as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_xsidegap3methods"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_xsidegap3methods bars_seen={} value={:?}>",
             self.inner.bars_seen(),
             self.inner.value()
         )
@@ -12464,9 +16121,34 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(bbands, m)?)?;
     m.add_function(wrap_pyfunction!(bop, m)?)?;
     m.add_function(wrap_pyfunction!(cci, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_belthold, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_closingmarubozu, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_counterattack, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_darkcloudcover, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_doji, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_dragonflydoji, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_engulfing, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_gravestonedoji, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_hammer, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_harami, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_haramicross, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_highwave, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_homingpigeon, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_inneck, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_kicking, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_kickingbylength, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_longleggeddoji, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_longline, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_marubozu, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_matchinglow, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_onneck, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_piercing, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_separatinglines, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_shortline, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_spinningtop, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_takuri, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_thrusting, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_xsidegap3methods, m)?)?;
     m.add_function(wrap_pyfunction!(ceil, m)?)?;
     m.add_function(wrap_pyfunction!(cmo, m)?)?;
     m.add_function(wrap_pyfunction!(cos, m)?)?;
@@ -12564,9 +16246,34 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyBbandsStream>()?;
     m.add_class::<PyBopStream>()?;
     m.add_class::<PyCciStream>()?;
+    m.add_class::<PyCdlBeltholdStream>()?;
+    m.add_class::<PyCdlClosingmarubozuStream>()?;
+    m.add_class::<PyCdlCounterattackStream>()?;
+    m.add_class::<PyCdlDarkcloudcoverStream>()?;
     m.add_class::<PyCdlDojiStream>()?;
+    m.add_class::<PyCdlDragonflydojiStream>()?;
     m.add_class::<PyCdlEngulfingStream>()?;
+    m.add_class::<PyCdlGravestonedojiStream>()?;
     m.add_class::<PyCdlHammerStream>()?;
+    m.add_class::<PyCdlHaramiStream>()?;
+    m.add_class::<PyCdlHaramicrossStream>()?;
+    m.add_class::<PyCdlHighwaveStream>()?;
+    m.add_class::<PyCdlHomingpigeonStream>()?;
+    m.add_class::<PyCdlInneckStream>()?;
+    m.add_class::<PyCdlKickingStream>()?;
+    m.add_class::<PyCdlKickingbylengthStream>()?;
+    m.add_class::<PyCdlLongleggeddojiStream>()?;
+    m.add_class::<PyCdlLonglineStream>()?;
+    m.add_class::<PyCdlMarubozuStream>()?;
+    m.add_class::<PyCdlMatchinglowStream>()?;
+    m.add_class::<PyCdlOnneckStream>()?;
+    m.add_class::<PyCdlPiercingStream>()?;
+    m.add_class::<PyCdlSeparatinglinesStream>()?;
+    m.add_class::<PyCdlShortlineStream>()?;
+    m.add_class::<PyCdlSpinningtopStream>()?;
+    m.add_class::<PyCdlTakuriStream>()?;
+    m.add_class::<PyCdlThrustingStream>()?;
+    m.add_class::<PyCdlXsidegap3methodsStream>()?;
     m.add_class::<PyCeilStream>()?;
     m.add_class::<PyCmoStream>()?;
     m.add_class::<PyCosStream>()?;
@@ -12861,7 +16568,35 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     }
     {
         let params = PyDict::new(py);
+        table.set_item("cdl_belthold", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_closingmarubozu", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_counterattack", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.5)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("penetration", entry)?;
+        }
+        table.set_item("cdl_darkcloudcover", params)?;
+    }
+    {
+        let params = PyDict::new(py);
         table.set_item("cdl_doji", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_dragonflydoji", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -12869,7 +16604,87 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     }
     {
         let params = PyDict::new(py);
+        table.set_item("cdl_gravestonedoji", params)?;
+    }
+    {
+        let params = PyDict::new(py);
         table.set_item("cdl_hammer", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_harami", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_haramicross", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_highwave", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_homingpigeon", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_inneck", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_kicking", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_kickingbylength", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_longleggeddoji", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_longline", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_marubozu", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_matchinglow", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_onneck", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_piercing", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_separatinglines", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_shortline", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_spinningtop", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_takuri", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_thrusting", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_xsidegap3methods", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -13948,9 +17763,34 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("bbands", vec!["source"])?;
     table.set_item("bop", vec!["open", "high", "low", "close"])?;
     table.set_item("cci", vec!["high", "low", "close"])?;
+    table.set_item("cdl_belthold", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_closingmarubozu", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_counterattack", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_darkcloudcover", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_doji", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_dragonflydoji", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_engulfing", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_gravestonedoji", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_hammer", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_harami", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_haramicross", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_highwave", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_homingpigeon", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_inneck", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_kicking", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_kickingbylength", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_longleggeddoji", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_longline", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_marubozu", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_matchinglow", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_onneck", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_piercing", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_separatinglines", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_shortline", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_spinningtop", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_takuri", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_thrusting", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_xsidegap3methods", vec!["open", "high", "low", "close"])?;
     table.set_item("ceil", vec!["source"])?;
     table.set_item("cmo", vec!["source"])?;
     table.set_item("cos", vec!["source"])?;
@@ -14060,9 +17900,34 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     )?;
     table.set_item("bop", vec!["bop"])?;
     table.set_item("cci", vec!["cci"])?;
+    table.set_item("cdl_belthold", vec!["cdl_belthold"])?;
+    table.set_item("cdl_closingmarubozu", vec!["cdl_closingmarubozu"])?;
+    table.set_item("cdl_counterattack", vec!["cdl_counterattack"])?;
+    table.set_item("cdl_darkcloudcover", vec!["cdl_darkcloudcover"])?;
     table.set_item("cdl_doji", vec!["cdl_doji"])?;
+    table.set_item("cdl_dragonflydoji", vec!["cdl_dragonflydoji"])?;
     table.set_item("cdl_engulfing", vec!["cdl_engulfing"])?;
+    table.set_item("cdl_gravestonedoji", vec!["cdl_gravestonedoji"])?;
     table.set_item("cdl_hammer", vec!["cdl_hammer"])?;
+    table.set_item("cdl_harami", vec!["cdl_harami"])?;
+    table.set_item("cdl_haramicross", vec!["cdl_haramicross"])?;
+    table.set_item("cdl_highwave", vec!["cdl_highwave"])?;
+    table.set_item("cdl_homingpigeon", vec!["cdl_homingpigeon"])?;
+    table.set_item("cdl_inneck", vec!["cdl_inneck"])?;
+    table.set_item("cdl_kicking", vec!["cdl_kicking"])?;
+    table.set_item("cdl_kickingbylength", vec!["cdl_kickingbylength"])?;
+    table.set_item("cdl_longleggeddoji", vec!["cdl_longleggeddoji"])?;
+    table.set_item("cdl_longline", vec!["cdl_longline"])?;
+    table.set_item("cdl_marubozu", vec!["cdl_marubozu"])?;
+    table.set_item("cdl_matchinglow", vec!["cdl_matchinglow"])?;
+    table.set_item("cdl_onneck", vec!["cdl_onneck"])?;
+    table.set_item("cdl_piercing", vec!["cdl_piercing"])?;
+    table.set_item("cdl_separatinglines", vec!["cdl_separatinglines"])?;
+    table.set_item("cdl_shortline", vec!["cdl_shortline"])?;
+    table.set_item("cdl_spinningtop", vec!["cdl_spinningtop"])?;
+    table.set_item("cdl_takuri", vec!["cdl_takuri"])?;
+    table.set_item("cdl_thrusting", vec!["cdl_thrusting"])?;
+    table.set_item("cdl_xsidegap3methods", vec!["cdl_xsidegap3methods"])?;
     table.set_item("ceil", vec!["ceil"])?;
     table.set_item("cmo", vec!["cmo"])?;
     table.set_item("cos", vec!["cos"])?;
@@ -14178,9 +18043,34 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("bbands", vec!["float64", "float64", "float64"])?;
     table.set_item("bop", vec!["float64"])?;
     table.set_item("cci", vec!["float64"])?;
+    table.set_item("cdl_belthold", vec!["int32"])?;
+    table.set_item("cdl_closingmarubozu", vec!["int32"])?;
+    table.set_item("cdl_counterattack", vec!["int32"])?;
+    table.set_item("cdl_darkcloudcover", vec!["int32"])?;
     table.set_item("cdl_doji", vec!["int32"])?;
+    table.set_item("cdl_dragonflydoji", vec!["int32"])?;
     table.set_item("cdl_engulfing", vec!["int32"])?;
+    table.set_item("cdl_gravestonedoji", vec!["int32"])?;
     table.set_item("cdl_hammer", vec!["int32"])?;
+    table.set_item("cdl_harami", vec!["int32"])?;
+    table.set_item("cdl_haramicross", vec!["int32"])?;
+    table.set_item("cdl_highwave", vec!["int32"])?;
+    table.set_item("cdl_homingpigeon", vec!["int32"])?;
+    table.set_item("cdl_inneck", vec!["int32"])?;
+    table.set_item("cdl_kicking", vec!["int32"])?;
+    table.set_item("cdl_kickingbylength", vec!["int32"])?;
+    table.set_item("cdl_longleggeddoji", vec!["int32"])?;
+    table.set_item("cdl_longline", vec!["int32"])?;
+    table.set_item("cdl_marubozu", vec!["int32"])?;
+    table.set_item("cdl_matchinglow", vec!["int32"])?;
+    table.set_item("cdl_onneck", vec!["int32"])?;
+    table.set_item("cdl_piercing", vec!["int32"])?;
+    table.set_item("cdl_separatinglines", vec!["int32"])?;
+    table.set_item("cdl_shortline", vec!["int32"])?;
+    table.set_item("cdl_spinningtop", vec!["int32"])?;
+    table.set_item("cdl_takuri", vec!["int32"])?;
+    table.set_item("cdl_thrusting", vec!["int32"])?;
+    table.set_item("cdl_xsidegap3methods", vec!["int32"])?;
     table.set_item("ceil", vec!["float64"])?;
     table.set_item("cmo", vec!["float64"])?;
     table.set_item("cos", vec!["float64"])?;
@@ -14284,9 +18174,34 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("bbands", vec!["overlap", "nan_inf_output"])?;
     table.set_item("bop", Vec::<&str>::new())?;
     table.set_item("cci", Vec::<&str>::new())?;
+    table.set_item("cdl_belthold", vec!["pattern"])?;
+    table.set_item("cdl_closingmarubozu", vec!["pattern"])?;
+    table.set_item("cdl_counterattack", vec!["pattern"])?;
+    table.set_item("cdl_darkcloudcover", vec!["pattern"])?;
     table.set_item("cdl_doji", vec!["pattern"])?;
+    table.set_item("cdl_dragonflydoji", vec!["pattern"])?;
     table.set_item("cdl_engulfing", vec!["pattern"])?;
+    table.set_item("cdl_gravestonedoji", vec!["pattern"])?;
     table.set_item("cdl_hammer", vec!["pattern"])?;
+    table.set_item("cdl_harami", vec!["pattern"])?;
+    table.set_item("cdl_haramicross", vec!["pattern"])?;
+    table.set_item("cdl_highwave", vec!["pattern"])?;
+    table.set_item("cdl_homingpigeon", vec!["pattern"])?;
+    table.set_item("cdl_inneck", vec!["pattern"])?;
+    table.set_item("cdl_kicking", vec!["pattern"])?;
+    table.set_item("cdl_kickingbylength", vec!["pattern"])?;
+    table.set_item("cdl_longleggeddoji", vec!["pattern"])?;
+    table.set_item("cdl_longline", vec!["pattern"])?;
+    table.set_item("cdl_marubozu", vec!["pattern"])?;
+    table.set_item("cdl_matchinglow", vec!["pattern"])?;
+    table.set_item("cdl_onneck", vec!["pattern"])?;
+    table.set_item("cdl_piercing", vec!["pattern"])?;
+    table.set_item("cdl_separatinglines", vec!["pattern"])?;
+    table.set_item("cdl_shortline", vec!["pattern"])?;
+    table.set_item("cdl_spinningtop", vec!["pattern"])?;
+    table.set_item("cdl_takuri", vec!["pattern"])?;
+    table.set_item("cdl_thrusting", vec!["pattern"])?;
+    table.set_item("cdl_xsidegap3methods", vec!["pattern"])?;
     table.set_item("ceil", vec!["nan_inf_output"])?;
     table.set_item("cmo", vec!["unstable"])?;
     table.set_item("cos", vec!["nan_inf_output"])?;
@@ -14390,9 +18305,34 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("bbands", "overlap")?;
     table.set_item("bop", "momentum")?;
     table.set_item("cci", "momentum")?;
+    table.set_item("cdl_belthold", "patterns")?;
+    table.set_item("cdl_closingmarubozu", "patterns")?;
+    table.set_item("cdl_counterattack", "patterns")?;
+    table.set_item("cdl_darkcloudcover", "patterns")?;
     table.set_item("cdl_doji", "patterns")?;
+    table.set_item("cdl_dragonflydoji", "patterns")?;
     table.set_item("cdl_engulfing", "patterns")?;
+    table.set_item("cdl_gravestonedoji", "patterns")?;
     table.set_item("cdl_hammer", "patterns")?;
+    table.set_item("cdl_harami", "patterns")?;
+    table.set_item("cdl_haramicross", "patterns")?;
+    table.set_item("cdl_highwave", "patterns")?;
+    table.set_item("cdl_homingpigeon", "patterns")?;
+    table.set_item("cdl_inneck", "patterns")?;
+    table.set_item("cdl_kicking", "patterns")?;
+    table.set_item("cdl_kickingbylength", "patterns")?;
+    table.set_item("cdl_longleggeddoji", "patterns")?;
+    table.set_item("cdl_longline", "patterns")?;
+    table.set_item("cdl_marubozu", "patterns")?;
+    table.set_item("cdl_matchinglow", "patterns")?;
+    table.set_item("cdl_onneck", "patterns")?;
+    table.set_item("cdl_piercing", "patterns")?;
+    table.set_item("cdl_separatinglines", "patterns")?;
+    table.set_item("cdl_shortline", "patterns")?;
+    table.set_item("cdl_spinningtop", "patterns")?;
+    table.set_item("cdl_takuri", "patterns")?;
+    table.set_item("cdl_thrusting", "patterns")?;
+    table.set_item("cdl_xsidegap3methods", "patterns")?;
     table.set_item("ceil", "math")?;
     table.set_item("cmo", "momentum")?;
     table.set_item("cos", "math")?;
@@ -14496,1165 +18436,758 @@ pub fn lookback_of(
     match name {
         "accbands" => {
             let period = match get("period")? {
-                Some(value) => int_param("accbands", "period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("accbands", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 20,
             };
-            Ok(
-                <trendlib::indicators::accbands::Accbands as Kernel<3, 3>>::lookback(
-                    &trendlib::indicators::accbands::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::accbands::Accbands as Kernel<3, 3>>::lookback(&trendlib::indicators::accbands::Params { period, }))
         }
-        "acos" => Ok(
-            <trendlib::indicators::acos::Acos as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::acos::Params {},
-            ),
-        ),
-        "ad" => Ok(<trendlib::indicators::ad::Ad as Kernel<4, 1>>::lookback(
-            &trendlib::indicators::ad::Params {},
-        )),
-        "add" => Ok(<trendlib::indicators::add::Add as Kernel<2, 1>>::lookback(
-            &trendlib::indicators::add::Params {},
-        )),
+        "acos" => {
+            Ok(<trendlib::indicators::acos::Acos as Kernel<1, 1>>::lookback(&trendlib::indicators::acos::Params { }))
+        }
+        "ad" => {
+            Ok(<trendlib::indicators::ad::Ad as Kernel<4, 1>>::lookback(&trendlib::indicators::ad::Params { }))
+        }
+        "add" => {
+            Ok(<trendlib::indicators::add::Add as Kernel<2, 1>>::lookback(&trendlib::indicators::add::Params { }))
+        }
         "adx" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("adx", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("adx", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(<trendlib::indicators::adx::Adx as Kernel<3, 1>>::lookback(
-                &trendlib::indicators::adx::Params { period },
-            ))
+            Ok(<trendlib::indicators::adx::Adx as Kernel<3, 1>>::lookback(&trendlib::indicators::adx::Params { period, }))
         }
         "adxr" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("adxr", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("adxr", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(
-                <trendlib::indicators::adxr::Adxr as Kernel<3, 1>>::lookback(
-                    &trendlib::indicators::adxr::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::adxr::Adxr as Kernel<3, 1>>::lookback(&trendlib::indicators::adxr::Params { period, }))
         }
         "apo" => {
             let fast_period = match get("fast_period")? {
-                Some(value) => int_param("apo", "fast_period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("apo", "fast_period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 12,
             };
             let slow_period = match get("slow_period")? {
-                Some(value) => int_param("apo", "slow_period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("apo", "slow_period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 26,
             };
-            let ma_type = ma_type_param(
-                "apo",
-                "ma_type",
-                match text("ma_type")? {
-                    Some(ref value) => value,
-                    None => "ema",
-                },
-            )
-            .map_err(|e| to_py_err(py, &e))?;
-            Ok(<trendlib::indicators::apo::Apo as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::apo::Params {
-                    fast_period,
-                    slow_period,
-                    ma_type,
-                },
-            ))
+            let ma_type = ma_type_param("apo", "ma_type", match text("ma_type")? {
+                Some(ref value) => value,
+                None => "ema",
+            }).map_err(|e| to_py_err(py, &e))?;
+            Ok(<trendlib::indicators::apo::Apo as Kernel<1, 1>>::lookback(&trendlib::indicators::apo::Params { fast_period, slow_period, ma_type, }))
         }
         "aroon" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("aroon", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("aroon", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(
-                <trendlib::indicators::aroon::Aroon as Kernel<2, 2>>::lookback(
-                    &trendlib::indicators::aroon::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::aroon::Aroon as Kernel<2, 2>>::lookback(&trendlib::indicators::aroon::Params { period, }))
         }
         "aroonosc" => {
             let period = match get("period")? {
-                Some(value) => int_param("aroonosc", "period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("aroonosc", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(
-                <trendlib::indicators::aroonosc::Aroonosc as Kernel<2, 1>>::lookback(
-                    &trendlib::indicators::aroonosc::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::aroonosc::Aroonosc as Kernel<2, 1>>::lookback(&trendlib::indicators::aroonosc::Params { period, }))
         }
-        "asin" => Ok(
-            <trendlib::indicators::asin::Asin as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::asin::Params {},
-            ),
-        ),
-        "atan" => Ok(
-            <trendlib::indicators::atan::Atan as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::atan::Params {},
-            ),
-        ),
+        "asin" => {
+            Ok(<trendlib::indicators::asin::Asin as Kernel<1, 1>>::lookback(&trendlib::indicators::asin::Params { }))
+        }
+        "atan" => {
+            Ok(<trendlib::indicators::atan::Atan as Kernel<1, 1>>::lookback(&trendlib::indicators::atan::Params { }))
+        }
         "atr" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("atr", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("atr", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(<trendlib::indicators::atr::Atr as Kernel<3, 1>>::lookback(
-                &trendlib::indicators::atr::Params { period },
-            ))
+            Ok(<trendlib::indicators::atr::Atr as Kernel<3, 1>>::lookback(&trendlib::indicators::atr::Params { period, }))
         }
         "avgdev" => {
             let period = match get("period")? {
-                Some(value) => int_param("avgdev", "period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("avgdev", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(
-                <trendlib::indicators::avgdev::Avgdev as Kernel<1, 1>>::lookback(
-                    &trendlib::indicators::avgdev::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::avgdev::Avgdev as Kernel<1, 1>>::lookback(&trendlib::indicators::avgdev::Params { period, }))
         }
-        "avgprice" => Ok(
-            <trendlib::indicators::avgprice::Avgprice as Kernel<4, 1>>::lookback(
-                &trendlib::indicators::avgprice::Params {},
-            ),
-        ),
+        "avgprice" => {
+            Ok(<trendlib::indicators::avgprice::Avgprice as Kernel<4, 1>>::lookback(&trendlib::indicators::avgprice::Params { }))
+        }
         "bbands" => {
             let period = match get("period")? {
-                Some(value) => int_param("bbands", "period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("bbands", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 20,
             };
             let nbdev_up = 2.0;
             let nbdev_dn = 2.0;
-            let ma_type = ma_type_param(
-                "bbands",
-                "ma_type",
-                match text("ma_type")? {
-                    Some(ref value) => value,
-                    None => "sma",
-                },
-            )
-            .map_err(|e| to_py_err(py, &e))?;
-            Ok(
-                <trendlib::indicators::bbands::Bbands as Kernel<1, 3>>::lookback(
-                    &trendlib::indicators::bbands::Params {
-                        period,
-                        nbdev_up,
-                        nbdev_dn,
-                        ma_type,
-                    },
-                ),
-            )
+            let ma_type = ma_type_param("bbands", "ma_type", match text("ma_type")? {
+                Some(ref value) => value,
+                None => "sma",
+            }).map_err(|e| to_py_err(py, &e))?;
+            Ok(<trendlib::indicators::bbands::Bbands as Kernel<1, 3>>::lookback(&trendlib::indicators::bbands::Params { period, nbdev_up, nbdev_dn, ma_type, }))
         }
-        "bop" => Ok(<trendlib::indicators::bop::Bop as Kernel<4, 1>>::lookback(
-            &trendlib::indicators::bop::Params {},
-        )),
+        "bop" => {
+            Ok(<trendlib::indicators::bop::Bop as Kernel<4, 1>>::lookback(&trendlib::indicators::bop::Params { }))
+        }
         "cci" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("cci", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("cci", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(<trendlib::indicators::cci::Cci as Kernel<3, 1>>::lookback(
-                &trendlib::indicators::cci::Params { period },
-            ))
+            Ok(<trendlib::indicators::cci::Cci as Kernel<3, 1>>::lookback(&trendlib::indicators::cci::Params { period, }))
         }
-        "cdl_doji" => Ok(
-            <trendlib::indicators::cdl_doji::CdlDoji as Kernel<4, 1>>::lookback(
-                &trendlib::indicators::cdl_doji::Params {},
-            ),
-        ),
-        "cdl_engulfing" => Ok(
-            <trendlib::indicators::cdl_engulfing::CdlEngulfing as Kernel<4, 1>>::lookback(
-                &trendlib::indicators::cdl_engulfing::Params {},
-            ),
-        ),
-        "cdl_hammer" => Ok(<trendlib::indicators::cdl_hammer::CdlHammer as Kernel<
-            4,
-            1,
-        >>::lookback(
-            &trendlib::indicators::cdl_hammer::Params {}
-        )),
-        "ceil" => Ok(
-            <trendlib::indicators::ceil::Ceil as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::ceil::Params {},
-            ),
-        ),
+        "cdl_belthold" => {
+            Ok(<trendlib::indicators::cdl_belthold::CdlBelthold as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_belthold::Params { }))
+        }
+        "cdl_closingmarubozu" => {
+            Ok(<trendlib::indicators::cdl_closingmarubozu::CdlClosingmarubozu as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_closingmarubozu::Params { }))
+        }
+        "cdl_counterattack" => {
+            Ok(<trendlib::indicators::cdl_counterattack::CdlCounterattack as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_counterattack::Params { }))
+        }
+        "cdl_darkcloudcover" => {
+            let penetration = 0.5;
+            Ok(<trendlib::indicators::cdl_darkcloudcover::CdlDarkcloudcover as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_darkcloudcover::Params { penetration, }))
+        }
+        "cdl_doji" => {
+            Ok(<trendlib::indicators::cdl_doji::CdlDoji as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_doji::Params { }))
+        }
+        "cdl_dragonflydoji" => {
+            Ok(<trendlib::indicators::cdl_dragonflydoji::CdlDragonflydoji as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_dragonflydoji::Params { }))
+        }
+        "cdl_engulfing" => {
+            Ok(<trendlib::indicators::cdl_engulfing::CdlEngulfing as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_engulfing::Params { }))
+        }
+        "cdl_gravestonedoji" => {
+            Ok(<trendlib::indicators::cdl_gravestonedoji::CdlGravestonedoji as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_gravestonedoji::Params { }))
+        }
+        "cdl_hammer" => {
+            Ok(<trendlib::indicators::cdl_hammer::CdlHammer as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_hammer::Params { }))
+        }
+        "cdl_harami" => {
+            Ok(<trendlib::indicators::cdl_harami::CdlHarami as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_harami::Params { }))
+        }
+        "cdl_haramicross" => {
+            Ok(<trendlib::indicators::cdl_haramicross::CdlHaramicross as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_haramicross::Params { }))
+        }
+        "cdl_highwave" => {
+            Ok(<trendlib::indicators::cdl_highwave::CdlHighwave as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_highwave::Params { }))
+        }
+        "cdl_homingpigeon" => {
+            Ok(<trendlib::indicators::cdl_homingpigeon::CdlHomingpigeon as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_homingpigeon::Params { }))
+        }
+        "cdl_inneck" => {
+            Ok(<trendlib::indicators::cdl_inneck::CdlInneck as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_inneck::Params { }))
+        }
+        "cdl_kicking" => {
+            Ok(<trendlib::indicators::cdl_kicking::CdlKicking as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_kicking::Params { }))
+        }
+        "cdl_kickingbylength" => {
+            Ok(<trendlib::indicators::cdl_kickingbylength::CdlKickingbylength as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_kickingbylength::Params { }))
+        }
+        "cdl_longleggeddoji" => {
+            Ok(<trendlib::indicators::cdl_longleggeddoji::CdlLongleggeddoji as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_longleggeddoji::Params { }))
+        }
+        "cdl_longline" => {
+            Ok(<trendlib::indicators::cdl_longline::CdlLongline as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_longline::Params { }))
+        }
+        "cdl_marubozu" => {
+            Ok(<trendlib::indicators::cdl_marubozu::CdlMarubozu as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_marubozu::Params { }))
+        }
+        "cdl_matchinglow" => {
+            Ok(<trendlib::indicators::cdl_matchinglow::CdlMatchinglow as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_matchinglow::Params { }))
+        }
+        "cdl_onneck" => {
+            Ok(<trendlib::indicators::cdl_onneck::CdlOnneck as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_onneck::Params { }))
+        }
+        "cdl_piercing" => {
+            Ok(<trendlib::indicators::cdl_piercing::CdlPiercing as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_piercing::Params { }))
+        }
+        "cdl_separatinglines" => {
+            Ok(<trendlib::indicators::cdl_separatinglines::CdlSeparatinglines as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_separatinglines::Params { }))
+        }
+        "cdl_shortline" => {
+            Ok(<trendlib::indicators::cdl_shortline::CdlShortline as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_shortline::Params { }))
+        }
+        "cdl_spinningtop" => {
+            Ok(<trendlib::indicators::cdl_spinningtop::CdlSpinningtop as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_spinningtop::Params { }))
+        }
+        "cdl_takuri" => {
+            Ok(<trendlib::indicators::cdl_takuri::CdlTakuri as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_takuri::Params { }))
+        }
+        "cdl_thrusting" => {
+            Ok(<trendlib::indicators::cdl_thrusting::CdlThrusting as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_thrusting::Params { }))
+        }
+        "cdl_xsidegap3methods" => {
+            Ok(<trendlib::indicators::cdl_xsidegap3methods::CdlXsidegap3methods as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_xsidegap3methods::Params { }))
+        }
+        "ceil" => {
+            Ok(<trendlib::indicators::ceil::Ceil as Kernel<1, 1>>::lookback(&trendlib::indicators::ceil::Params { }))
+        }
         "cmo" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("cmo", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("cmo", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(<trendlib::indicators::cmo::Cmo as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::cmo::Params { period },
-            ))
+            Ok(<trendlib::indicators::cmo::Cmo as Kernel<1, 1>>::lookback(&trendlib::indicators::cmo::Params { period, }))
         }
-        "cos" => Ok(<trendlib::indicators::cos::Cos as Kernel<1, 1>>::lookback(
-            &trendlib::indicators::cos::Params {},
-        )),
-        "cosh" => Ok(
-            <trendlib::indicators::cosh::Cosh as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::cosh::Params {},
-            ),
-        ),
-        "cumsum" => Ok(
-            <trendlib::indicators::cumsum::Cumsum as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::cumsum::Params {},
-            ),
-        ),
+        "cos" => {
+            Ok(<trendlib::indicators::cos::Cos as Kernel<1, 1>>::lookback(&trendlib::indicators::cos::Params { }))
+        }
+        "cosh" => {
+            Ok(<trendlib::indicators::cosh::Cosh as Kernel<1, 1>>::lookback(&trendlib::indicators::cosh::Params { }))
+        }
+        "cumsum" => {
+            Ok(<trendlib::indicators::cumsum::Cumsum as Kernel<1, 1>>::lookback(&trendlib::indicators::cumsum::Params { }))
+        }
         "dema" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("dema", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("dema", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
-            Ok(
-                <trendlib::indicators::dema::Dema as Kernel<1, 1>>::lookback(
-                    &trendlib::indicators::dema::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::dema::Dema as Kernel<1, 1>>::lookback(&trendlib::indicators::dema::Params { period, }))
         }
-        "div" => Ok(<trendlib::indicators::div::Div as Kernel<2, 1>>::lookback(
-            &trendlib::indicators::div::Params {},
-        )),
+        "div" => {
+            Ok(<trendlib::indicators::div::Div as Kernel<2, 1>>::lookback(&trendlib::indicators::div::Params { }))
+        }
         "donchian" => {
             let period = match get("period")? {
-                Some(value) => int_param("donchian", "period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("donchian", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 20,
             };
-            Ok(
-                <trendlib::indicators::donchian::Donchian as Kernel<2, 3>>::lookback(
-                    &trendlib::indicators::donchian::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::donchian::Donchian as Kernel<2, 3>>::lookback(&trendlib::indicators::donchian::Params { period, }))
         }
         "dpo" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("dpo", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("dpo", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 20,
             };
-            Ok(<trendlib::indicators::dpo::Dpo as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::dpo::Params { period },
-            ))
+            Ok(<trendlib::indicators::dpo::Dpo as Kernel<1, 1>>::lookback(&trendlib::indicators::dpo::Params { period, }))
         }
         "dx" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("dx", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("dx", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(<trendlib::indicators::dx::Dx as Kernel<3, 1>>::lookback(
-                &trendlib::indicators::dx::Params { period },
-            ))
+            Ok(<trendlib::indicators::dx::Dx as Kernel<3, 1>>::lookback(&trendlib::indicators::dx::Params { period, }))
         }
         "ema" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("ema", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("ema", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
-            Ok(<trendlib::indicators::ema::Ema as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::ema::Params { period },
-            ))
+            Ok(<trendlib::indicators::ema::Ema as Kernel<1, 1>>::lookback(&trendlib::indicators::ema::Params { period, }))
         }
-        "exp" => Ok(<trendlib::indicators::exp::Exp as Kernel<1, 1>>::lookback(
-            &trendlib::indicators::exp::Params {},
-        )),
-        "floor" => Ok(
-            <trendlib::indicators::floor::Floor as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::floor::Params {},
-            ),
-        ),
-        "ha" => Ok(<trendlib::indicators::ha::Ha as Kernel<4, 4>>::lookback(
-            &trendlib::indicators::ha::Params {},
-        )),
+        "exp" => {
+            Ok(<trendlib::indicators::exp::Exp as Kernel<1, 1>>::lookback(&trendlib::indicators::exp::Params { }))
+        }
+        "floor" => {
+            Ok(<trendlib::indicators::floor::Floor as Kernel<1, 1>>::lookback(&trendlib::indicators::floor::Params { }))
+        }
+        "ha" => {
+            Ok(<trendlib::indicators::ha::Ha as Kernel<4, 4>>::lookback(&trendlib::indicators::ha::Params { }))
+        }
         "hma" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("hma", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("hma", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 20,
             };
-            Ok(<trendlib::indicators::hma::Hma as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::hma::Params { period },
-            ))
+            Ok(<trendlib::indicators::hma::Hma as Kernel<1, 1>>::lookback(&trendlib::indicators::hma::Params { period, }))
         }
         "kama" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("kama", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("kama", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
-            Ok(
-                <trendlib::indicators::kama::Kama as Kernel<1, 1>>::lookback(
-                    &trendlib::indicators::kama::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::kama::Kama as Kernel<1, 1>>::lookback(&trendlib::indicators::kama::Params { period, }))
         }
         "kc" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("kc", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("kc", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 20,
             };
             let atr_period = match get("atr_period")? {
-                Some(value) => int_param("kc", "atr_period", value, 1, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("kc", "atr_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 10,
             };
             let nbdev = 2.0;
-            Ok(<trendlib::indicators::kc::Kc as Kernel<3, 3>>::lookback(
-                &trendlib::indicators::kc::Params {
-                    period,
-                    atr_period,
-                    nbdev,
-                },
-            ))
+            Ok(<trendlib::indicators::kc::Kc as Kernel<3, 3>>::lookback(&trendlib::indicators::kc::Params { period, atr_period, nbdev, }))
         }
         "linearreg" => {
             let period = match get("period")? {
-                Some(value) => int_param("linearreg", "period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("linearreg", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(<trendlib::indicators::linearreg::Linearreg as Kernel<
-                1,
-                1,
-            >>::lookback(
-                &trendlib::indicators::linearreg::Params { period },
-            ))
+            Ok(<trendlib::indicators::linearreg::Linearreg as Kernel<1, 1>>::lookback(&trendlib::indicators::linearreg::Params { period, }))
         }
         "linearreg_angle" => {
             let period = match get("period")? {
-                Some(value) => int_param("linearreg_angle", "period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("linearreg_angle", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(
-                <trendlib::indicators::linearreg_angle::LinearregAngle as Kernel<1, 1>>::lookback(
-                    &trendlib::indicators::linearreg_angle::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::linearreg_angle::LinearregAngle as Kernel<1, 1>>::lookback(&trendlib::indicators::linearreg_angle::Params { period, }))
         }
         "linearreg_intercept" => {
             let period = match get("period")? {
-                Some(value) => int_param("linearreg_intercept", "period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("linearreg_intercept", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
             Ok(<trendlib::indicators::linearreg_intercept::LinearregIntercept as Kernel<1, 1>>::lookback(&trendlib::indicators::linearreg_intercept::Params { period, }))
         }
         "linearreg_slope" => {
             let period = match get("period")? {
-                Some(value) => int_param("linearreg_slope", "period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("linearreg_slope", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(
-                <trendlib::indicators::linearreg_slope::LinearregSlope as Kernel<1, 1>>::lookback(
-                    &trendlib::indicators::linearreg_slope::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::linearreg_slope::LinearregSlope as Kernel<1, 1>>::lookback(&trendlib::indicators::linearreg_slope::Params { period, }))
         }
-        "ln" => Ok(<trendlib::indicators::ln::Ln as Kernel<1, 1>>::lookback(
-            &trendlib::indicators::ln::Params {},
-        )),
-        "log10" => Ok(
-            <trendlib::indicators::log10::Log10 as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::log10::Params {},
-            ),
-        ),
+        "ln" => {
+            Ok(<trendlib::indicators::ln::Ln as Kernel<1, 1>>::lookback(&trendlib::indicators::ln::Params { }))
+        }
+        "log10" => {
+            Ok(<trendlib::indicators::log10::Log10 as Kernel<1, 1>>::lookback(&trendlib::indicators::log10::Params { }))
+        }
         "ma" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("ma", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("ma", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
-            let ma_type = ma_type_param(
-                "ma",
-                "ma_type",
-                match text("ma_type")? {
-                    Some(ref value) => value,
-                    None => "sma",
-                },
-            )
-            .map_err(|e| to_py_err(py, &e))?;
-            Ok(<trendlib::indicators::ma::Ma as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::ma::Params { period, ma_type },
-            ))
+            let ma_type = ma_type_param("ma", "ma_type", match text("ma_type")? {
+                Some(ref value) => value,
+                None => "sma",
+            }).map_err(|e| to_py_err(py, &e))?;
+            Ok(<trendlib::indicators::ma::Ma as Kernel<1, 1>>::lookback(&trendlib::indicators::ma::Params { period, ma_type, }))
         }
         "macd" => {
             let fast_period = match get("fast_period")? {
-                Some(value) => int_param("macd", "fast_period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("macd", "fast_period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 12,
             };
             let slow_period = match get("slow_period")? {
-                Some(value) => int_param("macd", "slow_period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("macd", "slow_period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 26,
             };
             let signal_period = match get("signal_period")? {
-                Some(value) => int_param("macd", "signal_period", value, 1, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("macd", "signal_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 9,
             };
-            Ok(
-                <trendlib::indicators::macd::Macd as Kernel<1, 3>>::lookback(
-                    &trendlib::indicators::macd::Params {
-                        fast_period,
-                        slow_period,
-                        signal_period,
-                    },
-                ),
-            )
+            Ok(<trendlib::indicators::macd::Macd as Kernel<1, 3>>::lookback(&trendlib::indicators::macd::Params { fast_period, slow_period, signal_period, }))
         }
         "macdext" => {
             let fast_period = match get("fast_period")? {
-                Some(value) => int_param("macdext", "fast_period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("macdext", "fast_period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 12,
             };
-            let fast_ma_type = ma_type_param(
-                "macdext",
-                "fast_ma_type",
-                match text("fast_ma_type")? {
-                    Some(ref value) => value,
-                    None => "sma",
-                },
-            )
-            .map_err(|e| to_py_err(py, &e))?;
+            let fast_ma_type = ma_type_param("macdext", "fast_ma_type", match text("fast_ma_type")? {
+                Some(ref value) => value,
+                None => "sma",
+            }).map_err(|e| to_py_err(py, &e))?;
             let slow_period = match get("slow_period")? {
-                Some(value) => int_param("macdext", "slow_period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("macdext", "slow_period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 26,
             };
-            let slow_ma_type = ma_type_param(
-                "macdext",
-                "slow_ma_type",
-                match text("slow_ma_type")? {
-                    Some(ref value) => value,
-                    None => "sma",
-                },
-            )
-            .map_err(|e| to_py_err(py, &e))?;
+            let slow_ma_type = ma_type_param("macdext", "slow_ma_type", match text("slow_ma_type")? {
+                Some(ref value) => value,
+                None => "sma",
+            }).map_err(|e| to_py_err(py, &e))?;
             let signal_period = match get("signal_period")? {
-                Some(value) => int_param("macdext", "signal_period", value, 1, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("macdext", "signal_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 9,
             };
-            let signal_ma_type = ma_type_param(
-                "macdext",
-                "signal_ma_type",
-                match text("signal_ma_type")? {
-                    Some(ref value) => value,
-                    None => "sma",
-                },
-            )
-            .map_err(|e| to_py_err(py, &e))?;
-            Ok(
-                <trendlib::indicators::macdext::Macdext as Kernel<1, 3>>::lookback(
-                    &trendlib::indicators::macdext::Params {
-                        fast_period,
-                        fast_ma_type,
-                        slow_period,
-                        slow_ma_type,
-                        signal_period,
-                        signal_ma_type,
-                    },
-                ),
-            )
+            let signal_ma_type = ma_type_param("macdext", "signal_ma_type", match text("signal_ma_type")? {
+                Some(ref value) => value,
+                None => "sma",
+            }).map_err(|e| to_py_err(py, &e))?;
+            Ok(<trendlib::indicators::macdext::Macdext as Kernel<1, 3>>::lookback(&trendlib::indicators::macdext::Params { fast_period, fast_ma_type, slow_period, slow_ma_type, signal_period, signal_ma_type, }))
         }
         "macdfix" => {
             let signal_period = match get("signal_period")? {
-                Some(value) => int_param("macdfix", "signal_period", value, 1, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("macdfix", "signal_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 9,
             };
-            Ok(
-                <trendlib::indicators::macdfix::Macdfix as Kernel<1, 3>>::lookback(
-                    &trendlib::indicators::macdfix::Params { signal_period },
-                ),
-            )
+            Ok(<trendlib::indicators::macdfix::Macdfix as Kernel<1, 3>>::lookback(&trendlib::indicators::macdfix::Params { signal_period, }))
         }
         "max" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("max", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("max", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
-            Ok(<trendlib::indicators::max::Max as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::max::Params { period },
-            ))
+            Ok(<trendlib::indicators::max::Max as Kernel<1, 1>>::lookback(&trendlib::indicators::max::Params { period, }))
         }
         "maxindex" => {
             let period = match get("period")? {
-                Some(value) => int_param("maxindex", "period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("maxindex", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
-            Ok(
-                <trendlib::indicators::maxindex::Maxindex as Kernel<1, 1>>::lookback(
-                    &trendlib::indicators::maxindex::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::maxindex::Maxindex as Kernel<1, 1>>::lookback(&trendlib::indicators::maxindex::Params { period, }))
         }
-        "medprice" => Ok(
-            <trendlib::indicators::medprice::Medprice as Kernel<2, 1>>::lookback(
-                &trendlib::indicators::medprice::Params {},
-            ),
-        ),
+        "medprice" => {
+            Ok(<trendlib::indicators::medprice::Medprice as Kernel<2, 1>>::lookback(&trendlib::indicators::medprice::Params { }))
+        }
         "mfi" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("mfi", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("mfi", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(<trendlib::indicators::mfi::Mfi as Kernel<4, 1>>::lookback(
-                &trendlib::indicators::mfi::Params { period },
-            ))
+            Ok(<trendlib::indicators::mfi::Mfi as Kernel<4, 1>>::lookback(&trendlib::indicators::mfi::Params { period, }))
         }
         "midpoint" => {
             let period = match get("period")? {
-                Some(value) => int_param("midpoint", "period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("midpoint", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(
-                <trendlib::indicators::midpoint::Midpoint as Kernel<1, 1>>::lookback(
-                    &trendlib::indicators::midpoint::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::midpoint::Midpoint as Kernel<1, 1>>::lookback(&trendlib::indicators::midpoint::Params { period, }))
         }
         "midprice" => {
             let period = match get("period")? {
-                Some(value) => int_param("midprice", "period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("midprice", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(
-                <trendlib::indicators::midprice::Midprice as Kernel<2, 1>>::lookback(
-                    &trendlib::indicators::midprice::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::midprice::Midprice as Kernel<2, 1>>::lookback(&trendlib::indicators::midprice::Params { period, }))
         }
         "min" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("min", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("min", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
-            Ok(<trendlib::indicators::min::Min as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::min::Params { period },
-            ))
+            Ok(<trendlib::indicators::min::Min as Kernel<1, 1>>::lookback(&trendlib::indicators::min::Params { period, }))
         }
         "minindex" => {
             let period = match get("period")? {
-                Some(value) => int_param("minindex", "period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("minindex", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
-            Ok(
-                <trendlib::indicators::minindex::Minindex as Kernel<1, 1>>::lookback(
-                    &trendlib::indicators::minindex::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::minindex::Minindex as Kernel<1, 1>>::lookback(&trendlib::indicators::minindex::Params { period, }))
         }
         "minmax" => {
             let period = match get("period")? {
-                Some(value) => int_param("minmax", "period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("minmax", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
-            Ok(
-                <trendlib::indicators::minmax::Minmax as Kernel<1, 2>>::lookback(
-                    &trendlib::indicators::minmax::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::minmax::Minmax as Kernel<1, 2>>::lookback(&trendlib::indicators::minmax::Params { period, }))
         }
         "minmaxindex" => {
             let period = match get("period")? {
-                Some(value) => int_param("minmaxindex", "period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("minmaxindex", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
-            Ok(<trendlib::indicators::minmaxindex::Minmaxindex as Kernel<
-                1,
-                2,
-            >>::lookback(
-                &trendlib::indicators::minmaxindex::Params { period },
-            ))
+            Ok(<trendlib::indicators::minmaxindex::Minmaxindex as Kernel<1, 2>>::lookback(&trendlib::indicators::minmaxindex::Params { period, }))
         }
         "minus_di" => {
             let period = match get("period")? {
-                Some(value) => int_param("minus_di", "period", value, 1, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("minus_di", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(
-                <trendlib::indicators::minus_di::MinusDi as Kernel<3, 1>>::lookback(
-                    &trendlib::indicators::minus_di::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::minus_di::MinusDi as Kernel<3, 1>>::lookback(&trendlib::indicators::minus_di::Params { period, }))
         }
         "minus_dm" => {
             let period = match get("period")? {
-                Some(value) => int_param("minus_dm", "period", value, 1, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("minus_dm", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(
-                <trendlib::indicators::minus_dm::MinusDm as Kernel<2, 1>>::lookback(
-                    &trendlib::indicators::minus_dm::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::minus_dm::MinusDm as Kernel<2, 1>>::lookback(&trendlib::indicators::minus_dm::Params { period, }))
         }
         "mom" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("mom", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("mom", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 10,
             };
-            Ok(<trendlib::indicators::mom::Mom as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::mom::Params { period },
-            ))
+            Ok(<trendlib::indicators::mom::Mom as Kernel<1, 1>>::lookback(&trendlib::indicators::mom::Params { period, }))
         }
-        "mult" => Ok(
-            <trendlib::indicators::mult::Mult as Kernel<2, 1>>::lookback(
-                &trendlib::indicators::mult::Params {},
-            ),
-        ),
+        "mult" => {
+            Ok(<trendlib::indicators::mult::Mult as Kernel<2, 1>>::lookback(&trendlib::indicators::mult::Params { }))
+        }
         "natr" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("natr", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("natr", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(
-                <trendlib::indicators::natr::Natr as Kernel<3, 1>>::lookback(
-                    &trendlib::indicators::natr::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::natr::Natr as Kernel<3, 1>>::lookback(&trendlib::indicators::natr::Params { period, }))
         }
-        "obv" => Ok(<trendlib::indicators::obv::Obv as Kernel<2, 1>>::lookback(
-            &trendlib::indicators::obv::Params {},
-        )),
+        "obv" => {
+            Ok(<trendlib::indicators::obv::Obv as Kernel<2, 1>>::lookback(&trendlib::indicators::obv::Params { }))
+        }
         "percentile" => {
             let period = match get("period")? {
-                Some(value) => int_param("percentile", "period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("percentile", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
             let percentile = 50.0;
-            Ok(<trendlib::indicators::percentile::Percentile as Kernel<
-                1,
-                1,
-            >>::lookback(
-                &trendlib::indicators::percentile::Params { period, percentile },
-            ))
+            Ok(<trendlib::indicators::percentile::Percentile as Kernel<1, 1>>::lookback(&trendlib::indicators::percentile::Params { period, percentile, }))
         }
         "percentrank" => {
             let period = match get("period")? {
-                Some(value) => int_param("percentrank", "period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("percentrank", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 100,
             };
-            Ok(<trendlib::indicators::percentrank::Percentrank as Kernel<
-                1,
-                1,
-            >>::lookback(
-                &trendlib::indicators::percentrank::Params { period },
-            ))
+            Ok(<trendlib::indicators::percentrank::Percentrank as Kernel<1, 1>>::lookback(&trendlib::indicators::percentrank::Params { period, }))
         }
         "plus_di" => {
             let period = match get("period")? {
-                Some(value) => int_param("plus_di", "period", value, 1, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("plus_di", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(
-                <trendlib::indicators::plus_di::PlusDi as Kernel<3, 1>>::lookback(
-                    &trendlib::indicators::plus_di::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::plus_di::PlusDi as Kernel<3, 1>>::lookback(&trendlib::indicators::plus_di::Params { period, }))
         }
         "plus_dm" => {
             let period = match get("period")? {
-                Some(value) => int_param("plus_dm", "period", value, 1, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("plus_dm", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(
-                <trendlib::indicators::plus_dm::PlusDm as Kernel<2, 1>>::lookback(
-                    &trendlib::indicators::plus_dm::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::plus_dm::PlusDm as Kernel<2, 1>>::lookback(&trendlib::indicators::plus_dm::Params { period, }))
         }
         "ppo" => {
             let fast_period = match get("fast_period")? {
-                Some(value) => int_param("ppo", "fast_period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("ppo", "fast_period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 12,
             };
             let slow_period = match get("slow_period")? {
-                Some(value) => int_param("ppo", "slow_period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("ppo", "slow_period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 26,
             };
-            let ma_type = ma_type_param(
-                "ppo",
-                "ma_type",
-                match text("ma_type")? {
-                    Some(ref value) => value,
-                    None => "ema",
-                },
-            )
-            .map_err(|e| to_py_err(py, &e))?;
-            Ok(<trendlib::indicators::ppo::Ppo as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::ppo::Params {
-                    fast_period,
-                    slow_period,
-                    ma_type,
-                },
-            ))
+            let ma_type = ma_type_param("ppo", "ma_type", match text("ma_type")? {
+                Some(ref value) => value,
+                None => "ema",
+            }).map_err(|e| to_py_err(py, &e))?;
+            Ok(<trendlib::indicators::ppo::Ppo as Kernel<1, 1>>::lookback(&trendlib::indicators::ppo::Params { fast_period, slow_period, ma_type, }))
         }
         "rma" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("rma", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("rma", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
-            Ok(<trendlib::indicators::rma::Rma as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::rma::Params { period },
-            ))
+            Ok(<trendlib::indicators::rma::Rma as Kernel<1, 1>>::lookback(&trendlib::indicators::rma::Params { period, }))
         }
         "roc" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("roc", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("roc", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 10,
             };
-            Ok(<trendlib::indicators::roc::Roc as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::roc::Params { period },
-            ))
+            Ok(<trendlib::indicators::roc::Roc as Kernel<1, 1>>::lookback(&trendlib::indicators::roc::Params { period, }))
         }
         "rocp" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("rocp", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("rocp", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 10,
             };
-            Ok(
-                <trendlib::indicators::rocp::Rocp as Kernel<1, 1>>::lookback(
-                    &trendlib::indicators::rocp::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::rocp::Rocp as Kernel<1, 1>>::lookback(&trendlib::indicators::rocp::Params { period, }))
         }
         "rocr" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("rocr", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("rocr", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 10,
             };
-            Ok(
-                <trendlib::indicators::rocr::Rocr as Kernel<1, 1>>::lookback(
-                    &trendlib::indicators::rocr::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::rocr::Rocr as Kernel<1, 1>>::lookback(&trendlib::indicators::rocr::Params { period, }))
         }
         "rocr100" => {
             let period = match get("period")? {
-                Some(value) => int_param("rocr100", "period", value, 1, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("rocr100", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 10,
             };
-            Ok(
-                <trendlib::indicators::rocr100::Rocr100 as Kernel<1, 1>>::lookback(
-                    &trendlib::indicators::rocr100::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::rocr100::Rocr100 as Kernel<1, 1>>::lookback(&trendlib::indicators::rocr100::Params { period, }))
         }
         "rsi" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("rsi", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("rsi", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(<trendlib::indicators::rsi::Rsi as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::rsi::Params { period },
-            ))
+            Ok(<trendlib::indicators::rsi::Rsi as Kernel<1, 1>>::lookback(&trendlib::indicators::rsi::Params { period, }))
         }
-        "sin" => Ok(<trendlib::indicators::sin::Sin as Kernel<1, 1>>::lookback(
-            &trendlib::indicators::sin::Params {},
-        )),
-        "sinh" => Ok(
-            <trendlib::indicators::sinh::Sinh as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::sinh::Params {},
-            ),
-        ),
+        "sin" => {
+            Ok(<trendlib::indicators::sin::Sin as Kernel<1, 1>>::lookback(&trendlib::indicators::sin::Params { }))
+        }
+        "sinh" => {
+            Ok(<trendlib::indicators::sinh::Sinh as Kernel<1, 1>>::lookback(&trendlib::indicators::sinh::Params { }))
+        }
         "sma" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("sma", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("sma", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
-            Ok(<trendlib::indicators::sma::Sma as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::sma::Params { period },
-            ))
+            Ok(<trendlib::indicators::sma::Sma as Kernel<1, 1>>::lookback(&trendlib::indicators::sma::Params { period, }))
         }
-        "sqrt" => Ok(
-            <trendlib::indicators::sqrt::Sqrt as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::sqrt::Params {},
-            ),
-        ),
+        "sqrt" => {
+            Ok(<trendlib::indicators::sqrt::Sqrt as Kernel<1, 1>>::lookback(&trendlib::indicators::sqrt::Params { }))
+        }
         "stddev" => {
             let period = match get("period")? {
-                Some(value) => int_param("stddev", "period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("stddev", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 5,
             };
             let nbdev = 1.0;
-            Ok(
-                <trendlib::indicators::stddev::Stddev as Kernel<1, 1>>::lookback(
-                    &trendlib::indicators::stddev::Params { period, nbdev },
-                ),
-            )
+            Ok(<trendlib::indicators::stddev::Stddev as Kernel<1, 1>>::lookback(&trendlib::indicators::stddev::Params { period, nbdev, }))
         }
         "stoch" => {
             let fastk_period = match get("fastk_period")? {
-                Some(value) => int_param("stoch", "fastk_period", value, 1, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("stoch", "fastk_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 5,
             };
             let slowk_period = match get("slowk_period")? {
-                Some(value) => int_param("stoch", "slowk_period", value, 1, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("stoch", "slowk_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 3,
             };
-            let slowk_ma_type = ma_type_param(
-                "stoch",
-                "slowk_ma_type",
-                match text("slowk_ma_type")? {
-                    Some(ref value) => value,
-                    None => "sma",
-                },
-            )
-            .map_err(|e| to_py_err(py, &e))?;
+            let slowk_ma_type = ma_type_param("stoch", "slowk_ma_type", match text("slowk_ma_type")? {
+                Some(ref value) => value,
+                None => "sma",
+            }).map_err(|e| to_py_err(py, &e))?;
             let slowd_period = match get("slowd_period")? {
-                Some(value) => int_param("stoch", "slowd_period", value, 1, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("stoch", "slowd_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 3,
             };
-            let slowd_ma_type = ma_type_param(
-                "stoch",
-                "slowd_ma_type",
-                match text("slowd_ma_type")? {
-                    Some(ref value) => value,
-                    None => "sma",
-                },
-            )
-            .map_err(|e| to_py_err(py, &e))?;
-            Ok(
-                <trendlib::indicators::stoch::Stoch as Kernel<3, 2>>::lookback(
-                    &trendlib::indicators::stoch::Params {
-                        fastk_period,
-                        slowk_period,
-                        slowk_ma_type,
-                        slowd_period,
-                        slowd_ma_type,
-                    },
-                ),
-            )
+            let slowd_ma_type = ma_type_param("stoch", "slowd_ma_type", match text("slowd_ma_type")? {
+                Some(ref value) => value,
+                None => "sma",
+            }).map_err(|e| to_py_err(py, &e))?;
+            Ok(<trendlib::indicators::stoch::Stoch as Kernel<3, 2>>::lookback(&trendlib::indicators::stoch::Params { fastk_period, slowk_period, slowk_ma_type, slowd_period, slowd_ma_type, }))
         }
         "stochf" => {
             let fastk_period = match get("fastk_period")? {
-                Some(value) => int_param("stochf", "fastk_period", value, 1, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("stochf", "fastk_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 5,
             };
             let fastd_period = match get("fastd_period")? {
-                Some(value) => int_param("stochf", "fastd_period", value, 1, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("stochf", "fastd_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 3,
             };
-            let fastd_ma_type = ma_type_param(
-                "stochf",
-                "fastd_ma_type",
-                match text("fastd_ma_type")? {
-                    Some(ref value) => value,
-                    None => "sma",
-                },
-            )
-            .map_err(|e| to_py_err(py, &e))?;
-            Ok(
-                <trendlib::indicators::stochf::Stochf as Kernel<3, 2>>::lookback(
-                    &trendlib::indicators::stochf::Params {
-                        fastk_period,
-                        fastd_period,
-                        fastd_ma_type,
-                    },
-                ),
-            )
+            let fastd_ma_type = ma_type_param("stochf", "fastd_ma_type", match text("fastd_ma_type")? {
+                Some(ref value) => value,
+                None => "sma",
+            }).map_err(|e| to_py_err(py, &e))?;
+            Ok(<trendlib::indicators::stochf::Stochf as Kernel<3, 2>>::lookback(&trendlib::indicators::stochf::Params { fastk_period, fastd_period, fastd_ma_type, }))
         }
         "stochrsi" => {
             let period = match get("period")? {
-                Some(value) => int_param("stochrsi", "period", value, 2, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("stochrsi", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
             let fastk_period = match get("fastk_period")? {
-                Some(value) => int_param("stochrsi", "fastk_period", value, 1, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("stochrsi", "fastk_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 5,
             };
             let fastd_period = match get("fastd_period")? {
-                Some(value) => int_param("stochrsi", "fastd_period", value, 1, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("stochrsi", "fastd_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 3,
             };
-            let fastd_ma_type = ma_type_param(
-                "stochrsi",
-                "fastd_ma_type",
-                match text("fastd_ma_type")? {
-                    Some(ref value) => value,
-                    None => "sma",
-                },
-            )
-            .map_err(|e| to_py_err(py, &e))?;
-            Ok(
-                <trendlib::indicators::stochrsi::Stochrsi as Kernel<1, 2>>::lookback(
-                    &trendlib::indicators::stochrsi::Params {
-                        period,
-                        fastk_period,
-                        fastd_period,
-                        fastd_ma_type,
-                    },
-                ),
-            )
+            let fastd_ma_type = ma_type_param("stochrsi", "fastd_ma_type", match text("fastd_ma_type")? {
+                Some(ref value) => value,
+                None => "sma",
+            }).map_err(|e| to_py_err(py, &e))?;
+            Ok(<trendlib::indicators::stochrsi::Stochrsi as Kernel<1, 2>>::lookback(&trendlib::indicators::stochrsi::Params { period, fastk_period, fastd_period, fastd_ma_type, }))
         }
-        "sub" => Ok(<trendlib::indicators::sub::Sub as Kernel<2, 1>>::lookback(
-            &trendlib::indicators::sub::Params {},
-        )),
+        "sub" => {
+            Ok(<trendlib::indicators::sub::Sub as Kernel<2, 1>>::lookback(&trendlib::indicators::sub::Params { }))
+        }
         "sum" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("sum", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("sum", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
-            Ok(<trendlib::indicators::sum::Sum as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::sum::Params { period },
-            ))
+            Ok(<trendlib::indicators::sum::Sum as Kernel<1, 1>>::lookback(&trendlib::indicators::sum::Params { period, }))
         }
         "t3" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("t3", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("t3", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 5,
             };
             let v_factor = 0.7;
-            Ok(<trendlib::indicators::t3::T3 as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::t3::Params { period, v_factor },
-            ))
+            Ok(<trendlib::indicators::t3::T3 as Kernel<1, 1>>::lookback(&trendlib::indicators::t3::Params { period, v_factor, }))
         }
-        "tan" => Ok(<trendlib::indicators::tan::Tan as Kernel<1, 1>>::lookback(
-            &trendlib::indicators::tan::Params {},
-        )),
-        "tanh" => Ok(
-            <trendlib::indicators::tanh::Tanh as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::tanh::Params {},
-            ),
-        ),
+        "tan" => {
+            Ok(<trendlib::indicators::tan::Tan as Kernel<1, 1>>::lookback(&trendlib::indicators::tan::Params { }))
+        }
+        "tanh" => {
+            Ok(<trendlib::indicators::tanh::Tanh as Kernel<1, 1>>::lookback(&trendlib::indicators::tanh::Params { }))
+        }
         "tema" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("tema", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("tema", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
-            Ok(
-                <trendlib::indicators::tema::Tema as Kernel<1, 1>>::lookback(
-                    &trendlib::indicators::tema::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::tema::Tema as Kernel<1, 1>>::lookback(&trendlib::indicators::tema::Params { period, }))
         }
-        "trange" => Ok(
-            <trendlib::indicators::trange::Trange as Kernel<3, 1>>::lookback(
-                &trendlib::indicators::trange::Params {},
-            ),
-        ),
+        "trange" => {
+            Ok(<trendlib::indicators::trange::Trange as Kernel<3, 1>>::lookback(&trendlib::indicators::trange::Params { }))
+        }
         "trima" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("trima", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("trima", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
-            Ok(
-                <trendlib::indicators::trima::Trima as Kernel<1, 1>>::lookback(
-                    &trendlib::indicators::trima::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::trima::Trima as Kernel<1, 1>>::lookback(&trendlib::indicators::trima::Params { period, }))
         }
         "trix" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("trix", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("trix", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
-            Ok(
-                <trendlib::indicators::trix::Trix as Kernel<1, 1>>::lookback(
-                    &trendlib::indicators::trix::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::trix::Trix as Kernel<1, 1>>::lookback(&trendlib::indicators::trix::Params { period, }))
         }
         "tsf" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("tsf", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("tsf", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(<trendlib::indicators::tsf::Tsf as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::tsf::Params { period },
-            ))
+            Ok(<trendlib::indicators::tsf::Tsf as Kernel<1, 1>>::lookback(&trendlib::indicators::tsf::Params { period, }))
         }
-        "typprice" => Ok(
-            <trendlib::indicators::typprice::Typprice as Kernel<3, 1>>::lookback(
-                &trendlib::indicators::typprice::Params {},
-            ),
-        ),
+        "typprice" => {
+            Ok(<trendlib::indicators::typprice::Typprice as Kernel<3, 1>>::lookback(&trendlib::indicators::typprice::Params { }))
+        }
         "ultosc" => {
             let period1 = match get("period1")? {
-                Some(value) => int_param("ultosc", "period1", value, 1, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("ultosc", "period1", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 7,
             };
             let period2 = match get("period2")? {
-                Some(value) => int_param("ultosc", "period2", value, 1, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("ultosc", "period2", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
             let period3 = match get("period3")? {
-                Some(value) => int_param("ultosc", "period3", value, 1, 100000)
-                    .map_err(|e| to_py_err(py, &e))?,
+                Some(value) => int_param("ultosc", "period3", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 28,
             };
-            Ok(
-                <trendlib::indicators::ultosc::Ultosc as Kernel<3, 1>>::lookback(
-                    &trendlib::indicators::ultosc::Params {
-                        period1,
-                        period2,
-                        period3,
-                    },
-                ),
-            )
+            Ok(<trendlib::indicators::ultosc::Ultosc as Kernel<3, 1>>::lookback(&trendlib::indicators::ultosc::Params { period1, period2, period3, }))
         }
         "var" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("var", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("var", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 5,
             };
             let nbdev = 1.0;
-            Ok(<trendlib::indicators::var::Var as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::var::Params { period, nbdev },
-            ))
+            Ok(<trendlib::indicators::var::Var as Kernel<1, 1>>::lookback(&trendlib::indicators::var::Params { period, nbdev, }))
         }
         "vwma" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("vwma", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("vwma", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
-            Ok(
-                <trendlib::indicators::vwma::Vwma as Kernel<2, 1>>::lookback(
-                    &trendlib::indicators::vwma::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::vwma::Vwma as Kernel<2, 1>>::lookback(&trendlib::indicators::vwma::Params { period, }))
         }
-        "wclprice" => Ok(
-            <trendlib::indicators::wclprice::Wclprice as Kernel<3, 1>>::lookback(
-                &trendlib::indicators::wclprice::Params {},
-            ),
-        ),
+        "wclprice" => {
+            Ok(<trendlib::indicators::wclprice::Wclprice as Kernel<3, 1>>::lookback(&trendlib::indicators::wclprice::Params { }))
+        }
         "willr" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("willr", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("willr", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 14,
             };
-            Ok(
-                <trendlib::indicators::willr::Willr as Kernel<3, 1>>::lookback(
-                    &trendlib::indicators::willr::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::willr::Willr as Kernel<3, 1>>::lookback(&trendlib::indicators::willr::Params { period, }))
         }
         "wma" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("wma", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("wma", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
-            Ok(<trendlib::indicators::wma::Wma as Kernel<1, 1>>::lookback(
-                &trendlib::indicators::wma::Params { period },
-            ))
+            Ok(<trendlib::indicators::wma::Wma as Kernel<1, 1>>::lookback(&trendlib::indicators::wma::Params { period, }))
         }
         "zlema" => {
             let period = match get("period")? {
-                Some(value) => {
-                    int_param("zlema", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
-                }
+                Some(value) => int_param("zlema", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
                 None => 30,
             };
-            Ok(
-                <trendlib::indicators::zlema::Zlema as Kernel<1, 1>>::lookback(
-                    &trendlib::indicators::zlema::Params { period },
-                ),
-            )
+            Ok(<trendlib::indicators::zlema::Zlema as Kernel<1, 1>>::lookback(&trendlib::indicators::zlema::Params { period, }))
         }
         other => Err(to_py_err(
             py,

@@ -1,0 +1,25 @@
+name: cdl_longline
+title: Long Line Candle
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_longline
+    dtype: int32
+    plot: pattern
+    doc: A long body with both wicks short, so the bar moved and stayed moved
+talib:
+  name: CDLLONGLINE
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_shortline, cdl_marubozu, cdl_belthold]

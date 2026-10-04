@@ -1,0 +1,25 @@
+name: cdl_xsidegap3methods
+title: Upside/Downside Gap Three Methods
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_xsidegap3methods
+    dtype: int32
+    plot: pattern
+    doc: Two bars of one colour with a gap between them, then a third that closes the gap
+talib:
+  name: CDLXSIDEGAP3METHODS
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_tasukigap, cdl_gapsidesidewhite, cdl_risefall3methods]

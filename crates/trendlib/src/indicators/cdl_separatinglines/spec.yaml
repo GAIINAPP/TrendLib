@@ -1,0 +1,25 @@
+name: cdl_separatinglines
+title: Separating Lines
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_separatinglines
+    dtype: int32
+    plot: pattern
+    doc: A long bar that opened where the opposite-coloured bar before it opened, and ran the other way
+talib:
+  name: CDLSEPARATINGLINES
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_belthold, cdl_counterattack, cdl_kicking]

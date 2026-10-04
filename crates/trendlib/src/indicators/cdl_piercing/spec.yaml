@@ -1,0 +1,25 @@
+name: cdl_piercing
+title: Piercing Pattern
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_piercing
+    dtype: int32
+    plot: pattern
+    doc: A long white bar that opened under the previous low and closed past the middle of the black body before it
+talib:
+  name: CDLPIERCING
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_darkcloudcover, cdl_engulfing, cdl_thrusting]

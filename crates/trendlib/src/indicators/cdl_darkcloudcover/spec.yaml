@@ -1,0 +1,31 @@
+name: cdl_darkcloudcover
+title: Dark Cloud Cover
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: penetration
+    type: float
+    default: 0.5
+    min: 0.0
+    doc: How far into the previous body the close has to travel, as a fraction of it
+outputs:
+  - name: cdl_darkcloudcover
+    dtype: int32
+    plot: pattern
+    doc: A black bar that opened above the previous high and closed well into the white body before it
+talib:
+  name: CDLDARKCLOUDCOVER
+  params: {penetration: penetration}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_piercing, cdl_engulfing, cdl_eveningstar]
