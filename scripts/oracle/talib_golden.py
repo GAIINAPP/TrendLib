@@ -186,7 +186,7 @@ def cases(spec: dict) -> dict[str, dict]:
     floors = {
         param["name"]: param["min"]
         for param in spec.get("params") or []
-        if param["type"] == "int" and param["name"].endswith("period") and "min" in param
+        if param["type"] == "int" and "period" in param["name"] and "min" in param
     }
     if floors:
         found["min_period"] = {**defaults(spec), **floors}

@@ -64,7 +64,7 @@ pub fn float_param(
     max: f64,
 ) -> Result<f64, TlError> {
     if !value.is_finite() || value < min || value > max {
-        return Err(TlError::param_out_of_range(
+        return Err(TlError::float_param_out_of_range(
             indicator, name, value, min, max,
         ));
     }

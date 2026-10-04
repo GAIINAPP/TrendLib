@@ -5257,6 +5257,155 @@ impl PyMedpriceStream {
 }
 
 #[pyfunction]
+#[pyo3(name = "mfi", signature = (high, low, close, volume, *, period))]
+pub fn mfi<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    volume: PyReadonlyArray1<'py, f64>,
+    period: i64,
+) -> PyResult<Bound<'py, PyArray1<f64>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let volume = as_slice(&volume, "volume")?;
+    let period = int_param("mfi", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::mfi::Params { period };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::mfi::Mfi as Kernel<4, 1>>::batch(
+                [high, low, close, volume],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok(std::mem::take(&mut out[0]).into_pyarray(py))
+}
+
+#[pyclass(module = "trendlib._core", name = "MfiStream", skip_from_py_object)]
+#[derive(Clone, Debug)]
+pub struct PyMfiStream {
+    inner: BarStream<trendlib::indicators::mfi::Mfi, 4, 1>,
+}
+
+#[pymethods]
+impl PyMfiStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, volume, *, period))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        volume: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let volume = as_slice(&volume, "volume")?;
+        let period =
+            int_param("mfi", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::mfi::Params { period };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::mfi::Mfi, 4, 1> as Stream>::open(
+                    [high, low, close, volume],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, volume, *, period))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        volume: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let volume = as_slice(&volume, "volume")?;
+        let period =
+            int_param("mfi", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::mfi::Params { period };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::mfi::Mfi as Kernel<4, 1>>::open_and_fill(
+                    [high, low, close, volume],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            std::mem::take(&mut out[0]).into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close, volume))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        high: f64,
+        low: f64,
+        close: f64,
+        volume: f64,
+    ) -> PyResult<f64> {
+        let row = self
+            .inner
+            .update([high, low, close, volume])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    #[pyo3(signature = (high, low, close, volume))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64, volume: f64) -> PyResult<f64> {
+        let row = self
+            .inner
+            .peek([high, low, close, volume])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value().map(|row| row[0])
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "mfi"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream mfi bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
 #[pyo3(name = "midpoint", signature = (source, *, period))]
 pub fn midpoint<'py>(
     py: Python<'py>,
@@ -6744,6 +6893,135 @@ impl PyObvStream {
     fn __repr__(&self) -> String {
         format!(
             "<trendlib stream obv bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "percentile", signature = (source, *, period, percentile))]
+pub fn percentile<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    percentile: f64,
+) -> PyResult<Bound<'py, PyArray1<f64>>> {
+    let source = as_slice(&source, "source")?;
+    let period =
+        int_param("percentile", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+    let percentile = float_param("percentile", "percentile", percentile, 0.0, 100.0)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::percentile::Params { period, percentile };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::percentile::Percentile as Kernel<1, 1>>::batch([source], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok(std::mem::take(&mut out[0]).into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "PercentileStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyPercentileStream {
+    inner: BarStream<trendlib::indicators::percentile::Percentile, 1, 1>,
+}
+
+#[pymethods]
+impl PyPercentileStream {
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period, percentile))]
+    fn open<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        percentile: f64,
+    ) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("percentile", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let percentile = float_param("percentile", "percentile", percentile, 0.0, 100.0)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::percentile::Params { period, percentile };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::percentile::Percentile, 1, 1> as Stream>::open(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period, percentile))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        percentile: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("percentile", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let percentile = float_param("percentile", "percentile", percentile, 0.0, 100.0)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::percentile::Params { period, percentile };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::percentile::Percentile as Kernel<1, 1>>::open_and_fill(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            std::mem::take(&mut out[0]).into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(&mut self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(&self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value().map(|row| row[0])
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "percentile"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream percentile bars_seen={} value={:?}>",
             self.inner.bars_seen(),
             self.inner.value()
         )
@@ -10119,6 +10397,173 @@ impl PyTyppriceStream {
 }
 
 #[pyfunction]
+#[pyo3(name = "ultosc", signature = (high, low, close, *, period1, period2, period3))]
+pub fn ultosc<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period1: i64,
+    period2: i64,
+    period3: i64,
+) -> PyResult<Bound<'py, PyArray1<f64>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period1 =
+        int_param("ultosc", "period1", period1, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+    let period2 =
+        int_param("ultosc", "period2", period2, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+    let period3 =
+        int_param("ultosc", "period3", period3, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::ultosc::Params {
+        period1,
+        period2,
+        period3,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::ultosc::Ultosc as Kernel<3, 1>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok(std::mem::take(&mut out[0]).into_pyarray(py))
+}
+
+#[pyclass(module = "trendlib._core", name = "UltoscStream", skip_from_py_object)]
+#[derive(Clone, Debug)]
+pub struct PyUltoscStream {
+    inner: BarStream<trendlib::indicators::ultosc::Ultosc, 3, 1>,
+}
+
+#[pymethods]
+impl PyUltoscStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period1, period2, period3))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period1: i64,
+        period2: i64,
+        period3: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period1 =
+            int_param("ultosc", "period1", period1, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+        let period2 =
+            int_param("ultosc", "period2", period2, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+        let period3 =
+            int_param("ultosc", "period3", period3, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::ultosc::Params {
+            period1,
+            period2,
+            period3,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::ultosc::Ultosc, 3, 1> as Stream>::open(
+                    [high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period1, period2, period3))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period1: i64,
+        period2: i64,
+        period3: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period1 =
+            int_param("ultosc", "period1", period1, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+        let period2 =
+            int_param("ultosc", "period2", period2, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+        let period3 =
+            int_param("ultosc", "period3", period3, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::ultosc::Params {
+            period1,
+            period2,
+            period3,
+        };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::ultosc::Ultosc as Kernel<3, 1>>::open_and_fill(
+                    [high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            std::mem::take(&mut out[0]).into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<f64> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<f64> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value().map(|row| row[0])
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "ultosc"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream ultosc bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
 #[pyo3(name = "var", signature = (source, *, period, nbdev))]
 pub fn var<'py>(
     py: Python<'py>,
@@ -10777,6 +11222,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(max, m)?)?;
     m.add_function(wrap_pyfunction!(maxindex, m)?)?;
     m.add_function(wrap_pyfunction!(medprice, m)?)?;
+    m.add_function(wrap_pyfunction!(mfi, m)?)?;
     m.add_function(wrap_pyfunction!(midpoint, m)?)?;
     m.add_function(wrap_pyfunction!(midprice, m)?)?;
     m.add_function(wrap_pyfunction!(min, m)?)?;
@@ -10789,6 +11235,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(mult, m)?)?;
     m.add_function(wrap_pyfunction!(natr, m)?)?;
     m.add_function(wrap_pyfunction!(obv, m)?)?;
+    m.add_function(wrap_pyfunction!(percentile, m)?)?;
     m.add_function(wrap_pyfunction!(percentrank, m)?)?;
     m.add_function(wrap_pyfunction!(plus_di, m)?)?;
     m.add_function(wrap_pyfunction!(plus_dm, m)?)?;
@@ -10817,6 +11264,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(trix, m)?)?;
     m.add_function(wrap_pyfunction!(tsf, m)?)?;
     m.add_function(wrap_pyfunction!(typprice, m)?)?;
+    m.add_function(wrap_pyfunction!(ultosc, m)?)?;
     m.add_function(wrap_pyfunction!(var, m)?)?;
     m.add_function(wrap_pyfunction!(vwma, m)?)?;
     m.add_function(wrap_pyfunction!(wclprice, m)?)?;
@@ -10865,6 +11313,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyMaxStream>()?;
     m.add_class::<PyMaxindexStream>()?;
     m.add_class::<PyMedpriceStream>()?;
+    m.add_class::<PyMfiStream>()?;
     m.add_class::<PyMidpointStream>()?;
     m.add_class::<PyMidpriceStream>()?;
     m.add_class::<PyMinStream>()?;
@@ -10877,6 +11326,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyMultStream>()?;
     m.add_class::<PyNatrStream>()?;
     m.add_class::<PyObvStream>()?;
+    m.add_class::<PyPercentileStream>()?;
     m.add_class::<PyPercentrankStream>()?;
     m.add_class::<PyPlusDiStream>()?;
     m.add_class::<PyPlusDmStream>()?;
@@ -10905,6 +11355,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyTrixStream>()?;
     m.add_class::<PyTsfStream>()?;
     m.add_class::<PyTyppriceStream>()?;
+    m.add_class::<PyUltoscStream>()?;
     m.add_class::<PyVarStream>()?;
     m.add_class::<PyVwmaStream>()?;
     m.add_class::<PyWclpriceStream>()?;
@@ -11386,6 +11837,18 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
             entry.set_item("choices", py.None())?;
             params.set_item("period", entry)?;
         }
+        table.set_item("mfi", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 14)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
         table.set_item("midpoint", params)?;
     }
     {
@@ -11503,6 +11966,26 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     {
         let params = PyDict::new(py);
         table.set_item("obv", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 30)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 50.0)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", 100.0)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("percentile", entry)?;
+        }
+        table.set_item("percentile", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -11906,6 +12389,34 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
         let params = PyDict::new(py);
         {
             let entry = PyDict::new(py);
+            entry.set_item("default", 7)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period1", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 14)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period2", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 28)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period3", entry)?;
+        }
+        table.set_item("ultosc", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
             entry.set_item("default", 5)?;
             entry.set_item("min", 1)?;
             entry.set_item("max", 100000)?;
@@ -12011,6 +12522,7 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("max", vec!["source"])?;
     table.set_item("maxindex", vec!["source"])?;
     table.set_item("medprice", vec!["high", "low"])?;
+    table.set_item("mfi", vec!["high", "low", "close", "volume"])?;
     table.set_item("midpoint", vec!["source"])?;
     table.set_item("midprice", vec!["high", "low"])?;
     table.set_item("min", vec!["source"])?;
@@ -12023,6 +12535,7 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("mult", vec!["source0", "source1"])?;
     table.set_item("natr", vec!["high", "low", "close"])?;
     table.set_item("obv", vec!["close", "volume"])?;
+    table.set_item("percentile", vec!["source"])?;
     table.set_item("percentrank", vec!["source"])?;
     table.set_item("plus_di", vec!["high", "low", "close"])?;
     table.set_item("plus_dm", vec!["high", "low"])?;
@@ -12051,6 +12564,7 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("trix", vec!["source"])?;
     table.set_item("tsf", vec!["source"])?;
     table.set_item("typprice", vec!["high", "low", "close"])?;
+    table.set_item("ultosc", vec!["high", "low", "close"])?;
     table.set_item("var", vec!["source"])?;
     table.set_item("vwma", vec!["close", "volume"])?;
     table.set_item("wclprice", vec!["high", "low", "close"])?;
@@ -12117,6 +12631,7 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("max", vec!["max"])?;
     table.set_item("maxindex", vec!["maxindex"])?;
     table.set_item("medprice", vec!["medprice"])?;
+    table.set_item("mfi", vec!["mfi"])?;
     table.set_item("midpoint", vec!["midpoint"])?;
     table.set_item("midprice", vec!["midprice"])?;
     table.set_item("min", vec!["min"])?;
@@ -12132,6 +12647,7 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("mult", vec!["mult"])?;
     table.set_item("natr", vec!["natr"])?;
     table.set_item("obv", vec!["obv"])?;
+    table.set_item("percentile", vec!["percentile"])?;
     table.set_item("percentrank", vec!["percentrank"])?;
     table.set_item("plus_di", vec!["plus_di"])?;
     table.set_item("plus_dm", vec!["plus_dm"])?;
@@ -12160,6 +12676,7 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("trix", vec!["trix"])?;
     table.set_item("tsf", vec!["tsf"])?;
     table.set_item("typprice", vec!["typprice"])?;
+    table.set_item("ultosc", vec!["ultosc"])?;
     table.set_item("var", vec!["var"])?;
     table.set_item("vwma", vec!["vwma"])?;
     table.set_item("wclprice", vec!["wclprice"])?;
@@ -12214,6 +12731,7 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("max", vec!["float64"])?;
     table.set_item("maxindex", vec!["int32"])?;
     table.set_item("medprice", vec!["float64"])?;
+    table.set_item("mfi", vec!["float64"])?;
     table.set_item("midpoint", vec!["float64"])?;
     table.set_item("midprice", vec!["float64"])?;
     table.set_item("min", vec!["float64"])?;
@@ -12226,6 +12744,7 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("mult", vec!["float64"])?;
     table.set_item("natr", vec!["float64"])?;
     table.set_item("obv", vec!["float64"])?;
+    table.set_item("percentile", vec!["float64"])?;
     table.set_item("percentrank", vec!["float64"])?;
     table.set_item("plus_di", vec!["float64"])?;
     table.set_item("plus_dm", vec!["float64"])?;
@@ -12254,6 +12773,7 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("trix", vec!["float64"])?;
     table.set_item("tsf", vec!["float64"])?;
     table.set_item("typprice", vec!["float64"])?;
+    table.set_item("ultosc", vec!["float64"])?;
     table.set_item("var", vec!["float64"])?;
     table.set_item("vwma", vec!["float64"])?;
     table.set_item("wclprice", vec!["float64"])?;
@@ -12308,6 +12828,7 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("max", Vec::<&str>::new())?;
     table.set_item("maxindex", vec!["absolute_index"])?;
     table.set_item("medprice", vec!["overlap"])?;
+    table.set_item("mfi", vec!["nan_inf_output"])?;
     table.set_item("midpoint", vec!["overlap"])?;
     table.set_item("midprice", vec!["overlap"])?;
     table.set_item("min", Vec::<&str>::new())?;
@@ -12320,6 +12841,7 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("mult", vec!["nan_inf_output"])?;
     table.set_item("natr", vec!["unstable"])?;
     table.set_item("obv", vec!["path_dependent"])?;
+    table.set_item("percentile", Vec::<&str>::new())?;
     table.set_item("percentrank", Vec::<&str>::new())?;
     table.set_item("plus_di", vec!["unstable"])?;
     table.set_item("plus_dm", vec!["unstable"])?;
@@ -12348,6 +12870,7 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("trix", vec!["unstable", "path_dependent", "nan_inf_output"])?;
     table.set_item("tsf", Vec::<&str>::new())?;
     table.set_item("typprice", vec!["overlap"])?;
+    table.set_item("ultosc", Vec::<&str>::new())?;
     table.set_item("var", vec!["nan_inf_output"])?;
     table.set_item("vwma", vec!["overlap", "nan_inf_output"])?;
     table.set_item("wclprice", vec!["overlap"])?;
@@ -12402,6 +12925,7 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("max", "statistic")?;
     table.set_item("maxindex", "statistic")?;
     table.set_item("medprice", "price")?;
+    table.set_item("mfi", "volume")?;
     table.set_item("midpoint", "overlap")?;
     table.set_item("midprice", "overlap")?;
     table.set_item("min", "statistic")?;
@@ -12414,6 +12938,7 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("mult", "operator")?;
     table.set_item("natr", "volatility")?;
     table.set_item("obv", "volume")?;
+    table.set_item("percentile", "statistic")?;
     table.set_item("percentrank", "statistic")?;
     table.set_item("plus_di", "momentum")?;
     table.set_item("plus_dm", "momentum")?;
@@ -12442,6 +12967,7 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("trix", "momentum")?;
     table.set_item("tsf", "statistic")?;
     table.set_item("typprice", "price")?;
+    table.set_item("ultosc", "momentum")?;
     table.set_item("var", "statistic")?;
     table.set_item("vwma", "overlap")?;
     table.set_item("wclprice", "price")?;
@@ -12888,6 +13414,17 @@ pub fn lookback_of(
                 &trendlib::indicators::medprice::Params {},
             ),
         ),
+        "mfi" => {
+            let period = match get("period")? {
+                Some(value) => {
+                    int_param("mfi", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?
+                }
+                None => 14,
+            };
+            Ok(<trendlib::indicators::mfi::Mfi as Kernel<4, 1>>::lookback(
+                &trendlib::indicators::mfi::Params { period },
+            ))
+        }
         "midpoint" => {
             let period = match get("period")? {
                 Some(value) => int_param("midpoint", "period", value, 2, 100000)
@@ -13016,6 +13553,20 @@ pub fn lookback_of(
         "obv" => Ok(<trendlib::indicators::obv::Obv as Kernel<2, 1>>::lookback(
             &trendlib::indicators::obv::Params {},
         )),
+        "percentile" => {
+            let period = match get("period")? {
+                Some(value) => int_param("percentile", "period", value, 2, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 30,
+            };
+            let percentile = 50.0;
+            Ok(<trendlib::indicators::percentile::Percentile as Kernel<
+                1,
+                1,
+            >>::lookback(
+                &trendlib::indicators::percentile::Params { period, percentile },
+            ))
+        }
         "percentrank" => {
             let period = match get("period")? {
                 Some(value) => int_param("percentrank", "period", value, 2, 100000)
@@ -13383,6 +13934,32 @@ pub fn lookback_of(
                 &trendlib::indicators::typprice::Params {},
             ),
         ),
+        "ultosc" => {
+            let period1 = match get("period1")? {
+                Some(value) => int_param("ultosc", "period1", value, 1, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 7,
+            };
+            let period2 = match get("period2")? {
+                Some(value) => int_param("ultosc", "period2", value, 1, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 14,
+            };
+            let period3 = match get("period3")? {
+                Some(value) => int_param("ultosc", "period3", value, 1, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 28,
+            };
+            Ok(
+                <trendlib::indicators::ultosc::Ultosc as Kernel<3, 1>>::lookback(
+                    &trendlib::indicators::ultosc::Params {
+                        period1,
+                        period2,
+                        period3,
+                    },
+                ),
+            )
+        }
         "var" => {
             let period = match get("period")? {
                 Some(value) => {

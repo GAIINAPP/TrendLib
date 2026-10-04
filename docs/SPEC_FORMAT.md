@@ -25,7 +25,8 @@ params:                           # optional; order = documented order (all keyw
   - name: period
     type: int                     # int | float | bool | tz | enum:<EnumName>
     default: 20
-    min: 2                        # inclusive; omit min/max for "any finite value"
+    min: 2                        # inclusive; omit either for "any finite value"
+                                  # on that side (see § 1.2)
     max: 100000
     doc: Number of bars in the average and the deviation window
   - name: nbdev_up
@@ -43,7 +44,7 @@ params:                           # optional; order = documented order (all keyw
 outputs:                          # required; order = tuple order
   - name: bbands_upper
     dtype: float64                # float64 | int32
-    plot: upper_band              # see § 1.2
+    plot: upper_band              # see § 1.3
     doc: Middle band plus nbdev_up standard deviations
   - name: bbands_middle
     dtype: float64
@@ -85,7 +86,16 @@ Rules:
 | `pattern` | Candlestick pattern, int32 ±100 output | Registry grouping, docs |
 | `nan_inf_output` | A finite input may produce `NaN` or infinity | The edge-case suite checks the indicator answered, not that it answered finitely |
 
-### 1.2 Plot hints
+### 1.2 Ranges
+
+`min` and `max` are independent: a parameter may declare one, both or neither.
+TA-Lib's `penetration`, for instance, cannot be negative and has no ceiling, so
+it declares `min: 0.0` and no `max`. `INDICATORS_TALIB.md` prints a side the
+oracle does not check as `any`, and `talib_catalogue.py` finds the bounds by
+bisecting the live library and then confirming the boundary is the round number
+it reports.
+
+### 1.3 Plot hints
 
 `line`, `histogram`, `upper_band`, `middle_band`, `lower_band`, `level`,
 `direction`, `pattern`. They are hints for chart builders (GAIIN's UI uses them);

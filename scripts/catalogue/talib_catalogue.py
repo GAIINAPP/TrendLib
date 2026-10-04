@@ -255,6 +255,67 @@ def probe_range(function, arrays, defaults, param, default) -> tuple[int, int]:
     return minimum, maximum
 
 
+# How far out a float parameter is probed before it counts as unbounded, and
+# how close to a round number a boundary has to sit to be reported as one.
+FLOAT_LIMIT = 1.0e9
+FLOAT_EPSILON = 1.0e-9
+
+
+def snap(boundary: float, function, arrays, defaults, param, inside: int) -> float:
+    """`boundary` as the round number the oracle actually turns over at.
+
+    Bisection converges on a value a hair away from the boundary rather than on
+    the boundary itself, so this looks for a round number that is accepted
+    while a step further out is refused. `inside` is the direction of the
+    accepted side: -1 for a maximum, +1 for a minimum.
+    """
+    for digits in range(0, 7):
+        candidate = round(boundary, digits)
+        outside = candidate - inside * FLOAT_EPSILON * max(abs(candidate), 1.0)
+        if accepts(function, arrays, defaults, param, candidate) and not accepts(
+            function, arrays, defaults, param, outside
+        ):
+            return candidate
+    raise SystemExit(f"{param}: the oracle's boundary near {boundary} is not a round number")
+
+
+def probe_float_range(function, arrays, defaults, param, default):
+    """Bounds for a float parameter, or `None` where the oracle takes anything.
+
+    Most float parameters are multipliers the oracle never checks, so a range
+    is only reported when something is actually refused.
+    """
+    takes_anything = all(
+        accepts(function, arrays, defaults, param, value)
+        for value in (-FLOAT_LIMIT, FLOAT_LIMIT)
+    )
+    if takes_anything:
+        return None
+
+    # One side can be bounded and the other not: a candlestick penetration
+    # cannot be negative but has no ceiling.
+    bounds: list[float | None] = []
+    for inside, outside in ((1, -FLOAT_LIMIT), (-1, FLOAT_LIMIT)):
+        if accepts(function, arrays, defaults, param, outside):
+            bounds.append(None)
+            continue
+        low, high = outside, float(default)
+        for _ in range(200):
+            middle = (low + high) / 2
+            if middle in (low, high):
+                break
+            if accepts(function, arrays, defaults, param, middle):
+                high = middle
+            else:
+                low = middle
+        bounds.append(snap(high, function, arrays, defaults, param, inside))
+
+    minimum, maximum = bounds
+    if (minimum is not None and default < minimum) or (maximum is not None and default > maximum):
+        raise SystemExit(f"{param}: default {default} is outside the probed range")
+    return minimum, maximum
+
+
 def sample_arrays():
     import numpy as np
 
@@ -302,6 +363,13 @@ def describe(talib_name: str, arrays) -> dict:
             entry["min"], entry["max"] = probe_range(function, sample, defaults, raw, default)
         else:
             entry["type"] = "float"
+            bounds = probe_float_range(function, sample, defaults, raw, default)
+            if bounds is not None:
+                minimum, maximum = bounds
+                if minimum is not None:
+                    entry["min"] = minimum
+                if maximum is not None:
+                    entry["max"] = maximum
         params.append(entry)
 
     return {
@@ -432,6 +500,16 @@ def render(entries: list[dict], versions: tuple[str, str]) -> str:
     return "\n".join(lines).rstrip("\n") + "\n"
 
 
+def float_range(param: dict) -> str:
+    """How a float parameter's bounds are written, with `any` for a side the
+    oracle does not check."""
+    if "min" not in param and "max" not in param:
+        return "any"
+    low = param.get("min", "any")
+    high = param.get("max", "any")
+    return f"[{low}, {high}]"
+
+
 def render_params(params: list[dict]) -> str:
     if not params:
         return "--"
@@ -442,7 +520,7 @@ def render_params(params: list[dict]) -> str:
                 f"`{param['name']}` {param['default']} [{param['min']}, {param['max']}]"
             )
         elif param["type"] == "float":
-            rendered.append(f"`{param['name']}` {param['default']} any")
+            rendered.append(f"`{param['name']}` {param['default']} {float_range(param)}")
         else:
             rendered.append(f'`{param["name"]}` "{param["default"]}" (MaType)')
     return "; ".join(rendered)

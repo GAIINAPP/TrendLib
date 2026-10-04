@@ -78,11 +78,13 @@ def test_every_shipped_indicator_matches_its_catalogue_row(repo_root, catalogue)
                 # prints which enum it is.
                 enum_name = param["type"].split(":", 1)[1]
                 expected = f'`{param["name"]}` "{param["default"]}" ({enum_name})'
-            elif "min" in param and "max" in param:
-                expected = f"`{param['name']}` {param['default']} [{param['min']}, {param['max']}]"
+            elif "min" in param or "max" in param:
+                # A side the oracle does not check is left out of the spec and
+                # the catalogue prints "any" in its place.
+                low = param.get("min", "any")
+                high = param.get("max", "any")
+                expected = f"`{param['name']}` {param['default']} [{low}, {high}]"
             else:
-                # A parameter declared without bounds means any finite value,
-                # which the catalogue prints as "any".
                 expected = f"`{param['name']}` {param['default']} any"
             assert expected in row, f"{spec['name']}: {param['name']} disagrees with the catalogue"
         for output in spec["outputs"]:

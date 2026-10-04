@@ -1,0 +1,31 @@
+name: percentile
+title: Percentile (nearest rank)
+group: statistic
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 30
+    min: 2
+    max: 100000
+    doc: Number of bars the percentile is taken over
+  - name: percentile
+    type: float
+    default: 50.0
+    min: 0.0
+    max: 100.0
+    doc: Which percentile of the window to report
+outputs:
+  - name: percentile
+    dtype: float64
+    plot: line
+    doc: Value at the requested percentile of the window
+talib:
+  name: PERCENTILE
+  params: {period: timeperiod, percentile: percentile}
+  outputs: [real]
+references:
+  - TA-Lib, ta_PERCENTILE.c, nearest-rank percentile over a rolling window
+see_also: [percentrank, midpoint]

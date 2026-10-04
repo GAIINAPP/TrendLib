@@ -56,6 +56,7 @@ __all__ = [
     "MAX",
     "MAXINDEX",
     "MEDPRICE",
+    "MFI",
     "MIDPOINT",
     "MIDPRICE",
     "MIN",
@@ -68,6 +69,7 @@ __all__ = [
     "MULT",
     "NATR",
     "OBV",
+    "PERCENTILE",
     "PERCENTRANK",
     "PLUS_DI",
     "PLUS_DM",
@@ -96,6 +98,7 @@ __all__ = [
     "TRIX",
     "TSF",
     "TYPPRICE",
+    "ULTOSC",
     "VAR",
     "VWMA",
     "WCLPRICE",
@@ -145,6 +148,7 @@ __all__ = [
     "max",
     "maxindex",
     "medprice",
+    "mfi",
     "midpoint",
     "midprice",
     "min",
@@ -157,6 +161,7 @@ __all__ = [
     "mult",
     "natr",
     "obv",
+    "percentile",
     "percentrank",
     "plus_di",
     "plus_dm",
@@ -185,6 +190,7 @@ __all__ = [
     "trix",
     "tsf",
     "typprice",
+    "ultosc",
     "var",
     "vwma",
     "wclprice",
@@ -1248,6 +1254,47 @@ def medprice(high=None, low=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("medprice",))
 
 
+def mfi(
+    high=None,
+    low=None,
+    close=None,
+    volume=None,
+    *,
+    period: int = _PARAMS["mfi"]["period"]["default"],
+) -> Any:
+    """Money Flow Index.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bar-to-bar changes the flows are summed over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Share of recent money flow that moved on up bars, as a percentage.
+    """
+    period = _convert.as_int("mfi", "period", period)
+    columns, carrier = _convert.bars(
+        "mfi",
+        (high, low, close, volume),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.mfi(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("mfi",))
+
+
 def midpoint(source=None, *, period: int = _PARAMS["midpoint"]["period"]["default"]) -> Any:
     """Midpoint.
 
@@ -1552,6 +1599,33 @@ def obv(close=None, volume=None) -> Any:
     )
     out = _core.obv(*columns)
     return _convert.wrap_outputs(out, carrier, ("obv",))
+
+
+def percentile(
+    source=None,
+    *,
+    period: int = _PARAMS["percentile"]["period"]["default"],
+    percentile: float = _PARAMS["percentile"]["percentile"]["default"],
+) -> Any:
+    """Percentile (nearest rank).
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the percentile is taken over, from 2 to 100000.
+    percentile : float, default 50.0
+        Which percentile of the window to report, from 0.0 to 100.0.
+
+    Returns
+    -------
+    ndarray or Series
+        Value at the requested percentile of the window.
+    """
+    period = _convert.as_int("percentile", "period", period)
+    percentile = _convert.as_float("percentile", "percentile", percentile)
+    columns, carrier = _convert.bars("percentile", (source,), ("source",), ("series",))
+    out = _core.percentile(*columns, period=period, percentile=percentile)
+    return _convert.wrap_outputs(out, carrier, ("percentile",))
 
 
 def percentrank(source=None, *, period: int = _PARAMS["percentrank"]["period"]["default"]) -> Any:
@@ -2238,6 +2312,52 @@ def typprice(high=None, low=None, close=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("typprice",))
 
 
+def ultosc(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period1: int = _PARAMS["ultosc"]["period1"]["default"],
+    period2: int = _PARAMS["ultosc"]["period2"]["default"],
+    period3: int = _PARAMS["ultosc"]["period3"]["default"],
+) -> Any:
+    """Ultimate Oscillator.
+
+    Parameters
+    ----------
+    period1 : int, default 7
+        Shortest window, weighted four times, from 1 to 100000.
+    period2 : int, default 14
+        Middle window, weighted twice, from 1 to 100000.
+    period3 : int, default 28
+        Longest window, weighted once, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Weighted blend of three buying-pressure ratios, as a percentage.
+    """
+    period1 = _convert.as_int("ultosc", "period1", period1)
+    period2 = _convert.as_int("ultosc", "period2", period2)
+    period3 = _convert.as_int("ultosc", "period3", period3)
+    columns, carrier = _convert.bars(
+        "ultosc",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.ultosc(*columns, period1=period1, period2=period2, period3=period3)
+    return _convert.wrap_outputs(out, carrier, ("ultosc",))
+
+
 def var(
     source=None,
     *,
@@ -2626,6 +2746,11 @@ def MEDPRICE(high, low) -> Any:
     return medprice(high, low)
 
 
+def MFI(high, low, close, volume, timeperiod: int = _PARAMS["mfi"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`mfi`."""
+    return mfi(high, low, close, volume, period=timeperiod)
+
+
 def MIDPOINT(source, timeperiod: int = _PARAMS["midpoint"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`midpoint`."""
     return midpoint(source, period=timeperiod)
@@ -2684,6 +2809,19 @@ def NATR(high, low, close, timeperiod: int = _PARAMS["natr"]["period"]["default"
 def OBV(close, volume) -> Any:
     """TA-Lib-style alias for :func:`obv`."""
     return obv(close, volume)
+
+
+# `percentile` is also a parameter name below, where it would shadow this.
+_percentile = percentile
+
+
+def PERCENTILE(
+    source,
+    timeperiod: int = _PARAMS["percentile"]["period"]["default"],
+    percentile: float = _PARAMS["percentile"]["percentile"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`percentile`."""
+    return _percentile(source, period=timeperiod, percentile=percentile)
 
 
 def PERCENTRANK(source, timeperiod: int = _PARAMS["percentrank"]["period"]["default"]) -> Any:
@@ -2877,6 +3015,18 @@ def TSF(source, timeperiod: int = _PARAMS["tsf"]["period"]["default"]) -> Any:
 def TYPPRICE(high, low, close) -> Any:
     """TA-Lib-style alias for :func:`typprice`."""
     return typprice(high, low, close)
+
+
+def ULTOSC(
+    high,
+    low,
+    close,
+    timeperiod1: int = _PARAMS["ultosc"]["period1"]["default"],
+    timeperiod2: int = _PARAMS["ultosc"]["period2"]["default"],
+    timeperiod3: int = _PARAMS["ultosc"]["period3"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`ultosc`."""
+    return ultosc(high, low, close, period1=timeperiod1, period2=timeperiod2, period3=timeperiod3)
 
 
 def VAR(

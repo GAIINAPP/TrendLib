@@ -890,10 +890,29 @@ fn functions(specs: &[Spec]) -> String {
         } else {
             format!("{}, {}", args.join(", "), forwarded.join(", "))
         };
+        // A TA-Lib parameter name can be the TrendLib function's own name
+        // (`PERCENTILE(source, timeperiod, percentile)`), and inside the alias
+        // that parameter shadows the function. Binding it under a private name
+        // first is the only way to still reach it.
+        let shadowed = spec
+            .params
+            .iter()
+            .any(|p| alias.params.get(&p.name).unwrap_or(&p.name) == &spec.name);
+        let target = if shadowed {
+            let private = format!("_{}", spec.name);
+            let _ = write!(
+                out,
+                "# `{}` is also a parameter name below, where it would shadow this.\n{private} = {}\n\n\n",
+                spec.name, spec.name
+            );
+            private
+        } else {
+            spec.name.clone()
+        };
         let _ = write!(
             out,
-            "def {}({signature}) -> Any:\n    \"\"\"TA-Lib-style alias for :func:`{}`.\"\"\"\n    return {}({call})\n\n\n",
-            alias.name, spec.name, spec.name
+            "def {}({signature}) -> Any:\n    \"\"\"TA-Lib-style alias for :func:`{}`.\"\"\"\n    return {target}({call})\n\n\n",
+            alias.name, spec.name
         );
     }
 

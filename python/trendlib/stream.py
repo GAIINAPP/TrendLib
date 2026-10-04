@@ -57,6 +57,7 @@ __all__ = [
     "max",
     "maxindex",
     "medprice",
+    "mfi",
     "midpoint",
     "midprice",
     "min",
@@ -69,6 +70,7 @@ __all__ = [
     "mult",
     "natr",
     "obv",
+    "percentile",
     "percentrank",
     "plus_di",
     "plus_dm",
@@ -97,6 +99,7 @@ __all__ = [
     "trix",
     "tsf",
     "typprice",
+    "ultosc",
     "var",
     "vwma",
     "wclprice",
@@ -423,6 +426,23 @@ medprice = Factory(
     ),
     ("medprice",),
 )
+mfi = Factory(
+    "mfi",
+    _core.MfiStream,
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    ("mfi",),
+)
 midpoint = Factory("midpoint", _core.MidpointStream, ("source",), ("series",), ("midpoint",))
 midprice = Factory(
     "midprice",
@@ -528,6 +548,9 @@ obv = Factory(
         "volume",
     ),
     ("obv",),
+)
+percentile = Factory(
+    "percentile", _core.PercentileStream, ("source",), ("series",), ("percentile",)
 )
 percentrank = Factory(
     "percentrank", _core.PercentrankStream, ("source",), ("series",), ("percentrank",)
@@ -667,6 +690,21 @@ typprice = Factory(
         "close",
     ),
     ("typprice",),
+)
+ultosc = Factory(
+    "ultosc",
+    _core.UltoscStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("ultosc",),
 )
 var = Factory("var", _core.VarStream, ("source",), ("series",), ("var",))
 vwma = Factory(

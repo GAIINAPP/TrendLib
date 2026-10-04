@@ -1,0 +1,41 @@
+name: ultosc
+title: Ultimate Oscillator
+group: momentum
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period1
+    type: int
+    default: 7
+    min: 1
+    max: 100000
+    doc: Shortest window, weighted four times
+  - name: period2
+    type: int
+    default: 14
+    min: 1
+    max: 100000
+    doc: Middle window, weighted twice
+  - name: period3
+    type: int
+    default: 28
+    min: 1
+    max: 100000
+    doc: Longest window, weighted once
+outputs:
+  - name: ultosc
+    dtype: float64
+    plot: line
+    doc: Weighted blend of three buying-pressure ratios, as a percentage
+talib:
+  name: ULTOSC
+  params: {period1: timeperiod1, period2: timeperiod2, period3: timeperiod3}
+  outputs: [real]
+references:
+  - Larry Williams, The Ultimate Oscillator, Technical Analysis of Stocks and Commodities, August 1985
+see_also: [rsi, stoch, willr]

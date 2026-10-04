@@ -2,8 +2,8 @@
 
 # Progress
 
-**88 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 116 not started.
+**91 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 113 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -17,12 +17,12 @@ something is done that is not. CI checks it is current.
 | Group | Shipped | Total |
 | --- | --- | --- |
 | Overlap studies | 14 | 25 |
-| Momentum | 28 | 47 |
+| Momentum | 30 | 47 |
 | Volatility | 3 | 7 |
 | Volume | 2 | 12 |
 | Price transforms | 6 | 6 |
 | Cycle | 0 | 5 |
-| Statistics | 8 | 11 |
+| Statistics | 9 | 11 |
 | Math transforms | 15 | 15 |
 | Math operators | 12 | 12 |
 | Candlestick patterns | 0 | 61 |
@@ -56,7 +56,7 @@ something is done that is not. CI checks it is current.
 - [x] `wma` (`WMA`) -- Weighted Moving Average *
 - [ ] `zlema` (`ZLEMA`)
 
-## Momentum (28 of 47)
+## Momentum (30 of 47)
 
 - [ ] `ac` (`AC`)
 - [x] `adx` (`ADX`) -- Average Directional Movement Index *
@@ -81,7 +81,7 @@ something is done that is not. CI checks it is current.
 - [x] `macd` (`MACD`) -- Moving Average Convergence Divergence *
 - [ ] `macdext` (`MACDEXT`)
 - [x] `macdfix` (`MACDFIX`) -- MACD with Fixed Periods
-- [ ] `mfi` (`MFI`)
+- [x] `mfi` (`MFI`) -- Money Flow Index
 - [x] `minus_di` (`MINUS_DI`) -- Minus Directional Indicator
 - [x] `minus_dm` (`MINUS_DM`) -- Minus Directional Movement
 - [x] `mom` (`MOM`) -- Momentum
@@ -100,7 +100,7 @@ something is done that is not. CI checks it is current.
 - [x] `stochrsi` (`STOCHRSI`) -- Stochastic RSI
 - [x] `trix` (`TRIX`) -- Triple Exponential Average
 - [ ] `tsi` (`TSI`)
-- [ ] `ultosc` (`ULTOSC`)
+- [x] `ultosc` (`ULTOSC`) -- Ultimate Oscillator
 - [ ] `vhf` (`VHF`)
 - [ ] `vortex` (`VORTEX`)
 - [ ] `wad` (`WAD`)
@@ -148,7 +148,7 @@ something is done that is not. CI checks it is current.
 - [ ] `ht_sine` (`HT_SINE`)
 - [ ] `ht_trendmode` (`HT_TRENDMODE`)
 
-## Statistics (8 of 11)
+## Statistics (9 of 11)
 
 - [ ] `beta` (`BETA`)
 - [ ] `correl` (`CORREL`)
@@ -156,7 +156,7 @@ something is done that is not. CI checks it is current.
 - [x] `linearreg_angle` (`LINEARREG_ANGLE`) -- Linear Regression Angle
 - [x] `linearreg_intercept` (`LINEARREG_INTERCEPT`) -- Linear Regression Intercept
 - [x] `linearreg_slope` (`LINEARREG_SLOPE`) -- Linear Regression Slope
-- [ ] `percentile` (`PERCENTILE`)
+- [x] `percentile` (`PERCENTILE`) -- Percentile (nearest rank)
 - [x] `percentrank` (`PERCENTRANK`) -- Percent Rank
 - [x] `stddev` (`STDDEV`) -- Standard Deviation
 - [x] `tsf` (`TSF`) -- Time Series Forecast

@@ -53,16 +53,16 @@ Total: **201 functions**.
 | `kama` | `KAMA` | `source` | `period` 30 [1, 100000] | `kama` |
 | `kc` | `KC` | `high`, `low`, `close` | `period` 20 [2, 100000]; `atr_period` 10 [1, 100000]; `nbdev` 2.0 any | `kc_upper`, `kc_middle`, `kc_lower` |
 | `ma` | `MA` | `source` | `period` 30 [1, 100000]; `ma_type` "sma" (MaType) | `ma` |
-| `mama` | `MAMA` | `source` | `fast_limit` 0.5 any; `slow_limit` 0.05 any | `mama`, `mama_fama` |
+| `mama` | `MAMA` | `source` | `fast_limit` 0.5 [0.01, 0.99]; `slow_limit` 0.05 [0.01, 0.99] | `mama`, `mama_fama` |
 | `mavp` | `MAVP` | `close`, `periods` | `min_period` 2 [1, 30]; `max_period` 30 [2, 100000]; `ma_type` "sma" (MaType) | `mavp` |
 | `midpoint` | `MIDPOINT` | `source` | `period` 14 [2, 100000] | `midpoint` |
 | `midprice` | `MIDPRICE` | `high`, `low` | `period` 14 [2, 100000] | `midprice` |
 | `rma` | `RMA` | `source` | `period` 30 [1, 100000] | `rma` |
-| `sar` | `SAR` | `high`, `low` | `acceleration` 0.02 any; `maximum` 0.2 any | `sar` |
-| `sarext` | `SAREXT` | `high`, `low` | `start_value` 0.0 any; `offset_on_reverse` 0.0 any; `acceleration_init_long` 0.02 any; `acceleration_long` 0.02 any; `acceleration_max_long` 0.2 any; `acceleration_init_short` 0.02 any; `acceleration_short` 0.02 any; `acceleration_max_short` 0.2 any | `sarext` |
+| `sar` | `SAR` | `high`, `low` | `acceleration` 0.02 [0.0, any]; `maximum` 0.2 [0.0, any] | `sar` |
+| `sarext` | `SAREXT` | `high`, `low` | `start_value` 0.0 any; `offset_on_reverse` 0.0 [0.0, any]; `acceleration_init_long` 0.02 [0.0, any]; `acceleration_long` 0.02 [0.0, any]; `acceleration_max_long` 0.2 [0.0, any]; `acceleration_init_short` 0.02 [0.0, any]; `acceleration_short` 0.02 [0.0, any]; `acceleration_max_short` 0.2 [0.0, any] | `sarext` |
 | `sma` | `SMA` | `source` | `period` 30 [1, 100000] | `sma` |
-| `supertrend` | `SUPERTREND` | `high`, `low`, `close` | `period` 10 [2, 100000]; `multiplier` 3.0 any | `supertrend`, `supertrend_direction` |
-| `t3` | `T3` | `source` | `period` 5 [1, 100000]; `v_factor` 0.7 any | `t3` |
+| `supertrend` | `SUPERTREND` | `high`, `low`, `close` | `period` 10 [2, 100000]; `multiplier` 3.0 [0.0, any] | `supertrend`, `supertrend_direction` |
+| `t3` | `T3` | `source` | `period` 5 [1, 100000]; `v_factor` 0.7 [0.0, 1.0] | `t3` |
 | `tema` | `TEMA` | `source` | `period` 30 [1, 100000] | `tema` |
 | `trima` | `TRIMA` | `source` | `period` 30 [1, 100000] | `trima` |
 | `vwma` | `VWMA` | `close`, `volume` | `period` 30 [1, 100000] | `vwma` |
@@ -195,7 +195,7 @@ Total: **201 functions**.
 | `linearreg_angle` | `LINEARREG_ANGLE` | `source` | `period` 14 [2, 100000] | `linearreg_angle` |
 | `linearreg_intercept` | `LINEARREG_INTERCEPT` | `source` | `period` 14 [2, 100000] | `linearreg_intercept` |
 | `linearreg_slope` | `LINEARREG_SLOPE` | `source` | `period` 14 [2, 100000] | `linearreg_slope` |
-| `percentile` | `PERCENTILE` | `source` | `period` 30 [2, 100000]; `percentile` 50.0 any | `percentile` |
+| `percentile` | `PERCENTILE` | `source` | `period` 30 [2, 100000]; `percentile` 50.0 [0.0, 100.0] | `percentile` |
 | `percentrank` | `PERCENTRANK` | `source` | `period` 100 [2, 100000] | `percentrank` |
 | `stddev` | `STDDEV` | `source` | `period` 5 [2, 100000]; `nbdev` 1.0 any | `stddev` |
 | `tsf` | `TSF` | `source` | `period` 14 [2, 100000] | `tsf` |
@@ -255,20 +255,20 @@ Total: **201 functions**.
 | `cdl_3outside` | `CDL3OUTSIDE` | `open`, `high`, `low`, `close` | -- | `cdl_3outside` (int32) |
 | `cdl_3starsinsouth` | `CDL3STARSINSOUTH` | `open`, `high`, `low`, `close` | -- | `cdl_3starsinsouth` (int32) |
 | `cdl_3whitesoldiers` | `CDL3WHITESOLDIERS` | `open`, `high`, `low`, `close` | -- | `cdl_3whitesoldiers` (int32) |
-| `cdl_abandonedbaby` | `CDLABANDONEDBABY` | `open`, `high`, `low`, `close` | `penetration` 0.3 any | `cdl_abandonedbaby` (int32) |
+| `cdl_abandonedbaby` | `CDLABANDONEDBABY` | `open`, `high`, `low`, `close` | `penetration` 0.3 [0.0, any] | `cdl_abandonedbaby` (int32) |
 | `cdl_advanceblock` | `CDLADVANCEBLOCK` | `open`, `high`, `low`, `close` | -- | `cdl_advanceblock` (int32) |
 | `cdl_belthold` | `CDLBELTHOLD` | `open`, `high`, `low`, `close` | -- | `cdl_belthold` (int32) |
 | `cdl_breakaway` | `CDLBREAKAWAY` | `open`, `high`, `low`, `close` | -- | `cdl_breakaway` (int32) |
 | `cdl_closingmarubozu` | `CDLCLOSINGMARUBOZU` | `open`, `high`, `low`, `close` | -- | `cdl_closingmarubozu` (int32) |
 | `cdl_concealbabyswall` | `CDLCONCEALBABYSWALL` | `open`, `high`, `low`, `close` | -- | `cdl_concealbabyswall` (int32) |
 | `cdl_counterattack` | `CDLCOUNTERATTACK` | `open`, `high`, `low`, `close` | -- | `cdl_counterattack` (int32) |
-| `cdl_darkcloudcover` | `CDLDARKCLOUDCOVER` | `open`, `high`, `low`, `close` | `penetration` 0.5 any | `cdl_darkcloudcover` (int32) |
+| `cdl_darkcloudcover` | `CDLDARKCLOUDCOVER` | `open`, `high`, `low`, `close` | `penetration` 0.5 [0.0, any] | `cdl_darkcloudcover` (int32) |
 | `cdl_doji` | `CDLDOJI` | `open`, `high`, `low`, `close` | -- | `cdl_doji` (int32) |
 | `cdl_dojistar` | `CDLDOJISTAR` | `open`, `high`, `low`, `close` | -- | `cdl_dojistar` (int32) |
 | `cdl_dragonflydoji` | `CDLDRAGONFLYDOJI` | `open`, `high`, `low`, `close` | -- | `cdl_dragonflydoji` (int32) |
 | `cdl_engulfing` | `CDLENGULFING` | `open`, `high`, `low`, `close` | -- | `cdl_engulfing` (int32) |
-| `cdl_eveningdojistar` | `CDLEVENINGDOJISTAR` | `open`, `high`, `low`, `close` | `penetration` 0.3 any | `cdl_eveningdojistar` (int32) |
-| `cdl_eveningstar` | `CDLEVENINGSTAR` | `open`, `high`, `low`, `close` | `penetration` 0.3 any | `cdl_eveningstar` (int32) |
+| `cdl_eveningdojistar` | `CDLEVENINGDOJISTAR` | `open`, `high`, `low`, `close` | `penetration` 0.3 [0.0, any] | `cdl_eveningdojistar` (int32) |
+| `cdl_eveningstar` | `CDLEVENINGSTAR` | `open`, `high`, `low`, `close` | `penetration` 0.3 [0.0, any] | `cdl_eveningstar` (int32) |
 | `cdl_gapsidesidewhite` | `CDLGAPSIDESIDEWHITE` | `open`, `high`, `low`, `close` | -- | `cdl_gapsidesidewhite` (int32) |
 | `cdl_gravestonedoji` | `CDLGRAVESTONEDOJI` | `open`, `high`, `low`, `close` | -- | `cdl_gravestonedoji` (int32) |
 | `cdl_hammer` | `CDLHAMMER` | `open`, `high`, `low`, `close` | -- | `cdl_hammer` (int32) |
@@ -289,9 +289,9 @@ Total: **201 functions**.
 | `cdl_longline` | `CDLLONGLINE` | `open`, `high`, `low`, `close` | -- | `cdl_longline` (int32) |
 | `cdl_marubozu` | `CDLMARUBOZU` | `open`, `high`, `low`, `close` | -- | `cdl_marubozu` (int32) |
 | `cdl_matchinglow` | `CDLMATCHINGLOW` | `open`, `high`, `low`, `close` | -- | `cdl_matchinglow` (int32) |
-| `cdl_mathold` | `CDLMATHOLD` | `open`, `high`, `low`, `close` | `penetration` 0.5 any | `cdl_mathold` (int32) |
-| `cdl_morningdojistar` | `CDLMORNINGDOJISTAR` | `open`, `high`, `low`, `close` | `penetration` 0.3 any | `cdl_morningdojistar` (int32) |
-| `cdl_morningstar` | `CDLMORNINGSTAR` | `open`, `high`, `low`, `close` | `penetration` 0.3 any | `cdl_morningstar` (int32) |
+| `cdl_mathold` | `CDLMATHOLD` | `open`, `high`, `low`, `close` | `penetration` 0.5 [0.0, any] | `cdl_mathold` (int32) |
+| `cdl_morningdojistar` | `CDLMORNINGDOJISTAR` | `open`, `high`, `low`, `close` | `penetration` 0.3 [0.0, any] | `cdl_morningdojistar` (int32) |
+| `cdl_morningstar` | `CDLMORNINGSTAR` | `open`, `high`, `low`, `close` | `penetration` 0.3 [0.0, any] | `cdl_morningstar` (int32) |
 | `cdl_onneck` | `CDLONNECK` | `open`, `high`, `low`, `close` | -- | `cdl_onneck` (int32) |
 | `cdl_piercing` | `CDLPIERCING` | `open`, `high`, `low`, `close` | -- | `cdl_piercing` (int32) |
 | `cdl_rickshawman` | `CDLRICKSHAWMAN` | `open`, `high`, `low`, `close` | -- | `cdl_rickshawman` (int32) |

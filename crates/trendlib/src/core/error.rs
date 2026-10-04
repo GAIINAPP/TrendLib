@@ -29,6 +29,27 @@ impl TlError {
         ))
     }
 
+    /// The same message for a parameter that is a float.
+    ///
+    /// `-1` and `-1.0` are the same number but not the same message, and the
+    /// Python contract tests compare the text against what the spec says, so a
+    /// whole-numbered float has to keep its point.
+    pub fn float_param_out_of_range(
+        indicator: &str,
+        param: &str,
+        value: f64,
+        min: f64,
+        max: f64,
+    ) -> Self {
+        Self::param_out_of_range(
+            indicator,
+            param,
+            AsPython(value),
+            AsPython(min),
+            AsPython(max),
+        )
+    }
+
     pub fn unequal_lengths(
         indicator: &str,
         first_input: &str,
@@ -69,6 +90,19 @@ impl fmt::Display for TlError {
 }
 
 impl std::error::Error for TlError {}
+
+/// A float written the way Python writes it.
+struct AsPython(f64);
+
+impl fmt::Display for AsPython {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if self.0.is_finite() && self.0 == self.0.trunc() && self.0.abs() < 1.0e16 {
+            write!(f, "{:.1}", self.0)
+        } else {
+            write!(f, "{}", self.0)
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests {

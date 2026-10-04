@@ -1,0 +1,32 @@
+name: mfi
+title: Money Flow Index
+group: volume
+flags: [nan_inf_output]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+  - name: volume
+    kind: volume
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 2
+    max: 100000
+    doc: Number of bar-to-bar changes the flows are summed over
+outputs:
+  - name: mfi
+    dtype: float64
+    plot: line
+    doc: Share of recent money flow that moved on up bars, as a percentage
+talib:
+  name: MFI
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Gene Quong and Avrum Soudack, Volume-Weighted RSI - Money Flow, Technical Analysis of Stocks and Commodities, March 1989
+see_also: [rsi, obv, ad]
