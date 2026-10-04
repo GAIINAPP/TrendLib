@@ -1,10 +1,23 @@
 """Write the committed synthetic datasets in ``testdata/``.
 
-Golden files are computed from these bars, so the datasets have to be the same
-on every machine forever. They are built from :class:`random.Random`, whose
-Mersenne Twister stream is part of CPython's documented behaviour, rather than
-from NumPy, whose generators carry no cross-version stream guarantee. Even so,
-the committed CSVs are the source of truth (``docs/TESTING.md`` section 3):
+Golden files are computed from these bars, so the datasets have to come out
+identical on every machine, forever.
+
+That rules out more than it sounds like. :class:`random.Random` is fine: its
+Mersenne Twister stream and its ``random()`` and ``randrange()`` outputs are
+part of CPython's documented behaviour and are built from integer arithmetic.
+``random.gauss``, ``math.exp`` and ``math.log`` are not: they call into the
+platform's libm, which is free to be a unit in the last place away from another
+platform's, and these files are written with round-trip precision, so one ULP
+is a different file. CI caught exactly that between Linux and macOS.
+
+So everything below is built from operations IEEE-754 defines exactly:
+addition, subtraction, multiplication, division and comparison. The normal-ish
+variate is Irwin-Hall (twelve uniforms, minus six), the price walk compounds
+``1 + mu + sigma * z`` instead of ``exp``, and the intraday volume curve is a
+polynomial rather than a log-normal.
+
+The committed CSVs remain the source of truth (``docs/TESTING.md`` section 3):
 regenerate only on purpose, and regenerate every golden file in the same PR.
 
     python scripts/testdata/make_synthetic.py [--check]
@@ -16,7 +29,6 @@ from __future__ import annotations
 
 import argparse
 import itertools
-import math
 import random
 import sys
 from datetime import date, datetime, timedelta, timezone
@@ -49,6 +61,29 @@ EMPTY_MID_SESSION = 7
 EMPTY_MID_BAR = 41
 
 
+def normalish(rng: random.Random) -> float:
+    """A bell-shaped variate on [-6, 6], from addition alone.
+
+    Twelve uniforms sum to a variate with mean 6 and variance 1 (Irwin-Hall),
+    so subtracting 6 approximates a standard normal closely enough for test
+    bars, without touching a transcendental function.
+    """
+    total = 0.0
+    for _ in range(12):
+        total += rng.random()
+    return total - 6.0
+
+
+def _bar(
+    rng: random.Random, prev_close: float, gap: float, drift: float, sigma: float, wick: float
+) -> tuple[float, float, float, float]:
+    open_ = prev_close * (1.0 + gap * normalish(rng))
+    close = open_ * (1.0 + drift + sigma * normalish(rng))
+    high = max(open_, close) * (1.0 + wick * abs(normalish(rng)))
+    low = min(open_, close) * (1.0 - wick * abs(normalish(rng)))
+    return open_, high, low, close
+
+
 def _weekdays(start: date, count: int) -> list[date]:
     days: list[date] = []
     day = start
@@ -59,34 +94,26 @@ def _weekdays(start: date, count: int) -> list[date]:
     return days
 
 
-def _bar(rng: random.Random, prev_close: float, gap_sigma: float, ret_sigma: float,
-         wick: float) -> tuple[float, float, float, float]:
-    open_ = prev_close * math.exp(rng.gauss(0.0, gap_sigma))
-    close = open_ * math.exp(rng.gauss(0.0, ret_sigma))
-    high = max(open_, close) * (1.0 + abs(rng.gauss(0.0, wick)))
-    low = min(open_, close) * (1.0 - abs(rng.gauss(0.0, wick)))
-    return open_, high, low, close
-
-
 def make_daily() -> str:
     rng = random.Random(DAILY_SEED)
     rows = ["date,open,high,low,close,volume"]
     close = DAILY_START_PRICE
     for day in _weekdays(DAILY_START, DAILY_BARS):
-        open_, high, low, close = _bar(rng, close, 0.0015, 0.011, 0.004)
-        volume = round(math.exp(rng.gauss(math.log(500_000.0), 0.45)))
-        rows.append(
-            f"{day.isoformat()},{open_!r},{high!r},{low!r},{close!r},{volume}"
-        )
+        open_, high, low, close = _bar(rng, close, 0.0015, 0.00025, 0.011, 0.004)
+        volume = 200_000 + rng.randrange(800_000)
+        rows.append(f"{day.isoformat()},{open_!r},{high!r},{low!r},{close!r},{volume}")
     return "\n".join(rows) + "\n"
 
 
 def _intraday_volume(rng: random.Random, bar_index: int) -> int:
     # Real sessions trade heavily at the open and the close and quietly in the
-    # middle; the shape matters because VWAP weights by volume.
+    # middle; the shape matters because VWAP weights by volume. A cubic gives
+    # that curve without an exponential.
     position = bar_index / (BARS_PER_SESSION - 1)
-    shape = 1.0 + 2.2 * math.exp(-8.0 * position) + 1.4 * math.exp(-8.0 * (1.0 - position))
-    return round(math.exp(rng.gauss(math.log(9_000.0 * shape), 0.35)))
+    rest = 1.0 - position
+    shape = 1.0 + 2.2 * rest * rest * rest + 1.4 * position * position * position
+    jitter = 0.7 + 0.6 * rng.random()
+    return round(6_000.0 * shape * jitter)
 
 
 def make_intraday() -> str:
@@ -96,9 +123,9 @@ def make_intraday() -> str:
     for session, day in enumerate(_weekdays(INTRADAY_START, SESSIONS), start=1):
         first = datetime(day.year, day.month, day.day, *SESSION_OPEN, tzinfo=IST)
         # The overnight gap is wider than any single 5-minute move.
-        close *= math.exp(rng.gauss(0.0, 0.006))
+        close *= 1.0 + 0.006 * normalish(rng)
         for bar in range(BARS_PER_SESSION):
-            open_, high, low, close = _bar(rng, close, 0.0004, 0.0019, 0.0009)
+            open_, high, low, close = _bar(rng, close, 0.0004, 0.0, 0.0019, 0.0009)
             volume = _intraday_volume(rng, bar)
             if session == EMPTY_OPEN_SESSION and bar == 0:
                 volume = 0
@@ -122,6 +149,8 @@ def _check_daily(text: str) -> None:
         assert int(volume) > 0, line
         assert day > previous_day, line
         previous_day = day
+    last = float(lines[-1].split(",")[4])
+    assert 100.0 < last < 10_000.0, f"the walk left a plausible range: {last}"
 
 
 def _check_intraday(text: str) -> None:

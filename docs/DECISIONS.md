@@ -54,9 +54,19 @@ A3 (M0, 2026-10-04): `.github/pull_request_template.md`, the two issue templates
 `.claude/skills/new-indicator/SKILL.md` are described as "provided" by
 `MILESTONES.md` and `CLAUDE.md` but were not in the repository, so M0 wrote them.
 
-A4 (M0, 2026-10-04): the synthetic datasets are built from the standard library's
-`random.Random`, not NumPy. CPython documents its Mersenne Twister stream; NumPy
-promises no cross-version stream, which `TESTING.md` section 3 itself warns about.
+A4 (M0, 2026-10-04, amended M1): the synthetic datasets are built from the
+standard library's `random.Random`, not NumPy. CPython documents its Mersenne
+Twister stream; NumPy promises no cross-version stream, which `TESTING.md`
+section 3 itself warns about.
+
+Amended after CI: that is necessary but not sufficient. The first version also
+used `random.gauss`, `math.exp` and `math.log`, which call the platform's libm
+and may land a unit in the last place apart; with round-trip precision in the
+files, one ULP is a different file, and the macOS jobs failed `--check` against
+data generated on Linux. The generator now uses only operations IEEE-754 defines
+exactly: an Irwin-Hall variate instead of `gauss`, a compounded `1 + mu + sigma*z`
+walk instead of `exp`, and a polynomial volume curve instead of a log-normal. Any
+future test data must hold to the same rule.
 
 A5 (M0, 2026-10-04): `testdata/daily_2000.csv` carries a `date` column (naive ISO
 date, the way a SQL `DATE` reads back) and `testdata/intraday_5m_20d.csv` a
