@@ -6320,6 +6320,112 @@ mod hma_adapter {
     }
 }
 
+mod ht_dcperiod_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::ht_dcperiod::HtDcperiod;
+    const INPUTS: usize = 1;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::ht_dcperiod::Params {
+        let _ = values;
+        trendlib::indicators::ht_dcperiod::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "ht_dcperiod takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::ht_dcperiod::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod ht_phasor_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::ht_phasor::HtPhasor;
+    const INPUTS: usize = 1;
+    const OUTPUTS: usize = 2;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::ht_phasor::Params {
+        let _ = values;
+        trendlib::indicators::ht_phasor::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "ht_phasor takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::ht_phasor::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[false, false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod imi_adapter {
     use super::*;
 
@@ -11764,6 +11870,8 @@ pub fn registered() -> Vec<Registered> {
         fractal_adapter::registered(),
         ha_adapter::registered(),
         hma_adapter::registered(),
+        ht_dcperiod_adapter::registered(),
+        ht_phasor_adapter::registered(),
         imi_adapter::registered(),
         kama_adapter::registered(),
         kc_adapter::registered(),

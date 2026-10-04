@@ -108,6 +108,8 @@ pub mod fosc;
 pub mod fractal;
 pub mod ha;
 pub mod hma;
+pub mod ht_dcperiod;
+pub mod ht_phasor;
 pub mod imi;
 pub mod kama;
 pub mod kc;

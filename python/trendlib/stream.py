@@ -122,6 +122,8 @@ __all__ = [
     "fractal",
     "ha",
     "hma",
+    "ht_dcperiod",
+    "ht_phasor",
     "imi",
     "kama",
     "kc",
@@ -1673,6 +1675,19 @@ ha = Factory(
     ),
 )
 hma = Factory("hma", _core.HmaStream, ("source",), ("series",), ("hma",))
+ht_dcperiod = Factory(
+    "ht_dcperiod", _core.HtDcperiodStream, ("source",), ("series",), ("ht_dcperiod",)
+)
+ht_phasor = Factory(
+    "ht_phasor",
+    _core.HtPhasorStream,
+    ("source",),
+    ("series",),
+    (
+        "ht_phasor_in_phase",
+        "ht_phasor_quadrature",
+    ),
+)
 imi = Factory(
     "imi",
     _core.ImiStream,

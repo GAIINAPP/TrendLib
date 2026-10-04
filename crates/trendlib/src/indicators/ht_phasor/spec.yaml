@@ -1,0 +1,23 @@
+name: ht_phasor
+title: Hilbert Transform Phasor Components
+group: cycle
+flags: [unstable, path_dependent]
+inputs:
+  - name: source
+    kind: series
+outputs:
+  - name: ht_phasor_in_phase
+    dtype: float64
+    plot: line
+    doc: The part of the signal in phase with the dominant cycle
+  - name: ht_phasor_quadrature
+    dtype: float64
+    plot: line
+    doc: The part a quarter turn ahead of it
+talib:
+  name: HT_PHASOR
+  params: {}
+  outputs: [inphase, quadrature]
+references:
+  - John F. Ehlers, Rocket Science for Traders, Wiley, 2001
+see_also: [ht_dcperiod, ht_dcphase, ht_sine]

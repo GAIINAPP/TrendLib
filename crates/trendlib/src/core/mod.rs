@@ -1,5 +1,6 @@
 pub mod candles;
 pub mod error;
+pub mod hilbert;
 pub mod input;
 pub mod kernel;
 pub mod math;

@@ -120,6 +120,12 @@ INDICATOR_TOLERANCE = {
     "linearreg_slope": ("rel=2e-9 abs=1e-12", SLOPE_CANCELS),
     "linearreg_angle": ("rel=2e-9 abs=1e-12", SLOPE_CANCELS),
     "fosc": ("rel=5e-9 abs=1e-12", FORECAST_CANCELS),
+    "ht_phasor": (
+        "rel=1e-10 abs=1e-10",
+        "the two parts cross zero, and a relative bound measures nothing within a hair of a "
+        "crossing; the worst absolute disagreement over this dataset is 1.4e-11 against "
+        "quantities that run to 134, so the absolute bound is the one that says anything",
+    ),
 }
 
 

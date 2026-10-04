@@ -1,0 +1,19 @@
+name: ht_dcperiod
+title: Hilbert Transform Dominant Cycle Period
+group: cycle
+flags: [unstable, path_dependent]
+inputs:
+  - name: source
+    kind: series
+outputs:
+  - name: ht_dcperiod
+    dtype: float64
+    plot: line
+    doc: Length of the dominant cycle, in bars
+talib:
+  name: HT_DCPERIOD
+  params: {}
+  outputs: [real]
+references:
+  - John F. Ehlers, Rocket Science for Traders, Wiley, 2001
+see_also: [ht_phasor, ht_dcphase, mama]

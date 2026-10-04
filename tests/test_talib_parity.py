@@ -75,6 +75,12 @@ ORACLE_IS_LOOSER = {
 # residue itself and there is no relative error to measure: TrendLib's 3.1e-13
 # against ta-lib-python's 5.8e-11. This is the figure the golden files carry as
 # `abs` for the same cases.
+# Indicators whose value crosses zero, where a relative bound measures nothing
+# within a hair of the crossing and the absolute one is what says something.
+# For `ht_phasor` the worst absolute disagreement over the committed dataset is
+# 1.4e-11 against quantities that run to 134.
+CROSSES_ZERO = {"ht_phasor": 1e-10}
+
 ORACLE_IS_LOOSER_NEAR_ZERO = {
     "stoch": 2e-10,
     "stochf": 2e-10,
@@ -190,7 +196,7 @@ def compare(name, mine, theirs, indicator_name=None):
     defined = ~np.isnan(theirs) & np.isfinite(theirs)
     key = indicator_name or name
     rtol = CANCELS.get(key, ORACLE_IS_LOOSER.get(key, RTOL))
-    atol = ORACLE_IS_LOOSER_NEAR_ZERO.get(key, ATOL)
+    atol = CROSSES_ZERO.get(key, ORACLE_IS_LOOSER_NEAR_ZERO.get(key, ATOL))
     np.testing.assert_allclose(mine[defined], theirs[defined], rtol=rtol, atol=atol, err_msg=name)
     # An infinity on one side has to be an infinity on the other.
     np.testing.assert_array_equal(np.isinf(mine), np.isinf(theirs), err_msg=f"{name}: infinities")

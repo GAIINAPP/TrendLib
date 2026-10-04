@@ -121,6 +121,8 @@ __all__ = [
     "FRACTAL",
     "HA",
     "HMA",
+    "HT_DCPERIOD",
+    "HT_PHASOR",
     "IMI",
     "KAMA",
     "KC",
@@ -312,6 +314,8 @@ __all__ = [
     "fractal",
     "ha",
     "hma",
+    "ht_dcperiod",
+    "ht_phasor",
     "imi",
     "kama",
     "kc",
@@ -3521,6 +3525,40 @@ def hma(source=None, *, period: int = _PARAMS["hma"]["period"]["default"]) -> An
     return _convert.wrap_outputs(out, carrier, ("hma",))
 
 
+def ht_dcperiod(source=None) -> Any:
+    """Hilbert Transform Dominant Cycle Period.
+
+    Returns
+    -------
+    ndarray or Series
+        Length of the dominant cycle, in bars.
+    """
+    columns, carrier = _convert.bars("ht_dcperiod", (source,), ("source",), ("series",))
+    out = _core.ht_dcperiod(*columns)
+    return _convert.wrap_outputs(out, carrier, ("ht_dcperiod",))
+
+
+def ht_phasor(source=None) -> Any:
+    """Hilbert Transform Phasor Components.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        ht_phasor_in_phase: The part of the signal in phase with the dominant cycle.
+        ht_phasor_quadrature: The part a quarter turn ahead of it.
+    """
+    columns, carrier = _convert.bars("ht_phasor", (source,), ("source",), ("series",))
+    out = _core.ht_phasor(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "ht_phasor_in_phase",
+            "ht_phasor_quadrature",
+        ),
+    )
+
+
 def imi(open=None, close=None, *, period: int = _PARAMS["imi"]["period"]["default"]) -> Any:
     """Intraday Momentum Index.
 
@@ -6458,6 +6496,16 @@ def HA(open, high, low, close) -> Any:
 def HMA(source, timeperiod: int = _PARAMS["hma"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`hma`."""
     return hma(source, period=timeperiod)
+
+
+def HT_DCPERIOD(source) -> Any:
+    """TA-Lib-style alias for :func:`ht_dcperiod`."""
+    return ht_dcperiod(source)
+
+
+def HT_PHASOR(source) -> Any:
+    """TA-Lib-style alias for :func:`ht_phasor`."""
+    return ht_phasor(source)
 
 
 def IMI(open, close, timeperiod: int = _PARAMS["imi"]["period"]["default"]) -> Any:
