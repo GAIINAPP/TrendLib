@@ -28,6 +28,9 @@ tl.vwap(high, low, close, volume, timestamps=None, *, anchor="day", tz="Asia/Kol
   single-series indicators a DataFrame uses its `close` column. Timestamps come from
   a pandas `DatetimeIndex`, or a column named `timestamp`/`datetime`/`date`/`time`
   if the index is not datetime-like. Missing columns raise `InvalidInput` naming them.
+  A frame must hold one instrument at one interval, sorted ascending with no
+  duplicate timestamps; `DATA_INTEGRATION.md` § 2 is the full contract and § 3
+  covers why a multi-symbol or dual-listed result set must be grouped first.
 - **Array-likes:** NumPy arrays, pandas Series, polars Series, Python lists. All
   inputs must have equal length.
 - **Enum parameters** take lowercase strings (`ma_type="ema"`); the uppercase aliases

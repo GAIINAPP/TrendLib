@@ -33,6 +33,9 @@ disagree. GAIIN's own platform needs one trusted indicator engine.
 Data feeds or broker connectors · backtesting · strategy logic, signals or
 recommendations · charting · GPU · decimal arithmetic (float64 only).
 
+Callers load their own bars. The frame contract they have to satisfy, and
+loader patterns for SQL sources, are in `DATA_INTEGRATION.md` (D15).
+
 ## 4. Users
 
 | Persona | Needs | Primary surface |
@@ -50,7 +53,7 @@ recommendations · charting · GPU · decimal arithmetic (float64 only).
 | F2 | Batch API returns outputs aligned to input length with NaN warm-up (`CONVENTIONS.md`) | P0 | M1 |
 | F3 | Streaming API: open from history, `update`, `peek`, `value`, `copy` | P0 | M1 |
 | F4 | `lookback(**params)` available for every indicator | P0 | M1 |
-| F5 | NumPy, pandas and polars inputs; same type out; pandas index preserved; OHLCV columns auto-mapped | P0 | M2 |
+| F5 | NumPy, pandas and polars inputs; same type out; pandas index preserved; OHLCV columns auto-mapped per `DATA_INTEGRATION.md` § 2 | P0 | M2 |
 | F6 | Registry: list groups and indicators, describe params (type, default, range), outputs and plot hints, as Python objects and JSON | P0 | M2 |
 | F7 | Uppercase TA-Lib aliases with ta-lib-python parameter and output names for every shared indicator | P1 | M2 (as indicators land) |
 | F8 | v0.1 indicator set incl. India set: session VWAP, Supertrend, CPR, classic and Camarilla pivots (`INDICATORS.md`) | P0 | M4 |
@@ -59,6 +62,7 @@ recommendations · charting · GPU · decimal arithmetic (float64 only).
 | F11 | Wheels on PyPI for all supported platforms; sdist builds with only Rust installed | P0 | M3 |
 | F12 | Rust crate on crates.io | P1 | M6 |
 | F13 | NSE/BSE trading calendar (holidays, sessions) for opening-range and multi-day anchors | P1 | M6 |
+| F14 | Input validation enforces the frame contract: tz-aware timestamps, ascending order, no duplicate timestamps, with errors naming the offending row | P1 | M2 |
 
 ## 6. Non-functional requirements
 

@@ -17,6 +17,7 @@ over your own preferences; if two docs disagree, or a doc is wrong, stop and ask
 | `docs/ARCHITECTURE.md` | Repo layout, crates, traits, code generator, Python layer |
 | `docs/PYTHON_API.md` | The public Python contract, exactly |
 | `docs/CONVENTIONS.md` | Numerics: warm-up, NaN, seeding, timestamps, known deviations |
+| `docs/DATA_INTEGRATION.md` | The input frame contract, and loading bars from a database |
 | `docs/SPEC_FORMAT.md` | Formats of `spec.yaml`, `doc.md`, golden CSVs |
 | `docs/INDICATORS.md` | Approved indicator list, names, params, defaults, formulas |
 | `docs/TESTING.md` | Oracles, golden data, parity, edge cases, benchmarks |

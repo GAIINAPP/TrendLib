@@ -42,10 +42,19 @@ Volume: OBV, A/D, A/D Oscillator, VWAP ·
 Levels: CPR, traditional pivots, Camarilla pivots ·
 Patterns: Doji, Engulfing, Hammer.
 
+## Using your own data
+
+TrendLib takes arrays and frames, not connections. Hand it a DataFrame with
+`open`/`high`/`low`/`close`/`volume` and a timezone-aware index, one instrument
+at a time, and every function works. `docs/DATA_INTEGRATION.md` has the full
+contract, ready-made loaders for daily and intraday SQL tables, how to continue
+a live stream from stored history, and the mistakes that produce wrong numbers
+instead of errors.
+
 ## Documentation
 
 Docs site: _coming in 0.1_. Until then: `docs/PYTHON_API.md`, `docs/CONVENTIONS.md`,
-`docs/INDICATORS.md`.
+`docs/INDICATORS.md`, `docs/DATA_INTEGRATION.md`.
 
 TrendLib computes measurements. It does not give investment advice.
 

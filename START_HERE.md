@@ -1,5 +1,9 @@
 # Start here (for you, not for Claude Code)
 
+> **Internal, not for the public repo.** This file describes how the project is
+> driven, milestone by milestone. Delete it before the repository goes public,
+> or keep it out of the first public commit. Nothing else in `docs/` is internal.
+
 This pack is the starting repo for TrendLib. Claude Code reads `CLAUDE.md`
 automatically and follows the docs in `docs/`. You approve each milestone.
 
@@ -53,7 +57,7 @@ Standard" on daily NIFTY bars: date, prior-day OHLC, each level), then:
 
 ```
 Here are reference values for pivots_traditional from TradingView (Pivot Points
-Standard, type Traditional, NSE:NIFTY daily, transcribed by Danish on <date>):
+Standard, type Traditional, NSE:NIFTY daily, transcribed by <name> on <date>):
 <paste table>. Write them as golden/default.csv per docs/SPEC_FORMAT.md § 4 with
 produced_by: manual, enable the test, and report the result.
 ```
