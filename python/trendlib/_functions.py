@@ -13,6 +13,7 @@ from typing import Any
 from trendlib import _convert, _core
 
 __all__ = [
+    "ACCBANDS",
     "ACOS",
     "AD",
     "ADD",
@@ -37,6 +38,7 @@ __all__ = [
     "DEMA",
     "DIV",
     "DONCHIAN",
+    "DPO",
     "DX",
     "EMA",
     "EXP",
@@ -50,6 +52,7 @@ __all__ = [
     "LOG10",
     "MA",
     "MACD",
+    "MACDFIX",
     "MAX",
     "MAXINDEX",
     "MEDPRICE",
@@ -65,6 +68,7 @@ __all__ = [
     "MULT",
     "NATR",
     "OBV",
+    "PERCENTRANK",
     "PLUS_DI",
     "PLUS_DM",
     "PPO",
@@ -97,6 +101,7 @@ __all__ = [
     "WCLPRICE",
     "WILLR",
     "WMA",
+    "accbands",
     "acos",
     "ad",
     "add",
@@ -121,6 +126,7 @@ __all__ = [
     "dema",
     "div",
     "donchian",
+    "dpo",
     "dx",
     "ema",
     "exp",
@@ -135,6 +141,7 @@ __all__ = [
     "lookback",
     "ma",
     "macd",
+    "macdfix",
     "max",
     "maxindex",
     "medprice",
@@ -150,6 +157,7 @@ __all__ = [
     "mult",
     "natr",
     "obv",
+    "percentrank",
     "plus_di",
     "plus_dm",
     "ppo",
@@ -185,6 +193,50 @@ __all__ = [
 ]
 
 _PARAMS = _core.PARAMS
+
+
+def accbands(
+    high=None, low=None, close=None, *, period: int = _PARAMS["accbands"]["period"]["default"]
+) -> Any:
+    """Acceleration Bands.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Number of bars each band is averaged over, from 2 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        accbands_upper: Average of the high widened by the bar's own range.
+        accbands_middle: Average close.
+        accbands_lower: Average of the low narrowed by the bar's own range.
+    """
+    period = _convert.as_int("accbands", "period", period)
+    columns, carrier = _convert.bars(
+        "accbands",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.accbands(*columns, period=period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "accbands_upper",
+            "accbands_middle",
+            "accbands_lower",
+        ),
+    )
 
 
 def acos(source=None) -> Any:
@@ -789,6 +841,25 @@ def donchian(high=None, low=None, *, period: int = _PARAMS["donchian"]["period"]
     )
 
 
+def dpo(source=None, *, period: int = _PARAMS["dpo"]["period"]["default"]) -> Any:
+    """Detrended Price Oscillator.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Number of bars the trend is measured over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        How far an earlier value sat above or below the current average.
+    """
+    period = _convert.as_int("dpo", "period", period)
+    columns, carrier = _convert.bars("dpo", (source,), ("source",), ("series",))
+    out = _core.dpo(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("dpo",))
+
+
 def dx(high=None, low=None, close=None, *, period: int = _PARAMS["dx"]["period"]["default"]) -> Any:
     """Directional Movement Index.
 
@@ -1080,6 +1151,37 @@ def macd(
             "macd",
             "macd_signal",
             "macd_hist",
+        ),
+    )
+
+
+def macdfix(
+    source=None, *, signal_period: int = _PARAMS["macdfix"]["signal_period"]["default"]
+) -> Any:
+    """MACD with Fixed Periods.
+
+    Parameters
+    ----------
+    signal_period : int, default 9
+        Number of bars the signal line is smoothed over, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        macdfix_macd: Fast exponential average minus the slow one.
+        macdfix_signal: Exponential average of the MACD line.
+        macdfix_hist: MACD line minus the signal line.
+    """
+    signal_period = _convert.as_int("macdfix", "signal_period", signal_period)
+    columns, carrier = _convert.bars("macdfix", (source,), ("source",), ("series",))
+    out = _core.macdfix(*columns, signal_period=signal_period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "macdfix_macd",
+            "macdfix_signal",
+            "macdfix_hist",
         ),
     )
 
@@ -1450,6 +1552,25 @@ def obv(close=None, volume=None) -> Any:
     )
     out = _core.obv(*columns)
     return _convert.wrap_outputs(out, carrier, ("obv",))
+
+
+def percentrank(source=None, *, period: int = _PARAMS["percentrank"]["period"]["default"]) -> Any:
+    """Percent Rank.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Number of bars the current value is ranked against, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Share of the previous period bars below the current value, as a percentage.
+    """
+    period = _convert.as_int("percentrank", "period", period)
+    columns, carrier = _convert.bars("percentrank", (source,), ("source",), ("series",))
+    out = _core.percentrank(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("percentrank",))
 
 
 def plus_di(
@@ -2264,6 +2385,11 @@ def lookback(name: str, **params: Any) -> int:
     return _core.lookback(name, **params)
 
 
+def ACCBANDS(high, low, close, timeperiod: int = _PARAMS["accbands"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`accbands`."""
+    return accbands(high, low, close, period=timeperiod)
+
+
 def ACOS(source) -> Any:
     """TA-Lib-style alias for :func:`acos`."""
     return acos(source)
@@ -2395,6 +2521,11 @@ def DONCHIAN(high, low, timeperiod: int = _PARAMS["donchian"]["period"]["default
     return donchian(high, low, period=timeperiod)
 
 
+def DPO(source, timeperiod: int = _PARAMS["dpo"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`dpo`."""
+    return dpo(source, period=timeperiod)
+
+
 def DX(high, low, close, timeperiod: int = _PARAMS["dx"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`dx`."""
     return dx(high, low, close, period=timeperiod)
@@ -2475,6 +2606,11 @@ def MACD(
     return macd(source, fast_period=fastperiod, slow_period=slowperiod, signal_period=signalperiod)
 
 
+def MACDFIX(source, signalperiod: int = _PARAMS["macdfix"]["signal_period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`macdfix`."""
+    return macdfix(source, signal_period=signalperiod)
+
+
 def MAX(source, timeperiod: int = _PARAMS["max"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`max`."""
     return max(source, period=timeperiod)
@@ -2548,6 +2684,11 @@ def NATR(high, low, close, timeperiod: int = _PARAMS["natr"]["period"]["default"
 def OBV(close, volume) -> Any:
     """TA-Lib-style alias for :func:`obv`."""
     return obv(close, volume)
+
+
+def PERCENTRANK(source, timeperiod: int = _PARAMS["percentrank"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`percentrank`."""
+    return percentrank(source, period=timeperiod)
 
 
 def PLUS_DI(high, low, close, timeperiod: int = _PARAMS["plus_di"]["period"]["default"]) -> Any:

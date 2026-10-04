@@ -14,6 +14,7 @@ from trendlib import _convert, _core
 from trendlib._stream_base import Factory
 
 __all__ = [
+    "accbands",
     "acos",
     "ad",
     "add",
@@ -38,6 +39,7 @@ __all__ = [
     "dema",
     "div",
     "donchian",
+    "dpo",
     "dx",
     "ema",
     "exp",
@@ -51,6 +53,7 @@ __all__ = [
     "log10",
     "ma",
     "macd",
+    "macdfix",
     "max",
     "maxindex",
     "medprice",
@@ -66,6 +69,7 @@ __all__ = [
     "mult",
     "natr",
     "obv",
+    "percentrank",
     "plus_di",
     "plus_dm",
     "ppo",
@@ -100,6 +104,25 @@ __all__ = [
     "wma",
 ]
 
+accbands = Factory(
+    "accbands",
+    _core.AccbandsStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "accbands_upper",
+        "accbands_middle",
+        "accbands_lower",
+    ),
+)
 acos = Factory("acos", _core.AcosStream, ("source",), ("series",), ("acos",))
 ad = Factory(
     "ad",
@@ -305,6 +328,7 @@ donchian = Factory(
         "donchian_lower",
     ),
 )
+dpo = Factory("dpo", _core.DpoStream, ("source",), ("series",), ("dpo",))
 dx = Factory(
     "dx",
     _core.DxStream,
@@ -371,6 +395,17 @@ macd = Factory(
         "macd",
         "macd_signal",
         "macd_hist",
+    ),
+)
+macdfix = Factory(
+    "macdfix",
+    _core.MacdfixStream,
+    ("source",),
+    ("series",),
+    (
+        "macdfix_macd",
+        "macdfix_signal",
+        "macdfix_hist",
     ),
 )
 max = Factory("max", _core.MaxStream, ("source",), ("series",), ("max",))
@@ -493,6 +528,9 @@ obv = Factory(
         "volume",
     ),
     ("obv",),
+)
+percentrank = Factory(
+    "percentrank", _core.PercentrankStream, ("source",), ("series",), ("percentrank",)
 )
 plus_di = Factory(
     "plus_di",

@@ -393,6 +393,34 @@ fn var_of_two_bars_is_the_square_of_half_their_difference() {
     }
 }
 
+/// `macdfix` reads as a convenience wrapper over `macd(12, 26)` and is not
+/// one: TA-Lib writes its smoothing constants as the literals 0.075 and 0.15
+/// rather than deriving them from the periods. Anyone tidying that away would
+/// change every value the function returns, so the difference is pinned here
+/// and the reason is in `macdfix/doc.md`.
+#[test]
+fn the_fixed_macd_is_not_the_twelve_twenty_six_one() {
+    let closes = support::daily_column("close");
+    let fixed = support::find("macdfix").expect("registered");
+    let general = support::find("macd").expect("registered");
+
+    let mine = (fixed.batch)(&[&closes], &fixed.defaults()).unwrap();
+    let theirs = (general.batch)(&[&closes], &general.defaults()).unwrap();
+
+    let gap = mine[0]
+        .iter()
+        .zip(&theirs[0])
+        .filter(|(a, b)| a.is_finite() && b.is_finite())
+        .map(|(a, b)| (a - b).abs())
+        .fold(0.0f64, f64::max);
+    // Measured at 2.686 over the committed dataset. Deriving the constants
+    // from the periods instead would take this to zero.
+    assert!(
+        (2.0..3.0).contains(&gap),
+        "macdfix and macd(12, 26) differ by {gap}, which used to be 2.686"
+    );
+}
+
 /// `linearreg_slope` and `linearreg_angle` carry a looser golden tolerance
 /// because the fitted slope is a difference of two sums of the same size and
 /// almost every digit cancels. Where the answer is exact TrendLib's has to be

@@ -199,6 +199,19 @@ impl Ema {
         }
     }
 
+    /// An exponential average seeded over `period` bars but smoothed with a
+    /// constant of its own.
+    ///
+    /// `macdfix` is the reason this exists: TA-Lib writes its two constants as
+    /// the literals 0.075 and 0.15, which are not `2 / (26 + 1)` and
+    /// `2 / (12 + 1)`, so the fixed MACD is not the 12/26 one.
+    pub fn with_smoothing(period: usize, k: f64) -> Self {
+        Self {
+            k,
+            ..Self::new(period)
+        }
+    }
+
     pub fn push(&mut self, value: f64) -> Option<f64> {
         if self.seen < self.period {
             self.seed_total += value;

@@ -1,0 +1,38 @@
+name: accbands
+title: Acceleration Bands
+group: overlap
+flags: [overlap, nan_inf_output]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 20
+    min: 2
+    max: 100000
+    doc: Number of bars each band is averaged over
+outputs:
+  - name: accbands_upper
+    dtype: float64
+    plot: upper_band
+    doc: Average of the high widened by the bar's own range
+  - name: accbands_middle
+    dtype: float64
+    plot: middle_band
+    doc: Average close
+  - name: accbands_lower
+    dtype: float64
+    plot: lower_band
+    doc: Average of the low narrowed by the bar's own range
+talib:
+  name: ACCBANDS
+  params: {period: timeperiod}
+  outputs: [upperband, middleband, lowerband]
+references:
+  - Price Headley, Big Trends in Trading, Wiley, 2002
+see_also: [bbands, kc, donchian]

@@ -2,8 +2,8 @@
 
 # Progress
 
-**84 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 120 not started.
+**88 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 116 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -16,21 +16,21 @@ something is done that is not. CI checks it is current.
 
 | Group | Shipped | Total |
 | --- | --- | --- |
-| Overlap studies | 13 | 25 |
-| Momentum | 26 | 47 |
+| Overlap studies | 14 | 25 |
+| Momentum | 28 | 47 |
 | Volatility | 3 | 7 |
 | Volume | 2 | 12 |
 | Price transforms | 6 | 6 |
 | Cycle | 0 | 5 |
-| Statistics | 7 | 11 |
+| Statistics | 8 | 11 |
 | Math transforms | 15 | 15 |
 | Math operators | 12 | 12 |
 | Candlestick patterns | 0 | 61 |
 | Levels | 0 | 3 |
 
-## Overlap studies (13 of 25)
+## Overlap studies (14 of 25)
 
-- [ ] `accbands` (`ACCBANDS`)
+- [x] `accbands` (`ACCBANDS`) -- Acceleration Bands
 - [x] `bbands` (`BBANDS`) -- Bollinger Bands *
 - [x] `dema` (`DEMA`) -- Double Exponential Moving Average *
 - [x] `donchian` (`DONCHIAN`) -- Donchian Channel
@@ -56,7 +56,7 @@ something is done that is not. CI checks it is current.
 - [x] `wma` (`WMA`) -- Weighted Moving Average *
 - [ ] `zlema` (`ZLEMA`)
 
-## Momentum (26 of 47)
+## Momentum (28 of 47)
 
 - [ ] `ac` (`AC`)
 - [x] `adx` (`ADX`) -- Average Directional Movement Index *
@@ -70,7 +70,7 @@ something is done that is not. CI checks it is current.
 - [x] `cmo` (`CMO`) -- Chande Momentum Oscillator
 - [ ] `cmou` (`CMOU`)
 - [ ] `coppock` (`COPPOCK`)
-- [ ] `dpo` (`DPO`)
+- [x] `dpo` (`DPO`) -- Detrended Price Oscillator
 - [x] `dx` (`DX`) -- Directional Movement Index
 - [ ] `er` (`ER`)
 - [ ] `eri` (`ERI`)
@@ -80,7 +80,7 @@ something is done that is not. CI checks it is current.
 - [ ] `kdj` (`KDJ`)
 - [x] `macd` (`MACD`) -- Moving Average Convergence Divergence *
 - [ ] `macdext` (`MACDEXT`)
-- [ ] `macdfix` (`MACDFIX`)
+- [x] `macdfix` (`MACDFIX`) -- MACD with Fixed Periods
 - [ ] `mfi` (`MFI`)
 - [x] `minus_di` (`MINUS_DI`) -- Minus Directional Indicator
 - [x] `minus_dm` (`MINUS_DM`) -- Minus Directional Movement
@@ -148,7 +148,7 @@ something is done that is not. CI checks it is current.
 - [ ] `ht_sine` (`HT_SINE`)
 - [ ] `ht_trendmode` (`HT_TRENDMODE`)
 
-## Statistics (7 of 11)
+## Statistics (8 of 11)
 
 - [ ] `beta` (`BETA`)
 - [ ] `correl` (`CORREL`)
@@ -157,7 +157,7 @@ something is done that is not. CI checks it is current.
 - [x] `linearreg_intercept` (`LINEARREG_INTERCEPT`) -- Linear Regression Intercept
 - [x] `linearreg_slope` (`LINEARREG_SLOPE`) -- Linear Regression Slope
 - [ ] `percentile` (`PERCENTILE`)
-- [ ] `percentrank` (`PERCENTRANK`)
+- [x] `percentrank` (`PERCENTRANK`) -- Percent Rank
 - [x] `stddev` (`STDDEV`) -- Standard Deviation
 - [x] `tsf` (`TSF`) -- Time Series Forecast
 - [x] `var` (`VAR`) -- Variance

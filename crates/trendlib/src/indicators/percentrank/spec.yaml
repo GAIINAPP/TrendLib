@@ -1,0 +1,25 @@
+name: percentrank
+title: Percent Rank
+group: statistic
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 100
+    min: 2
+    max: 100000
+    doc: Number of bars the current value is ranked against
+outputs:
+  - name: percentrank
+    dtype: float64
+    plot: line
+    doc: Share of the previous period bars below the current value, as a percentage
+talib:
+  name: PERCENTRANK
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - TA-Lib, ta_PERCENTRANK.c
+see_also: [percentile, stochf]
