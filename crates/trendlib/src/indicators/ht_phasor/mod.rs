@@ -1,5 +1,5 @@
 use crate::core::error::TlError;
-use crate::core::hilbert::Hilbert;
+use crate::core::hilbert::{Hilbert, PRIMED_EARLY};
 use crate::core::kernel::{BarStream, Kernel, Step};
 
 pub const NAME: &str = "ht_phasor";
@@ -54,7 +54,7 @@ impl Kernel<1, 2> for HtPhasor {
 
     fn state(_params: &Params) -> State {
         State {
-            cycle: Hilbert::new(),
+            cycle: Hilbert::new(PRIMED_EARLY),
             seen: 0,
         }
     }

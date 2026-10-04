@@ -1,0 +1,23 @@
+name: ht_sine
+title: Hilbert Transform SineWave
+group: cycle
+flags: [unstable, path_dependent]
+inputs:
+  - name: source
+    kind: series
+outputs:
+  - name: ht_sine_sine
+    dtype: float64
+    plot: line
+    doc: Sine of the dominant cycle's phase
+  - name: ht_sine_lead_sine
+    dtype: float64
+    plot: line
+    doc: The same an eighth of a turn ahead
+talib:
+  name: HT_SINE
+  params: {}
+  outputs: [sine, leadsine]
+references:
+  - John F. Ehlers, Rocket Science for Traders, Wiley, 2001
+see_also: [ht_dcphase, ht_trendmode, ht_dcperiod]

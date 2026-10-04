@@ -122,7 +122,11 @@ __all__ = [
     "HA",
     "HMA",
     "HT_DCPERIOD",
+    "HT_DCPHASE",
     "HT_PHASOR",
+    "HT_SINE",
+    "HT_TRENDLINE",
+    "HT_TRENDMODE",
     "IMI",
     "KAMA",
     "KC",
@@ -137,6 +141,7 @@ __all__ = [
     "MACD",
     "MACDEXT",
     "MACDFIX",
+    "MAMA",
     "MARKETFI",
     "MASSI",
     "MAX",
@@ -315,7 +320,11 @@ __all__ = [
     "ha",
     "hma",
     "ht_dcperiod",
+    "ht_dcphase",
     "ht_phasor",
+    "ht_sine",
+    "ht_trendline",
+    "ht_trendmode",
     "imi",
     "kama",
     "kc",
@@ -331,6 +340,7 @@ __all__ = [
     "macd",
     "macdext",
     "macdfix",
+    "mama",
     "marketfi",
     "massi",
     "max",
@@ -3538,6 +3548,19 @@ def ht_dcperiod(source=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("ht_dcperiod",))
 
 
+def ht_dcphase(source=None) -> Any:
+    """Hilbert Transform Dominant Cycle Phase.
+
+    Returns
+    -------
+    ndarray or Series
+        Where the dominant cycle currently sits in its turn, in degrees.
+    """
+    columns, carrier = _convert.bars("ht_dcphase", (source,), ("source",), ("series",))
+    out = _core.ht_dcphase(*columns)
+    return _convert.wrap_outputs(out, carrier, ("ht_dcphase",))
+
+
 def ht_phasor(source=None) -> Any:
     """Hilbert Transform Phasor Components.
 
@@ -3557,6 +3580,53 @@ def ht_phasor(source=None) -> Any:
             "ht_phasor_quadrature",
         ),
     )
+
+
+def ht_sine(source=None) -> Any:
+    """Hilbert Transform SineWave.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        ht_sine_sine: Sine of the dominant cycle's phase.
+        ht_sine_lead_sine: The same an eighth of a turn ahead.
+    """
+    columns, carrier = _convert.bars("ht_sine", (source,), ("source",), ("series",))
+    out = _core.ht_sine(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "ht_sine_sine",
+            "ht_sine_lead_sine",
+        ),
+    )
+
+
+def ht_trendline(source=None) -> Any:
+    """Hilbert Transform Instantaneous Trendline.
+
+    Returns
+    -------
+    ndarray or Series
+        The series averaged over one dominant cycle and smoothed.
+    """
+    columns, carrier = _convert.bars("ht_trendline", (source,), ("source",), ("series",))
+    out = _core.ht_trendline(*columns)
+    return _convert.wrap_outputs(out, carrier, ("ht_trendline",))
+
+
+def ht_trendmode(source=None) -> Any:
+    """Hilbert Transform Trend vs Cycle Mode.
+
+    Returns
+    -------
+    ndarray or Series
+        One while the series is trending, zero while it is cycling.
+    """
+    columns, carrier = _convert.bars("ht_trendmode", (source,), ("source",), ("series",))
+    out = _core.ht_trendmode(*columns)
+    return _convert.wrap_outputs(out, carrier, ("ht_trendmode",))
 
 
 def imi(open=None, close=None, *, period: int = _PARAMS["imi"]["period"]["default"]) -> Any:
@@ -4001,6 +4071,41 @@ def macdfix(
             "macdfix_macd",
             "macdfix_signal",
             "macdfix_hist",
+        ),
+    )
+
+
+def mama(
+    source=None,
+    *,
+    fast_limit: float = _PARAMS["mama"]["fast_limit"]["default"],
+    slow_limit: float = _PARAMS["mama"]["slow_limit"]["default"],
+) -> Any:
+    """MESA Adaptive Moving Average.
+
+    Parameters
+    ----------
+    fast_limit : float, default 0.5
+        Largest share of a new bar the average will take, from 0.01 to 0.99.
+    slow_limit : float, default 0.05
+        Smallest share of a new bar the average will take, from 0.01 to 0.99.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        mama: Average whose step follows how fast the cycle's phase is turning.
+        mama_fama: The same average smoothed again at half the step.
+    """
+    fast_limit = _convert.as_float("mama", "fast_limit", fast_limit)
+    slow_limit = _convert.as_float("mama", "slow_limit", slow_limit)
+    columns, carrier = _convert.bars("mama", (source,), ("source",), ("series",))
+    out = _core.mama(*columns, fast_limit=fast_limit, slow_limit=slow_limit)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "mama",
+            "mama_fama",
         ),
     )
 
@@ -6503,9 +6608,29 @@ def HT_DCPERIOD(source) -> Any:
     return ht_dcperiod(source)
 
 
+def HT_DCPHASE(source) -> Any:
+    """TA-Lib-style alias for :func:`ht_dcphase`."""
+    return ht_dcphase(source)
+
+
 def HT_PHASOR(source) -> Any:
     """TA-Lib-style alias for :func:`ht_phasor`."""
     return ht_phasor(source)
+
+
+def HT_SINE(source) -> Any:
+    """TA-Lib-style alias for :func:`ht_sine`."""
+    return ht_sine(source)
+
+
+def HT_TRENDLINE(source) -> Any:
+    """TA-Lib-style alias for :func:`ht_trendline`."""
+    return ht_trendline(source)
+
+
+def HT_TRENDMODE(source) -> Any:
+    """TA-Lib-style alias for :func:`ht_trendmode`."""
+    return ht_trendmode(source)
 
 
 def IMI(open, close, timeperiod: int = _PARAMS["imi"]["period"]["default"]) -> Any:
@@ -6632,6 +6757,15 @@ def MACDEXT(
 def MACDFIX(source, signalperiod: int = _PARAMS["macdfix"]["signal_period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`macdfix`."""
     return macdfix(source, signal_period=signalperiod)
+
+
+def MAMA(
+    source,
+    fastlimit: float = _PARAMS["mama"]["fast_limit"]["default"],
+    slowlimit: float = _PARAMS["mama"]["slow_limit"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`mama`."""
+    return mama(source, fast_limit=fastlimit, slow_limit=slowlimit)
 
 
 def MARKETFI(high, low, volume) -> Any:

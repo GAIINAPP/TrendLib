@@ -1,0 +1,36 @@
+name: mama
+title: MESA Adaptive Moving Average
+group: overlap
+flags: [overlap, unstable, path_dependent]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: fast_limit
+    type: float
+    default: 0.5
+    min: 0.01
+    max: 0.99
+    doc: Largest share of a new bar the average will take
+  - name: slow_limit
+    type: float
+    default: 0.05
+    min: 0.01
+    max: 0.99
+    doc: Smallest share of a new bar the average will take
+outputs:
+  - name: mama
+    dtype: float64
+    plot: line
+    doc: Average whose step follows how fast the cycle's phase is turning
+  - name: mama_fama
+    dtype: float64
+    plot: line
+    doc: The same average smoothed again at half the step
+talib:
+  name: MAMA
+  params: {fast_limit: fastlimit, slow_limit: slowlimit}
+  outputs: [mama, fama]
+references:
+  - John F. Ehlers, MESA Adaptive Moving Averages, Technical Analysis of Stocks and Commodities, September 2001
+see_also: [ht_dcperiod, kama, ema]

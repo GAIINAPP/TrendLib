@@ -2,8 +2,8 @@
 
 # Progress
 
-**193 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 11 not started.
+**198 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 6 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -16,19 +16,19 @@ something is done that is not. CI checks it is current.
 
 | Group | Shipped | Total |
 | --- | --- | --- |
-| Overlap studies | 21 | 25 |
+| Overlap studies | 23 | 25 |
 | Momentum | 47 | 47 |
 | Volatility | 7 | 7 |
 | Volume | 11 | 12 |
 | Price transforms | 6 | 6 |
-| Cycle | 2 | 5 |
+| Cycle | 5 | 5 |
 | Statistics | 11 | 11 |
 | Math transforms | 15 | 15 |
 | Math operators | 12 | 12 |
 | Candlestick patterns | 61 | 61 |
 | Levels | 0 | 3 |
 
-## Overlap studies (21 of 25)
+## Overlap studies (23 of 25)
 
 - [x] `accbands` (`ACCBANDS`) -- Acceleration Bands
 - [x] `bbands` (`BBANDS`) -- Bollinger Bands *
@@ -36,11 +36,11 @@ something is done that is not. CI checks it is current.
 - [x] `donchian` (`DONCHIAN`) -- Donchian Channel
 - [x] `ema` (`EMA`) -- Exponential Moving Average *
 - [x] `hma` (`HMA`) -- Hull Moving Average
-- [ ] `ht_trendline` (`HT_TRENDLINE`)
+- [x] `ht_trendline` (`HT_TRENDLINE`) -- Hilbert Transform Instantaneous Trendline
 - [x] `kama` (`KAMA`) -- Kaufman Adaptive Moving Average
 - [x] `kc` (`KC`) -- Keltner Channel
 - [x] `ma` (`MA`) -- Moving Average
-- [ ] `mama` (`MAMA`)
+- [x] `mama` (`MAMA`) -- MESA Adaptive Moving Average
 - [ ] `mavp` (`MAVP`)
 - [x] `midpoint` (`MIDPOINT`) -- Midpoint
 - [x] `midprice` (`MIDPRICE`) -- Midprice
@@ -140,13 +140,13 @@ something is done that is not. CI checks it is current.
 - [x] `typprice` (`TYPPRICE`) -- Typical Price
 - [x] `wclprice` (`WCLPRICE`) -- Weighted Close Price
 
-## Cycle (2 of 5)
+## Cycle (5 of 5)
 
 - [x] `ht_dcperiod` (`HT_DCPERIOD`) -- Hilbert Transform Dominant Cycle Period
-- [ ] `ht_dcphase` (`HT_DCPHASE`)
+- [x] `ht_dcphase` (`HT_DCPHASE`) -- Hilbert Transform Dominant Cycle Phase
 - [x] `ht_phasor` (`HT_PHASOR`) -- Hilbert Transform Phasor Components
-- [ ] `ht_sine` (`HT_SINE`)
-- [ ] `ht_trendmode` (`HT_TRENDMODE`)
+- [x] `ht_sine` (`HT_SINE`) -- Hilbert Transform SineWave
+- [x] `ht_trendmode` (`HT_TRENDMODE`) -- Hilbert Transform Trend vs Cycle Mode
 
 ## Statistics (11 of 11)
 

@@ -123,7 +123,11 @@ __all__ = [
     "ha",
     "hma",
     "ht_dcperiod",
+    "ht_dcphase",
     "ht_phasor",
+    "ht_sine",
+    "ht_trendline",
+    "ht_trendmode",
     "imi",
     "kama",
     "kc",
@@ -138,6 +142,7 @@ __all__ = [
     "macd",
     "macdext",
     "macdfix",
+    "mama",
     "marketfi",
     "massi",
     "max",
@@ -1678,6 +1683,7 @@ hma = Factory("hma", _core.HmaStream, ("source",), ("series",), ("hma",))
 ht_dcperiod = Factory(
     "ht_dcperiod", _core.HtDcperiodStream, ("source",), ("series",), ("ht_dcperiod",)
 )
+ht_dcphase = Factory("ht_dcphase", _core.HtDcphaseStream, ("source",), ("series",), ("ht_dcphase",))
 ht_phasor = Factory(
     "ht_phasor",
     _core.HtPhasorStream,
@@ -1687,6 +1693,22 @@ ht_phasor = Factory(
         "ht_phasor_in_phase",
         "ht_phasor_quadrature",
     ),
+)
+ht_sine = Factory(
+    "ht_sine",
+    _core.HtSineStream,
+    ("source",),
+    ("series",),
+    (
+        "ht_sine_sine",
+        "ht_sine_lead_sine",
+    ),
+)
+ht_trendline = Factory(
+    "ht_trendline", _core.HtTrendlineStream, ("source",), ("series",), ("ht_trendline",)
+)
+ht_trendmode = Factory(
+    "ht_trendmode", _core.HtTrendmodeStream, ("source",), ("series",), ("ht_trendmode",)
 )
 imi = Factory(
     "imi",
@@ -1788,6 +1810,16 @@ macdfix = Factory(
         "macdfix_macd",
         "macdfix_signal",
         "macdfix_hist",
+    ),
+)
+mama = Factory(
+    "mama",
+    _core.MamaStream,
+    ("source",),
+    ("series",),
+    (
+        "mama",
+        "mama_fama",
     ),
 )
 marketfi = Factory(

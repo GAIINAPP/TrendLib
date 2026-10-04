@@ -1,0 +1,19 @@
+name: ht_trendline
+title: Hilbert Transform Instantaneous Trendline
+group: cycle
+flags: [overlap, unstable, path_dependent]
+inputs:
+  - name: source
+    kind: series
+outputs:
+  - name: ht_trendline
+    dtype: float64
+    plot: line
+    doc: The series averaged over one dominant cycle and smoothed
+talib:
+  name: HT_TRENDLINE
+  params: {}
+  outputs: [real]
+references:
+  - John F. Ehlers, Rocket Science for Traders, Wiley, 2001
+see_also: [ht_dcperiod, ht_trendmode, mama]

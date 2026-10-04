@@ -6,6 +6,7 @@
 //! what the next `push` would return and touches nothing.
 
 use crate::TlError;
+use crate::core::hilbert::{self, Hilbert};
 
 /// Mean of the last `period` values, kept as a running sum.
 ///
@@ -1036,6 +1037,75 @@ impl LinearRegression {
     }
 }
 
+/// Ehlers' MESA adaptive average: its step follows how fast the dominant
+/// cycle's phase is turning, so it hurries when the cycle stalls and slows
+/// when it is moving.
+#[derive(Clone, Debug)]
+pub struct Mesa {
+    cycle: Hilbert,
+    fast_limit: f64,
+    slow_limit: f64,
+    previous_degrees: f64,
+    mama: f64,
+    fama: f64,
+    seen: usize,
+}
+
+impl Mesa {
+    /// The limits TA-Lib fixes when MESA is reached through the moving average
+    /// dispatch rather than called directly.
+    pub const FAST_LIMIT_DEFAULT: f64 = 0.5;
+    pub const SLOW_LIMIT_DEFAULT: f64 = 0.05;
+    pub const LOOKBACK: usize = 32;
+
+    pub fn new(fast_limit: f64, slow_limit: f64) -> Self {
+        Self {
+            cycle: Hilbert::new(hilbert::PRIMED_EARLY),
+            fast_limit,
+            slow_limit,
+            previous_degrees: 0.0,
+            mama: 0.0,
+            fama: 0.0,
+            seen: 0,
+        }
+    }
+
+    /// How much of the new bar the average takes. A phase that barely moved
+    /// means the cycle has stalled and the average steps at its fastest; one
+    /// turning quickly slows it down in proportion.
+    fn step(&self, turned: f64) -> f64 {
+        if turned <= 1.0 {
+            self.fast_limit
+        } else {
+            (self.fast_limit / turned).max(self.slow_limit)
+        }
+    }
+
+    /// Both lines, or `None` until the cycle reading has settled.
+    pub fn push(&mut self, value: f64) -> Option<(f64, f64)> {
+        let reading = self.cycle.push(value);
+        self.seen += 1;
+        let reading = reading?;
+        let degrees = if reading.in_phase != 0.0 {
+            (reading.quadrature / reading.in_phase).atan() * (180.0 / std::f64::consts::PI)
+        } else {
+            0.0
+        };
+        let turned = (self.previous_degrees - degrees).max(1.0);
+        self.previous_degrees = degrees;
+        let alpha = self.step(turned);
+        self.mama = (1.0 - alpha).mul_add(self.mama, alpha * value);
+        let half = alpha * 0.5;
+        self.fama = (1.0 - half).mul_add(self.fama, half * self.mama);
+        (self.seen > Self::LOOKBACK).then_some((self.mama, self.fama))
+    }
+
+    pub fn preview(&self, value: f64) -> Option<(f64, f64)> {
+        let mut forked = self.clone();
+        forked.push(value)
+    }
+}
+
 /// Kaufman's adaptive average: smooths hard when the series travels a long way
 /// to go nowhere and barely at all when it goes straight there.
 #[derive(Clone, Debug)]
@@ -1519,18 +1589,19 @@ mod tests {
         assert_eq!(MaType::Tema.lookback(30), 87);
         assert_eq!(MaType::Trima.lookback(30), 29);
         assert_eq!(MaType::Kama.lookback(30), 30);
+        assert_eq!(MaType::Mama.lookback(30), 32);
         assert_eq!(MaType::T3.lookback(30), 174);
         assert_eq!(MaType::Hma.lookback(30), 33);
         assert_eq!(MaType::Zlema.lookback(30), 43);
         assert_eq!(MaType::from_name("rma"), Some(MaType::Rma));
-        // Approved but not built, so it is named in the error rather than
-        // quietly standing in for another average.
-        assert_eq!(MaType::from_name("mama"), None);
+        // Every approved average is built, so an unknown name is a typo and
+        // the error lists what there is.
+        assert!(MaType::PENDING.is_empty());
         assert!(
-            MaType::parse("ma", "ma_type", "mama")
+            MaType::parse("ma", "ma_type", "nonsense")
                 .unwrap_err()
                 .to_string()
-                .contains("not implemented yet")
+                .contains("must be one of")
         );
     }
 
@@ -1669,6 +1740,7 @@ pub enum MaType {
     Tema,
     Trima,
     Kama,
+    Mama,
     T3,
     Hma,
     Zlema,
@@ -1686,6 +1758,7 @@ impl MaType {
         ("tema", MaType::Tema),
         ("trima", MaType::Trima),
         ("kama", MaType::Kama),
+        ("mama", MaType::Mama),
         ("t3", MaType::T3),
         ("hma", MaType::Hma),
         ("zlema", MaType::Zlema),
@@ -1696,7 +1769,7 @@ impl MaType {
     /// named in the error rather than treated as unknown, so a caller asking
     /// for one is told it is coming, not that it was a typo, and the enum never
     /// quietly falls back to a different average.
-    pub const PENDING: &'static [&'static str] = &["mama"];
+    pub const PENDING: &'static [&'static str] = &[];
 
     /// The average `name` asks for, or the error the Python layer reports.
     pub fn parse(indicator: &str, param: &str, name: &str) -> Result<Self, TlError> {
@@ -1741,6 +1814,9 @@ impl MaType {
             Self::Dema => 2 * one,
             Self::Tema => 3 * one,
             Self::Kama => Adaptive::lookback(period),
+            // The dispatch gives MESA no period to work from: it reads one
+            // from the series itself.
+            Self::Mama => Mesa::LOOKBACK,
             Self::T3 => Tillson::lookback(period),
             Self::Hma => Hull::lookback(period),
             Self::Zlema => ZeroLag::lookback(period),
@@ -1758,6 +1834,13 @@ impl MaType {
                 MovingAverage::Triple(Ema::new(period), Ema::new(period), Ema::new(period))
             }
             Self::Kama => MovingAverage::Kaufman(Adaptive::new(period)),
+            // Reached through the dispatch, MESA takes the limits TA-Lib fixes
+            // for it rather than ones the caller chooses, and ignores the
+            // period entirely.
+            Self::Mama => MovingAverage::Mesa(Box::new(Mesa::new(
+                Mesa::FAST_LIMIT_DEFAULT,
+                Mesa::SLOW_LIMIT_DEFAULT,
+            ))),
             // Reached through the dispatch, T3 takes the `v_factor` TA-Lib
             // fixes for it rather than one the caller chooses.
             Self::T3 => MovingAverage::Tillson(Tillson::new(period, Tillson::V_FACTOR_DEFAULT)),
@@ -1791,6 +1874,9 @@ pub enum MovingAverage {
     Triple(Ema, Ema, Ema),
     Triangular(RollingMean, RollingMean),
     Kaufman(Adaptive),
+    // MESA carries the whole Hilbert transform, which is far larger than the
+    // other averages; boxing it keeps the enum the size of the rest.
+    Mesa(Box<Mesa>),
     Tillson(Tillson),
     Hull(Hull),
     ZeroLag(ZeroLag),
@@ -1817,6 +1903,9 @@ impl MovingAverage {
                 second.push(one)
             }
             Self::Kaufman(inner) => inner.push(value),
+            // Only the MAMA line is a moving average; FAMA is a second
+            // reading the dispatch does not expose.
+            Self::Mesa(inner) => inner.push(value).map(|(mama, _)| mama),
             Self::Tillson(inner) => inner.push(value),
             Self::Hull(inner) => inner.push(value),
             Self::ZeroLag(inner) => inner.push(value),
@@ -1845,6 +1934,7 @@ impl MovingAverage {
                 second.preview(one)
             }
             Self::Kaufman(inner) => inner.preview(value),
+            Self::Mesa(inner) => inner.preview(value).map(|(mama, _)| mama),
             Self::Tillson(inner) => inner.preview(value),
             Self::Hull(inner) => inner.preview(value),
             Self::ZeroLag(inner) => inner.preview(value),

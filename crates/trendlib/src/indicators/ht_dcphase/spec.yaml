@@ -1,0 +1,19 @@
+name: ht_dcphase
+title: Hilbert Transform Dominant Cycle Phase
+group: cycle
+flags: [unstable, path_dependent]
+inputs:
+  - name: source
+    kind: series
+outputs:
+  - name: ht_dcphase
+    dtype: float64
+    plot: line
+    doc: Where the dominant cycle currently sits in its turn, in degrees
+talib:
+  name: HT_DCPHASE
+  params: {}
+  outputs: [real]
+references:
+  - John F. Ehlers, Rocket Science for Traders, Wiley, 2001
+see_also: [ht_sine, ht_dcperiod, ht_trendmode]

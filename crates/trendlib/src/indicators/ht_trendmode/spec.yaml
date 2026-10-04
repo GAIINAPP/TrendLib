@@ -1,0 +1,19 @@
+name: ht_trendmode
+title: Hilbert Transform Trend vs Cycle Mode
+group: cycle
+flags: [unstable, path_dependent]
+inputs:
+  - name: source
+    kind: series
+outputs:
+  - name: ht_trendmode
+    dtype: int32
+    plot: direction
+    doc: One while the series is trending, zero while it is cycling
+talib:
+  name: HT_TRENDMODE
+  params: {}
+  outputs: [integer]
+references:
+  - John F. Ehlers, Rocket Science for Traders, Wiley, 2001
+see_also: [ht_trendline, ht_sine, ht_dcphase]

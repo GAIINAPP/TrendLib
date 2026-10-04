@@ -15080,6 +15080,114 @@ impl PyHtDcperiodStream {
     }
 }
 
+#[pyfunction]
+#[pyo3(name = "ht_dcphase", signature = (source))]
+pub fn ht_dcphase<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<f64>>> {
+    let source = as_slice(&source, "source")?;
+    let params = trendlib::indicators::ht_dcphase::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::ht_dcphase::HtDcphase as Kernel<1, 1>>::batch([source], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok(std::mem::take(&mut out[0]).into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "HtDcphaseStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyHtDcphaseStream {
+    inner: BarStream<trendlib::indicators::ht_dcphase::HtDcphase, 1, 1>,
+}
+
+#[pymethods]
+impl PyHtDcphaseStream {
+    #[staticmethod]
+    #[pyo3(signature = (source))]
+    fn open<'py>(py: Python<'py>, source: PyReadonlyArray1<'py, f64>) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let params = trendlib::indicators::ht_dcphase::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::ht_dcphase::HtDcphase, 1, 1> as Stream>::open(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
+        let source = as_slice(&source, "source")?;
+        let params = trendlib::indicators::ht_dcphase::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::ht_dcphase::HtDcphase as Kernel<1, 1>>::open_and_fill(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            std::mem::take(&mut out[0]).into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(&mut self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(&self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value().map(|row| row[0])
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "ht_dcphase"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream ht_dcphase bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
 type HtPhasorOutputs<'py> = (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>);
 
 #[pyfunction]
@@ -15190,6 +15298,346 @@ impl PyHtPhasorStream {
     fn __repr__(&self) -> String {
         format!(
             "<trendlib stream ht_phasor bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+type HtSineOutputs<'py> = (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>);
+
+#[pyfunction]
+#[pyo3(name = "ht_sine", signature = (source))]
+pub fn ht_sine<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+) -> PyResult<HtSineOutputs<'py>> {
+    let source = as_slice(&source, "source")?;
+    let params = trendlib::indicators::ht_sine::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::ht_sine::HtSine as Kernel<1, 2>>::batch([source], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok((
+        std::mem::take(&mut out[0]).into_pyarray(py),
+        std::mem::take(&mut out[1]).into_pyarray(py),
+    ))
+}
+
+#[pyclass(module = "trendlib._core", name = "HtSineStream", skip_from_py_object)]
+#[derive(Clone, Debug)]
+pub struct PyHtSineStream {
+    inner: BarStream<trendlib::indicators::ht_sine::HtSine, 1, 2>,
+}
+
+#[pymethods]
+impl PyHtSineStream {
+    #[staticmethod]
+    #[pyo3(signature = (source))]
+    fn open<'py>(py: Python<'py>, source: PyReadonlyArray1<'py, f64>) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let params = trendlib::indicators::ht_sine::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::ht_sine::HtSine, 1, 2> as Stream>::open(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, HtSineOutputs<'py>)> {
+        let source = as_slice(&source, "source")?;
+        let params = trendlib::indicators::ht_sine::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::ht_sine::HtSine as Kernel<1, 2>>::open_and_fill(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            (
+                std::mem::take(&mut out[0]).into_pyarray(py),
+                std::mem::take(&mut out[1]).into_pyarray(py),
+            )
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(&mut self, py: Python<'_>, source: f64) -> PyResult<(f64, f64)> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1]))
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(&self, py: Python<'_>, source: f64) -> PyResult<(f64, f64)> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1]))
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64)> {
+        self.inner.value().map(|row| (row[0], row[1]))
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "ht_sine"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream ht_sine bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "ht_trendline", signature = (source))]
+pub fn ht_trendline<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<f64>>> {
+    let source = as_slice(&source, "source")?;
+    let params = trendlib::indicators::ht_trendline::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::ht_trendline::HtTrendline as Kernel<1, 1>>::batch(
+                [source],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok(std::mem::take(&mut out[0]).into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "HtTrendlineStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyHtTrendlineStream {
+    inner: BarStream<trendlib::indicators::ht_trendline::HtTrendline, 1, 1>,
+}
+
+#[pymethods]
+impl PyHtTrendlineStream {
+    #[staticmethod]
+    #[pyo3(signature = (source))]
+    fn open<'py>(py: Python<'py>, source: PyReadonlyArray1<'py, f64>) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let params = trendlib::indicators::ht_trendline::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::ht_trendline::HtTrendline, 1, 1> as Stream>::open(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
+        let source = as_slice(&source, "source")?;
+        let params = trendlib::indicators::ht_trendline::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::ht_trendline::HtTrendline as Kernel<1, 1>>::open_and_fill(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            std::mem::take(&mut out[0]).into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(&mut self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(&self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value().map(|row| row[0])
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "ht_trendline"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream ht_trendline bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "ht_trendmode", signature = (source))]
+pub fn ht_trendmode<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let source = as_slice(&source, "source")?;
+    let params = trendlib::indicators::ht_trendmode::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::ht_trendmode::HtTrendmode as Kernel<1, 1>>::batch(
+                [source],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "HtTrendmodeStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyHtTrendmodeStream {
+    inner: BarStream<trendlib::indicators::ht_trendmode::HtTrendmode, 1, 1>,
+}
+
+#[pymethods]
+impl PyHtTrendmodeStream {
+    #[staticmethod]
+    #[pyo3(signature = (source))]
+    fn open<'py>(py: Python<'py>, source: PyReadonlyArray1<'py, f64>) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let params = trendlib::indicators::ht_trendmode::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::ht_trendmode::HtTrendmode, 1, 1> as Stream>::open(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let source = as_slice(&source, "source")?;
+        let params = trendlib::indicators::ht_trendmode::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::ht_trendmode::HtTrendmode as Kernel<1, 1>>::open_and_fill(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(&mut self, py: Python<'_>, source: f64) -> PyResult<i32> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(&self, py: Python<'_>, source: f64) -> PyResult<i32> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "ht_trendmode"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream ht_trendmode bars_seen={} value={:?}>",
             self.inner.bars_seen(),
             self.inner.value()
         )
@@ -17069,6 +17517,143 @@ impl PyMacdfixStream {
     fn __repr__(&self) -> String {
         format!(
             "<trendlib stream macdfix bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+type MamaOutputs<'py> = (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>);
+
+#[pyfunction]
+#[pyo3(name = "mama", signature = (source, *, fast_limit, slow_limit))]
+pub fn mama<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+    fast_limit: f64,
+    slow_limit: f64,
+) -> PyResult<MamaOutputs<'py>> {
+    let source = as_slice(&source, "source")?;
+    let fast_limit =
+        float_param("mama", "fast_limit", fast_limit, 0.01, 0.99).map_err(|e| to_py_err(py, &e))?;
+    let slow_limit =
+        float_param("mama", "slow_limit", slow_limit, 0.01, 0.99).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::mama::Params {
+        fast_limit,
+        slow_limit,
+    };
+    let out = py
+        .detach(|| <trendlib::indicators::mama::Mama as Kernel<1, 2>>::batch([source], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok((
+        std::mem::take(&mut out[0]).into_pyarray(py),
+        std::mem::take(&mut out[1]).into_pyarray(py),
+    ))
+}
+
+#[pyclass(module = "trendlib._core", name = "MamaStream", skip_from_py_object)]
+#[derive(Clone, Debug)]
+pub struct PyMamaStream {
+    inner: BarStream<trendlib::indicators::mama::Mama, 1, 2>,
+}
+
+#[pymethods]
+impl PyMamaStream {
+    #[staticmethod]
+    #[pyo3(signature = (source, *, fast_limit, slow_limit))]
+    fn open<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        fast_limit: f64,
+        slow_limit: f64,
+    ) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let fast_limit = float_param("mama", "fast_limit", fast_limit, 0.01, 0.99)
+            .map_err(|e| to_py_err(py, &e))?;
+        let slow_limit = float_param("mama", "slow_limit", slow_limit, 0.01, 0.99)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::mama::Params {
+            fast_limit,
+            slow_limit,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::mama::Mama, 1, 2> as Stream>::open(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source, *, fast_limit, slow_limit))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        fast_limit: f64,
+        slow_limit: f64,
+    ) -> PyResult<(Self, MamaOutputs<'py>)> {
+        let source = as_slice(&source, "source")?;
+        let fast_limit = float_param("mama", "fast_limit", fast_limit, 0.01, 0.99)
+            .map_err(|e| to_py_err(py, &e))?;
+        let slow_limit = float_param("mama", "slow_limit", slow_limit, 0.01, 0.99)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::mama::Params {
+            fast_limit,
+            slow_limit,
+        };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::mama::Mama as Kernel<1, 2>>::open_and_fill([source], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            (
+                std::mem::take(&mut out[0]).into_pyarray(py),
+                std::mem::take(&mut out[1]).into_pyarray(py),
+            )
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(&mut self, py: Python<'_>, source: f64) -> PyResult<(f64, f64)> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1]))
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(&self, py: Python<'_>, source: f64) -> PyResult<(f64, f64)> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1]))
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64)> {
+        self.inner.value().map(|row| (row[0], row[1]))
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "mama"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream mama bars_seen={} value={:?}>",
             self.inner.bars_seen(),
             self.inner.value()
         )
@@ -25820,7 +26405,11 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(ha, m)?)?;
     m.add_function(wrap_pyfunction!(hma, m)?)?;
     m.add_function(wrap_pyfunction!(ht_dcperiod, m)?)?;
+    m.add_function(wrap_pyfunction!(ht_dcphase, m)?)?;
     m.add_function(wrap_pyfunction!(ht_phasor, m)?)?;
+    m.add_function(wrap_pyfunction!(ht_sine, m)?)?;
+    m.add_function(wrap_pyfunction!(ht_trendline, m)?)?;
+    m.add_function(wrap_pyfunction!(ht_trendmode, m)?)?;
     m.add_function(wrap_pyfunction!(imi, m)?)?;
     m.add_function(wrap_pyfunction!(kama, m)?)?;
     m.add_function(wrap_pyfunction!(kc, m)?)?;
@@ -25835,6 +26424,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(macd, m)?)?;
     m.add_function(wrap_pyfunction!(macdext, m)?)?;
     m.add_function(wrap_pyfunction!(macdfix, m)?)?;
+    m.add_function(wrap_pyfunction!(mama, m)?)?;
     m.add_function(wrap_pyfunction!(marketfi, m)?)?;
     m.add_function(wrap_pyfunction!(massi, m)?)?;
     m.add_function(wrap_pyfunction!(max, m)?)?;
@@ -26013,7 +26603,11 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyHaStream>()?;
     m.add_class::<PyHmaStream>()?;
     m.add_class::<PyHtDcperiodStream>()?;
+    m.add_class::<PyHtDcphaseStream>()?;
     m.add_class::<PyHtPhasorStream>()?;
+    m.add_class::<PyHtSineStream>()?;
+    m.add_class::<PyHtTrendlineStream>()?;
+    m.add_class::<PyHtTrendmodeStream>()?;
     m.add_class::<PyImiStream>()?;
     m.add_class::<PyKamaStream>()?;
     m.add_class::<PyKcStream>()?;
@@ -26028,6 +26622,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyMacdStream>()?;
     m.add_class::<PyMacdextStream>()?;
     m.add_class::<PyMacdfixStream>()?;
+    m.add_class::<PyMamaStream>()?;
     m.add_class::<PyMarketfiStream>()?;
     m.add_class::<PyMassiStream>()?;
     m.add_class::<PyMaxStream>()?;
@@ -26975,7 +27570,23 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     }
     {
         let params = PyDict::new(py);
+        table.set_item("ht_dcphase", params)?;
+    }
+    {
+        let params = PyDict::new(py);
         table.set_item("ht_phasor", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("ht_sine", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("ht_trendline", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("ht_trendmode", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -27276,6 +27887,26 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
             params.set_item("signal_period", entry)?;
         }
         table.set_item("macdfix", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.5)?;
+            entry.set_item("min", 0.01)?;
+            entry.set_item("max", 0.99)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("fast_limit", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.01)?;
+            entry.set_item("max", 0.99)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("slow_limit", entry)?;
+        }
+        table.set_item("mama", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -28336,7 +28967,11 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("ha", vec!["open", "high", "low", "close"])?;
     table.set_item("hma", vec!["source"])?;
     table.set_item("ht_dcperiod", vec!["source"])?;
+    table.set_item("ht_dcphase", vec!["source"])?;
     table.set_item("ht_phasor", vec!["source"])?;
+    table.set_item("ht_sine", vec!["source"])?;
+    table.set_item("ht_trendline", vec!["source"])?;
+    table.set_item("ht_trendmode", vec!["source"])?;
     table.set_item("imi", vec!["open", "close"])?;
     table.set_item("kama", vec!["source"])?;
     table.set_item("kc", vec!["high", "low", "close"])?;
@@ -28351,6 +28986,7 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("macd", vec!["source"])?;
     table.set_item("macdext", vec!["source"])?;
     table.set_item("macdfix", vec!["source"])?;
+    table.set_item("mama", vec!["source"])?;
     table.set_item("marketfi", vec!["high", "low", "volume"])?;
     table.set_item("massi", vec!["high", "low"])?;
     table.set_item("max", vec!["source"])?;
@@ -28544,10 +29180,14 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("ha", vec!["ha_open", "ha_high", "ha_low", "ha_close"])?;
     table.set_item("hma", vec!["hma"])?;
     table.set_item("ht_dcperiod", vec!["ht_dcperiod"])?;
+    table.set_item("ht_dcphase", vec!["ht_dcphase"])?;
     table.set_item(
         "ht_phasor",
         vec!["ht_phasor_in_phase", "ht_phasor_quadrature"],
     )?;
+    table.set_item("ht_sine", vec!["ht_sine_sine", "ht_sine_lead_sine"])?;
+    table.set_item("ht_trendline", vec!["ht_trendline"])?;
+    table.set_item("ht_trendmode", vec!["ht_trendmode"])?;
     table.set_item("imi", vec!["imi"])?;
     table.set_item("kama", vec!["kama"])?;
     table.set_item("kc", vec!["kc_upper", "kc_middle", "kc_lower"])?;
@@ -28568,6 +29208,7 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
         "macdfix",
         vec!["macdfix_macd", "macdfix_signal", "macdfix_hist"],
     )?;
+    table.set_item("mama", vec!["mama", "mama_fama"])?;
     table.set_item("marketfi", vec!["marketfi"])?;
     table.set_item("massi", vec!["massi"])?;
     table.set_item("max", vec!["max"])?;
@@ -28755,7 +29396,11 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("ha", vec!["float64", "float64", "float64", "float64"])?;
     table.set_item("hma", vec!["float64"])?;
     table.set_item("ht_dcperiod", vec!["float64"])?;
+    table.set_item("ht_dcphase", vec!["float64"])?;
     table.set_item("ht_phasor", vec!["float64", "float64"])?;
+    table.set_item("ht_sine", vec!["float64", "float64"])?;
+    table.set_item("ht_trendline", vec!["float64"])?;
+    table.set_item("ht_trendmode", vec!["int32"])?;
     table.set_item("imi", vec!["float64"])?;
     table.set_item("kama", vec!["float64"])?;
     table.set_item("kc", vec!["float64", "float64", "float64"])?;
@@ -28770,6 +29415,7 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("macd", vec!["float64", "float64", "float64"])?;
     table.set_item("macdext", vec!["float64", "float64", "float64"])?;
     table.set_item("macdfix", vec!["float64", "float64", "float64"])?;
+    table.set_item("mama", vec!["float64", "float64"])?;
     table.set_item("marketfi", vec!["float64"])?;
     table.set_item("massi", vec!["float64"])?;
     table.set_item("max", vec!["float64"])?;
@@ -28954,7 +29600,14 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("ha", vec!["overlap", "path_dependent"])?;
     table.set_item("hma", vec!["overlap"])?;
     table.set_item("ht_dcperiod", vec!["unstable", "path_dependent"])?;
+    table.set_item("ht_dcphase", vec!["unstable", "path_dependent"])?;
     table.set_item("ht_phasor", vec!["unstable", "path_dependent"])?;
+    table.set_item("ht_sine", vec!["unstable", "path_dependent"])?;
+    table.set_item(
+        "ht_trendline",
+        vec!["overlap", "unstable", "path_dependent"],
+    )?;
+    table.set_item("ht_trendmode", vec!["unstable", "path_dependent"])?;
     table.set_item("imi", Vec::<&str>::new())?;
     table.set_item("kama", vec!["overlap", "unstable", "path_dependent"])?;
     table.set_item("kc", vec!["overlap", "unstable", "path_dependent"])?;
@@ -28969,6 +29622,7 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("macd", vec!["unstable"])?;
     table.set_item("macdext", Vec::<&str>::new())?;
     table.set_item("macdfix", vec!["unstable", "path_dependent"])?;
+    table.set_item("mama", vec!["overlap", "unstable", "path_dependent"])?;
     table.set_item("marketfi", Vec::<&str>::new())?;
     table.set_item("massi", vec!["unstable", "path_dependent"])?;
     table.set_item("max", Vec::<&str>::new())?;
@@ -29153,7 +29807,11 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("ha", "overlap")?;
     table.set_item("hma", "overlap")?;
     table.set_item("ht_dcperiod", "cycle")?;
+    table.set_item("ht_dcphase", "cycle")?;
     table.set_item("ht_phasor", "cycle")?;
+    table.set_item("ht_sine", "cycle")?;
+    table.set_item("ht_trendline", "cycle")?;
+    table.set_item("ht_trendmode", "cycle")?;
     table.set_item("imi", "momentum")?;
     table.set_item("kama", "overlap")?;
     table.set_item("kc", "overlap")?;
@@ -29168,6 +29826,7 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("macd", "momentum")?;
     table.set_item("macdext", "momentum")?;
     table.set_item("macdfix", "momentum")?;
+    table.set_item("mama", "overlap")?;
     table.set_item("marketfi", "volume")?;
     table.set_item("massi", "volatility")?;
     table.set_item("max", "statistic")?;
@@ -29766,8 +30425,20 @@ pub fn lookback_of(
         "ht_dcperiod" => {
             Ok(<trendlib::indicators::ht_dcperiod::HtDcperiod as Kernel<1, 1>>::lookback(&trendlib::indicators::ht_dcperiod::Params { }))
         }
+        "ht_dcphase" => {
+            Ok(<trendlib::indicators::ht_dcphase::HtDcphase as Kernel<1, 1>>::lookback(&trendlib::indicators::ht_dcphase::Params { }))
+        }
         "ht_phasor" => {
             Ok(<trendlib::indicators::ht_phasor::HtPhasor as Kernel<1, 2>>::lookback(&trendlib::indicators::ht_phasor::Params { }))
+        }
+        "ht_sine" => {
+            Ok(<trendlib::indicators::ht_sine::HtSine as Kernel<1, 2>>::lookback(&trendlib::indicators::ht_sine::Params { }))
+        }
+        "ht_trendline" => {
+            Ok(<trendlib::indicators::ht_trendline::HtTrendline as Kernel<1, 1>>::lookback(&trendlib::indicators::ht_trendline::Params { }))
+        }
+        "ht_trendmode" => {
+            Ok(<trendlib::indicators::ht_trendmode::HtTrendmode as Kernel<1, 1>>::lookback(&trendlib::indicators::ht_trendmode::Params { }))
         }
         "imi" => {
             let period = match get("period")? {
@@ -29911,6 +30582,11 @@ pub fn lookback_of(
                 None => 9,
             };
             Ok(<trendlib::indicators::macdfix::Macdfix as Kernel<1, 3>>::lookback(&trendlib::indicators::macdfix::Params { signal_period, }))
+        }
+        "mama" => {
+            let fast_limit = 0.5;
+            let slow_limit = 0.05;
+            Ok(<trendlib::indicators::mama::Mama as Kernel<1, 2>>::lookback(&trendlib::indicators::mama::Params { fast_limit, slow_limit, }))
         }
         "marketfi" => {
             Ok(<trendlib::indicators::marketfi::Marketfi as Kernel<3, 1>>::lookback(&trendlib::indicators::marketfi::Params { }))
