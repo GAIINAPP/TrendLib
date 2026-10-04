@@ -1,0 +1,57 @@
+name: macdext
+title: MACD with Selectable Averages
+group: momentum
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: fast_period
+    type: int
+    default: 12
+    min: 2
+    max: 100000
+    doc: Number of bars in the shorter average
+  - name: fast_ma_type
+    type: enum:MaType
+    default: sma
+    doc: Moving average used for the shorter one
+  - name: slow_period
+    type: int
+    default: 26
+    min: 2
+    max: 100000
+    doc: Number of bars in the longer average
+  - name: slow_ma_type
+    type: enum:MaType
+    default: sma
+    doc: Moving average used for the longer one
+  - name: signal_period
+    type: int
+    default: 9
+    min: 1
+    max: 100000
+    doc: Number of bars the MACD line is smoothed over
+  - name: signal_ma_type
+    type: enum:MaType
+    default: sma
+    doc: Moving average used for the signal line
+outputs:
+  - name: macdext_macd
+    dtype: float64
+    plot: line
+    doc: Shorter average minus the longer one
+  - name: macdext_signal
+    dtype: float64
+    plot: line
+    doc: Average of the MACD line
+  - name: macdext_hist
+    dtype: float64
+    plot: histogram
+    doc: MACD line minus the signal line
+talib:
+  name: MACDEXT
+  params: {fast_period: fastperiod, fast_ma_type: fastmatype, slow_period: slowperiod, slow_ma_type: slowmatype, signal_period: signalperiod, signal_ma_type: signalmatype}
+  outputs: [macd, macdsignal, macdhist]
+references:
+  - Gerald Appel, Technical Analysis - Power Tools for Active Investors, FT Press, 2005
+see_also: [macd, macdfix, apo]

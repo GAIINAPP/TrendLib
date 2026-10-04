@@ -101,12 +101,31 @@ INDICATOR_TOLERANCE = {
 }
 
 
+# Tolerances for an indicator's enum cases only. Where the default case
+# reproduces the oracle exactly there is no reason to loosen it as well, and
+# leaving it tight is what would catch a regression in the shared machinery.
+ENUM_CASE_TOLERANCE = {
+    "macdext": (
+        "rel=1e-8 abs=1e-11",
+        "the line is a difference of two averages of the series and the signal and histogram "
+        "are differences of that again, so an error of 1e-13 on a value near 1000 arrives as "
+        "4e-9 on a histogram near 0.05; with the default averages TrendLib reproduces "
+        "ta-lib-python to the last bit, which is what the default and min_period cases hold it "
+        "to",
+    ),
+}
+
+BASE_CASES = ("default", "min_period")
+
+
 def tolerance_for(name: str, case: str) -> tuple[str, str | None]:
     """The tolerance a golden file carries, and the reason if it is not the default."""
     if (name, case) in CASE_TOLERANCE:
         return CASE_TOLERANCE[(name, case)]
     if name in INDICATOR_TOLERANCE:
         return INDICATOR_TOLERANCE[name]
+    if name in ENUM_CASE_TOLERANCE and case not in BASE_CASES:
+        return ENUM_CASE_TOLERANCE[name]
     return TOLERANCE, None
 
 

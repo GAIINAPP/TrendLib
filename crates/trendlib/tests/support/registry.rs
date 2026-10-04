@@ -1953,6 +1953,87 @@ mod kama_adapter {
     }
 }
 
+mod kc_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::kc::Kc;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 3;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "period",
+            default: 20.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "atr_period",
+            default: 10.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "nbdev",
+            default: 2.0,
+            min: f64::NEG_INFINITY,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::kc::Params {
+        trendlib::indicators::kc::Params {
+            period: values[0] as usize,
+            atr_period: values[1] as usize,
+            nbdev: values[2],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "kc takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::kc::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[false, false, false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod linearreg_adapter {
     use super::*;
 
@@ -2454,6 +2535,114 @@ mod macd_adapter {
     pub fn registered() -> Registered {
         Registered {
             name: trendlib::indicators::macd::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false, false, false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod macdext_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::macdext::Macdext;
+    const INPUTS: usize = 1;
+    const OUTPUTS: usize = 3;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "fast_period",
+            default: 12.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "fast_ma_type",
+            default: 0.0,
+            min: 0.0,
+            max: 10.0,
+            integral: false,
+            choices: MA_TYPES,
+        },
+        ParamSpec {
+            name: "slow_period",
+            default: 26.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "slow_ma_type",
+            default: 0.0,
+            min: 0.0,
+            max: 10.0,
+            integral: false,
+            choices: MA_TYPES,
+        },
+        ParamSpec {
+            name: "signal_period",
+            default: 9.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "signal_ma_type",
+            default: 0.0,
+            min: 0.0,
+            max: 10.0,
+            integral: false,
+            choices: MA_TYPES,
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::macdext::Params {
+        trendlib::indicators::macdext::Params {
+            fast_period: values[0] as usize,
+            fast_ma_type: ma_type_at(values[1]),
+            slow_period: values[2] as usize,
+            slow_ma_type: ma_type_at(values[3]),
+            signal_period: values[4] as usize,
+            signal_ma_type: ma_type_at(values[5]),
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "macdext takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::macdext::NAME,
             inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
             outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
             params: PARAMS,
@@ -5872,6 +6061,7 @@ pub fn registered() -> Vec<Registered> {
         ha_adapter::registered(),
         hma_adapter::registered(),
         kama_adapter::registered(),
+        kc_adapter::registered(),
         linearreg_adapter::registered(),
         linearreg_angle_adapter::registered(),
         linearreg_intercept_adapter::registered(),
@@ -5880,6 +6070,7 @@ pub fn registered() -> Vec<Registered> {
         log10_adapter::registered(),
         ma_adapter::registered(),
         macd_adapter::registered(),
+        macdext_adapter::registered(),
         macdfix_adapter::registered(),
         max_adapter::registered(),
         maxindex_adapter::registered(),

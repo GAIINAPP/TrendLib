@@ -1,0 +1,48 @@
+name: kc
+title: Keltner Channel
+group: overlap
+flags: [overlap, unstable, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 20
+    min: 2
+    max: 100000
+    doc: Number of bars the middle band is averaged over
+  - name: atr_period
+    type: int
+    default: 10
+    min: 1
+    max: 100000
+    doc: Number of bars the average true range uses
+  - name: nbdev
+    type: float
+    default: 2.0
+    doc: How many average true ranges the bands sit from the middle
+outputs:
+  - name: kc_upper
+    dtype: float64
+    plot: upper_band
+    doc: Middle band plus nbdev average true ranges
+  - name: kc_middle
+    dtype: float64
+    plot: middle_band
+    doc: Exponential average of the typical price
+  - name: kc_lower
+    dtype: float64
+    plot: lower_band
+    doc: Middle band minus nbdev average true ranges
+talib:
+  name: KC
+  params: {period: timeperiod, atr_period: atrperiod, nbdev: nbdev}
+  outputs: [upperband, middleband, lowerband]
+references:
+  - Chester W. Keltner, How to Make Money in Commodities, Keltner Statistical Service, 1960
+see_also: [bbands, atr, donchian]

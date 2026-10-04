@@ -66,7 +66,12 @@ ORACLE_IS_LOOSER = {
 # residue itself and there is no relative error to measure: TrendLib's 3.1e-13
 # against ta-lib-python's 5.8e-11. This is the figure the golden files carry as
 # `abs` for the same cases.
-ORACLE_IS_LOOSER_NEAR_ZERO = {"stoch": 2e-10, "stochf": 2e-10, "stochrsi": 2e-10}
+ORACLE_IS_LOOSER_NEAR_ZERO = {
+    "stoch": 2e-10,
+    "stochf": 2e-10,
+    "stochrsi": 2e-10,
+    "macdext": 1e-11,
+}
 
 # Indicators whose output is a difference of two moving averages of the same
 # series. The difference is around 1e-5 of the averages, so one ULP on either
@@ -85,11 +90,19 @@ ORACLE_IS_LOOSER_NEAR_ZERO = {"stoch": 2e-10, "stochf": 2e-10, "stochrsi": 2e-10
 # period 2.8e-10 against 8.0e-8; TrendLib is the closer of the two on 1896 and
 # 1911 rows respectively. The edge-case suite fits a line to a series that
 # already is one and pins that TrendLib reproduces it bit for bit.
+#
+# `macdext` is the same shape once more, one layer deeper: the line is a
+# difference of two averages of the series and the signal and histogram are
+# differences of that again, so an error of 1e-13 on a value near 1000 arrives
+# as 4e-9 on a histogram near 0.05. With the default averages TrendLib
+# reproduces the oracle to the last bit, which `macdext` in BITWISE below would
+# not capture, since this suite also sweeps every other average.
 CANCELS = {
     "apo": 2e-9,
     "ppo": 2e-9,
     "linearreg_slope": 2e-7,
     "linearreg_angle": 2e-7,
+    "macdext": 1e-8,
 }
 
 # SMA is pure addition, subtraction and one division, so there is no

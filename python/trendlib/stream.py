@@ -47,6 +47,7 @@ __all__ = [
     "ha",
     "hma",
     "kama",
+    "kc",
     "linearreg",
     "linearreg_angle",
     "linearreg_intercept",
@@ -55,6 +56,7 @@ __all__ = [
     "log10",
     "ma",
     "macd",
+    "macdext",
     "macdfix",
     "max",
     "maxindex",
@@ -378,6 +380,25 @@ ha = Factory(
 )
 hma = Factory("hma", _core.HmaStream, ("source",), ("series",), ("hma",))
 kama = Factory("kama", _core.KamaStream, ("source",), ("series",), ("kama",))
+kc = Factory(
+    "kc",
+    _core.KcStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "kc_upper",
+        "kc_middle",
+        "kc_lower",
+    ),
+)
 linearreg = Factory("linearreg", _core.LinearregStream, ("source",), ("series",), ("linearreg",))
 linearreg_angle = Factory(
     "linearreg_angle", _core.LinearregAngleStream, ("source",), ("series",), ("linearreg_angle",)
@@ -404,6 +425,17 @@ macd = Factory(
         "macd",
         "macd_signal",
         "macd_hist",
+    ),
+)
+macdext = Factory(
+    "macdext",
+    _core.MacdextStream,
+    ("source",),
+    ("series",),
+    (
+        "macdext_macd",
+        "macdext_signal",
+        "macdext_hist",
     ),
 )
 macdfix = Factory(

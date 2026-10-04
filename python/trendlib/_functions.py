@@ -46,6 +46,7 @@ __all__ = [
     "HA",
     "HMA",
     "KAMA",
+    "KC",
     "LINEARREG",
     "LINEARREG_ANGLE",
     "LINEARREG_INTERCEPT",
@@ -54,6 +55,7 @@ __all__ = [
     "LOG10",
     "MA",
     "MACD",
+    "MACDEXT",
     "MACDFIX",
     "MAX",
     "MAXINDEX",
@@ -141,6 +143,7 @@ __all__ = [
     "ha",
     "hma",
     "kama",
+    "kc",
     "linearreg",
     "linearreg_angle",
     "linearreg_intercept",
@@ -150,6 +153,7 @@ __all__ = [
     "lookback",
     "ma",
     "macd",
+    "macdext",
     "macdfix",
     "max",
     "maxindex",
@@ -1029,6 +1033,62 @@ def kama(source=None, *, period: int = _PARAMS["kama"]["period"]["default"]) -> 
     return _convert.wrap_outputs(out, carrier, ("kama",))
 
 
+def kc(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["kc"]["period"]["default"],
+    atr_period: int = _PARAMS["kc"]["atr_period"]["default"],
+    nbdev: float = _PARAMS["kc"]["nbdev"]["default"],
+) -> Any:
+    """Keltner Channel.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Number of bars the middle band is averaged over, from 2 to 100000.
+    atr_period : int, default 10
+        Number of bars the average true range uses, from 1 to 100000.
+    nbdev : float, default 2.0
+        How many average true ranges the bands sit from the middle.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        kc_upper: Middle band plus nbdev average true ranges.
+        kc_middle: Exponential average of the typical price.
+        kc_lower: Middle band minus nbdev average true ranges.
+    """
+    period = _convert.as_int("kc", "period", period)
+    atr_period = _convert.as_int("kc", "atr_period", atr_period)
+    nbdev = _convert.as_float("kc", "nbdev", nbdev)
+    columns, carrier = _convert.bars(
+        "kc",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.kc(*columns, period=period, atr_period=atr_period, nbdev=nbdev)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "kc_upper",
+            "kc_middle",
+            "kc_lower",
+        ),
+    )
+
+
 def linearreg(source=None, *, period: int = _PARAMS["linearreg"]["period"]["default"]) -> Any:
     """Linear Regression.
 
@@ -1203,6 +1263,67 @@ def macd(
             "macd",
             "macd_signal",
             "macd_hist",
+        ),
+    )
+
+
+def macdext(
+    source=None,
+    *,
+    fast_period: int = _PARAMS["macdext"]["fast_period"]["default"],
+    fast_ma_type: str = _PARAMS["macdext"]["fast_ma_type"]["default"],
+    slow_period: int = _PARAMS["macdext"]["slow_period"]["default"],
+    slow_ma_type: str = _PARAMS["macdext"]["slow_ma_type"]["default"],
+    signal_period: int = _PARAMS["macdext"]["signal_period"]["default"],
+    signal_ma_type: str = _PARAMS["macdext"]["signal_ma_type"]["default"],
+) -> Any:
+    """MACD with Selectable Averages.
+
+    Parameters
+    ----------
+    fast_period : int, default 12
+        Number of bars in the shorter average, from 2 to 100000.
+    fast_ma_type : str, default "sma"
+        Moving average used for the shorter one.
+    slow_period : int, default 26
+        Number of bars in the longer average, from 2 to 100000.
+    slow_ma_type : str, default "sma"
+        Moving average used for the longer one.
+    signal_period : int, default 9
+        Number of bars the MACD line is smoothed over, from 1 to 100000.
+    signal_ma_type : str, default "sma"
+        Moving average used for the signal line.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        macdext_macd: Shorter average minus the longer one.
+        macdext_signal: Average of the MACD line.
+        macdext_hist: MACD line minus the signal line.
+    """
+    fast_period = _convert.as_int("macdext", "fast_period", fast_period)
+    fast_ma_type = _convert.as_text("macdext", "fast_ma_type", fast_ma_type)
+    slow_period = _convert.as_int("macdext", "slow_period", slow_period)
+    slow_ma_type = _convert.as_text("macdext", "slow_ma_type", slow_ma_type)
+    signal_period = _convert.as_int("macdext", "signal_period", signal_period)
+    signal_ma_type = _convert.as_text("macdext", "signal_ma_type", signal_ma_type)
+    columns, carrier = _convert.bars("macdext", (source,), ("source",), ("series",))
+    out = _core.macdext(
+        *columns,
+        fast_period=fast_period,
+        fast_ma_type=fast_ma_type,
+        slow_period=slow_period,
+        slow_ma_type=slow_ma_type,
+        signal_period=signal_period,
+        signal_ma_type=signal_ma_type,
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "macdext_macd",
+            "macdext_signal",
+            "macdext_hist",
         ),
     )
 
@@ -2773,6 +2894,18 @@ def KAMA(source, timeperiod: int = _PARAMS["kama"]["period"]["default"]) -> Any:
     return kama(source, period=timeperiod)
 
 
+def KC(
+    high,
+    low,
+    close,
+    timeperiod: int = _PARAMS["kc"]["period"]["default"],
+    atrperiod: int = _PARAMS["kc"]["atr_period"]["default"],
+    nbdev: float = _PARAMS["kc"]["nbdev"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`kc`."""
+    return kc(high, low, close, period=timeperiod, atr_period=atrperiod, nbdev=nbdev)
+
+
 def LINEARREG(source, timeperiod: int = _PARAMS["linearreg"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`linearreg`."""
     return linearreg(source, period=timeperiod)
@@ -2826,6 +2959,27 @@ def MACD(
 ) -> Any:
     """TA-Lib-style alias for :func:`macd`."""
     return macd(source, fast_period=fastperiod, slow_period=slowperiod, signal_period=signalperiod)
+
+
+def MACDEXT(
+    source,
+    fastperiod: int = _PARAMS["macdext"]["fast_period"]["default"],
+    fastmatype: str = _PARAMS["macdext"]["fast_ma_type"]["default"],
+    slowperiod: int = _PARAMS["macdext"]["slow_period"]["default"],
+    slowmatype: str = _PARAMS["macdext"]["slow_ma_type"]["default"],
+    signalperiod: int = _PARAMS["macdext"]["signal_period"]["default"],
+    signalmatype: str = _PARAMS["macdext"]["signal_ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`macdext`."""
+    return macdext(
+        source,
+        fast_period=fastperiod,
+        fast_ma_type=fastmatype,
+        slow_period=slowperiod,
+        slow_ma_type=slowmatype,
+        signal_period=signalperiod,
+        signal_ma_type=signalmatype,
+    )
 
 
 def MACDFIX(source, signalperiod: int = _PARAMS["macdfix"]["signal_period"]["default"]) -> Any:

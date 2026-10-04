@@ -2,8 +2,8 @@
 
 # Progress
 
-**95 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 109 not started.
+**97 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 107 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -16,8 +16,8 @@ something is done that is not. CI checks it is current.
 
 | Group | Shipped | Total |
 | --- | --- | --- |
-| Overlap studies | 18 | 25 |
-| Momentum | 30 | 47 |
+| Overlap studies | 19 | 25 |
+| Momentum | 31 | 47 |
 | Volatility | 3 | 7 |
 | Volume | 2 | 12 |
 | Price transforms | 6 | 6 |
@@ -28,7 +28,7 @@ something is done that is not. CI checks it is current.
 | Candlestick patterns | 0 | 61 |
 | Levels | 0 | 3 |
 
-## Overlap studies (18 of 25)
+## Overlap studies (19 of 25)
 
 - [x] `accbands` (`ACCBANDS`) -- Acceleration Bands
 - [x] `bbands` (`BBANDS`) -- Bollinger Bands *
@@ -38,7 +38,7 @@ something is done that is not. CI checks it is current.
 - [x] `hma` (`HMA`) -- Hull Moving Average
 - [ ] `ht_trendline` (`HT_TRENDLINE`)
 - [x] `kama` (`KAMA`) -- Kaufman Adaptive Moving Average
-- [ ] `kc` (`KC`)
+- [x] `kc` (`KC`) -- Keltner Channel
 - [x] `ma` (`MA`) -- Moving Average
 - [ ] `mama` (`MAMA`)
 - [ ] `mavp` (`MAVP`)
@@ -56,7 +56,7 @@ something is done that is not. CI checks it is current.
 - [x] `wma` (`WMA`) -- Weighted Moving Average *
 - [x] `zlema` (`ZLEMA`) -- Zero Lag Exponential Moving Average
 
-## Momentum (30 of 47)
+## Momentum (31 of 47)
 
 - [ ] `ac` (`AC`)
 - [x] `adx` (`ADX`) -- Average Directional Movement Index *
@@ -79,7 +79,7 @@ something is done that is not. CI checks it is current.
 - [ ] `imi` (`IMI`)
 - [ ] `kdj` (`KDJ`)
 - [x] `macd` (`MACD`) -- Moving Average Convergence Divergence *
-- [ ] `macdext` (`MACDEXT`)
+- [x] `macdext` (`MACDEXT`) -- MACD with Selectable Averages
 - [x] `macdfix` (`MACDFIX`) -- MACD with Fixed Periods
 - [x] `mfi` (`MFI`) -- Money Flow Index
 - [x] `minus_di` (`MINUS_DI`) -- Minus Directional Indicator
