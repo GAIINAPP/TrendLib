@@ -64,6 +64,9 @@ def _daily() -> dict[str, np.ndarray]:
     }
     # The same mapping the oracle script and the Rust suites use, so every
     # layer is looking at the same bars.
+    # `mavp` asks for a period per bar rather than a price; this is the same
+    # ramp the oracle script writes into its golden files.
+    columns["periods"] = np.array([2.0 + (row % 29) for row in range(len(rows))])
     columns["source"] = columns["close"]
     columns["source0"] = columns["close"]
     columns["source1"] = columns["open"]
@@ -88,6 +91,7 @@ class Indicator:
 
         self.name = name
         self.inputs: list[str] = list(_core.INPUTS[name])
+        self.kinds: list[str] = list(_core.KINDS[name])
         self.outputs: list[str] = list(_core.OUTPUTS[name])
         self.params: dict = dict(_core.PARAMS[name])
         self.group: str = _core.GROUPS[name]

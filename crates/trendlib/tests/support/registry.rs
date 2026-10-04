@@ -7821,6 +7821,87 @@ mod massi_adapter {
     }
 }
 
+mod mavp_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::mavp::Mavp;
+    const INPUTS: usize = 2;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "min_period",
+            default: 2.0,
+            min: 1.0,
+            max: 30.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "max_period",
+            default: 30.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "ma_type",
+            default: 0.0,
+            min: 0.0,
+            max: 11.0,
+            integral: false,
+            choices: MA_TYPES,
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::mavp::Params {
+        trendlib::indicators::mavp::Params {
+            min_period: values[0] as usize,
+            max_period: values[1] as usize,
+            ma_type: ma_type_at(values[2]),
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "mavp takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::mavp::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod max_adapter {
     use super::*;
 
@@ -12303,6 +12384,7 @@ pub fn registered() -> Vec<Registered> {
         mama_adapter::registered(),
         marketfi_adapter::registered(),
         massi_adapter::registered(),
+        mavp_adapter::registered(),
         max_adapter::registered(),
         maxindex_adapter::registered(),
         medprice_adapter::registered(),

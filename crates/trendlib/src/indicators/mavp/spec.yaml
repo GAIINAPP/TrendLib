@@ -1,0 +1,38 @@
+name: mavp
+title: Moving Average with Variable Period
+group: overlap
+flags: [overlap]
+inputs:
+  - name: close
+    kind: close
+  - name: periods
+    kind: series
+params:
+  - name: min_period
+    type: int
+    default: 2
+    min: 1
+    max: 30
+    doc: Shortest average any bar may ask for
+  - name: max_period
+    type: int
+    default: 30
+    min: 2
+    max: 100000
+    doc: Longest average any bar may ask for
+  - name: ma_type
+    type: enum:MaType
+    default: sma
+    doc: Which moving average to apply
+outputs:
+  - name: mavp
+    dtype: float64
+    plot: line
+    doc: Moving average whose length each bar chooses for itself
+talib:
+  name: MAVP
+  params: {min_period: minperiod, max_period: maxperiod, ma_type: matype}
+  outputs: [real]
+references:
+  - TA-Lib, ta_MAVP.c, one moving average per distinct period requested
+see_also: [ma, sma, ema]

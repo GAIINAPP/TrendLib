@@ -145,6 +145,7 @@ __all__ = [
     "mama",
     "marketfi",
     "massi",
+    "mavp",
     "max",
     "maxindex",
     "medprice",
@@ -1850,6 +1851,19 @@ massi = Factory(
         "low",
     ),
     ("massi",),
+)
+mavp = Factory(
+    "mavp",
+    _core.MavpStream,
+    (
+        "close",
+        "periods",
+    ),
+    (
+        "close",
+        "series",
+    ),
+    ("mavp",),
 )
 max = Factory("max", _core.MaxStream, ("source",), ("series",), ("max",))
 maxindex = Factory("maxindex", _core.MaxindexStream, ("source",), ("series",), ("maxindex",))

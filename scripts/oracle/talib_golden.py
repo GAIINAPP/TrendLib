@@ -295,6 +295,16 @@ def bind_inputs(spec: dict, columns: dict[str, list]):
     bound = {}
     for spec_input in spec["inputs"]:
         name, kind = spec_input["name"], spec_input["kind"]
+        if name == "periods":
+            # A column of prices would clamp to the longest period on every
+            # bar, which tests the clamp and nothing else. This walks the
+            # whole range instead, deterministically, and the values are
+            # written into the golden file like any other input.
+            bound[name] = np.array(
+                [2.0 + (row % 29) for row in range(len(columns["close"]))],
+                dtype=np.float64,
+            )
+            continue
         if kind == "series":
             source = SECOND_OPERAND if name == "source1" else "close"
         elif kind == "timestamps":

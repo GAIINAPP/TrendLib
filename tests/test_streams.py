@@ -148,7 +148,8 @@ def test_a_bad_bar_is_rejected_and_the_stream_is_unchanged(bars, indicator, bad)
 
 
 def test_a_dataframe_history_is_accepted(bars, indicator):
-    if sum(1 for name in indicator.inputs if name.startswith("source")) > 1:
+    generic = sum(1 for kind in indicator.kinds if kind == "series")
+    if generic > 1 or (generic == 1 and len(indicator.inputs) > 1):
         pytest.skip("a frame cannot say which column is which operand")
     rows = 200
     from_frame = factory(indicator)(indicator.frame(bars, rows))

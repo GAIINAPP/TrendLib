@@ -425,6 +425,13 @@ pub fn daily_column(name: &str) -> Vec<f64> {
     // The same mapping the oracle script uses, so a suite and a golden file are
     // looking at the same bars: a lone generic series is the close, and the two
     // operands of an arithmetic operator are two different series.
+    if name == "periods" {
+        // Not a column of the dataset: `mavp` asks for a period per bar, and
+        // the oracle script writes this same ramp into its golden files.
+        return (0..lines.clone().filter(|line| !line.is_empty()).count() - 1)
+            .map(|row| 2.0 + (row % 29) as f64)
+            .collect();
+    }
     let wanted = match name {
         "source" | "source0" => "close",
         "source1" => "open",

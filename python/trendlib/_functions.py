@@ -144,6 +144,7 @@ __all__ = [
     "MAMA",
     "MARKETFI",
     "MASSI",
+    "MAVP",
     "MAX",
     "MAXINDEX",
     "MEDPRICE",
@@ -344,6 +345,7 @@ __all__ = [
     "mama",
     "marketfi",
     "massi",
+    "mavp",
     "max",
     "maxindex",
     "medprice",
@@ -4177,6 +4179,49 @@ def massi(
     return _convert.wrap_outputs(out, carrier, ("massi",))
 
 
+def mavp(
+    close=None,
+    periods=None,
+    *,
+    min_period: int = _PARAMS["mavp"]["min_period"]["default"],
+    max_period: int = _PARAMS["mavp"]["max_period"]["default"],
+    ma_type: str = _PARAMS["mavp"]["ma_type"]["default"],
+) -> Any:
+    """Moving Average with Variable Period.
+
+    Parameters
+    ----------
+    min_period : int, default 2
+        Shortest average any bar may ask for, from 1 to 30.
+    max_period : int, default 30
+        Longest average any bar may ask for, from 2 to 100000.
+    ma_type : str, default "sma"
+        Which moving average to apply.
+
+    Returns
+    -------
+    ndarray or Series
+        Moving average whose length each bar chooses for itself.
+    """
+    min_period = _convert.as_int("mavp", "min_period", min_period)
+    max_period = _convert.as_int("mavp", "max_period", max_period)
+    ma_type = _convert.as_text("mavp", "ma_type", ma_type)
+    columns, carrier = _convert.bars(
+        "mavp",
+        (close, periods),
+        (
+            "close",
+            "periods",
+        ),
+        (
+            "close",
+            "series",
+        ),
+    )
+    out = _core.mavp(*columns, min_period=min_period, max_period=max_period, ma_type=ma_type)
+    return _convert.wrap_outputs(out, carrier, ("mavp",))
+
+
 def max(source=None, *, period: int = _PARAMS["max"]["period"]["default"]) -> Any:
     """Rolling Maximum.
 
@@ -6864,6 +6909,17 @@ def MASSI(
 ) -> Any:
     """TA-Lib-style alias for :func:`massi`."""
     return massi(high, low, fast_period=fastperiod, slow_period=slowperiod)
+
+
+def MAVP(
+    close,
+    periods,
+    minperiod: int = _PARAMS["mavp"]["min_period"]["default"],
+    maxperiod: int = _PARAMS["mavp"]["max_period"]["default"],
+    matype: str = _PARAMS["mavp"]["ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`mavp`."""
+    return mavp(close, periods, min_period=minperiod, max_period=maxperiod, ma_type=matype)
 
 
 def MAX(source, timeperiod: int = _PARAMS["max"]["period"]["default"]) -> Any:

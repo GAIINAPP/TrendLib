@@ -131,6 +131,7 @@ pub mod macdfix;
 pub mod mama;
 pub mod marketfi;
 pub mod massi;
+pub mod mavp;
 pub mod max;
 pub mod maxindex;
 pub mod medprice;

@@ -276,6 +276,8 @@ def test_lookback_equals_talibs(indicator, alias):
 
 def test_a_constant_series_agrees_with_talib(indicator, alias):
     flat = {name: np.full(120, 7.5) for name in ("open", "high", "low", "close", "volume")}
+    # `mavp` asks for a period per bar; a constant one keeps the series flat.
+    flat["periods"] = np.full(120, 7.5)
     flat["source"] = flat["source0"] = flat["close"]
     flat["source1"] = flat["open"]
     mine, theirs = run_both(indicator, alias, flat)

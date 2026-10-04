@@ -157,10 +157,19 @@ def bars(
         # it cannot say which of two interchangeable series is which. Mapping
         # both to `close` would make `sub` return zeros on every row, which is
         # the kind of plausible wrong number a loud error is worth avoiding.
-        if sum(1 for kind in kinds if kind == "series") > 1:
+        generic = [name for name, kind in zip(names, kinds, strict=True) if kind == "series"]
+        if len(generic) > 1:
             raise InvalidInput(
                 f"{indicator}: a DataFrame cannot say which column is "
-                f"{names[0]} and which is {names[1]}; pass them separately"
+                f"{generic[0]} and which is {generic[1]}; pass them separately"
+            )
+        # A lone generic series is the close. Alongside a named bar input it
+        # is something else entirely, and a frame of bars has no column for
+        # it: `mavp` wants a period per bar, not a price.
+        if generic and len(names) > 1:
+            raise InvalidInput(
+                f"{indicator}: a DataFrame cannot say which column is {generic[0]}; "
+                "pass the inputs separately"
             )
         held, columns, kind = frame
         index = held.index if kind == "pandas" else None

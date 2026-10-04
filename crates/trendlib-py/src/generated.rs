@@ -17939,6 +17939,161 @@ impl PyMassiStream {
 }
 
 #[pyfunction]
+#[pyo3(name = "mavp", signature = (close, periods, *, min_period, max_period, ma_type))]
+pub fn mavp<'py>(
+    py: Python<'py>,
+    close: PyReadonlyArray1<'py, f64>,
+    periods: PyReadonlyArray1<'py, f64>,
+    min_period: i64,
+    max_period: i64,
+    ma_type: &str,
+) -> PyResult<Bound<'py, PyArray1<f64>>> {
+    let close = as_slice(&close, "close")?;
+    let periods = as_slice(&periods, "periods")?;
+    let min_period =
+        int_param("mavp", "min_period", min_period, 1, 30).map_err(|e| to_py_err(py, &e))?;
+    let max_period =
+        int_param("mavp", "max_period", max_period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+    let ma_type = ma_type_param("mavp", "ma_type", ma_type).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::mavp::Params {
+        min_period,
+        max_period,
+        ma_type,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::mavp::Mavp as Kernel<2, 1>>::batch([close, periods], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok(std::mem::take(&mut out[0]).into_pyarray(py))
+}
+
+#[pyclass(module = "trendlib._core", name = "MavpStream", skip_from_py_object)]
+#[derive(Clone, Debug)]
+pub struct PyMavpStream {
+    inner: BarStream<trendlib::indicators::mavp::Mavp, 2, 1>,
+}
+
+#[pymethods]
+impl PyMavpStream {
+    #[staticmethod]
+    #[pyo3(signature = (close, periods, *, min_period, max_period, ma_type))]
+    fn open<'py>(
+        py: Python<'py>,
+        close: PyReadonlyArray1<'py, f64>,
+        periods: PyReadonlyArray1<'py, f64>,
+        min_period: i64,
+        max_period: i64,
+        ma_type: &str,
+    ) -> PyResult<Self> {
+        let close = as_slice(&close, "close")?;
+        let periods = as_slice(&periods, "periods")?;
+        let min_period =
+            int_param("mavp", "min_period", min_period, 1, 30).map_err(|e| to_py_err(py, &e))?;
+        let max_period = int_param("mavp", "max_period", max_period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let ma_type = ma_type_param("mavp", "ma_type", ma_type).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::mavp::Params {
+            min_period,
+            max_period,
+            ma_type,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::mavp::Mavp, 2, 1> as Stream>::open(
+                    [close, periods],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (close, periods, *, min_period, max_period, ma_type))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        close: PyReadonlyArray1<'py, f64>,
+        periods: PyReadonlyArray1<'py, f64>,
+        min_period: i64,
+        max_period: i64,
+        ma_type: &str,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
+        let close = as_slice(&close, "close")?;
+        let periods = as_slice(&periods, "periods")?;
+        let min_period =
+            int_param("mavp", "min_period", min_period, 1, 30).map_err(|e| to_py_err(py, &e))?;
+        let max_period = int_param("mavp", "max_period", max_period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let ma_type = ma_type_param("mavp", "ma_type", ma_type).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::mavp::Params {
+            min_period,
+            max_period,
+            ma_type,
+        };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::mavp::Mavp as Kernel<2, 1>>::open_and_fill(
+                    [close, periods],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            std::mem::take(&mut out[0]).into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (close, periods))]
+    fn update(&mut self, py: Python<'_>, close: f64, periods: f64) -> PyResult<f64> {
+        let row = self
+            .inner
+            .update([close, periods])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    #[pyo3(signature = (close, periods))]
+    fn peek(&self, py: Python<'_>, close: f64, periods: f64) -> PyResult<f64> {
+        let row = self
+            .inner
+            .peek([close, periods])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value().map(|row| row[0])
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "mavp"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream mavp bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
 #[pyo3(name = "max", signature = (source, *, period))]
 pub fn max<'py>(
     py: Python<'py>,
@@ -26792,6 +26947,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(mama, m)?)?;
     m.add_function(wrap_pyfunction!(marketfi, m)?)?;
     m.add_function(wrap_pyfunction!(massi, m)?)?;
+    m.add_function(wrap_pyfunction!(mavp, m)?)?;
     m.add_function(wrap_pyfunction!(max, m)?)?;
     m.add_function(wrap_pyfunction!(maxindex, m)?)?;
     m.add_function(wrap_pyfunction!(medprice, m)?)?;
@@ -26991,6 +27147,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyMamaStream>()?;
     m.add_class::<PyMarketfiStream>()?;
     m.add_class::<PyMassiStream>()?;
+    m.add_class::<PyMavpStream>()?;
     m.add_class::<PyMaxStream>()?;
     m.add_class::<PyMaxindexStream>()?;
     m.add_class::<PyMedpriceStream>()?;
@@ -27061,6 +27218,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyZlemaStream>()?;
     m.add("PARAMS", params_table(m.py())?)?;
     m.add("INPUTS", inputs_table(m.py())?)?;
+    m.add("KINDS", kinds_table(m.py())?)?;
     m.add("OUTPUTS", outputs_table(m.py())?)?;
     m.add("GROUPS", groups_table(m.py())?)?;
     m.add("FLAGS", flags_table(m.py())?)?;
@@ -28303,6 +28461,40 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
         let params = PyDict::new(py);
         {
             let entry = PyDict::new(py);
+            entry.set_item("default", 2)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 30)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("min_period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 30)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("max_period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", "sma")?;
+            entry.set_item("min", py.None())?;
+            entry.set_item("max", py.None())?;
+            entry.set_item(
+                "choices",
+                MaType::ALL
+                    .iter()
+                    .map(|(name, _)| *name)
+                    .collect::<Vec<_>>(),
+            )?;
+            params.set_item("ma_type", entry)?;
+        }
+        table.set_item("mavp", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
             entry.set_item("default", 30)?;
             entry.set_item("min", 2)?;
             entry.set_item("max", 100000)?;
@@ -29424,6 +29616,7 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("mama", vec!["source"])?;
     table.set_item("marketfi", vec!["high", "low", "volume"])?;
     table.set_item("massi", vec!["high", "low"])?;
+    table.set_item("mavp", vec!["close", "periods"])?;
     table.set_item("max", vec!["source"])?;
     table.set_item("maxindex", vec!["source"])?;
     table.set_item("medprice", vec!["high", "low"])?;
@@ -29492,6 +29685,212 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("willr", vec!["high", "low", "close"])?;
     table.set_item("wma", vec!["source"])?;
     table.set_item("zlema", vec!["source"])?;
+    Ok(table)
+}
+
+/// What each input is, so a caller knows which of them a frame can supply.
+fn kinds_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
+    let table = PyDict::new(py);
+    table.set_item("ac", vec!["high", "low"])?;
+    table.set_item("accbands", vec!["high", "low", "close"])?;
+    table.set_item("acos", vec!["series"])?;
+    table.set_item("ad", vec!["high", "low", "close", "volume"])?;
+    table.set_item("add", vec!["series", "series"])?;
+    table.set_item("adosc", vec!["high", "low", "close", "volume"])?;
+    table.set_item("adr", vec!["high", "low"])?;
+    table.set_item("adx", vec!["high", "low", "close"])?;
+    table.set_item("adxr", vec!["high", "low", "close"])?;
+    table.set_item("ao", vec!["high", "low"])?;
+    table.set_item("apo", vec!["series"])?;
+    table.set_item("aroon", vec!["high", "low"])?;
+    table.set_item("aroonosc", vec!["high", "low"])?;
+    table.set_item("asin", vec!["series"])?;
+    table.set_item("atan", vec!["series"])?;
+    table.set_item("atr", vec!["high", "low", "close"])?;
+    table.set_item("avgdev", vec!["series"])?;
+    table.set_item("avgprice", vec!["open", "high", "low", "close"])?;
+    table.set_item("bbands", vec!["series"])?;
+    table.set_item("beta", vec!["series", "series"])?;
+    table.set_item("bop", vec!["open", "high", "low", "close"])?;
+    table.set_item("cci", vec!["high", "low", "close"])?;
+    table.set_item("cdl_2crows", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_3blackcrows", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_3inside", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_3linestrike", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_3outside", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_3starsinsouth", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_3whitesoldiers", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_abandonedbaby", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_advanceblock", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_belthold", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_breakaway", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_closingmarubozu", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_concealbabyswall", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_counterattack", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_darkcloudcover", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_doji", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_dojistar", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_dragonflydoji", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_engulfing", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_eveningdojistar", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_eveningstar", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_gapsidesidewhite", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_gravestonedoji", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_hammer", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_hangingman", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_harami", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_haramicross", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_highwave", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_hikkake", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_hikkakemod", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_homingpigeon", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_identical3crows", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_inneck", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_invertedhammer", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_kicking", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_kickingbylength", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_ladderbottom", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_longleggeddoji", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_longline", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_marubozu", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_matchinglow", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_mathold", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_morningdojistar", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_morningstar", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_onneck", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_piercing", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_rickshawman", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_risefall3methods", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_separatinglines", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_shootingstar", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_shortline", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_spinningtop", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_stalledpattern", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_sticksandwich", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_takuri", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_tasukigap", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_thrusting", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_tristar", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_unique3river", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_upsidegap2crows", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_xsidegap3methods", vec!["open", "high", "low", "close"])?;
+    table.set_item("ceil", vec!["series"])?;
+    table.set_item("cmf", vec!["high", "low", "close", "volume"])?;
+    table.set_item("cmo", vec!["series"])?;
+    table.set_item("cmou", vec!["series"])?;
+    table.set_item("coppock", vec!["series"])?;
+    table.set_item("correl", vec!["series", "series"])?;
+    table.set_item("cos", vec!["series"])?;
+    table.set_item("cosh", vec!["series"])?;
+    table.set_item("cumsum", vec!["series"])?;
+    table.set_item("cvi", vec!["high", "low"])?;
+    table.set_item("dema", vec!["series"])?;
+    table.set_item("div", vec!["series", "series"])?;
+    table.set_item("donchian", vec!["high", "low"])?;
+    table.set_item("dpo", vec!["series"])?;
+    table.set_item("dx", vec!["high", "low", "close"])?;
+    table.set_item("efi", vec!["close", "volume"])?;
+    table.set_item("ema", vec!["series"])?;
+    table.set_item("er", vec!["series"])?;
+    table.set_item("eri", vec!["high", "low", "close"])?;
+    table.set_item("exp", vec!["series"])?;
+    table.set_item("floor", vec!["series"])?;
+    table.set_item("fosc", vec!["series"])?;
+    table.set_item("fractal", vec!["high", "low"])?;
+    table.set_item("ha", vec!["open", "high", "low", "close"])?;
+    table.set_item("hma", vec!["series"])?;
+    table.set_item("ht_dcperiod", vec!["series"])?;
+    table.set_item("ht_dcphase", vec!["series"])?;
+    table.set_item("ht_phasor", vec!["series"])?;
+    table.set_item("ht_sine", vec!["series"])?;
+    table.set_item("ht_trendline", vec!["series"])?;
+    table.set_item("ht_trendmode", vec!["series"])?;
+    table.set_item("imi", vec!["open", "close"])?;
+    table.set_item("kama", vec!["series"])?;
+    table.set_item("kc", vec!["high", "low", "close"])?;
+    table.set_item("kdj", vec!["high", "low", "close"])?;
+    table.set_item("linearreg", vec!["series"])?;
+    table.set_item("linearreg_angle", vec!["series"])?;
+    table.set_item("linearreg_intercept", vec!["series"])?;
+    table.set_item("linearreg_slope", vec!["series"])?;
+    table.set_item("ln", vec!["series"])?;
+    table.set_item("log10", vec!["series"])?;
+    table.set_item("ma", vec!["series"])?;
+    table.set_item("macd", vec!["series"])?;
+    table.set_item("macdext", vec!["series"])?;
+    table.set_item("macdfix", vec!["series"])?;
+    table.set_item("mama", vec!["series"])?;
+    table.set_item("marketfi", vec!["high", "low", "volume"])?;
+    table.set_item("massi", vec!["high", "low"])?;
+    table.set_item("mavp", vec!["close", "series"])?;
+    table.set_item("max", vec!["series"])?;
+    table.set_item("maxindex", vec!["series"])?;
+    table.set_item("medprice", vec!["high", "low"])?;
+    table.set_item("mfi", vec!["high", "low", "close", "volume"])?;
+    table.set_item("midpoint", vec!["series"])?;
+    table.set_item("midprice", vec!["high", "low"])?;
+    table.set_item("min", vec!["series"])?;
+    table.set_item("minindex", vec!["series"])?;
+    table.set_item("minmax", vec!["series"])?;
+    table.set_item("minmaxindex", vec!["series"])?;
+    table.set_item("minus_di", vec!["high", "low", "close"])?;
+    table.set_item("minus_dm", vec!["high", "low"])?;
+    table.set_item("mom", vec!["series"])?;
+    table.set_item("mult", vec!["series", "series"])?;
+    table.set_item("natr", vec!["high", "low", "close"])?;
+    table.set_item("nvi", vec!["close", "volume"])?;
+    table.set_item("obv", vec!["close", "volume"])?;
+    table.set_item("percentile", vec!["series"])?;
+    table.set_item("percentrank", vec!["series"])?;
+    table.set_item("plus_di", vec!["high", "low", "close"])?;
+    table.set_item("plus_dm", vec!["high", "low"])?;
+    table.set_item("ppo", vec!["series"])?;
+    table.set_item("pvi", vec!["close", "volume"])?;
+    table.set_item("pvo", vec!["volume"])?;
+    table.set_item("pvt", vec!["close", "volume"])?;
+    table.set_item("qstick", vec!["open", "close"])?;
+    table.set_item("rma", vec!["series"])?;
+    table.set_item("roc", vec!["series"])?;
+    table.set_item("rocp", vec!["series"])?;
+    table.set_item("rocr", vec!["series"])?;
+    table.set_item("rocr100", vec!["series"])?;
+    table.set_item("rsi", vec!["series"])?;
+    table.set_item("rvi", vec!["series"])?;
+    table.set_item("rvol", vec!["volume"])?;
+    table.set_item("sar", vec!["high", "low"])?;
+    table.set_item("sarext", vec!["high", "low"])?;
+    table.set_item("sin", vec!["series"])?;
+    table.set_item("sinh", vec!["series"])?;
+    table.set_item("sma", vec!["series"])?;
+    table.set_item("smi", vec!["high", "low", "close"])?;
+    table.set_item("sqrt", vec!["series"])?;
+    table.set_item("stddev", vec!["series"])?;
+    table.set_item("stoch", vec!["high", "low", "close"])?;
+    table.set_item("stochf", vec!["high", "low", "close"])?;
+    table.set_item("stochrsi", vec!["series"])?;
+    table.set_item("sub", vec!["series", "series"])?;
+    table.set_item("sum", vec!["series"])?;
+    table.set_item("supertrend", vec!["high", "low", "close"])?;
+    table.set_item("t3", vec!["series"])?;
+    table.set_item("tan", vec!["series"])?;
+    table.set_item("tanh", vec!["series"])?;
+    table.set_item("tema", vec!["series"])?;
+    table.set_item("trange", vec!["high", "low", "close"])?;
+    table.set_item("trima", vec!["series"])?;
+    table.set_item("trix", vec!["series"])?;
+    table.set_item("tsf", vec!["series"])?;
+    table.set_item("tsi", vec!["series"])?;
+    table.set_item("typprice", vec!["high", "low", "close"])?;
+    table.set_item("ultosc", vec!["high", "low", "close"])?;
+    table.set_item("var", vec!["series"])?;
+    table.set_item("vhf", vec!["series"])?;
+    table.set_item("vortex", vec!["high", "low", "close"])?;
+    table.set_item("vwma", vec!["close", "volume"])?;
+    table.set_item("wad", vec!["high", "low", "close"])?;
+    table.set_item("wclprice", vec!["high", "low", "close"])?;
+    table.set_item("willr", vec!["high", "low", "close"])?;
+    table.set_item("wma", vec!["series"])?;
+    table.set_item("zlema", vec!["series"])?;
     Ok(table)
 }
 
@@ -29647,6 +30046,7 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("mama", vec!["mama", "mama_fama"])?;
     table.set_item("marketfi", vec!["marketfi"])?;
     table.set_item("massi", vec!["massi"])?;
+    table.set_item("mavp", vec!["mavp"])?;
     table.set_item("max", vec!["max"])?;
     table.set_item("maxindex", vec!["maxindex"])?;
     table.set_item("medprice", vec!["medprice"])?;
@@ -29855,6 +30255,7 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("mama", vec!["float64", "float64"])?;
     table.set_item("marketfi", vec!["float64"])?;
     table.set_item("massi", vec!["float64"])?;
+    table.set_item("mavp", vec!["float64"])?;
     table.set_item("max", vec!["float64"])?;
     table.set_item("maxindex", vec!["int32"])?;
     table.set_item("medprice", vec!["float64"])?;
@@ -30063,6 +30464,7 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("mama", vec!["overlap", "unstable", "path_dependent"])?;
     table.set_item("marketfi", Vec::<&str>::new())?;
     table.set_item("massi", vec!["unstable", "path_dependent"])?;
+    table.set_item("mavp", vec!["overlap"])?;
     table.set_item("max", Vec::<&str>::new())?;
     table.set_item("maxindex", vec!["absolute_index"])?;
     table.set_item("medprice", vec!["overlap"])?;
@@ -30268,6 +30670,7 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("mama", "overlap")?;
     table.set_item("marketfi", "volume")?;
     table.set_item("massi", "volatility")?;
+    table.set_item("mavp", "overlap")?;
     table.set_item("max", "statistic")?;
     table.set_item("maxindex", "statistic")?;
     table.set_item("medprice", "price")?;
@@ -31041,6 +31444,21 @@ pub fn lookback_of(
                 None => 25,
             };
             Ok(<trendlib::indicators::massi::Massi as Kernel<2, 1>>::lookback(&trendlib::indicators::massi::Params { fast_period, slow_period, }))
+        }
+        "mavp" => {
+            let min_period = match get("min_period")? {
+                Some(value) => int_param("mavp", "min_period", value, 1, 30).map_err(|e| to_py_err(py, &e))?,
+                None => 2,
+            };
+            let max_period = match get("max_period")? {
+                Some(value) => int_param("mavp", "max_period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 30,
+            };
+            let ma_type = ma_type_param("mavp", "ma_type", match text("ma_type")? {
+                Some(ref value) => value,
+                None => "sma",
+            }).map_err(|e| to_py_err(py, &e))?;
+            Ok(<trendlib::indicators::mavp::Mavp as Kernel<2, 1>>::lookback(&trendlib::indicators::mavp::Params { min_period, max_period, ma_type, }))
         }
         "max" => {
             let period = match get("period")? {

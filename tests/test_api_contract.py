@@ -56,8 +56,13 @@ def test_pandas_series_keeps_its_index_and_output_names(bars, indicator):
 
 
 def _interchangeable_inputs(indicator) -> bool:
-    """Two or more generic series, which a frame cannot tell apart."""
-    return sum(1 for name in indicator.inputs if name.startswith("source")) > 1
+    """An input a frame of bars cannot supply.
+
+    Two generic series it cannot tell apart, or one alongside a named bar
+    input, where the frame simply has no column for it.
+    """
+    generic = sum(1 for kind in indicator.kinds if kind == "series")
+    return generic > 1 or (generic == 1 and len(indicator.inputs) > 1)
 
 
 def test_a_dataframe_is_refused_when_it_cannot_say_which_column_is_which(bars, indicator):

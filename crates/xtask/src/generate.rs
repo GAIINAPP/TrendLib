@@ -524,6 +524,7 @@ fn registration(specs: &[Spec]) -> String {
     out.push_str(
         "    m.add(\"PARAMS\", params_table(m.py())?)?;\n\
          \x20   m.add(\"INPUTS\", inputs_table(m.py())?)?;\n\
+         \x20   m.add(\"KINDS\", kinds_table(m.py())?)?;\n\
          \x20   m.add(\"OUTPUTS\", outputs_table(m.py())?)?;\n\
          \x20   m.add(\"GROUPS\", groups_table(m.py())?)?;\n\
          \x20   m.add(\"FLAGS\", flags_table(m.py())?)?;\n\
@@ -578,6 +579,19 @@ fn registration(specs: &[Spec]) -> String {
                     (
                         s.name.clone(),
                         s.inputs.iter().map(|i| i.name.clone()).collect(),
+                    )
+                })
+                .collect::<Vec<(String, Vec<String>)>>(),
+        ),
+        (
+            "kinds_table",
+            "What each input is, so a caller knows which of them a frame can supply.",
+            specs
+                .iter()
+                .map(|s| {
+                    (
+                        s.name.clone(),
+                        s.inputs.iter().map(|i| i.kind.clone()).collect(),
                     )
                 })
                 .collect::<Vec<(String, Vec<String>)>>(),
