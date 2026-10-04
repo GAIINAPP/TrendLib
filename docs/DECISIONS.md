@@ -120,3 +120,12 @@ A14 (M1, 2026-10-04): TA-Lib's C library at HEAD has 223 functions, 22 more than
 the 0.8.1 Python wheel exposes. Those 22 are out of scope, because `TESTING.md`
 § 2 requires an oracle that can be *run* and there is no Python binding to run.
 Revisit when a ta-lib-python release exposes them.
+
+A15 (M4, 2026-10-04): `vwap` ships with `anchor` and no `tz`. `INDICATORS.md`
+§ 3.1 names a `tz` parameter but no default for it, and `CONVENTIONS.md` § 7
+describes a pipeline (the Python layer resolving a zone and passing per-bar UTC
+offsets into the core) that nothing else needs yet. The session boundary is the
+calendar date of the timestamp as given, so a caller wanting another zone passes
+timestamps already expressed in it. Adding `tz` later changes no existing result,
+because UTC is what the current behaviour already means. `INDICATORS.md` § 3.1 and
+`CONVENTIONS.md` § 7 say so in the same commit.

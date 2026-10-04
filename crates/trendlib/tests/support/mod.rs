@@ -12,7 +12,7 @@ use std::path::{Path, PathBuf};
 
 use trendlib::TlError;
 use trendlib::core::kernel::{BarStream, Kernel};
-use trendlib::core::math::MaType;
+use trendlib::core::math::{MaType, VwapAnchor};
 use trendlib::core::traits::Stream;
 
 pub fn repo_root() -> PathBuf {
@@ -79,14 +79,32 @@ pub struct ParamSpec {
     pub choices: &'static [&'static str],
 }
 
-/// An enum parameter travels through the registry as its index in `MA_TYPES`,
-/// so a parameter vector stays `&[f64]` whatever the indicator takes.
-pub fn ma_type_at(index: f64) -> MaType {
+/// An enum parameter travels through the registry as its index in the list of
+/// values it accepts, so a parameter vector stays `&[f64]` whatever the
+/// indicator takes.
+pub fn enum_at<T: FromName>(index: f64, values: &[&str]) -> T {
     let index = index as usize;
-    MaType::ALL
+    let name = values
         .get(index)
-        .map(|(_, kind)| *kind)
-        .unwrap_or_else(|| panic!("ma_type index {index} is out of range"))
+        .unwrap_or_else(|| panic!("enum index {index} is out of range"));
+    T::from_name(name).unwrap_or_else(|| panic!("no value named {name}"))
+}
+
+/// What the registry needs of an enum to decode one.
+pub trait FromName: Sized {
+    fn from_name(name: &str) -> Option<Self>;
+}
+
+impl FromName for MaType {
+    fn from_name(name: &str) -> Option<Self> {
+        MaType::from_name(name)
+    }
+}
+
+impl FromName for VwapAnchor {
+    fn from_name(name: &str) -> Option<Self> {
+        VwapAnchor::from_name(name)
+    }
 }
 
 pub type Columns = Vec<Vec<f64>>;
@@ -425,6 +443,16 @@ pub fn daily_column(name: &str) -> Vec<f64> {
     // The same mapping the oracle script uses, so a suite and a golden file are
     // looking at the same bars: a lone generic series is the close, and the two
     // operands of an arithmetic operator are two different series.
+    if name == "timestamps" {
+        // The daily dataset carries no timestamps, so one bar a day is
+        // synthesised. The suites only need a column that is a valid input;
+        // the session behaviour itself is pinned by the golden files, which
+        // use the intraday dataset and its real timestamps.
+        const DAY: f64 = 86_400_000_000_000.0;
+        return (0..lines.clone().filter(|line| !line.is_empty()).count() - 1)
+            .map(|row| 1_767_225_600_000_000_000.0 + row as f64 * DAY)
+            .collect();
+    }
     if name == "periods" {
         // Not a column of the dataset: `mavp` asks for a period per bar, and
         // the oracle script writes this same ramp into its golden files.

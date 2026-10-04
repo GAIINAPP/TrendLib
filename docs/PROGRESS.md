@@ -2,8 +2,8 @@
 
 # Progress
 
-**200 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 4 not started.
+**201 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 3 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -19,7 +19,7 @@ something is done that is not. CI checks it is current.
 | Overlap studies | 25 | 25 |
 | Momentum | 47 | 47 |
 | Volatility | 7 | 7 |
-| Volume | 11 | 12 |
+| Volume | 12 | 12 |
 | Price transforms | 6 | 6 |
 | Cycle | 5 | 5 |
 | Statistics | 11 | 11 |
@@ -116,7 +116,7 @@ something is done that is not. CI checks it is current.
 - [x] `rvi` (`RVI`) -- Relative Volatility Index
 - [x] `trange` (`TRANGE`) -- True Range *
 
-## Volume (11 of 12)
+## Volume (12 of 12)
 
 - [x] `ad` (`AD`) -- Chaikin Accumulation Distribution Line *
 - [x] `adosc` (`ADOSC`) -- Chaikin Accumulation/Distribution Oscillator *
@@ -129,7 +129,7 @@ something is done that is not. CI checks it is current.
 - [x] `pvo` (`PVO`) -- Percentage Volume Oscillator
 - [x] `pvt` (`PVT`) -- Price Volume Trend
 - [x] `rvol` (`RVOL`) -- Relative Volume
-- [ ] `vwap` (`VWAP`) *
+- [x] `vwap` (`VWAP`) -- Volume Weighted Average Price *
 
 ## Price transforms (6 of 6)
 

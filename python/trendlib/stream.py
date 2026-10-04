@@ -208,6 +208,7 @@ __all__ = [
     "var",
     "vhf",
     "vortex",
+    "vwap",
     "vwma",
     "wad",
     "wclprice",
@@ -2298,6 +2299,25 @@ vortex = Factory(
         "vortex_plusvi",
         "vortex_minusvi",
     ),
+)
+vwap = Factory(
+    "vwap",
+    _core.VwapStream,
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+        "timestamps",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+        "timestamps",
+    ),
+    ("vwap",),
 )
 vwma = Factory(
     "vwma",

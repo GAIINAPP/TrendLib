@@ -64,6 +64,13 @@ def _daily() -> dict[str, np.ndarray]:
     }
     # The same mapping the oracle script and the Rust suites use, so every
     # layer is looking at the same bars.
+    # The daily dataset carries no timestamps, so one bar a day is synthesised.
+    # `vwap`'s session behaviour is pinned by its golden files, which use the
+    # intraday dataset and its real timestamps.
+    columns["timestamps"] = np.array(
+        [1_767_225_600_000_000_000 + row * 86_400_000_000_000 for row in range(len(rows))],
+        dtype=np.float64,
+    )
     # `mavp` asks for a period per bar rather than a price; this is the same
     # ramp the oracle script writes into its golden files.
     columns["periods"] = np.array([2.0 + (row % 29) for row in range(len(rows))])

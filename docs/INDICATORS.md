@@ -94,8 +94,11 @@ tp_t   = (high_t + low_t + close_t) / 3
 vwap_t = Σ_{i ∈ session(t), i ≤ t} tp_i · volume_i  /  Σ_{i ∈ session(t), i ≤ t} volume_i
 ```
 
-- `session(t)`: bars sharing the local date of `timestamps[t]` in `tz`
+- `session(t)`: bars sharing the calendar date of `timestamps[t]`
   (`anchor="day"`), or all bars (`anchor="none"`). See `CONVENTIONS.md` § 7.
+  A `tz` parameter is M6 (assumption A15): the date is read from the timestamp
+  as given, so a caller wanting another zone passes timestamps already
+  expressed in it.
 - Lookback 0. Before any volume has traded in the session the value is `NaN`
   (Deviation 2). A zero-volume bar after volume has traded leaves the value
   unchanged.

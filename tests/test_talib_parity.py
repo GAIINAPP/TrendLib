@@ -165,6 +165,13 @@ def ma_type_ints():
     return yaml.safe_load(ENUMS.read_text())["MaType"]["talib_int"]
 
 
+# TrendLib's `vwap` starts over each session where TA-Lib's never does
+# (`CONVENTIONS.md` deviation 3), so the two only answer the same question with
+# the reset turned off. That is the setting the uppercase `tl.VWAP` uses, and
+# it is what this suite compares.
+MATCHES_ORACLE_WITH = {"vwap": {"anchor": "none"}}
+
+
 def swept(spec, wanted):
     """`wanted`, pulled back inside the parameter's documented range.
 
@@ -178,11 +185,17 @@ def swept(spec, wanted):
 
 
 def talib_kwargs(alias, params):
+    """The parameters as the oracle takes them.
+
+    A parameter the alias block does not name is one the oracle does not have:
+    `vwap`'s anchor says where to start over, and TA-Lib's never does.
+    """
     renames = alias.get("params") or {}
     numbers = ma_type_ints()
     return {
-        renames.get(key, key): numbers[value] if isinstance(value, str) else value
+        renames[key]: numbers[value] if isinstance(value, str) else value
         for key, value in params.items()
+        if key in renames
     }
 
 
@@ -207,9 +220,17 @@ def compare(name, mine, theirs, indicator_name=None):
 
 
 def run_both(indicator, alias, bars, rows=None, **params):
+    params = {**MATCHES_ORACLE_WITH.get(indicator.name, {}), **params}
     columns = columns_for(indicator, bars, rows)
     mine = getattr(tl, indicator.name)(*columns, **params)
-    theirs = getattr(talib, alias["name"])(*columns, **talib_kwargs(alias, params))
+    # The oracle has no timestamps input: where this library reads sessions
+    # from them, TA-Lib expects the caller to have sliced the data already.
+    theirs_columns = [
+        column
+        for column, kind in zip(columns, indicator.kinds, strict=True)
+        if kind != "timestamps"
+    ]
+    theirs = getattr(talib, alias["name"])(*theirs_columns, **talib_kwargs(alias, params))
     mine = list(mine) if indicator.multi_output else [mine]
     theirs = list(theirs) if isinstance(theirs, tuple) else [theirs]
     assert len(mine) == len(theirs)
@@ -225,7 +246,12 @@ def test_the_committed_dataset_agrees_with_talib(bars, indicator, alias):
 def test_every_average_agrees_with_talib(bars, indicator, alias):
     """An enum parameter is only as good as its least-used value, so each one
     is run rather than only the default."""
-    choices = {name: spec["choices"] for name, spec in indicator.params.items() if spec["choices"]}
+    fixed = MATCHES_ORACLE_WITH.get(indicator.name, {})
+    choices = {
+        name: spec["choices"]
+        for name, spec in indicator.params.items()
+        if spec["choices"] and name not in fixed
+    }
     if not choices:
         pytest.skip("no enum parameters")
     for name, values in choices.items():
@@ -278,6 +304,11 @@ def test_a_constant_series_agrees_with_talib(indicator, alias):
     flat = {name: np.full(120, 7.5) for name in ("open", "high", "low", "close", "volume")}
     # `mavp` asks for a period per bar; a constant one keeps the series flat.
     flat["periods"] = np.full(120, 7.5)
+    # `vwap` reads sessions from timestamps; one bar a day keeps them apart.
+    flat["timestamps"] = np.array(
+        [1_767_225_600_000_000_000 + row * 86_400_000_000_000 for row in range(120)],
+        dtype=np.float64,
+    )
     flat["source"] = flat["source0"] = flat["close"]
     flat["source1"] = flat["open"]
     mine, theirs = run_both(indicator, alias, flat)

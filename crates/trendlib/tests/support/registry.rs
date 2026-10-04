@@ -2,14 +2,18 @@
 
 #![allow(dead_code)]
 
-use super::{AnyStream, Columns, OpenAndFillResult, ParamSpec, Registered, TlError, ma_type_at};
+use super::{AnyStream, Columns, OpenAndFillResult, ParamSpec, Registered, TlError, enum_at};
 use trendlib::core::kernel::Kernel;
 
-/// The averages an `ma_type` parameter accepts, in the order its index
+/// The values a `MaType` parameter accepts, in the order its index
 /// encoding uses.
 pub const MA_TYPES: &[&str] = &[
     "sma", "ema", "wma", "dema", "tema", "trima", "kama", "mama", "t3", "hma", "zlema", "rma",
 ];
+
+/// The values a `VwapAnchor` parameter accepts, in the order its index
+/// encoding uses.
+pub const VWAP_ANCHORS: &[&str] = &["day", "none"];
 
 mod ac_adapter {
     use super::*;
@@ -677,7 +681,7 @@ mod apo_adapter {
         trendlib::indicators::apo::Params {
             fast_period: values[0] as usize,
             slow_period: values[1] as usize,
-            ma_type: ma_type_at(values[2]),
+            ma_type: enum_at(values[2], MA_TYPES),
         }
     }
 
@@ -1170,7 +1174,7 @@ mod bbands_adapter {
             period: values[0] as usize,
             nbdev_up: values[1],
             nbdev_dn: values[2],
-            ma_type: ma_type_at(values[3]),
+            ma_type: enum_at(values[3], MA_TYPES),
         }
     }
 
@@ -6895,9 +6899,9 @@ mod kdj_adapter {
         trendlib::indicators::kdj::Params {
             fastk_period: values[0] as usize,
             slowk_period: values[1] as usize,
-            slowk_ma_type: ma_type_at(values[2]),
+            slowk_ma_type: enum_at(values[2], MA_TYPES),
             slowd_period: values[3] as usize,
-            slowd_ma_type: ma_type_at(values[4]),
+            slowd_ma_type: enum_at(values[4], MA_TYPES),
         }
     }
 
@@ -7331,7 +7335,7 @@ mod ma_adapter {
     fn params(values: &[f64]) -> trendlib::indicators::ma::Params {
         trendlib::indicators::ma::Params {
             period: values[0] as usize,
-            ma_type: ma_type_at(values[1]),
+            ma_type: enum_at(values[1], MA_TYPES),
         }
     }
 
@@ -7516,11 +7520,11 @@ mod macdext_adapter {
     fn params(values: &[f64]) -> trendlib::indicators::macdext::Params {
         trendlib::indicators::macdext::Params {
             fast_period: values[0] as usize,
-            fast_ma_type: ma_type_at(values[1]),
+            fast_ma_type: enum_at(values[1], MA_TYPES),
             slow_period: values[2] as usize,
-            slow_ma_type: ma_type_at(values[3]),
+            slow_ma_type: enum_at(values[3], MA_TYPES),
             signal_period: values[4] as usize,
-            signal_ma_type: ma_type_at(values[5]),
+            signal_ma_type: enum_at(values[5], MA_TYPES),
         }
     }
 
@@ -7859,7 +7863,7 @@ mod mavp_adapter {
         trendlib::indicators::mavp::Params {
             min_period: values[0] as usize,
             max_period: values[1] as usize,
-            ma_type: ma_type_at(values[2]),
+            ma_type: enum_at(values[2], MA_TYPES),
         }
     }
 
@@ -9200,7 +9204,7 @@ mod ppo_adapter {
         trendlib::indicators::ppo::Params {
             fast_period: values[0] as usize,
             slow_period: values[1] as usize,
-            ma_type: ma_type_at(values[2]),
+            ma_type: enum_at(values[2], MA_TYPES),
         }
     }
 
@@ -9334,7 +9338,7 @@ mod pvo_adapter {
         trendlib::indicators::pvo::Params {
             fast_period: values[0] as usize,
             slow_period: values[1] as usize,
-            ma_type: ma_type_at(values[2]),
+            ma_type: enum_at(values[2], MA_TYPES),
         }
     }
 
@@ -10624,9 +10628,9 @@ mod stoch_adapter {
         trendlib::indicators::stoch::Params {
             fastk_period: values[0] as usize,
             slowk_period: values[1] as usize,
-            slowk_ma_type: ma_type_at(values[2]),
+            slowk_ma_type: enum_at(values[2], MA_TYPES),
             slowd_period: values[3] as usize,
-            slowd_ma_type: ma_type_at(values[4]),
+            slowd_ma_type: enum_at(values[4], MA_TYPES),
         }
     }
 
@@ -10707,7 +10711,7 @@ mod stochf_adapter {
         trendlib::indicators::stochf::Params {
             fastk_period: values[0] as usize,
             fastd_period: values[1] as usize,
-            fastd_ma_type: ma_type_at(values[2]),
+            fastd_ma_type: enum_at(values[2], MA_TYPES),
         }
     }
 
@@ -10797,7 +10801,7 @@ mod stochrsi_adapter {
             period: values[0] as usize,
             fastk_period: values[1] as usize,
             fastd_period: values[2] as usize,
-            fastd_ma_type: ma_type_at(values[3]),
+            fastd_ma_type: enum_at(values[3], MA_TYPES),
         }
     }
 
@@ -11901,6 +11905,67 @@ mod vortex_adapter {
     }
 }
 
+mod vwap_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::vwap::Vwap;
+    const INPUTS: usize = 5;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "anchor",
+        default: 0.0,
+        min: 0.0,
+        max: 1.0,
+        integral: false,
+        choices: VWAP_ANCHORS,
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::vwap::Params {
+        trendlib::indicators::vwap::Params {
+            anchor: enum_at(values[0], VWAP_ANCHORS),
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "vwap takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::vwap::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: true,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod vwma_adapter {
     use super::*;
 
@@ -12447,6 +12512,7 @@ pub fn registered() -> Vec<Registered> {
         var_adapter::registered(),
         vhf_adapter::registered(),
         vortex_adapter::registered(),
+        vwap_adapter::registered(),
         vwma_adapter::registered(),
         wad_adapter::registered(),
         wclprice_adapter::registered(),

@@ -71,6 +71,11 @@ def test_every_shipped_indicator_matches_its_catalogue_row(repo_root, catalogue)
             None,
         )
         assert row is not None, f"{spec['name']} has a talib: block but no catalogue row"
+        if "&dagger;" in row:
+            # The catalogue marks the functions INDICATORS.md section 3 governs
+            # rather than the oracle: their inputs and parameters are ours, not
+            # TA-Lib's, and the row records what TA-Lib has.
+            continue
         assert f"`{alias['name']}`" in row, f"{spec['name']}: alias disagrees with the catalogue"
         for param in spec.get("params") or []:
             if param["type"].startswith("enum:"):

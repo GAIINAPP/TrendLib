@@ -207,6 +207,7 @@ __all__ = [
     "VAR",
     "VHF",
     "VORTEX",
+    "VWAP",
     "VWMA",
     "WAD",
     "WCLPRICE",
@@ -408,6 +409,7 @@ __all__ = [
     "var",
     "vhf",
     "vortex",
+    "vwap",
     "vwma",
     "wad",
     "wclprice",
@@ -5944,6 +5946,50 @@ def vortex(
     )
 
 
+def vwap(
+    high=None,
+    low=None,
+    close=None,
+    volume=None,
+    timestamps=None,
+    *,
+    anchor: str = _PARAMS["vwap"]["anchor"]["default"],
+) -> Any:
+    """Volume Weighted Average Price.
+
+    Parameters
+    ----------
+    anchor : str, default "day"
+        Where the running total starts over.
+
+    Returns
+    -------
+    ndarray or Series
+        Average price so far this session, weighted by the volume at each.
+    """
+    anchor = _convert.as_text("vwap", "anchor", anchor)
+    columns, carrier = _convert.bars(
+        "vwap",
+        (high, low, close, volume, timestamps),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+            "timestamps",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+            "timestamps",
+        ),
+    )
+    out = _core.vwap(*columns, anchor=anchor)
+    return _convert.wrap_outputs(out, carrier, ("vwap",))
+
+
 def vwma(close=None, volume=None, *, period: int = _PARAMS["vwma"]["period"]["default"]) -> Any:
     """Volume Weighted Moving Average.
 
@@ -7368,6 +7414,13 @@ def VHF(source, timeperiod: int = _PARAMS["vhf"]["period"]["default"]) -> Any:
 def VORTEX(high, low, close, timeperiod: int = _PARAMS["vortex"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`vortex`."""
     return vortex(high, low, close, period=timeperiod)
+
+
+def VWAP(
+    high, low, close, volume, timestamps, anchor: str = _PARAMS["vwap"]["anchor"]["default"]
+) -> Any:
+    """TA-Lib-style alias for :func:`vwap`."""
+    return vwap(high, low, close, volume, timestamps, anchor=anchor)
 
 
 def VWMA(close, volume, timeperiod: int = _PARAMS["vwma"]["period"]["default"]) -> Any:

@@ -5,6 +5,7 @@
 //! endings - so running it twice changes nothing and `regen-check` can tell a
 //! stale file from a changed one.
 
+use std::collections::BTreeMap;
 use std::fmt::Write as _;
 use std::fs;
 use std::io::Write as _;
@@ -34,12 +35,69 @@ fn unsupported(spec: &Spec, param: &Param) -> SpecError {
     )
 }
 
+/// What the generator knows about an enum parameter: the core type it becomes,
+/// the helper that parses a name into it, and the constant the test registry
+/// lists its values under.
+struct Enumeration {
+    kind: &'static str,
+    parses_with: &'static str,
+    listed_as: &'static str,
+    /// `true` when a value is only offered if an indicator of that name
+    /// exists, which is how `MaType` decides what it can build.
+    needs_an_indicator: bool,
+}
+
+const ENUMERATIONS: &[(&str, Enumeration)] = &[
+    (
+        "MaType",
+        Enumeration {
+            kind: "MaType",
+            parses_with: "ma_type_param",
+            listed_as: "MA_TYPES",
+            needs_an_indicator: true,
+        },
+    ),
+    (
+        "VwapAnchor",
+        Enumeration {
+            kind: "VwapAnchor",
+            parses_with: "vwap_anchor_param",
+            listed_as: "VWAP_ANCHORS",
+            needs_an_indicator: false,
+        },
+    ),
+];
+
+fn enumeration(name: &str) -> &'static Enumeration {
+    &ENUMERATIONS
+        .iter()
+        .find(|(known, _)| *known == name)
+        .unwrap_or_else(|| panic!("no enum named {name}"))
+        .1
+}
+
+/// Every enum some indicator takes a parameter of, in table order.
+fn enums_used(specs: &[Spec]) -> Vec<&'static str> {
+    ENUMERATIONS
+        .iter()
+        .filter(|(name, _)| {
+            specs.iter().any(|spec| {
+                spec.params
+                    .iter()
+                    .any(|p| matches!(&p.ty, ParamType::Enum(used) if used == name))
+            })
+        })
+        .map(|(name, _)| *name)
+        .collect()
+}
+
 fn check_supported(specs: &[Spec]) -> Result<(), Vec<SpecError>> {
     let mut errors = Vec::new();
     for spec in specs {
         for param in &spec.params {
             let known = matches!(param.ty, ParamType::Int | ParamType::Float)
-                || matches!(&param.ty, ParamType::Enum(name) if name == "MaType");
+                || matches!(&param.ty, ParamType::Enum(name)
+                    if ENUMERATIONS.iter().any(|(known, _)| known == name));
             if !known {
                 errors.push(unsupported(spec, param));
             }
@@ -145,8 +203,8 @@ fn helpers_needed(specs: &[Spec]) -> String {
     {
         needed.push("float_param");
     }
-    if has_enum(specs) {
-        needed.push("ma_type_param");
+    for name in enums_used(specs) {
+        needed.push(enumeration(name).parses_with);
     }
     needed.sort();
     needed.iter().map(|name| format!("{name}, ")).collect()
@@ -170,14 +228,13 @@ fn bindings(specs: &[Spec]) -> String {
          use pyo3::types::PyDict;\n\
          use trendlib::TlError;\n\
          use trendlib::core::kernel::{{BarStream, Kernel}};\n\
-         use trendlib::core::traits::Stream;\n{ma_type}\
+         use trendlib::core::traits::Stream;\n{enums}\
          use crate::shared::{{as_slice, {helpers}to_py_err}};\n",
         helpers = helpers_needed(specs),
-        ma_type = if has_enum(specs) {
-            "use trendlib::core::math::MaType;\n"
-        } else {
-            ""
-        },
+        enums = enums_used(specs)
+            .into_iter()
+            .map(|name| format!("use trendlib::core::math::{};\n", enumeration(name).kind))
+            .collect::<String>(),
     );
 
     for spec in specs {
@@ -471,9 +528,11 @@ fn params_builder(spec: &Spec) -> String {
     let mut out = String::new();
     for param in &spec.params {
         let check = match &param.ty {
-            ParamType::Enum(_) => format!(
-                "    let {0} = ma_type_param(\"{1}\", \"{0}\", {0}).map_err(|e| to_py_err(py, &e))?;\n",
-                param.name, spec.name,
+            ParamType::Enum(name) => format!(
+                "    let {0} = {2}(\"{1}\", \"{0}\", {0}).map_err(|e| to_py_err(py, &e))?;\n",
+                param.name,
+                spec.name,
+                enumeration(name).parses_with,
             ),
             ParamType::Int => format!(
                 "    let {0} = int_param(\"{1}\", \"{0}\", {0}, {2}, {3}).map_err(|e| to_py_err(py, &e))?;\n",
@@ -554,9 +613,11 @@ fn registration(specs: &[Spec]) -> String {
                     .map(|v| rust_literal(param, v))
                     .unwrap_or_else(|| "py.None()".into()),
                 match &param.ty {
-                    ParamType::Enum(_) =>
-                        "MaType::ALL.iter().map(|(name, _)| *name).collect::<Vec<_>>()",
-                    _ => "py.None()",
+                    ParamType::Enum(name) => format!(
+                        "{}::ALL.iter().map(|(name, _)| *name).collect::<Vec<_>>()",
+                        enumeration(name).kind
+                    ),
+                    _ => "py.None()".to_string(),
                 },
                 param.name
             );
@@ -694,7 +755,7 @@ fn lookback_table(specs: &[Spec]) -> String {
             // A float parameter cannot go through `int_param`, and it never
             // changes a lookback; it still has to be read so the Params struct
             // can be built.
-            match param.ty {
+            match &param.ty {
                 ParamType::Int => {
                     let _ = write!(
                         body,
@@ -706,11 +767,14 @@ fn lookback_table(specs: &[Spec]) -> String {
                         param.default,
                     );
                 }
-                ParamType::Enum(_) => {
+                ParamType::Enum(name) => {
                     let _ = write!(
                         body,
-                        "            let {0} = ma_type_param(\"{1}\", \"{0}\", match text(\"{0}\")? {{\n                Some(ref value) => value,\n                None => {2:?},\n            }}).map_err(|e| to_py_err(py, &e))?;\n",
-                        param.name, spec.name, param.default,
+                        "            let {0} = {3}(\"{1}\", \"{0}\", match text(\"{0}\")? {{\n                Some(ref value) => value,\n                None => {2:?},\n            }}).map_err(|e| to_py_err(py, &e))?;\n",
+                        param.name,
+                        spec.name,
+                        param.default,
+                        enumeration(name).parses_with,
                     );
                 }
                 _ => {
@@ -1137,17 +1201,29 @@ fn shipped(values: &[String], specs: &[Spec]) -> Vec<String> {
         .collect()
 }
 
-fn test_registry(specs: &[Spec], ma_types: &[String]) -> String {
-    let listed: Vec<String> = ma_types.iter().map(|name| format!("{name:?}")).collect();
+fn test_registry(specs: &[Spec], values: &BTreeMap<String, Vec<String>>) -> String {
+    let mut constants = String::new();
+    for (name, enumeration) in ENUMERATIONS {
+        let listed: Vec<String> = values[*name]
+            .iter()
+            .map(|value| format!("{value:?}"))
+            .collect();
+        let _ = write!(
+            constants,
+            "/// The values a `{}` parameter accepts, in the order its index\n\
+             /// encoding uses.\n\
+             pub const {}: &[&str] = &[{}];\n\n",
+            name,
+            enumeration.listed_as,
+            listed.join(", ")
+        );
+    }
     let mut out = format!(
         "{RUST_BANNER}\n\n\
          #![allow(dead_code)]\n\n\
-         use super::{{AnyStream, Columns, ma_type_at, OpenAndFillResult, ParamSpec, Registered, TlError}};\n\
+         use super::{{AnyStream, Columns, enum_at, OpenAndFillResult, ParamSpec, Registered, TlError}};\n\
          use trendlib::core::kernel::Kernel;\n\n\
-         /// The averages an `ma_type` parameter accepts, in the order its index\n\
-         /// encoding uses.\n\
-         pub const MA_TYPES: &[&str] = &[{listed}];\n\n",
-        listed = listed.join(", "),
+         {constants}"
     );
 
     for spec in specs {
@@ -1160,11 +1236,13 @@ fn test_registry(specs: &[Spec], ma_types: &[String]) -> String {
             .params
             .iter()
             .enumerate()
-            .map(|(index, param)| match param.ty {
+            .map(|(index, param)| match &param.ty {
                 ParamType::Int => format!("{}: values[{index}] as usize, ", param.name),
-                ParamType::Enum(_) => {
-                    format!("{}: ma_type_at(values[{index}]), ", param.name)
-                }
+                ParamType::Enum(name) => format!(
+                    "{}: enum_at(values[{index}], {}), ",
+                    param.name,
+                    enumeration(name).listed_as
+                ),
                 _ => format!("{}: values[{index}], ", param.name),
             })
             .collect();
@@ -1184,16 +1262,19 @@ fn test_registry(specs: &[Spec], ma_types: &[String]) -> String {
                     // of range is unrepresentable in Rust, so the suite that
                     // checks out-of-range values are refused has nothing to
                     // offer here, and the Python layer tests the name instead.
-                    ParamType::Enum(_) => (
-                        ma_types
-                            .iter()
-                            .position(|name| name == &param.default)
-                            .map(|index| format!("{index}.0"))
-                            .unwrap_or_else(|| "0.0".into()),
-                        "0.0".to_string(),
-                        format!("{}.0", ma_types.len().saturating_sub(1)),
-                        "MA_TYPES",
-                    ),
+                    ParamType::Enum(name) => {
+                        let listed = &values[name];
+                        (
+                            listed
+                                .iter()
+                                .position(|value| value == &param.default)
+                                .map(|index| format!("{index}.0"))
+                                .unwrap_or_else(|| "0.0".into()),
+                            "0.0".to_string(),
+                            format!("{}.0", listed.len().saturating_sub(1)),
+                            enumeration(name).listed_as,
+                        )
+                    }
                     _ => (
                         as_float(&param.default),
                         param
@@ -1288,10 +1369,16 @@ pub fn generate(root: &Path) -> Result<Vec<Generated>, Vec<SpecError>> {
     let specs = crate::spec::read_all(&indicators)?;
     check_supported(&specs)?;
     let enums = crate::spec::read_enums(&indicators.join("_enums.yaml")).map_err(|e| vec![e])?;
-    let ma_types = shipped(
-        enums.get("MaType").map(Vec::as_slice).unwrap_or_default(),
-        &specs,
-    );
+    let mut values: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    for (name, enumeration) in ENUMERATIONS {
+        let declared = enums.get(*name).map(Vec::as_slice).unwrap_or_default();
+        let offered = if enumeration.needs_an_indicator {
+            shipped(declared, &specs)
+        } else {
+            declared.to_vec()
+        };
+        values.insert((*name).to_string(), offered);
+    }
 
     let raw = vec![
         (indicators.join("mod.rs"), indicators_mod(&specs)),
@@ -1307,7 +1394,7 @@ pub fn generate(root: &Path) -> Result<Vec<Generated>, Vec<SpecError>> {
         (root.join("python/trendlib/_core.pyi"), stubs(&specs)),
         (
             root.join("crates/trendlib/tests/support/registry.rs"),
-            test_registry(&specs, &ma_types),
+            test_registry(&specs, &values),
         ),
     ];
 

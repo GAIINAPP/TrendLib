@@ -195,14 +195,18 @@ CASE_OVERRIDES = {
 
 
 def shipped_values(enum_name: str) -> list[str]:
-    """The enum's values that have an indicator of the same name.
+    """The values of `enum_name` an indicator can actually be asked for.
 
-    The averages the library can actually build; the rest are approved but not
-    implemented, and asking for one is an error rather than a golden case.
+    `MaType` offers the averages the library has built, which are the ones with
+    an indicator of the same name; the rest are approved but not implemented,
+    and asking for one is an error rather than a golden case. Every other
+    enum's values stand on their own.
     """
     import yaml
 
     values = yaml.safe_load(ENUMS.read_text(encoding="utf-8"))[enum_name]["values"]
+    if enum_name != "MaType":
+        return values
     return [value for value in values if (INDICATORS / value / "spec.yaml").exists()]
 
 
@@ -323,10 +327,71 @@ def bind_inputs(spec: dict, columns: dict[str, list]):
     return bound
 
 
+def session_vwap(bound: dict, anchor: str):
+    """TA-Lib's VWAP run separately on each session's slice.
+
+    TA-Lib's own VWAP never resets, so the only way to get the session-anchored
+    figure out of it is to hand it one session at a time. The slices are cut on
+    the calendar date of the timestamp, which is what `anchor="day"` means
+    (`INDICATORS.md` section 3.1).
+    """
+    import numpy as np
+    import talib
+
+    high, low, close = bound["high"], bound["low"], bound["close"]
+    volume, stamps = bound["volume"], bound["timestamps"]
+    out = np.full(len(close), np.nan)
+    if anchor == "none":
+        return talib.VWAP(high, low, close, volume)
+    day = stamps // 86_400_000_000_000
+    for session in np.unique(day):
+        rows = np.flatnonzero(day == session)
+        out[rows] = talib.VWAP(high[rows], low[rows], close[rows], volume[rows])
+    return out
+
+
+def excluded_rows(spec: dict, bound: dict, params: dict) -> tuple[str, str | None]:
+    """Rows the oracle cannot pin, as a range list and the reason.
+
+    Only `vwap` has any: before volume has traded in a session TA-Lib carries
+    the previous value or starts at zero, and zero is not a price
+    (`CONVENTIONS.md` deviation 2).
+    """
+    import numpy as np
+
+    if spec["name"] != "vwap":
+        return "none", None
+    volume, stamps = bound["volume"], bound["timestamps"]
+    day = stamps // 86_400_000_000_000 if params["anchor"] == "day" else np.zeros_like(stamps)
+    traded = np.zeros(len(volume))
+    for session in np.unique(day):
+        rows = np.flatnonzero(day == session)
+        traded[rows] = np.cumsum(volume[rows])
+    rows = np.flatnonzero(traded == 0.0)
+    if len(rows) == 0:
+        return "none", None
+    ranges = []
+    start = previous = int(rows[0])
+    for row in map(int, rows[1:]):
+        if row != previous + 1:
+            ranges.append((start, previous))
+            start = row
+        previous = row
+    ranges.append((start, previous))
+    listed = ", ".join(f"{low}-{high}" for low, high in ranges)
+    return (
+        f"{listed} (Deviation 2)",
+        "before any volume has traded in a session there is no average fill to report, and "
+        "TA-Lib answers zero where this answers NaN, because zero is not a price",
+    )
+
+
 def run_oracle(spec: dict, bound: dict, params: dict):
     """Call TA-Lib with its own parameter names and return its output arrays."""
     import talib
 
+    if spec["name"] == "vwap":
+        return [session_vwap(bound, params["anchor"])]
     alias = spec.get("talib")
     if alias is None:
         raise SystemExit(
@@ -358,6 +423,7 @@ def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
         )
 
     rendered = ", ".join(f"{key}={value}" for key, value in params.items()) or "none"
+    excluded, excluded_why = excluded_rows(spec, bound, params)
     header = [
         f"# indicator: {name}",
         f"# case: {case}",
@@ -368,9 +434,10 @@ def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
         f"# input: testdata/{dataset} (all rows)"
         + (", source scaled into [-1, 1]" if name in SCALED_SOURCE else ""),
         f"# tolerance: {tolerance_for(name, case)[0]}",
-        "# excluded_rows: none",
+        f"# excluded_rows: {excluded}",
         *([f"# note: {CASE_OVERRIDES[(name, case)][1]}"] if (name, case) in CASE_OVERRIDES else []),
         *([f"# note: {reason}"] if (reason := tolerance_for(name, case)[1]) else []),
+        *([f"# note: {excluded_why}"] if excluded_why else []),
         f"# date: {dt.date.today().isoformat()}",
     ]
 

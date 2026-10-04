@@ -5,7 +5,7 @@
 mod support;
 
 use support::{as_slices, bitwise_equal, find, first_difference, golden_files, read_golden};
-use trendlib::core::math::MaType;
+use trendlib::core::math::{MaType, VwapAnchor};
 
 #[test]
 fn every_golden_file_matches_the_implementation() {
@@ -148,6 +148,8 @@ fn every_indicator_has_the_golden_cases_its_parameters_call_for() {
 fn the_registry_lists_every_average_the_core_has() {
     let core: Vec<&str> = MaType::ALL.iter().map(|(name, _)| *name).collect();
     assert_eq!(support::registry::MA_TYPES, core.as_slice());
+    let anchors: Vec<&str> = VwapAnchor::ALL.iter().map(|(name, _)| *name).collect();
+    assert_eq!(support::registry::VWAP_ANCHORS, anchors.as_slice());
     for pending in MaType::PENDING {
         assert!(
             !core.contains(pending),

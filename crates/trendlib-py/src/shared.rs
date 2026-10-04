@@ -4,7 +4,7 @@
 use numpy::PyReadonlyArray1;
 use pyo3::prelude::*;
 use trendlib::TlError;
-use trendlib::core::math::MaType;
+use trendlib::core::math::{MaType, VwapAnchor};
 
 /// Map a core error onto the Python class `docs/PYTHON_API.md` promises. The
 /// module is imported on the error path only, so the happy path pays nothing
@@ -77,4 +77,8 @@ pub fn float_param(
 /// quietly standing in for another one (`docs/INDICATORS.md` section 1).
 pub fn ma_type_param(indicator: &str, name: &str, value: &str) -> Result<MaType, TlError> {
     MaType::parse(indicator, name, value)
+}
+
+pub fn vwap_anchor_param(indicator: &str, name: &str, value: &str) -> Result<VwapAnchor, TlError> {
+    VwapAnchor::parse(indicator, name, value)
 }

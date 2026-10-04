@@ -1726,6 +1726,46 @@ mod tests {
     }
 }
 
+/// Where a running total starts over.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum VwapAnchor {
+    /// A new session each time the calendar date of the timestamp changes.
+    Day,
+    /// Never: one running total over the whole series.
+    None,
+}
+
+impl VwapAnchor {
+    pub const ALL: &'static [(&'static str, VwapAnchor)] =
+        &[("day", VwapAnchor::Day), ("none", VwapAnchor::None)];
+
+    pub fn from_name(name: &str) -> Option<Self> {
+        Self::ALL
+            .iter()
+            .find(|(known, _)| *known == name)
+            .map(|(_, kind)| *kind)
+    }
+
+    pub fn name(self) -> &'static str {
+        Self::ALL
+            .iter()
+            .find(|(_, kind)| *kind == self)
+            .map(|(name, _)| *name)
+            .unwrap_or("day")
+    }
+
+    /// The anchor `name` asks for, or the error the Python layer reports.
+    pub fn parse(indicator: &str, param: &str, name: &str) -> Result<Self, TlError> {
+        Self::from_name(name).ok_or_else(|| {
+            let known: Vec<&str> = Self::ALL.iter().map(|(name, _)| *name).collect();
+            TlError::InvalidInput(format!(
+                "{indicator}: {param} must be one of {}, got {name:?}",
+                known.join(", ")
+            ))
+        })
+    }
+}
+
 /// The moving averages an indicator can be asked to use.
 ///
 /// `spec.yaml` names these in lowercase and the uppercase TA-Lib aliases accept

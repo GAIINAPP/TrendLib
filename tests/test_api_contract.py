@@ -55,20 +55,29 @@ def test_pandas_series_keeps_its_index_and_output_names(bars, indicator):
         assert result.index.equals(index)
 
 
+#: What a frame of bars holds.
+BAR_KINDS = {"open", "high", "low", "close", "volume"}
+
+
 def _interchangeable_inputs(indicator) -> bool:
     """An input a frame of bars cannot supply.
 
-    Two generic series it cannot tell apart, or one alongside a named bar
-    input, where the frame simply has no column for it.
+    Two generic series it cannot tell apart, one alongside a named bar input
+    where the frame has no column for it, or something that is not a bar
+    column at all, such as timestamps.
     """
     generic = sum(1 for kind in indicator.kinds if kind == "series")
-    return generic > 1 or (generic == 1 and len(indicator.inputs) > 1)
+    if generic > 1 or (generic == 1 and len(indicator.inputs) > 1):
+        return True
+    return any(kind not in BAR_KINDS and kind != "series" for kind in indicator.kinds)
 
 
 def test_a_dataframe_is_refused_when_it_cannot_say_which_column_is_which(bars, indicator):
     if not _interchangeable_inputs(indicator):
         pytest.skip("inputs are named columns, so a frame is unambiguous")
-    with pytest.raises(tl.InvalidInput, match="cannot say which column"):
+    # Either it cannot tell two series apart, or it simply has no column for
+    # what was asked; both are refusals that name the input.
+    with pytest.raises(tl.InvalidInput, match=r"cannot say which column|has no '"):
         getattr(tl, indicator.name)(indicator.frame(bars))
 
 
@@ -179,10 +188,13 @@ def test_an_average_that_is_not_built_yet_is_refused_by_name(repo_root, bars, in
 
     columns = indicator.columns(bars, 60)
     enums = yaml.safe_load((repo_root / "crates/trendlib/src/indicators/_enums.yaml").read_text())
+    averages = enums["MaType"]["values"]
     for name, spec in indicator.params.items():
-        if not spec["choices"]:
+        # Only the averages have values that are approved and not yet built;
+        # the other enums offer everything they declare.
+        if not spec["choices"] or not set(spec["choices"]) <= set(averages):
             continue
-        for value in enums["MaType"]["values"]:
+        for value in averages:
             if value in spec["choices"]:
                 continue
             with pytest.raises(tl.InvalidInput, match="not implemented yet"):

@@ -115,11 +115,12 @@ where the computation starts. Their `spec.yaml` carries the `path_dependent` fla
   nanoseconds (UTC). Naive pandas/Python datetimes raise `InvalidInput` asking
   the caller to localize (D10).
 - Timestamps must be non-decreasing; equal timestamps are allowed.
-- `tz` parameters take IANA names (`"Asia/Kolkata"`). The Python layer converts
-  timestamps to epoch ns and passes per-bar UTC offsets to Rust, so the core crate
-  needs no timezone database. (India has had no DST since 1945; the per-bar
-  offsets still keep this correct for other zones.)
-- `anchor="day"`: a new session starts when the local calendar date in `tz`
+- `tz` parameters are M6 (assumption A15); nothing takes one yet. When one
+  lands it will take IANA names (`"Asia/Kolkata"`), with the Python layer
+  converting timestamps to epoch ns and passing per-bar UTC offsets to Rust, so
+  the core crate needs no timezone database. (India has had no DST since 1945;
+  the per-bar offsets still keep this correct for other zones.)
+- `anchor="day"`: a new session starts when the calendar date of the timestamp
   changes. `anchor="none"`: never reset. More anchors (week, month, NSE trading
   calendar) are M6.
 

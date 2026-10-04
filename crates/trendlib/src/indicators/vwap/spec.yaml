@@ -1,0 +1,32 @@
+name: vwap
+title: Volume Weighted Average Price
+group: volume
+flags: [overlap, path_dependent, requires_timestamps, nan_inf_output]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+  - name: volume
+    kind: volume
+  - name: timestamps
+    kind: timestamps
+params:
+  - name: anchor
+    type: enum:VwapAnchor
+    default: day
+    doc: Where the running total starts over
+outputs:
+  - name: vwap
+    dtype: float64
+    plot: line
+    doc: Average price so far this session, weighted by the volume at each
+talib:
+  name: VWAP
+  params: {}
+  outputs: [real]
+references:
+  - INDICATORS.md section 3.1, the approved session-anchored definition
+see_also: [vwma, ad, obv]

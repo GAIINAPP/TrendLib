@@ -194,6 +194,7 @@ pub mod ultosc;
 pub mod var;
 pub mod vhf;
 pub mod vortex;
+pub mod vwap;
 pub mod vwma;
 pub mod wad;
 pub mod wclprice;
