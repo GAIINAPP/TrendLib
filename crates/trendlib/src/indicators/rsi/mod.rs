@@ -7,9 +7,9 @@ pub const NAME: &str = "rsi";
 
 // Mirrors spec.yaml. From M2 `cargo xtask generate` owns these three values and
 // the validate body below; a Python test asserts they agree until then.
-const PERIOD_DEFAULT: usize = 14;
-const PERIOD_MIN: usize = 2;
-const PERIOD_MAX: usize = 100_000;
+pub const PERIOD_DEFAULT: usize = 14;
+pub const PERIOD_MIN: usize = 2;
+pub const PERIOD_MAX: usize = 100_000;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Params {

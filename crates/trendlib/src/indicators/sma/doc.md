@@ -18,8 +18,11 @@ where $x$ is `source` and $n$ is `period`.
 - Lookback is $n - 1$: the first $n - 1$ rows after the first valid bar are
   `NaN`, as in TA-Lib.
 - The window sum is advanced rather than recomputed: add the newest value,
-  divide, subtract the oldest. This reproduces TA-Lib's values bit for bit
-  (`CONVENTIONS.md` section 1). A recomputed sum differs by a few ULP.
+  divide, subtract the oldest. A recomputed sum differs by a few ULP.
+- Values are bit for bit identical to ta-lib-python, which the test suite
+  asserts. SMA has no multiply-add for a compiler to fuse, so matching the
+  summation order is enough; the recursive indicators cannot promise this
+  (`CONVENTIONS.md` section 1).
 - `period = 1` performs no smoothing and returns `source` unchanged.
 - Leading `NaN` rows are skipped and the lookback counts from the first valid
   bar; a `NaN` or infinity after it raises `InvalidInput` (Deviation 1).

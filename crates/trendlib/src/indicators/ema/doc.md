@@ -22,9 +22,14 @@ where $x$ is `source` and $n$ is `period`.
 
 - Seeded with the simple mean of the first $n$ values, as TA-Lib seeds it, so
   lookback is $n - 1$.
-- Advanced as `prev + (x - prev) * k`. The algebraically equal form
-  `x*k + prev*(1-k)` rounds differently and drifts from the oracle by a few ULP
-  (`CONVENTIONS.md` section 1).
+- Advanced as `prev + (x - prev) * k`, which is the accurate ordering when the
+  series has converged and `x - prev` is small.
+- Values agree with ta-lib-python inside the 1e-10 tolerance this project
+  requires, but not bit for bit: TA-Lib's published wheel evaluates the same
+  expression as a single fused multiply-add, so it rounds once where TrendLib
+  rounds twice (`CONVENTIONS.md` section 1). On price data the gap is a unit or
+  two in the last place; on a series decaying towards zero for hundreds of bars
+  it compounds, while staying far inside the tolerance.
 - Recursive, so the value at any bar still carries a trace of the seed. There is
   no unstable-period setting (D9); discard extra leading rows yourself if you
   want values independent of where the series starts.

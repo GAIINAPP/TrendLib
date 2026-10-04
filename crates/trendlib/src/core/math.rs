@@ -87,7 +87,7 @@ impl Ema {
             self.prev = self.seed_total / self.period_f64;
             return Some(self.prev);
         }
-        self.prev = ((value - self.prev) * self.k) + self.prev;
+        self.prev = self.step(value);
         self.seen += 1;
         Some(self.prev)
     }
@@ -96,8 +96,20 @@ impl Ema {
         match (self.seen + 1).cmp(&self.period) {
             std::cmp::Ordering::Less => None,
             std::cmp::Ordering::Equal => Some((self.seed_total + value) / self.period_f64),
-            std::cmp::Ordering::Greater => Some(((value - self.prev) * self.k) + self.prev),
+            std::cmp::Ordering::Greater => Some(self.step(value)),
         }
+    }
+
+    fn step(&self, value: f64) -> f64 {
+        // A period of 1 weights the new bar fully, so the average is the series
+        // itself. Taking the general path there would subtract two values of
+        // very different magnitude and add the difference back, losing the
+        // smaller one: EMA(1) of [16384.0, -9.7e-11] would return -9.8e-11
+        // instead of the bar that was just handed in.
+        if self.period == 1 {
+            return value;
+        }
+        ((value - self.prev) * self.k) + self.prev
     }
 }
 

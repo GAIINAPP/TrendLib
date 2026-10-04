@@ -6,12 +6,29 @@ every exception must also appear in § 9.
 ## 1. Numbers
 
 - Inputs and float outputs are IEEE-754 `float64`. Integer outputs are `int32`.
+- The accuracy contract in `SPEC.md` § 6 covers **normal** `float64`. Subnormal
+  inputs (magnitude below about 2.2e-308) are computed, raise nothing and
+  produce a full-length output, but every operation on them drops significand
+  bits, so two correct implementations can drift far past 1e-10 from each other
+  and no tolerance against the oracle is claimed there.
 - No fast-math, no reassociation flags. Do not use `mul_add` in one path (batch)
-  and plain `a * b + c` in the other (stream): parity is bitwise.
+  and plain `a * b + c` in the other (stream): parity between TrendLib's own two
+  paths is bitwise.
 - Summation order matters for TA-Lib parity. Where TA-Lib uses a running sum
   (add newest, subtract oldest), do the same. Do not add Kahan or pairwise
   summation to a shared indicator unless parity with TA-Lib still holds within
   tolerance; if you do, document it.
+- **Bitwise agreement with TA-Lib is not a goal and for some indicators is not
+  reachable.** The contract against the oracle is the tolerance in `SPEC.md`
+  § 6. Matching the arithmetic order gets SMA there exactly, because it has no
+  multiply-add. It cannot get EMA there: ta-lib-python's published wheel
+  evaluates `prev + (x - prev) * k` as one fused multiply-add, rounding once
+  where a plain `a * b + c` rounds twice, so the two differ by up to one unit in
+  the last place and then track each other (measured on 0.8.1, Linux x86-64,
+  M1). Whether that contraction happens is a property of TA-Lib's build, not of
+  the algorithm, so chasing it would make TrendLib's output depend on someone
+  else's compiler flags. Each indicator's `doc.md` states which of the two it
+  achieves, and the Python parity suite asserts it.
 
 ## 2. Alignment and warm-up
 

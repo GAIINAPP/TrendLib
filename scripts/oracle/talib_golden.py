@@ -131,7 +131,9 @@ def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
 
     expected = len(spec["outputs"])
     if len(outputs) != expected:
-        raise SystemExit(f"{name}/{case}: oracle returned {len(outputs)} outputs, spec has {expected}")
+        raise SystemExit(
+            f"{name}/{case}: oracle returned {len(outputs)} outputs, spec has {expected}"
+        )
 
     rendered = ", ".join(f"{key}={value}" for key, value in params.items()) or "none"
     header = [
@@ -149,9 +151,10 @@ def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
 
     names = [i["name"] for i in spec["inputs"]] + [o["name"] for o in spec["outputs"]]
     series = [bound[i["name"]] for i in spec["inputs"]] + outputs
-    lines = header + [",".join(names)]
-    for row in range(len(series[0])):
-        lines.append(",".join(repr(column[row].item()) for column in series))
+    lines = [*header, ",".join(names)]
+    lines.extend(
+        ",".join(repr(column[row].item()) for column in series) for row in range(len(series[0]))
+    )
 
     path = INDICATORS / name / "golden" / f"{case}.csv"
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -160,7 +163,9 @@ def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
 
     size = path.stat().st_size
     if size > 2_000_000:
-        raise SystemExit(f"{path.name} is {size} bytes; docs/SPEC_FORMAT.md section 4 caps it at 2 MB")
+        raise SystemExit(
+            f"{path.name} is {size} bytes; docs/SPEC_FORMAT.md section 4 caps it at 2 MB"
+        )
     return path
 
 

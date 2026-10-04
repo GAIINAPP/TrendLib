@@ -81,3 +81,17 @@ the repository README is two levels up.
 A10 (M0, 2026-10-04): pinned pyo3 0.29 with numpy 0.29 (the matching pair), Rust
 edition 2024 and toolchain 1.95. `extension-module` is a default feature of
 `trendlib-py` so `cargo test --workspace` never has to link libpython.
+
+A11 (M1, 2026-10-04): the EMA step stays `prev + (x - prev) * k` with two
+roundings rather than `f64::mul_add`. Using `mul_add` would match ta-lib-python's
+published wheel bit for bit, because that wheel contracts the expression into a
+fused multiply-add, but on a target without hardware FMA Rust falls back to a
+software `fma` call per bar, which puts the 1.5x-of-TA-Lib budget in
+`SPEC.md` § 6 at risk. The observed gap is at most one unit in the last place.
+Revisit with the M4 benchmarks if bitwise parity turns out to be worth it.
+
+A12 (M1, 2026-10-04): RSI follows the Wilder wording in `CONVENTIONS.md` § 4
+(`prev * (n - 1) / n + x / n`). Six orderings were compared against the oracle
+and none reproduced ta-lib-python bit for bit for periods above 2; all agreed to
+about 6e-16 relative, well inside the 1e-10 contract. Code and doc therefore say
+the same thing.

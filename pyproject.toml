@@ -45,7 +45,12 @@ target-version = "py311"
 extend-exclude = ["testdata", "*.md"]
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+# docs/PYTHON_API.md section 1 fixes these exception names; they are public
+# API and cannot gain an Error suffix.
+"python/trendlib/errors.py" = ["N818"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["trendlib"]

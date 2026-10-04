@@ -6,15 +6,24 @@ investment advice.
 
 import re as _re
 
-from trendlib import _core
+from trendlib import _core, stream
+from trendlib._functions import EMA, RSI, SMA, ema, lookback, rsi, sma
 from trendlib.errors import InsufficientHistory, InvalidInput, TrendLibError
 
 __all__ = [
+    "EMA",
+    "RSI",
+    "SMA",
     "InsufficientHistory",
     "InvalidInput",
     "TrendLibError",
     "__version__",
     "__version_info__",
+    "ema",
+    "lookback",
+    "rsi",
+    "sma",
+    "stream",
 ]
 
 
