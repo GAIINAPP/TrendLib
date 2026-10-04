@@ -2,8 +2,8 @@
 
 # Progress
 
-**158 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 46 not started.
+**173 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 31 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -17,9 +17,9 @@ something is done that is not. CI checks it is current.
 | Group | Shipped | Total |
 | --- | --- | --- |
 | Overlap studies | 19 | 25 |
-| Momentum | 31 | 47 |
-| Volatility | 3 | 7 |
-| Volume | 2 | 12 |
+| Momentum | 37 | 47 |
+| Volatility | 4 | 7 |
+| Volume | 10 | 12 |
 | Price transforms | 6 | 6 |
 | Cycle | 0 | 5 |
 | Statistics | 9 | 11 |
@@ -56,19 +56,19 @@ something is done that is not. CI checks it is current.
 - [x] `wma` (`WMA`) -- Weighted Moving Average *
 - [x] `zlema` (`ZLEMA`) -- Zero Lag Exponential Moving Average
 
-## Momentum (31 of 47)
+## Momentum (37 of 47)
 
-- [ ] `ac` (`AC`)
+- [x] `ac` (`AC`) -- Accelerator Oscillator
 - [x] `adx` (`ADX`) -- Average Directional Movement Index *
 - [x] `adxr` (`ADXR`) -- Average Directional Movement Index Rating
-- [ ] `ao` (`AO`)
+- [x] `ao` (`AO`) -- Awesome Oscillator
 - [x] `apo` (`APO`) -- Absolute Price Oscillator
 - [x] `aroon` (`AROON`) -- Aroon
 - [x] `aroonosc` (`AROONOSC`) -- Aroon Oscillator
 - [x] `bop` (`BOP`) -- Balance of Power
 - [x] `cci` (`CCI`) -- Commodity Channel Index *
 - [x] `cmo` (`CMO`) -- Chande Momentum Oscillator
-- [ ] `cmou` (`CMOU`)
+- [x] `cmou` (`CMOU`) -- Chande Momentum Oscillator (unsmoothed)
 - [ ] `coppock` (`COPPOCK`)
 - [x] `dpo` (`DPO`) -- Detrended Price Oscillator
 - [x] `dx` (`DX`) -- Directional Movement Index
@@ -76,7 +76,7 @@ something is done that is not. CI checks it is current.
 - [ ] `eri` (`ERI`)
 - [ ] `fosc` (`FOSC`)
 - [ ] `fractal` (`FRACTAL`)
-- [ ] `imi` (`IMI`)
+- [x] `imi` (`IMI`) -- Intraday Momentum Index
 - [ ] `kdj` (`KDJ`)
 - [x] `macd` (`MACD`) -- Moving Average Convergence Divergence *
 - [x] `macdext` (`MACDEXT`) -- MACD with Selectable Averages
@@ -88,7 +88,7 @@ something is done that is not. CI checks it is current.
 - [x] `plus_di` (`PLUS_DI`) -- Plus Directional Indicator
 - [x] `plus_dm` (`PLUS_DM`) -- Plus Directional Movement
 - [x] `ppo` (`PPO`) -- Percentage Price Oscillator
-- [ ] `qstick` (`QSTICK`)
+- [x] `qstick` (`QSTICK`) -- Qstick
 - [x] `roc` (`ROC`) -- Rate of Change *
 - [x] `rocp` (`ROCP`) -- Rate of Change Percentage
 - [x] `rocr` (`ROCR`) -- Rate of Change Ratio
@@ -103,12 +103,12 @@ something is done that is not. CI checks it is current.
 - [x] `ultosc` (`ULTOSC`) -- Ultimate Oscillator
 - [ ] `vhf` (`VHF`)
 - [ ] `vortex` (`VORTEX`)
-- [ ] `wad` (`WAD`)
+- [x] `wad` (`WAD`) -- Williams Accumulation/Distribution
 - [x] `willr` (`WILLR`) -- Williams Percent Range *
 
-## Volatility (3 of 7)
+## Volatility (4 of 7)
 
-- [ ] `adr` (`ADR`)
+- [x] `adr` (`ADR`) -- Average Day Range
 - [x] `atr` (`ATR`) -- Average True Range *
 - [ ] `cvi` (`CVI`)
 - [ ] `massi` (`MASSI`)
@@ -116,19 +116,19 @@ something is done that is not. CI checks it is current.
 - [ ] `rvi` (`RVI`)
 - [x] `trange` (`TRANGE`) -- True Range *
 
-## Volume (2 of 12)
+## Volume (10 of 12)
 
 - [x] `ad` (`AD`) -- Chaikin Accumulation Distribution Line *
-- [ ] `adosc` (`ADOSC`) *
-- [ ] `cmf` (`CMF`)
-- [ ] `efi` (`EFI`)
-- [ ] `marketfi` (`MARKETFI`)
-- [ ] `nvi` (`NVI`)
+- [x] `adosc` (`ADOSC`) -- Chaikin Accumulation/Distribution Oscillator *
+- [x] `cmf` (`CMF`) -- Chaikin Money Flow
+- [x] `efi` (`EFI`) -- Elder Force Index
+- [x] `marketfi` (`MARKETFI`) -- Market Facilitation Index
+- [x] `nvi` (`NVI`) -- Negative Volume Index
 - [x] `obv` (`OBV`) -- On Balance Volume *
-- [ ] `pvi` (`PVI`)
+- [x] `pvi` (`PVI`) -- Positive Volume Index
 - [ ] `pvo` (`PVO`)
-- [ ] `pvt` (`PVT`)
-- [ ] `rvol` (`RVOL`)
+- [x] `pvt` (`PVT`) -- Price Volume Trend
+- [x] `rvol` (`RVOL`) -- Relative Volume
 - [ ] `vwap` (`VWAP`) *
 
 ## Price transforms (6 of 6)

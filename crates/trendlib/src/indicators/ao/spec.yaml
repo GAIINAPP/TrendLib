@@ -1,0 +1,33 @@
+name: ao
+title: Awesome Oscillator
+group: momentum
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+params:
+  - name: fast_period
+    type: int
+    default: 5
+    min: 2
+    max: 100000
+    doc: Number of bars in the shorter average
+  - name: slow_period
+    type: int
+    default: 34
+    min: 2
+    max: 100000
+    doc: Number of bars in the longer average
+outputs:
+  - name: ao
+    dtype: float64
+    plot: histogram
+    doc: Short average of the bar midpoints minus the long one
+talib:
+  name: AO
+  params: {fast_period: fastperiod, slow_period: slowperiod}
+  outputs: [real]
+references:
+  - Bill Williams, Trading Chaos, Wiley, 1995
+see_also: [ac, apo, macd]

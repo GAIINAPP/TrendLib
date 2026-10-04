@@ -1,0 +1,26 @@
+name: rvol
+title: Relative Volume
+group: volume
+flags: [nan_inf_output]
+inputs:
+  - name: volume
+    kind: volume
+params:
+  - name: period
+    type: int
+    default: 20
+    min: 1
+    max: 100000
+    doc: Number of earlier bars the volume is compared against
+outputs:
+  - name: rvol
+    dtype: float64
+    plot: line
+    doc: This bar's volume as a multiple of the recent average
+talib:
+  name: RVOL
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - TA-Lib, ta_RVOL.c
+see_also: [obv, marketfi, vwma]

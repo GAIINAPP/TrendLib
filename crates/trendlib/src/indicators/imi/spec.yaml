@@ -1,0 +1,27 @@
+name: imi
+title: Intraday Momentum Index
+group: momentum
+inputs:
+  - name: open
+    kind: open
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 2
+    max: 100000
+    doc: Number of bars the bodies are summed over
+outputs:
+  - name: imi
+    dtype: float64
+    plot: line
+    doc: Share of recent body movement that was upward, as a percentage
+talib:
+  name: IMI
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Tushar S. Chande and Stanley Kroll, The New Technical Trader, Wiley, 1994
+see_also: [rsi, cmo, qstick]

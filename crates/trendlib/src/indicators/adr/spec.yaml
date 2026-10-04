@@ -1,0 +1,27 @@
+name: adr
+title: Average Day Range
+group: volatility
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 1
+    max: 100000
+    doc: Number of bars the range is averaged over
+outputs:
+  - name: adr
+    dtype: float64
+    plot: line
+    doc: Average high-low range over the window
+talib:
+  name: ADR
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - TA-Lib, ta_ADR.c
+see_also: [atr, natr, trange]

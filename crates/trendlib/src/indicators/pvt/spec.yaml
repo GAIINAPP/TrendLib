@@ -1,0 +1,21 @@
+name: pvt
+title: Price Volume Trend
+group: volume
+flags: [path_dependent]
+inputs:
+  - name: close
+    kind: close
+  - name: volume
+    kind: volume
+outputs:
+  - name: pvt
+    dtype: float64
+    plot: line
+    doc: Running total of volume weighted by each bar's percentage change
+talib:
+  name: PVT
+  params: {}
+  outputs: [real]
+references:
+  - Joseph E. Granville, New Strategy of Daily Stock Market Timing for Maximum Profit, Prentice-Hall, 1976
+see_also: [obv, ad, nvi]

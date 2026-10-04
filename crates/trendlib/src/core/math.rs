@@ -745,6 +745,40 @@ impl Wilder {
     }
 }
 
+/// An exponential average seeded with the first value it is given rather than
+/// with the mean of the first `period`.
+///
+/// The Chaikin oscillator needs it: its two averages run over a cumulative
+/// line that starts at the first bar and has no warm-up of its own to average.
+#[derive(Clone, Debug)]
+pub struct EmaFromFirst {
+    k: f64,
+    previous: Option<f64>,
+}
+
+impl EmaFromFirst {
+    pub fn new(period: usize) -> Self {
+        assert!(period > 0, "period must be at least 1");
+        Self {
+            k: 2.0 / (period as f64 + 1.0),
+            previous: None,
+        }
+    }
+
+    pub fn push(&mut self, value: f64) -> f64 {
+        let next = self.preview(value);
+        self.previous = Some(next);
+        next
+    }
+
+    pub fn preview(&self, value: f64) -> f64 {
+        match self.previous {
+            Some(previous) => (value - previous) * self.k + previous,
+            None => value,
+        }
+    }
+}
+
 /// Two moving averages of one series, the shorter period first.
 ///
 /// TA-Lib sorts the two periods before it starts, so asking for a fast period

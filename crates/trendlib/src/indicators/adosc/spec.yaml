@@ -1,0 +1,38 @@
+name: adosc
+title: Chaikin Accumulation/Distribution Oscillator
+group: volume
+flags: [unstable, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+  - name: volume
+    kind: volume
+params:
+  - name: fast_period
+    type: int
+    default: 3
+    min: 2
+    max: 100000
+    doc: Number of bars in the shorter average
+  - name: slow_period
+    type: int
+    default: 10
+    min: 2
+    max: 100000
+    doc: Number of bars in the longer average
+outputs:
+  - name: adosc
+    dtype: float64
+    plot: histogram
+    doc: Short exponential average of the A/D line minus the long one
+talib:
+  name: ADOSC
+  params: {fast_period: fastperiod, slow_period: slowperiod}
+  outputs: [real]
+references:
+  - Marc Chaikin, as described in Steven B. Achelis, Technical Analysis from A to Z, McGraw-Hill, 2000
+see_also: [ad, obv, mfi]

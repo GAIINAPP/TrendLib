@@ -14,12 +14,16 @@ from trendlib import _convert, _core
 from trendlib._stream_base import Factory
 
 __all__ = [
+    "ac",
     "accbands",
     "acos",
     "ad",
     "add",
+    "adosc",
+    "adr",
     "adx",
     "adxr",
+    "ao",
     "apo",
     "aroon",
     "aroonosc",
@@ -93,7 +97,9 @@ __all__ = [
     "cdl_upsidegap2crows",
     "cdl_xsidegap3methods",
     "ceil",
+    "cmf",
     "cmo",
+    "cmou",
     "cos",
     "cosh",
     "cumsum",
@@ -102,11 +108,13 @@ __all__ = [
     "donchian",
     "dpo",
     "dx",
+    "efi",
     "ema",
     "exp",
     "floor",
     "ha",
     "hma",
+    "imi",
     "kama",
     "kc",
     "linearreg",
@@ -119,6 +127,7 @@ __all__ = [
     "macd",
     "macdext",
     "macdfix",
+    "marketfi",
     "max",
     "maxindex",
     "medprice",
@@ -134,18 +143,23 @@ __all__ = [
     "mom",
     "mult",
     "natr",
+    "nvi",
     "obv",
     "percentile",
     "percentrank",
     "plus_di",
     "plus_dm",
     "ppo",
+    "pvi",
+    "pvt",
+    "qstick",
     "rma",
     "roc",
     "rocp",
     "rocr",
     "rocr100",
     "rsi",
+    "rvol",
     "sin",
     "sinh",
     "sma",
@@ -168,12 +182,26 @@ __all__ = [
     "ultosc",
     "var",
     "vwma",
+    "wad",
     "wclprice",
     "willr",
     "wma",
     "zlema",
 ]
 
+ac = Factory(
+    "ac",
+    _core.AcStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("ac",),
+)
 accbands = Factory(
     "accbands",
     _core.AccbandsStream,
@@ -224,6 +252,36 @@ add = Factory(
     ),
     ("add",),
 )
+adosc = Factory(
+    "adosc",
+    _core.AdoscStream,
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    ("adosc",),
+)
+adr = Factory(
+    "adr",
+    _core.AdrStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("adr",),
+)
 adx = Factory(
     "adx",
     _core.AdxStream,
@@ -253,6 +311,19 @@ adxr = Factory(
         "close",
     ),
     ("adxr",),
+)
+ao = Factory(
+    "ao",
+    _core.AoStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("ao",),
 )
 apo = Factory("apo", _core.ApoStream, ("source",), ("series",), ("apo",))
 aroon = Factory(
@@ -1400,7 +1471,25 @@ cdl_xsidegap3methods = Factory(
     ("cdl_xsidegap3methods",),
 )
 ceil = Factory("ceil", _core.CeilStream, ("source",), ("series",), ("ceil",))
+cmf = Factory(
+    "cmf",
+    _core.CmfStream,
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    ("cmf",),
+)
 cmo = Factory("cmo", _core.CmoStream, ("source",), ("series",), ("cmo",))
+cmou = Factory("cmou", _core.CmouStream, ("source",), ("series",), ("cmou",))
 cos = Factory("cos", _core.CosStream, ("source",), ("series",), ("cos",))
 cosh = Factory("cosh", _core.CoshStream, ("source",), ("series",), ("cosh",))
 cumsum = Factory("cumsum", _core.CumsumStream, ("source",), ("series",), ("cumsum",))
@@ -1451,6 +1540,19 @@ dx = Factory(
     ),
     ("dx",),
 )
+efi = Factory(
+    "efi",
+    _core.EfiStream,
+    (
+        "close",
+        "volume",
+    ),
+    (
+        "close",
+        "volume",
+    ),
+    ("efi",),
+)
 ema = Factory("ema", _core.EmaStream, ("source",), ("series",), ("ema",))
 exp = Factory("exp", _core.ExpStream, ("source",), ("series",), ("exp",))
 floor = Factory("floor", _core.FloorStream, ("source",), ("series",), ("floor",))
@@ -1477,6 +1579,19 @@ ha = Factory(
     ),
 )
 hma = Factory("hma", _core.HmaStream, ("source",), ("series",), ("hma",))
+imi = Factory(
+    "imi",
+    _core.ImiStream,
+    (
+        "open",
+        "close",
+    ),
+    (
+        "open",
+        "close",
+    ),
+    ("imi",),
+)
 kama = Factory("kama", _core.KamaStream, ("source",), ("series",), ("kama",))
 kc = Factory(
     "kc",
@@ -1546,6 +1661,21 @@ macdfix = Factory(
         "macdfix_signal",
         "macdfix_hist",
     ),
+)
+marketfi = Factory(
+    "marketfi",
+    _core.MarketfiStream,
+    (
+        "high",
+        "low",
+        "volume",
+    ),
+    (
+        "high",
+        "low",
+        "volume",
+    ),
+    ("marketfi",),
 )
 max = Factory("max", _core.MaxStream, ("source",), ("series",), ("max",))
 maxindex = Factory("maxindex", _core.MaxindexStream, ("source",), ("series",), ("maxindex",))
@@ -1672,6 +1802,19 @@ natr = Factory(
     ),
     ("natr",),
 )
+nvi = Factory(
+    "nvi",
+    _core.NviStream,
+    (
+        "close",
+        "volume",
+    ),
+    (
+        "close",
+        "volume",
+    ),
+    ("nvi",),
+)
 obv = Factory(
     "obv",
     _core.ObvStream,
@@ -1720,12 +1863,52 @@ plus_dm = Factory(
     ("plus_dm",),
 )
 ppo = Factory("ppo", _core.PpoStream, ("source",), ("series",), ("ppo",))
+pvi = Factory(
+    "pvi",
+    _core.PviStream,
+    (
+        "close",
+        "volume",
+    ),
+    (
+        "close",
+        "volume",
+    ),
+    ("pvi",),
+)
+pvt = Factory(
+    "pvt",
+    _core.PvtStream,
+    (
+        "close",
+        "volume",
+    ),
+    (
+        "close",
+        "volume",
+    ),
+    ("pvt",),
+)
+qstick = Factory(
+    "qstick",
+    _core.QstickStream,
+    (
+        "open",
+        "close",
+    ),
+    (
+        "open",
+        "close",
+    ),
+    ("qstick",),
+)
 rma = Factory("rma", _core.RmaStream, ("source",), ("series",), ("rma",))
 roc = Factory("roc", _core.RocStream, ("source",), ("series",), ("roc",))
 rocp = Factory("rocp", _core.RocpStream, ("source",), ("series",), ("rocp",))
 rocr = Factory("rocr", _core.RocrStream, ("source",), ("series",), ("rocr",))
 rocr100 = Factory("rocr100", _core.Rocr100Stream, ("source",), ("series",), ("rocr100",))
 rsi = Factory("rsi", _core.RsiStream, ("source",), ("series",), ("rsi",))
+rvol = Factory("rvol", _core.RvolStream, ("volume",), ("volume",), ("rvol",))
 sin = Factory("sin", _core.SinStream, ("source",), ("series",), ("sin",))
 sinh = Factory("sinh", _core.SinhStream, ("source",), ("series",), ("sinh",))
 sma = Factory("sma", _core.SmaStream, ("source",), ("series",), ("sma",))
@@ -1856,6 +2039,21 @@ vwma = Factory(
         "volume",
     ),
     ("vwma",),
+)
+wad = Factory(
+    "wad",
+    _core.WadStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("wad",),
 )
 wclprice = Factory(
     "wclprice",

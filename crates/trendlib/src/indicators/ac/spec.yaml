@@ -1,0 +1,39 @@
+name: ac
+title: Accelerator Oscillator
+group: momentum
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+params:
+  - name: fast_period
+    type: int
+    default: 5
+    min: 2
+    max: 100000
+    doc: Number of bars in the shorter average
+  - name: slow_period
+    type: int
+    default: 34
+    min: 2
+    max: 100000
+    doc: Number of bars in the longer average
+  - name: signal_period
+    type: int
+    default: 5
+    min: 2
+    max: 100000
+    doc: Number of bars the oscillator is smoothed over
+outputs:
+  - name: ac
+    dtype: float64
+    plot: histogram
+    doc: Awesome oscillator minus its own short average
+talib:
+  name: AC
+  params: {fast_period: fastperiod, slow_period: slowperiod, signal_period: signalperiod}
+  outputs: [real]
+references:
+  - Bill Williams, Trading Chaos, Wiley, 1995
+see_also: [ao, macd, apo]

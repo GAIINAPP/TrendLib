@@ -1,0 +1,28 @@
+name: efi
+title: Elder Force Index
+group: volume
+flags: [unstable, path_dependent, nan_inf_output]
+inputs:
+  - name: close
+    kind: close
+  - name: volume
+    kind: volume
+params:
+  - name: period
+    type: int
+    default: 13
+    min: 1
+    max: 100000
+    doc: Number of bars the force is smoothed over
+outputs:
+  - name: efi
+    dtype: float64
+    plot: histogram
+    doc: Exponentially smoothed move times volume
+talib:
+  name: EFI
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Alexander Elder, Trading for a Living, Wiley, 1993
+see_also: [obv, pvt, mfi]

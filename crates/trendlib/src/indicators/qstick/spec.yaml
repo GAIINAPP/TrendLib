@@ -1,0 +1,27 @@
+name: qstick
+title: Qstick
+group: momentum
+inputs:
+  - name: open
+    kind: open
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 10
+    min: 1
+    max: 100000
+    doc: Number of bars the body is averaged over
+outputs:
+  - name: qstick
+    dtype: float64
+    plot: histogram
+    doc: Average distance from open to close over the window
+talib:
+  name: QSTICK
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Tushar S. Chande and Stanley Kroll, The New Technical Trader, Wiley, 1994
+see_also: [cmo, mom, ao]

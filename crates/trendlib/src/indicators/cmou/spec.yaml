@@ -1,0 +1,25 @@
+name: cmou
+title: Chande Momentum Oscillator (unsmoothed)
+group: momentum
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 2
+    max: 100000
+    doc: Number of bar-to-bar changes summed
+outputs:
+  - name: cmou
+    dtype: float64
+    plot: line
+    doc: Net movement as a percentage of total movement
+talib:
+  name: CMOU
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Tushar S. Chande and Stanley Kroll, The New Technical Trader, Wiley, 1994
+see_also: [cmo, rsi, imi]

@@ -1,0 +1,22 @@
+name: marketfi
+title: Market Facilitation Index
+group: volume
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: volume
+    kind: volume
+outputs:
+  - name: marketfi
+    dtype: float64
+    plot: line
+    doc: How much range the bar covered per unit of volume
+talib:
+  name: MARKETFI
+  params: {}
+  outputs: [real]
+references:
+  - Bill Williams, Trading Chaos, Wiley, 1995
+see_also: [marketfi, rvol, atr]

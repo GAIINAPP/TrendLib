@@ -1,0 +1,21 @@
+name: nvi
+title: Negative Volume Index
+group: volume
+flags: [path_dependent]
+inputs:
+  - name: close
+    kind: close
+  - name: volume
+    kind: volume
+outputs:
+  - name: nvi
+    dtype: float64
+    plot: line
+    doc: Index that only moves on bars where volume falls
+talib:
+  name: NVI
+  params: {}
+  outputs: [real]
+references:
+  - Paul L. Dysart, as described in Norman G. Fosback, Stock Market Logic, Dearborn, 1976
+see_also: [pvi, obv, pvt]

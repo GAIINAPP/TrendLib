@@ -13,12 +13,16 @@ from typing import Any
 from trendlib import _convert, _core
 
 __all__ = [
+    "AC",
     "ACCBANDS",
     "ACOS",
     "AD",
     "ADD",
+    "ADOSC",
+    "ADR",
     "ADX",
     "ADXR",
+    "AO",
     "APO",
     "AROON",
     "AROONOSC",
@@ -92,7 +96,9 @@ __all__ = [
     "CDLUPSIDEGAP2CROWS",
     "CDLXSIDEGAP3METHODS",
     "CEIL",
+    "CMF",
     "CMO",
+    "CMOU",
     "COS",
     "COSH",
     "CUMSUM",
@@ -101,11 +107,13 @@ __all__ = [
     "DONCHIAN",
     "DPO",
     "DX",
+    "EFI",
     "EMA",
     "EXP",
     "FLOOR",
     "HA",
     "HMA",
+    "IMI",
     "KAMA",
     "KC",
     "LINEARREG",
@@ -118,6 +126,7 @@ __all__ = [
     "MACD",
     "MACDEXT",
     "MACDFIX",
+    "MARKETFI",
     "MAX",
     "MAXINDEX",
     "MEDPRICE",
@@ -133,18 +142,23 @@ __all__ = [
     "MOM",
     "MULT",
     "NATR",
+    "NVI",
     "OBV",
     "PERCENTILE",
     "PERCENTRANK",
     "PLUS_DI",
     "PLUS_DM",
     "PPO",
+    "PVI",
+    "PVT",
+    "QSTICK",
     "RMA",
     "ROC",
     "ROCP",
     "ROCR",
     "ROCR100",
     "RSI",
+    "RVOL",
     "SIN",
     "SINH",
     "SMA",
@@ -167,16 +181,21 @@ __all__ = [
     "ULTOSC",
     "VAR",
     "VWMA",
+    "WAD",
     "WCLPRICE",
     "WILLR",
     "WMA",
     "ZLEMA",
+    "ac",
     "accbands",
     "acos",
     "ad",
     "add",
+    "adosc",
+    "adr",
     "adx",
     "adxr",
+    "ao",
     "apo",
     "aroon",
     "aroonosc",
@@ -250,7 +269,9 @@ __all__ = [
     "cdl_upsidegap2crows",
     "cdl_xsidegap3methods",
     "ceil",
+    "cmf",
     "cmo",
+    "cmou",
     "cos",
     "cosh",
     "cumsum",
@@ -259,11 +280,13 @@ __all__ = [
     "donchian",
     "dpo",
     "dx",
+    "efi",
     "ema",
     "exp",
     "floor",
     "ha",
     "hma",
+    "imi",
     "kama",
     "kc",
     "linearreg",
@@ -277,6 +300,7 @@ __all__ = [
     "macd",
     "macdext",
     "macdfix",
+    "marketfi",
     "max",
     "maxindex",
     "medprice",
@@ -292,18 +316,23 @@ __all__ = [
     "mom",
     "mult",
     "natr",
+    "nvi",
     "obv",
     "percentile",
     "percentrank",
     "plus_di",
     "plus_dm",
     "ppo",
+    "pvi",
+    "pvt",
+    "qstick",
     "rma",
     "roc",
     "rocp",
     "rocr",
     "rocr100",
     "rsi",
+    "rvol",
     "sin",
     "sinh",
     "sma",
@@ -326,6 +355,7 @@ __all__ = [
     "ultosc",
     "var",
     "vwma",
+    "wad",
     "wclprice",
     "willr",
     "wma",
@@ -333,6 +363,51 @@ __all__ = [
 ]
 
 _PARAMS = _core.PARAMS
+
+
+def ac(
+    high=None,
+    low=None,
+    *,
+    fast_period: int = _PARAMS["ac"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["ac"]["slow_period"]["default"],
+    signal_period: int = _PARAMS["ac"]["signal_period"]["default"],
+) -> Any:
+    """Accelerator Oscillator.
+
+    Parameters
+    ----------
+    fast_period : int, default 5
+        Number of bars in the shorter average, from 2 to 100000.
+    slow_period : int, default 34
+        Number of bars in the longer average, from 2 to 100000.
+    signal_period : int, default 5
+        Number of bars the oscillator is smoothed over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Awesome oscillator minus its own short average.
+    """
+    fast_period = _convert.as_int("ac", "fast_period", fast_period)
+    slow_period = _convert.as_int("ac", "slow_period", slow_period)
+    signal_period = _convert.as_int("ac", "signal_period", signal_period)
+    columns, carrier = _convert.bars(
+        "ac",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.ac(
+        *columns, fast_period=fast_period, slow_period=slow_period, signal_period=signal_period
+    )
+    return _convert.wrap_outputs(out, carrier, ("ac",))
 
 
 def accbands(
@@ -444,6 +519,81 @@ def add(source0=None, source1=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("add",))
 
 
+def adosc(
+    high=None,
+    low=None,
+    close=None,
+    volume=None,
+    *,
+    fast_period: int = _PARAMS["adosc"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["adosc"]["slow_period"]["default"],
+) -> Any:
+    """Chaikin Accumulation/Distribution Oscillator.
+
+    Parameters
+    ----------
+    fast_period : int, default 3
+        Number of bars in the shorter average, from 2 to 100000.
+    slow_period : int, default 10
+        Number of bars in the longer average, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Short exponential average of the A/D line minus the long one.
+    """
+    fast_period = _convert.as_int("adosc", "fast_period", fast_period)
+    slow_period = _convert.as_int("adosc", "slow_period", slow_period)
+    columns, carrier = _convert.bars(
+        "adosc",
+        (high, low, close, volume),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.adosc(*columns, fast_period=fast_period, slow_period=slow_period)
+    return _convert.wrap_outputs(out, carrier, ("adosc",))
+
+
+def adr(high=None, low=None, *, period: int = _PARAMS["adr"]["period"]["default"]) -> Any:
+    """Average Day Range.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the range is averaged over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Average high-low range over the window.
+    """
+    period = _convert.as_int("adr", "period", period)
+    columns, carrier = _convert.bars(
+        "adr",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.adr(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("adr",))
+
+
 def adx(
     high=None, low=None, close=None, *, period: int = _PARAMS["adx"]["period"]["default"]
 ) -> Any:
@@ -510,6 +660,45 @@ def adxr(
     )
     out = _core.adxr(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("adxr",))
+
+
+def ao(
+    high=None,
+    low=None,
+    *,
+    fast_period: int = _PARAMS["ao"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["ao"]["slow_period"]["default"],
+) -> Any:
+    """Awesome Oscillator.
+
+    Parameters
+    ----------
+    fast_period : int, default 5
+        Number of bars in the shorter average, from 2 to 100000.
+    slow_period : int, default 34
+        Number of bars in the longer average, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Short average of the bar midpoints minus the long one.
+    """
+    fast_period = _convert.as_int("ao", "fast_period", fast_period)
+    slow_period = _convert.as_int("ao", "slow_period", slow_period)
+    columns, carrier = _convert.bars(
+        "ao",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.ao(*columns, fast_period=fast_period, slow_period=slow_period)
+    return _convert.wrap_outputs(out, carrier, ("ao",))
 
 
 def apo(
@@ -2649,6 +2838,47 @@ def ceil(source=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("ceil",))
 
 
+def cmf(
+    high=None,
+    low=None,
+    close=None,
+    volume=None,
+    *,
+    period: int = _PARAMS["cmf"]["period"]["default"],
+) -> Any:
+    """Chaikin Money Flow.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Number of bars the flows are summed over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Share of recent volume that traded in the upper half of its bars.
+    """
+    period = _convert.as_int("cmf", "period", period)
+    columns, carrier = _convert.bars(
+        "cmf",
+        (high, low, close, volume),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.cmf(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("cmf",))
+
+
 def cmo(source=None, *, period: int = _PARAMS["cmo"]["period"]["default"]) -> Any:
     """Chande Momentum Oscillator.
 
@@ -2666,6 +2896,25 @@ def cmo(source=None, *, period: int = _PARAMS["cmo"]["period"]["default"]) -> An
     columns, carrier = _convert.bars("cmo", (source,), ("source",), ("series",))
     out = _core.cmo(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("cmo",))
+
+
+def cmou(source=None, *, period: int = _PARAMS["cmou"]["period"]["default"]) -> Any:
+    """Chande Momentum Oscillator (unsmoothed).
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bar-to-bar changes summed, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Net movement as a percentage of total movement.
+    """
+    period = _convert.as_int("cmou", "period", period)
+    columns, carrier = _convert.bars("cmou", (source,), ("source",), ("series",))
+    out = _core.cmou(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("cmou",))
 
 
 def cos(source=None) -> Any:
@@ -2841,6 +3090,36 @@ def dx(high=None, low=None, close=None, *, period: int = _PARAMS["dx"]["period"]
     return _convert.wrap_outputs(out, carrier, ("dx",))
 
 
+def efi(close=None, volume=None, *, period: int = _PARAMS["efi"]["period"]["default"]) -> Any:
+    """Elder Force Index.
+
+    Parameters
+    ----------
+    period : int, default 13
+        Number of bars the force is smoothed over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Exponentially smoothed move times volume.
+    """
+    period = _convert.as_int("efi", "period", period)
+    columns, carrier = _convert.bars(
+        "efi",
+        (close, volume),
+        (
+            "close",
+            "volume",
+        ),
+        (
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.efi(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("efi",))
+
+
 def ema(source=None, *, period: int = _PARAMS["ema"]["period"]["default"]) -> Any:
     """Exponential Moving Average.
 
@@ -2943,6 +3222,36 @@ def hma(source=None, *, period: int = _PARAMS["hma"]["period"]["default"]) -> An
     columns, carrier = _convert.bars("hma", (source,), ("source",), ("series",))
     out = _core.hma(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("hma",))
+
+
+def imi(open=None, close=None, *, period: int = _PARAMS["imi"]["period"]["default"]) -> Any:
+    """Intraday Momentum Index.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the bodies are summed over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Share of recent body movement that was upward, as a percentage.
+    """
+    period = _convert.as_int("imi", "period", period)
+    columns, carrier = _convert.bars(
+        "imi",
+        (open, close),
+        (
+            "open",
+            "close",
+        ),
+        (
+            "open",
+            "close",
+        ),
+    )
+    out = _core.imi(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("imi",))
 
 
 def kama(source=None, *, period: int = _PARAMS["kama"]["period"]["default"]) -> Any:
@@ -3288,6 +3597,32 @@ def macdfix(
             "macdfix_hist",
         ),
     )
+
+
+def marketfi(high=None, low=None, volume=None) -> Any:
+    """Market Facilitation Index.
+
+    Returns
+    -------
+    ndarray or Series
+        How much range the bar covered per unit of volume.
+    """
+    columns, carrier = _convert.bars(
+        "marketfi",
+        (high, low, volume),
+        (
+            "high",
+            "low",
+            "volume",
+        ),
+        (
+            "high",
+            "low",
+            "volume",
+        ),
+    )
+    out = _core.marketfi(*columns)
+    return _convert.wrap_outputs(out, carrier, ("marketfi",))
 
 
 def max(source=None, *, period: int = _PARAMS["max"]["period"]["default"]) -> Any:
@@ -3675,6 +4010,30 @@ def natr(
     return _convert.wrap_outputs(out, carrier, ("natr",))
 
 
+def nvi(close=None, volume=None) -> Any:
+    """Negative Volume Index.
+
+    Returns
+    -------
+    ndarray or Series
+        Index that only moves on bars where volume falls.
+    """
+    columns, carrier = _convert.bars(
+        "nvi",
+        (close, volume),
+        (
+            "close",
+            "volume",
+        ),
+        (
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.nvi(*columns)
+    return _convert.wrap_outputs(out, carrier, ("nvi",))
+
+
 def obv(close=None, volume=None) -> Any:
     """On Balance Volume.
 
@@ -3840,6 +4199,84 @@ def ppo(
     return _convert.wrap_outputs(out, carrier, ("ppo",))
 
 
+def pvi(close=None, volume=None) -> Any:
+    """Positive Volume Index.
+
+    Returns
+    -------
+    ndarray or Series
+        Index that only moves on bars where volume rises.
+    """
+    columns, carrier = _convert.bars(
+        "pvi",
+        (close, volume),
+        (
+            "close",
+            "volume",
+        ),
+        (
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.pvi(*columns)
+    return _convert.wrap_outputs(out, carrier, ("pvi",))
+
+
+def pvt(close=None, volume=None) -> Any:
+    """Price Volume Trend.
+
+    Returns
+    -------
+    ndarray or Series
+        Running total of volume weighted by each bar's percentage change.
+    """
+    columns, carrier = _convert.bars(
+        "pvt",
+        (close, volume),
+        (
+            "close",
+            "volume",
+        ),
+        (
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.pvt(*columns)
+    return _convert.wrap_outputs(out, carrier, ("pvt",))
+
+
+def qstick(open=None, close=None, *, period: int = _PARAMS["qstick"]["period"]["default"]) -> Any:
+    """Qstick.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Number of bars the body is averaged over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Average distance from open to close over the window.
+    """
+    period = _convert.as_int("qstick", "period", period)
+    columns, carrier = _convert.bars(
+        "qstick",
+        (open, close),
+        (
+            "open",
+            "close",
+        ),
+        (
+            "open",
+            "close",
+        ),
+    )
+    out = _core.qstick(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("qstick",))
+
+
 def rma(source=None, *, period: int = _PARAMS["rma"]["period"]["default"]) -> Any:
     """Wilder Smoothed Moving Average.
 
@@ -3952,6 +4389,25 @@ def rsi(source=None, *, period: int = _PARAMS["rsi"]["period"]["default"]) -> An
     columns, carrier = _convert.bars("rsi", (source,), ("source",), ("series",))
     out = _core.rsi(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("rsi",))
+
+
+def rvol(volume=None, *, period: int = _PARAMS["rvol"]["period"]["default"]) -> Any:
+    """Relative Volume.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Number of earlier bars the volume is compared against, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        This bar's volume as a multiple of the recent average.
+    """
+    period = _convert.as_int("rvol", "period", period)
+    columns, carrier = _convert.bars("rvol", (volume,), ("volume",), ("volume",))
+    out = _core.rvol(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("rvol",))
 
 
 def sin(source=None) -> Any:
@@ -4540,6 +4996,32 @@ def vwma(close=None, volume=None, *, period: int = _PARAMS["vwma"]["period"]["de
     return _convert.wrap_outputs(out, carrier, ("vwma",))
 
 
+def wad(high=None, low=None, close=None) -> Any:
+    """Williams Accumulation/Distribution.
+
+    Returns
+    -------
+    ndarray or Series
+        Running total of how much ground each bar took or gave up.
+    """
+    columns, carrier = _convert.bars(
+        "wad",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.wad(*columns)
+    return _convert.wrap_outputs(out, carrier, ("wad",))
+
+
 def wclprice(high=None, low=None, close=None) -> Any:
     """Weighted Close Price.
 
@@ -4649,6 +5131,17 @@ def lookback(name: str, **params: Any) -> int:
     return _core.lookback(name, **params)
 
 
+def AC(
+    high,
+    low,
+    fastperiod: int = _PARAMS["ac"]["fast_period"]["default"],
+    slowperiod: int = _PARAMS["ac"]["slow_period"]["default"],
+    signalperiod: int = _PARAMS["ac"]["signal_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`ac`."""
+    return ac(high, low, fast_period=fastperiod, slow_period=slowperiod, signal_period=signalperiod)
+
+
 def ACCBANDS(high, low, close, timeperiod: int = _PARAMS["accbands"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`accbands`."""
     return accbands(high, low, close, period=timeperiod)
@@ -4669,6 +5162,23 @@ def ADD(source0, source1) -> Any:
     return add(source0, source1)
 
 
+def ADOSC(
+    high,
+    low,
+    close,
+    volume,
+    fastperiod: int = _PARAMS["adosc"]["fast_period"]["default"],
+    slowperiod: int = _PARAMS["adosc"]["slow_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`adosc`."""
+    return adosc(high, low, close, volume, fast_period=fastperiod, slow_period=slowperiod)
+
+
+def ADR(high, low, timeperiod: int = _PARAMS["adr"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`adr`."""
+    return adr(high, low, period=timeperiod)
+
+
 def ADX(high, low, close, timeperiod: int = _PARAMS["adx"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`adx`."""
     return adx(high, low, close, period=timeperiod)
@@ -4677,6 +5187,16 @@ def ADX(high, low, close, timeperiod: int = _PARAMS["adx"]["period"]["default"])
 def ADXR(high, low, close, timeperiod: int = _PARAMS["adxr"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`adxr`."""
     return adxr(high, low, close, period=timeperiod)
+
+
+def AO(
+    high,
+    low,
+    fastperiod: int = _PARAMS["ao"]["fast_period"]["default"],
+    slowperiod: int = _PARAMS["ao"]["slow_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`ao`."""
+    return ao(high, low, fast_period=fastperiod, slow_period=slowperiod)
 
 
 def APO(
@@ -5093,9 +5613,19 @@ def CEIL(source) -> Any:
     return ceil(source)
 
 
+def CMF(high, low, close, volume, timeperiod: int = _PARAMS["cmf"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`cmf`."""
+    return cmf(high, low, close, volume, period=timeperiod)
+
+
 def CMO(source, timeperiod: int = _PARAMS["cmo"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`cmo`."""
     return cmo(source, period=timeperiod)
+
+
+def CMOU(source, timeperiod: int = _PARAMS["cmou"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`cmou`."""
+    return cmou(source, period=timeperiod)
 
 
 def COS(source) -> Any:
@@ -5138,6 +5668,11 @@ def DX(high, low, close, timeperiod: int = _PARAMS["dx"]["period"]["default"]) -
     return dx(high, low, close, period=timeperiod)
 
 
+def EFI(close, volume, timeperiod: int = _PARAMS["efi"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`efi`."""
+    return efi(close, volume, period=timeperiod)
+
+
 def EMA(source, timeperiod: int = _PARAMS["ema"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`ema`."""
     return ema(source, period=timeperiod)
@@ -5161,6 +5696,11 @@ def HA(open, high, low, close) -> Any:
 def HMA(source, timeperiod: int = _PARAMS["hma"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`hma`."""
     return hma(source, period=timeperiod)
+
+
+def IMI(open, close, timeperiod: int = _PARAMS["imi"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`imi`."""
+    return imi(open, close, period=timeperiod)
 
 
 def KAMA(source, timeperiod: int = _PARAMS["kama"]["period"]["default"]) -> Any:
@@ -5261,6 +5801,11 @@ def MACDFIX(source, signalperiod: int = _PARAMS["macdfix"]["signal_period"]["def
     return macdfix(source, signal_period=signalperiod)
 
 
+def MARKETFI(high, low, volume) -> Any:
+    """TA-Lib-style alias for :func:`marketfi`."""
+    return marketfi(high, low, volume)
+
+
 def MAX(source, timeperiod: int = _PARAMS["max"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`max`."""
     return max(source, period=timeperiod)
@@ -5336,6 +5881,11 @@ def NATR(high, low, close, timeperiod: int = _PARAMS["natr"]["period"]["default"
     return natr(high, low, close, period=timeperiod)
 
 
+def NVI(close, volume) -> Any:
+    """TA-Lib-style alias for :func:`nvi`."""
+    return nvi(close, volume)
+
+
 def OBV(close, volume) -> Any:
     """TA-Lib-style alias for :func:`obv`."""
     return obv(close, volume)
@@ -5379,6 +5929,21 @@ def PPO(
     return ppo(source, fast_period=fastperiod, slow_period=slowperiod, ma_type=matype)
 
 
+def PVI(close, volume) -> Any:
+    """TA-Lib-style alias for :func:`pvi`."""
+    return pvi(close, volume)
+
+
+def PVT(close, volume) -> Any:
+    """TA-Lib-style alias for :func:`pvt`."""
+    return pvt(close, volume)
+
+
+def QSTICK(open, close, timeperiod: int = _PARAMS["qstick"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`qstick`."""
+    return qstick(open, close, period=timeperiod)
+
+
 def RMA(source, timeperiod: int = _PARAMS["rma"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`rma`."""
     return rma(source, period=timeperiod)
@@ -5407,6 +5972,11 @@ def ROCR100(source, timeperiod: int = _PARAMS["rocr100"]["period"]["default"]) -
 def RSI(source, timeperiod: int = _PARAMS["rsi"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`rsi`."""
     return rsi(source, period=timeperiod)
+
+
+def RVOL(volume, timeperiod: int = _PARAMS["rvol"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`rvol`."""
+    return rvol(volume, period=timeperiod)
 
 
 def SIN(source) -> Any:
@@ -5580,6 +6150,11 @@ def VAR(
 def VWMA(close, volume, timeperiod: int = _PARAMS["vwma"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`vwma`."""
     return vwma(close, volume, period=timeperiod)
+
+
+def WAD(high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`wad`."""
+    return wad(high, low, close)
 
 
 def WCLPRICE(high, low, close) -> Any:

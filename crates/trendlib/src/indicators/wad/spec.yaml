@@ -1,0 +1,23 @@
+name: wad
+title: Williams Accumulation/Distribution
+group: volume
+flags: [path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: wad
+    dtype: float64
+    plot: line
+    doc: Running total of how much ground each bar took or gave up
+talib:
+  name: WAD
+  params: {}
+  outputs: [real]
+references:
+  - Larry Williams, The Secret of Selecting Stocks for Immediate and Substantial Gains, Windsor Books, 1972
+see_also: [ad, obv, pvt]
