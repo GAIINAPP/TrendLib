@@ -235,9 +235,22 @@ fn bindings(specs: &[Spec]) -> String {
         };
         out.push_str(&alias);
 
+        // An indicator with several bar inputs and several parameters passes
+        // the lint's limit; the argument list is the Python signature, so it
+        // is not ours to shorten.
+        let wide = if spec.inputs.len() + spec.params.len() + 1 > 7 {
+            "#[allow(clippy::too_many_arguments)]\n"
+        } else {
+            ""
+        };
+        let wide_method = if wide.is_empty() {
+            String::new()
+        } else {
+            format!("    {wide}")
+        };
         let _ = write!(
             out,
-            "\n\
+            "\n{wide}\
              #[pyfunction]\n\
              #[pyo3(name = \"{name}\", signature = {signature})]\n\
              pub fn {name}<'py>(\n    py: Python<'py>,\n    {arg_list}{param_args},\n) -> PyResult<{return_type}> {{\n\
@@ -282,12 +295,14 @@ fn bindings(specs: &[Spec]) -> String {
              impl Py{stream_class} {{\n\
              \x20   #[staticmethod]\n\
              \x20   #[pyo3(signature = {signature})]\n\
+             {wide_method}\
              \x20   fn open<'py>(\n        py: Python<'py>,\n        {arg_list}{param_args},\n    ) -> PyResult<Self> {{\n\
              {borrow}{build_params}\
              \x20       let inner = py\n            .detach(|| <BarStream<{path}, {inputs}, {outputs}> as Stream>::open([{columns}], &params))\n            .map_err(|e| to_py_err(py, &e))?;\n        Ok(Self {{ inner }})\n    }}\n\
              \n\
              \x20   #[staticmethod]\n\
              \x20   #[pyo3(signature = {signature})]\n\
+             {wide_method}\
              \x20   fn open_and_fill<'py>(\n        py: Python<'py>,\n        {arg_list}{param_args},\n    ) -> PyResult<(Self, {return_type})> {{\n\
              {borrow}{build_params}\
              \x20       let (inner, out) = py\n            .detach(|| <{path} as Kernel<{inputs}, {outputs}>>::open_and_fill([{columns}], &params))\n            .map_err(|e| to_py_err(py, &e))?;\n        let filled = {{\n{}        }};\n        Ok((Self {{ inner }}, filled))\n    }}\n\

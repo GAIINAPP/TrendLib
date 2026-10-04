@@ -1,0 +1,45 @@
+name: stochrsi
+title: Stochastic RSI
+group: momentum
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 2
+    max: 100000
+    doc: Number of bars the RSI is taken over
+  - name: fastk_period
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Number of RSI values the range is taken over
+  - name: fastd_period
+    type: int
+    default: 3
+    min: 1
+    max: 100000
+    doc: Number of bars the %K line is smoothed over
+  - name: fastd_ma_type
+    type: enum:MaType
+    default: sma
+    doc: Moving average used to smooth %K into %D
+outputs:
+  - name: stochrsi_k
+    dtype: float64
+    plot: line
+    doc: Where the RSI sits in its own recent range, as a percentage
+  - name: stochrsi_d
+    dtype: float64
+    plot: line
+    doc: Smoothed %K
+talib:
+  name: STOCHRSI
+  params: {period: timeperiod, fastk_period: fastk_period, fastd_period: fastd_period, fastd_ma_type: fastd_matype}
+  outputs: [fastk, fastd]
+references:
+  - Tushar S. Chande and Stanley Kroll, The New Technical Trader, Wiley, 1994
+see_also: [rsi, stochf]

@@ -33,6 +33,14 @@ TOLERANCE = "rel=1e-10 abs=1e-12"
 # default tolerance would be measuring TA-Lib's error rather than ours.
 # `docs/SPEC_FORMAT.md` section 4 allows a looser per-file tolerance with a
 # written reason; the reason goes in the header beside it.
+TRIMA_RESIDUE = (
+    "%K swings between 0 and 100 and back, and a triangular average carries that swing in two "
+    "running sums whose residue never cancels; measured against exact arithmetic over this "
+    "dataset TrendLib's worst absolute error is 3.1e-13 and ta-lib-python's is 5.8e-11, with "
+    "TrendLib the closer of the two on 1986 rows to 6, so the looser bound covers the oracle's "
+    "own error rather than TrendLib's"
+)
+
 CASE_TOLERANCE = {
     ("stddev", "min_period"): (
         "rel=1e-9 abs=1e-12",
@@ -41,6 +49,10 @@ CASE_TOLERANCE = {
         "never worse than 1.6e-16, while ta-lib-python reaches 3.2e-10, so the looser "
         "bound covers the oracle's own error rather than TrendLib's",
     ),
+    ("stochf", "fastd_ma_type_trima"): ("rel=1e-8 abs=2e-10", TRIMA_RESIDUE),
+    ("stoch", "slowk_ma_type_trima"): ("rel=1e-8 abs=2e-10", TRIMA_RESIDUE),
+    ("stoch", "slowd_ma_type_trima"): ("rel=1e-8 abs=2e-10", TRIMA_RESIDUE),
+    ("stochrsi", "fastd_ma_type_trima"): ("rel=1e-8 abs=2e-10", TRIMA_RESIDUE),
 }
 
 # Which committed dataset a case reads. Session-anchored indicators need the

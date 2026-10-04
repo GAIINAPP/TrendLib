@@ -74,6 +74,9 @@ __all__ = [
     "sma",
     "sqrt",
     "stddev",
+    "stoch",
+    "stochf",
+    "stochrsi",
     "sub",
     "sum",
     "tan",
@@ -469,6 +472,52 @@ sinh = Factory("sinh", _core.SinhStream, ("source",), ("series",), ("sinh",))
 sma = Factory("sma", _core.SmaStream, ("source",), ("series",), ("sma",))
 sqrt = Factory("sqrt", _core.SqrtStream, ("source",), ("series",), ("sqrt",))
 stddev = Factory("stddev", _core.StddevStream, ("source",), ("series",), ("stddev",))
+stoch = Factory(
+    "stoch",
+    _core.StochStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "stoch_k",
+        "stoch_d",
+    ),
+)
+stochf = Factory(
+    "stochf",
+    _core.StochfStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "stochf_k",
+        "stochf_d",
+    ),
+)
+stochrsi = Factory(
+    "stochrsi",
+    _core.StochrsiStream,
+    ("source",),
+    ("series",),
+    (
+        "stochrsi_k",
+        "stochrsi_d",
+    ),
+)
 sub = Factory(
     "sub",
     _core.SubStream,

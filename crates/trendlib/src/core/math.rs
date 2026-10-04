@@ -777,6 +777,49 @@ impl MaPair {
     }
 }
 
+/// Where the close sits inside the high-low range of the last `period` bars,
+/// as a percentage: the raw %K the stochastic family is built on.
+#[derive(Clone, Debug)]
+pub struct Stochastic {
+    highest: RollingExtreme,
+    lowest: RollingExtreme,
+}
+
+impl Stochastic {
+    pub fn new(period: usize) -> Self {
+        Self {
+            highest: RollingExtreme::highest(period),
+            lowest: RollingExtreme::lowest(period),
+        }
+    }
+
+    pub fn push(&mut self, high: f64, low: f64, close: f64) -> Option<f64> {
+        // Both windows have to take the bar; returning on the first would
+        // leave the other one short.
+        let top = self.highest.push(high);
+        let bottom = self.lowest.push(low)?;
+        Some(Self::percent(close, top?, bottom))
+    }
+
+    pub fn preview(&self, high: f64, low: f64, close: f64) -> Option<f64> {
+        let top = self.highest.preview(high)?;
+        let bottom = self.lowest.preview(low)?;
+        Some(Self::percent(close, top, bottom))
+    }
+
+    /// A window with no range has nowhere for the close to sit, and TA-Lib
+    /// answers zero rather than dividing. The test is exact: a range that is
+    /// merely small still places the close somewhere.
+    fn percent(close: f64, top: f64, bottom: f64) -> f64 {
+        let range = top - bottom;
+        if range == 0.0 {
+            0.0
+        } else {
+            100.0 * ((close - bottom) / range)
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::{

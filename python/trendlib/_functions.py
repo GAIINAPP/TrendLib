@@ -73,6 +73,9 @@ __all__ = [
     "SMA",
     "SQRT",
     "STDDEV",
+    "STOCH",
+    "STOCHF",
+    "STOCHRSI",
     "SUB",
     "SUM",
     "TAN",
@@ -146,6 +149,9 @@ __all__ = [
     "sma",
     "sqrt",
     "stddev",
+    "stoch",
+    "stochf",
+    "stochrsi",
     "sub",
     "sum",
     "tan",
@@ -1560,6 +1566,180 @@ def stddev(
     return _convert.wrap_outputs(out, carrier, ("stddev",))
 
 
+def stoch(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    fastk_period: int = _PARAMS["stoch"]["fastk_period"]["default"],
+    slowk_period: int = _PARAMS["stoch"]["slowk_period"]["default"],
+    slowk_ma_type: str = _PARAMS["stoch"]["slowk_ma_type"]["default"],
+    slowd_period: int = _PARAMS["stoch"]["slowd_period"]["default"],
+    slowd_ma_type: str = _PARAMS["stoch"]["slowd_ma_type"]["default"],
+) -> Any:
+    """Slow Stochastic.
+
+    Parameters
+    ----------
+    fastk_period : int, default 5
+        Number of bars the high-low range is taken over, from 1 to 100000.
+    slowk_period : int, default 3
+        Number of bars the raw %K is smoothed over, from 1 to 100000.
+    slowk_ma_type : str, default "sma"
+        Moving average used to smooth the raw %K.
+    slowd_period : int, default 3
+        Number of bars the slow %K is smoothed over, from 1 to 100000.
+    slowd_ma_type : str, default "sma"
+        Moving average used to smooth slow %K into %D.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        stoch_k: Raw stochastic smoothed over slowk_period.
+        stoch_d: Slow %K smoothed over slowd_period.
+    """
+    fastk_period = _convert.as_int("stoch", "fastk_period", fastk_period)
+    slowk_period = _convert.as_int("stoch", "slowk_period", slowk_period)
+    slowk_ma_type = _convert.as_text("stoch", "slowk_ma_type", slowk_ma_type)
+    slowd_period = _convert.as_int("stoch", "slowd_period", slowd_period)
+    slowd_ma_type = _convert.as_text("stoch", "slowd_ma_type", slowd_ma_type)
+    columns, carrier = _convert.bars(
+        "stoch",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.stoch(
+        *columns,
+        fastk_period=fastk_period,
+        slowk_period=slowk_period,
+        slowk_ma_type=slowk_ma_type,
+        slowd_period=slowd_period,
+        slowd_ma_type=slowd_ma_type,
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "stoch_k",
+            "stoch_d",
+        ),
+    )
+
+
+def stochf(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    fastk_period: int = _PARAMS["stochf"]["fastk_period"]["default"],
+    fastd_period: int = _PARAMS["stochf"]["fastd_period"]["default"],
+    fastd_ma_type: str = _PARAMS["stochf"]["fastd_ma_type"]["default"],
+) -> Any:
+    """Fast Stochastic.
+
+    Parameters
+    ----------
+    fastk_period : int, default 5
+        Number of bars the high-low range is taken over, from 1 to 100000.
+    fastd_period : int, default 3
+        Number of bars the %K line is smoothed over, from 1 to 100000.
+    fastd_ma_type : str, default "sma"
+        Moving average used to smooth %K into %D.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        stochf_k: Where the close sits in the recent high-low range, as a percentage.
+        stochf_d: Smoothed %K.
+    """
+    fastk_period = _convert.as_int("stochf", "fastk_period", fastk_period)
+    fastd_period = _convert.as_int("stochf", "fastd_period", fastd_period)
+    fastd_ma_type = _convert.as_text("stochf", "fastd_ma_type", fastd_ma_type)
+    columns, carrier = _convert.bars(
+        "stochf",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.stochf(
+        *columns, fastk_period=fastk_period, fastd_period=fastd_period, fastd_ma_type=fastd_ma_type
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "stochf_k",
+            "stochf_d",
+        ),
+    )
+
+
+def stochrsi(
+    source=None,
+    *,
+    period: int = _PARAMS["stochrsi"]["period"]["default"],
+    fastk_period: int = _PARAMS["stochrsi"]["fastk_period"]["default"],
+    fastd_period: int = _PARAMS["stochrsi"]["fastd_period"]["default"],
+    fastd_ma_type: str = _PARAMS["stochrsi"]["fastd_ma_type"]["default"],
+) -> Any:
+    """Stochastic RSI.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the RSI is taken over, from 2 to 100000.
+    fastk_period : int, default 5
+        Number of RSI values the range is taken over, from 1 to 100000.
+    fastd_period : int, default 3
+        Number of bars the %K line is smoothed over, from 1 to 100000.
+    fastd_ma_type : str, default "sma"
+        Moving average used to smooth %K into %D.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        stochrsi_k: Where the RSI sits in its own recent range, as a percentage.
+        stochrsi_d: Smoothed %K.
+    """
+    period = _convert.as_int("stochrsi", "period", period)
+    fastk_period = _convert.as_int("stochrsi", "fastk_period", fastk_period)
+    fastd_period = _convert.as_int("stochrsi", "fastd_period", fastd_period)
+    fastd_ma_type = _convert.as_text("stochrsi", "fastd_ma_type", fastd_ma_type)
+    columns, carrier = _convert.bars("stochrsi", (source,), ("source",), ("series",))
+    out = _core.stochrsi(
+        *columns,
+        period=period,
+        fastk_period=fastk_period,
+        fastd_period=fastd_period,
+        fastd_ma_type=fastd_ma_type,
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "stochrsi_k",
+            "stochrsi_d",
+        ),
+    )
+
+
 def sub(source0=None, source1=None) -> Any:
     """Vector Subtraction.
 
@@ -2163,6 +2343,65 @@ def STDDEV(
 ) -> Any:
     """TA-Lib-style alias for :func:`stddev`."""
     return stddev(source, period=timeperiod, nbdev=nbdev)
+
+
+def STOCH(
+    high,
+    low,
+    close,
+    fastk_period: int = _PARAMS["stoch"]["fastk_period"]["default"],
+    slowk_period: int = _PARAMS["stoch"]["slowk_period"]["default"],
+    slowk_matype: str = _PARAMS["stoch"]["slowk_ma_type"]["default"],
+    slowd_period: int = _PARAMS["stoch"]["slowd_period"]["default"],
+    slowd_matype: str = _PARAMS["stoch"]["slowd_ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`stoch`."""
+    return stoch(
+        high,
+        low,
+        close,
+        fastk_period=fastk_period,
+        slowk_period=slowk_period,
+        slowk_ma_type=slowk_matype,
+        slowd_period=slowd_period,
+        slowd_ma_type=slowd_matype,
+    )
+
+
+def STOCHF(
+    high,
+    low,
+    close,
+    fastk_period: int = _PARAMS["stochf"]["fastk_period"]["default"],
+    fastd_period: int = _PARAMS["stochf"]["fastd_period"]["default"],
+    fastd_matype: str = _PARAMS["stochf"]["fastd_ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`stochf`."""
+    return stochf(
+        high,
+        low,
+        close,
+        fastk_period=fastk_period,
+        fastd_period=fastd_period,
+        fastd_ma_type=fastd_matype,
+    )
+
+
+def STOCHRSI(
+    source,
+    timeperiod: int = _PARAMS["stochrsi"]["period"]["default"],
+    fastk_period: int = _PARAMS["stochrsi"]["fastk_period"]["default"],
+    fastd_period: int = _PARAMS["stochrsi"]["fastd_period"]["default"],
+    fastd_matype: str = _PARAMS["stochrsi"]["fastd_ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`stochrsi`."""
+    return stochrsi(
+        source,
+        period=timeperiod,
+        fastk_period=fastk_period,
+        fastd_period=fastd_period,
+        fastd_ma_type=fastd_matype,
+    )
 
 
 def SUB(source0, source1) -> Any:

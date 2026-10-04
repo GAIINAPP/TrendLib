@@ -1,0 +1,43 @@
+name: stochf
+title: Fast Stochastic
+group: momentum
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: fastk_period
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Number of bars the high-low range is taken over
+  - name: fastd_period
+    type: int
+    default: 3
+    min: 1
+    max: 100000
+    doc: Number of bars the %K line is smoothed over
+  - name: fastd_ma_type
+    type: enum:MaType
+    default: sma
+    doc: Moving average used to smooth %K into %D
+outputs:
+  - name: stochf_k
+    dtype: float64
+    plot: line
+    doc: Where the close sits in the recent high-low range, as a percentage
+  - name: stochf_d
+    dtype: float64
+    plot: line
+    doc: Smoothed %K
+talib:
+  name: STOCHF
+  params: {fastk_period: fastk_period, fastd_period: fastd_period, fastd_ma_type: fastd_matype}
+  outputs: [fastk, fastd]
+references:
+  - George C. Lane, Lane's Stochastics, Technical Analysis of Stocks and Commodities, May-June 1984
+see_also: [stoch, stochrsi, willr]

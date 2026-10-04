@@ -2,8 +2,8 @@
 
 # Progress
 
-**72 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 132 not started.
+**75 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 129 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -17,7 +17,7 @@ something is done that is not. CI checks it is current.
 | Group | Shipped | Total |
 | --- | --- | --- |
 | Overlap studies | 11 | 25 |
-| Momentum | 22 | 47 |
+| Momentum | 25 | 47 |
 | Volatility | 3 | 7 |
 | Volume | 2 | 12 |
 | Price transforms | 5 | 6 |
@@ -56,7 +56,7 @@ something is done that is not. CI checks it is current.
 - [x] `wma` (`WMA`) -- Weighted Moving Average *
 - [ ] `zlema` (`ZLEMA`)
 
-## Momentum (22 of 47)
+## Momentum (25 of 47)
 
 - [ ] `ac` (`AC`)
 - [x] `adx` (`ADX`) -- Average Directional Movement Index *
@@ -95,9 +95,9 @@ something is done that is not. CI checks it is current.
 - [x] `rocr100` (`ROCR100`) -- Rate of Change Ratio Times 100
 - [x] `rsi` (`RSI`) -- Relative Strength Index *
 - [ ] `smi` (`SMI`)
-- [ ] `stoch` (`STOCH`) *
-- [ ] `stochf` (`STOCHF`)
-- [ ] `stochrsi` (`STOCHRSI`)
+- [x] `stoch` (`STOCH`) -- Slow Stochastic *
+- [x] `stochf` (`STOCHF`) -- Fast Stochastic
+- [x] `stochrsi` (`STOCHRSI`) -- Stochastic RSI
 - [ ] `trix` (`TRIX`)
 - [ ] `tsi` (`TSI`)
 - [ ] `ultosc` (`ULTOSC`)

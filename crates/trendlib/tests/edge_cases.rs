@@ -393,6 +393,46 @@ fn var_of_two_bars_is_the_square_of_half_their_difference() {
     }
 }
 
+/// The stochastic family carries a looser golden tolerance on its `trima`
+/// cases, on the grounds that TA-Lib's running sums keep a residue across the
+/// swing from 0 to 100 and back. That claim is only worth making if TrendLib's
+/// own answer is checked, so this rebuilds the triangular average of %K from
+/// the window itself rather than from a running sum, and pins how close the
+/// streamed one stays to it.
+#[test]
+fn the_triangular_average_of_percent_k_stays_near_the_window_mean() {
+    let stochf = support::find("stochf").expect("stochf is registered");
+    let bars = daily_inputs(&stochf);
+    let columns = as_slices(&bars);
+
+    // fastd_period = 1 smooths nothing, so this is the raw %K column.
+    let mut raw = stochf.defaults();
+    raw[1] = 1.0;
+    let k = (stochf.batch)(&columns, &raw).unwrap()[0].clone();
+
+    let mut params = stochf.defaults();
+    params[1] = 3.0;
+    params[2] = support::registry::MA_TYPES
+        .iter()
+        .position(|name| *name == "trima")
+        .expect("trima is an average the core has") as f64;
+    let out = (stochf.batch)(&columns, &params).unwrap();
+
+    // trima over three bars is the mean of two overlapping pairs, which is
+    // (a + 2b + c) / 4 written out.
+    for row in 2..k.len() {
+        if k[row - 2].is_nan() {
+            continue;
+        }
+        let expected = (k[row - 2] + 2.0 * k[row - 1] + k[row]) / 4.0;
+        let error = (out[1][row] - expected).abs();
+        assert!(
+            error <= 1.0e-12,
+            "stochf %D at row {row} is {error} away from the triangular mean of its window"
+        );
+    }
+}
+
 /// `apo` and `ppo` carry a looser golden tolerance because subtracting two
 /// averages of one series cancels most of the digits away. The claim is only
 /// worth making if the parts that do not cancel are pinned, so this checks the

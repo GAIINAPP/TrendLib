@@ -7163,6 +7163,550 @@ impl PyStddevStream {
     }
 }
 
+type StochOutputs<'py> = (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>);
+
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+#[pyo3(name = "stoch", signature = (high, low, close, *, fastk_period, slowk_period, slowk_ma_type, slowd_period, slowd_ma_type))]
+pub fn stoch<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    fastk_period: i64,
+    slowk_period: i64,
+    slowk_ma_type: &str,
+    slowd_period: i64,
+    slowd_ma_type: &str,
+) -> PyResult<StochOutputs<'py>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let fastk_period = int_param("stoch", "fastk_period", fastk_period, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let slowk_period = int_param("stoch", "slowk_period", slowk_period, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let slowk_ma_type =
+        ma_type_param("stoch", "slowk_ma_type", slowk_ma_type).map_err(|e| to_py_err(py, &e))?;
+    let slowd_period = int_param("stoch", "slowd_period", slowd_period, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let slowd_ma_type =
+        ma_type_param("stoch", "slowd_ma_type", slowd_ma_type).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::stoch::Params {
+        fastk_period,
+        slowk_period,
+        slowk_ma_type,
+        slowd_period,
+        slowd_ma_type,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::stoch::Stoch as Kernel<3, 2>>::batch([high, low, close], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok((
+        std::mem::take(&mut out[0]).into_pyarray(py),
+        std::mem::take(&mut out[1]).into_pyarray(py),
+    ))
+}
+
+#[pyclass(module = "trendlib._core", name = "StochStream", skip_from_py_object)]
+#[derive(Clone, Debug)]
+pub struct PyStochStream {
+    inner: BarStream<trendlib::indicators::stoch::Stoch, 3, 2>,
+}
+
+#[pymethods]
+impl PyStochStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, fastk_period, slowk_period, slowk_ma_type, slowd_period, slowd_ma_type))]
+    #[allow(clippy::too_many_arguments)]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        fastk_period: i64,
+        slowk_period: i64,
+        slowk_ma_type: &str,
+        slowd_period: i64,
+        slowd_ma_type: &str,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let fastk_period = int_param("stoch", "fastk_period", fastk_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let slowk_period = int_param("stoch", "slowk_period", slowk_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let slowk_ma_type = ma_type_param("stoch", "slowk_ma_type", slowk_ma_type)
+            .map_err(|e| to_py_err(py, &e))?;
+        let slowd_period = int_param("stoch", "slowd_period", slowd_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let slowd_ma_type = ma_type_param("stoch", "slowd_ma_type", slowd_ma_type)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::stoch::Params {
+            fastk_period,
+            slowk_period,
+            slowk_ma_type,
+            slowd_period,
+            slowd_ma_type,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::stoch::Stoch, 3, 2> as Stream>::open(
+                    [high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, fastk_period, slowk_period, slowk_ma_type, slowd_period, slowd_ma_type))]
+    #[allow(clippy::too_many_arguments)]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        fastk_period: i64,
+        slowk_period: i64,
+        slowk_ma_type: &str,
+        slowd_period: i64,
+        slowd_ma_type: &str,
+    ) -> PyResult<(Self, StochOutputs<'py>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let fastk_period = int_param("stoch", "fastk_period", fastk_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let slowk_period = int_param("stoch", "slowk_period", slowk_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let slowk_ma_type = ma_type_param("stoch", "slowk_ma_type", slowk_ma_type)
+            .map_err(|e| to_py_err(py, &e))?;
+        let slowd_period = int_param("stoch", "slowd_period", slowd_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let slowd_ma_type = ma_type_param("stoch", "slowd_ma_type", slowd_ma_type)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::stoch::Params {
+            fastk_period,
+            slowk_period,
+            slowk_ma_type,
+            slowd_period,
+            slowd_ma_type,
+        };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::stoch::Stoch as Kernel<3, 2>>::open_and_fill(
+                    [high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            (
+                std::mem::take(&mut out[0]).into_pyarray(py),
+                std::mem::take(&mut out[1]).into_pyarray(py),
+            )
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<(f64, f64)> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1]))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<(f64, f64)> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1]))
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64)> {
+        self.inner.value().map(|row| (row[0], row[1]))
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "stoch"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream stoch bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+type StochfOutputs<'py> = (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>);
+
+#[pyfunction]
+#[pyo3(name = "stochf", signature = (high, low, close, *, fastk_period, fastd_period, fastd_ma_type))]
+pub fn stochf<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    fastk_period: i64,
+    fastd_period: i64,
+    fastd_ma_type: &str,
+) -> PyResult<StochfOutputs<'py>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let fastk_period = int_param("stochf", "fastk_period", fastk_period, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let fastd_period = int_param("stochf", "fastd_period", fastd_period, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let fastd_ma_type =
+        ma_type_param("stochf", "fastd_ma_type", fastd_ma_type).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::stochf::Params {
+        fastk_period,
+        fastd_period,
+        fastd_ma_type,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::stochf::Stochf as Kernel<3, 2>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok((
+        std::mem::take(&mut out[0]).into_pyarray(py),
+        std::mem::take(&mut out[1]).into_pyarray(py),
+    ))
+}
+
+#[pyclass(module = "trendlib._core", name = "StochfStream", skip_from_py_object)]
+#[derive(Clone, Debug)]
+pub struct PyStochfStream {
+    inner: BarStream<trendlib::indicators::stochf::Stochf, 3, 2>,
+}
+
+#[pymethods]
+impl PyStochfStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, fastk_period, fastd_period, fastd_ma_type))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        fastk_period: i64,
+        fastd_period: i64,
+        fastd_ma_type: &str,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let fastk_period = int_param("stochf", "fastk_period", fastk_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fastd_period = int_param("stochf", "fastd_period", fastd_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fastd_ma_type = ma_type_param("stochf", "fastd_ma_type", fastd_ma_type)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::stochf::Params {
+            fastk_period,
+            fastd_period,
+            fastd_ma_type,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::stochf::Stochf, 3, 2> as Stream>::open(
+                    [high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, fastk_period, fastd_period, fastd_ma_type))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        fastk_period: i64,
+        fastd_period: i64,
+        fastd_ma_type: &str,
+    ) -> PyResult<(Self, StochfOutputs<'py>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let fastk_period = int_param("stochf", "fastk_period", fastk_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fastd_period = int_param("stochf", "fastd_period", fastd_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fastd_ma_type = ma_type_param("stochf", "fastd_ma_type", fastd_ma_type)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::stochf::Params {
+            fastk_period,
+            fastd_period,
+            fastd_ma_type,
+        };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::stochf::Stochf as Kernel<3, 2>>::open_and_fill(
+                    [high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            (
+                std::mem::take(&mut out[0]).into_pyarray(py),
+                std::mem::take(&mut out[1]).into_pyarray(py),
+            )
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<(f64, f64)> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1]))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<(f64, f64)> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1]))
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64)> {
+        self.inner.value().map(|row| (row[0], row[1]))
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "stochf"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream stochf bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+type StochrsiOutputs<'py> = (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>);
+
+#[pyfunction]
+#[pyo3(name = "stochrsi", signature = (source, *, period, fastk_period, fastd_period, fastd_ma_type))]
+pub fn stochrsi<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    fastk_period: i64,
+    fastd_period: i64,
+    fastd_ma_type: &str,
+) -> PyResult<StochrsiOutputs<'py>> {
+    let source = as_slice(&source, "source")?;
+    let period =
+        int_param("stochrsi", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+    let fastk_period = int_param("stochrsi", "fastk_period", fastk_period, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let fastd_period = int_param("stochrsi", "fastd_period", fastd_period, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let fastd_ma_type =
+        ma_type_param("stochrsi", "fastd_ma_type", fastd_ma_type).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::stochrsi::Params {
+        period,
+        fastk_period,
+        fastd_period,
+        fastd_ma_type,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::stochrsi::Stochrsi as Kernel<1, 2>>::batch([source], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok((
+        std::mem::take(&mut out[0]).into_pyarray(py),
+        std::mem::take(&mut out[1]).into_pyarray(py),
+    ))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "StochrsiStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyStochrsiStream {
+    inner: BarStream<trendlib::indicators::stochrsi::Stochrsi, 1, 2>,
+}
+
+#[pymethods]
+impl PyStochrsiStream {
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period, fastk_period, fastd_period, fastd_ma_type))]
+    fn open<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        fastk_period: i64,
+        fastd_period: i64,
+        fastd_ma_type: &str,
+    ) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("stochrsi", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let fastk_period = int_param("stochrsi", "fastk_period", fastk_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fastd_period = int_param("stochrsi", "fastd_period", fastd_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fastd_ma_type = ma_type_param("stochrsi", "fastd_ma_type", fastd_ma_type)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::stochrsi::Params {
+            period,
+            fastk_period,
+            fastd_period,
+            fastd_ma_type,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::stochrsi::Stochrsi, 1, 2> as Stream>::open(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period, fastk_period, fastd_period, fastd_ma_type))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        fastk_period: i64,
+        fastd_period: i64,
+        fastd_ma_type: &str,
+    ) -> PyResult<(Self, StochrsiOutputs<'py>)> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("stochrsi", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let fastk_period = int_param("stochrsi", "fastk_period", fastk_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fastd_period = int_param("stochrsi", "fastd_period", fastd_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fastd_ma_type = ma_type_param("stochrsi", "fastd_ma_type", fastd_ma_type)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::stochrsi::Params {
+            period,
+            fastk_period,
+            fastd_period,
+            fastd_ma_type,
+        };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::stochrsi::Stochrsi as Kernel<1, 2>>::open_and_fill(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            (
+                std::mem::take(&mut out[0]).into_pyarray(py),
+                std::mem::take(&mut out[1]).into_pyarray(py),
+            )
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(&mut self, py: Python<'_>, source: f64) -> PyResult<(f64, f64)> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1]))
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(&self, py: Python<'_>, source: f64) -> PyResult<(f64, f64)> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1]))
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64)> {
+        self.inner.value().map(|row| (row[0], row[1]))
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "stochrsi"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream stochrsi bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
 #[pyfunction]
 #[pyo3(name = "sub", signature = (source0, source1))]
 pub fn sub<'py>(
@@ -8616,6 +9160,9 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(sma, m)?)?;
     m.add_function(wrap_pyfunction!(sqrt, m)?)?;
     m.add_function(wrap_pyfunction!(stddev, m)?)?;
+    m.add_function(wrap_pyfunction!(stoch, m)?)?;
+    m.add_function(wrap_pyfunction!(stochf, m)?)?;
+    m.add_function(wrap_pyfunction!(stochrsi, m)?)?;
     m.add_function(wrap_pyfunction!(sub, m)?)?;
     m.add_function(wrap_pyfunction!(sum, m)?)?;
     m.add_function(wrap_pyfunction!(tan, m)?)?;
@@ -8688,6 +9235,9 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PySmaStream>()?;
     m.add_class::<PySqrtStream>()?;
     m.add_class::<PyStddevStream>()?;
+    m.add_class::<PyStochStream>()?;
+    m.add_class::<PyStochfStream>()?;
+    m.add_class::<PyStochrsiStream>()?;
     m.add_class::<PySubStream>()?;
     m.add_class::<PySumStream>()?;
     m.add_class::<PyTanStream>()?;
@@ -9370,6 +9920,138 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     }
     {
         let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("fastk_period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 3)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("slowk_period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", "sma")?;
+            entry.set_item("min", py.None())?;
+            entry.set_item("max", py.None())?;
+            entry.set_item(
+                "choices",
+                MaType::ALL
+                    .iter()
+                    .map(|(name, _)| *name)
+                    .collect::<Vec<_>>(),
+            )?;
+            params.set_item("slowk_ma_type", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 3)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("slowd_period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", "sma")?;
+            entry.set_item("min", py.None())?;
+            entry.set_item("max", py.None())?;
+            entry.set_item(
+                "choices",
+                MaType::ALL
+                    .iter()
+                    .map(|(name, _)| *name)
+                    .collect::<Vec<_>>(),
+            )?;
+            params.set_item("slowd_ma_type", entry)?;
+        }
+        table.set_item("stoch", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("fastk_period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 3)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("fastd_period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", "sma")?;
+            entry.set_item("min", py.None())?;
+            entry.set_item("max", py.None())?;
+            entry.set_item(
+                "choices",
+                MaType::ALL
+                    .iter()
+                    .map(|(name, _)| *name)
+                    .collect::<Vec<_>>(),
+            )?;
+            params.set_item("fastd_ma_type", entry)?;
+        }
+        table.set_item("stochf", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 14)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("fastk_period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 3)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("fastd_period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", "sma")?;
+            entry.set_item("min", py.None())?;
+            entry.set_item("max", py.None())?;
+            entry.set_item(
+                "choices",
+                MaType::ALL
+                    .iter()
+                    .map(|(name, _)| *name)
+                    .collect::<Vec<_>>(),
+            )?;
+            params.set_item("fastd_ma_type", entry)?;
+        }
+        table.set_item("stochrsi", params)?;
+    }
+    {
+        let params = PyDict::new(py);
         table.set_item("sub", params)?;
     }
     {
@@ -9538,6 +10220,9 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("sma", vec!["source"])?;
     table.set_item("sqrt", vec!["source"])?;
     table.set_item("stddev", vec!["source"])?;
+    table.set_item("stoch", vec!["high", "low", "close"])?;
+    table.set_item("stochf", vec!["high", "low", "close"])?;
+    table.set_item("stochrsi", vec!["source"])?;
     table.set_item("sub", vec!["source0", "source1"])?;
     table.set_item("sum", vec!["source"])?;
     table.set_item("tan", vec!["source"])?;
@@ -9622,6 +10307,9 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("sma", vec!["sma"])?;
     table.set_item("sqrt", vec!["sqrt"])?;
     table.set_item("stddev", vec!["stddev"])?;
+    table.set_item("stoch", vec!["stoch_k", "stoch_d"])?;
+    table.set_item("stochf", vec!["stochf_k", "stochf_d"])?;
+    table.set_item("stochrsi", vec!["stochrsi_k", "stochrsi_d"])?;
     table.set_item("sub", vec!["sub"])?;
     table.set_item("sum", vec!["sum"])?;
     table.set_item("tan", vec!["tan"])?;
@@ -9700,6 +10388,9 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("sma", vec!["float64"])?;
     table.set_item("sqrt", vec!["float64"])?;
     table.set_item("stddev", vec!["float64"])?;
+    table.set_item("stoch", vec!["float64", "float64"])?;
+    table.set_item("stochf", vec!["float64", "float64"])?;
+    table.set_item("stochrsi", vec!["float64", "float64"])?;
     table.set_item("sub", vec!["float64"])?;
     table.set_item("sum", vec!["float64"])?;
     table.set_item("tan", vec!["float64"])?;
@@ -9778,6 +10469,9 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("sma", vec!["overlap"])?;
     table.set_item("sqrt", vec!["nan_inf_output"])?;
     table.set_item("stddev", vec!["nan_inf_output"])?;
+    table.set_item("stoch", Vec::<&str>::new())?;
+    table.set_item("stochf", Vec::<&str>::new())?;
+    table.set_item("stochrsi", Vec::<&str>::new())?;
     table.set_item("sub", Vec::<&str>::new())?;
     table.set_item("sum", Vec::<&str>::new())?;
     table.set_item("tan", vec!["nan_inf_output"])?;
@@ -9856,6 +10550,9 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("sma", "overlap")?;
     table.set_item("sqrt", "math")?;
     table.set_item("stddev", "statistic")?;
+    table.set_item("stoch", "momentum")?;
+    table.set_item("stochf", "momentum")?;
+    table.set_item("stochrsi", "momentum")?;
     table.set_item("sub", "operator")?;
     table.set_item("sum", "statistic")?;
     table.set_item("tan", "math")?;
@@ -10499,6 +11196,118 @@ pub fn lookback_of(
             Ok(
                 <trendlib::indicators::stddev::Stddev as Kernel<1, 1>>::lookback(
                     &trendlib::indicators::stddev::Params { period, nbdev },
+                ),
+            )
+        }
+        "stoch" => {
+            let fastk_period = match get("fastk_period")? {
+                Some(value) => int_param("stoch", "fastk_period", value, 1, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let slowk_period = match get("slowk_period")? {
+                Some(value) => int_param("stoch", "slowk_period", value, 1, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 3,
+            };
+            let slowk_ma_type = ma_type_param(
+                "stoch",
+                "slowk_ma_type",
+                match text("slowk_ma_type")? {
+                    Some(ref value) => value,
+                    None => "sma",
+                },
+            )
+            .map_err(|e| to_py_err(py, &e))?;
+            let slowd_period = match get("slowd_period")? {
+                Some(value) => int_param("stoch", "slowd_period", value, 1, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 3,
+            };
+            let slowd_ma_type = ma_type_param(
+                "stoch",
+                "slowd_ma_type",
+                match text("slowd_ma_type")? {
+                    Some(ref value) => value,
+                    None => "sma",
+                },
+            )
+            .map_err(|e| to_py_err(py, &e))?;
+            Ok(
+                <trendlib::indicators::stoch::Stoch as Kernel<3, 2>>::lookback(
+                    &trendlib::indicators::stoch::Params {
+                        fastk_period,
+                        slowk_period,
+                        slowk_ma_type,
+                        slowd_period,
+                        slowd_ma_type,
+                    },
+                ),
+            )
+        }
+        "stochf" => {
+            let fastk_period = match get("fastk_period")? {
+                Some(value) => int_param("stochf", "fastk_period", value, 1, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let fastd_period = match get("fastd_period")? {
+                Some(value) => int_param("stochf", "fastd_period", value, 1, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 3,
+            };
+            let fastd_ma_type = ma_type_param(
+                "stochf",
+                "fastd_ma_type",
+                match text("fastd_ma_type")? {
+                    Some(ref value) => value,
+                    None => "sma",
+                },
+            )
+            .map_err(|e| to_py_err(py, &e))?;
+            Ok(
+                <trendlib::indicators::stochf::Stochf as Kernel<3, 2>>::lookback(
+                    &trendlib::indicators::stochf::Params {
+                        fastk_period,
+                        fastd_period,
+                        fastd_ma_type,
+                    },
+                ),
+            )
+        }
+        "stochrsi" => {
+            let period = match get("period")? {
+                Some(value) => int_param("stochrsi", "period", value, 2, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 14,
+            };
+            let fastk_period = match get("fastk_period")? {
+                Some(value) => int_param("stochrsi", "fastk_period", value, 1, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let fastd_period = match get("fastd_period")? {
+                Some(value) => int_param("stochrsi", "fastd_period", value, 1, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 3,
+            };
+            let fastd_ma_type = ma_type_param(
+                "stochrsi",
+                "fastd_ma_type",
+                match text("fastd_ma_type")? {
+                    Some(ref value) => value,
+                    None => "sma",
+                },
+            )
+            .map_err(|e| to_py_err(py, &e))?;
+            Ok(
+                <trendlib::indicators::stochrsi::Stochrsi as Kernel<1, 2>>::lookback(
+                    &trendlib::indicators::stochrsi::Params {
+                        period,
+                        fastk_period,
+                        fastd_period,
+                        fastd_ma_type,
+                    },
                 ),
             )
         }

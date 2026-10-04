@@ -1,0 +1,53 @@
+name: stoch
+title: Slow Stochastic
+group: momentum
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: fastk_period
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Number of bars the high-low range is taken over
+  - name: slowk_period
+    type: int
+    default: 3
+    min: 1
+    max: 100000
+    doc: Number of bars the raw %K is smoothed over
+  - name: slowk_ma_type
+    type: enum:MaType
+    default: sma
+    doc: Moving average used to smooth the raw %K
+  - name: slowd_period
+    type: int
+    default: 3
+    min: 1
+    max: 100000
+    doc: Number of bars the slow %K is smoothed over
+  - name: slowd_ma_type
+    type: enum:MaType
+    default: sma
+    doc: Moving average used to smooth slow %K into %D
+outputs:
+  - name: stoch_k
+    dtype: float64
+    plot: line
+    doc: Raw stochastic smoothed over slowk_period
+  - name: stoch_d
+    dtype: float64
+    plot: line
+    doc: Slow %K smoothed over slowd_period
+talib:
+  name: STOCH
+  params: {fastk_period: fastk_period, slowk_period: slowk_period, slowk_ma_type: slowk_matype, slowd_period: slowd_period, slowd_ma_type: slowd_matype}
+  outputs: [slowk, slowd]
+references:
+  - George C. Lane, Lane's Stochastics, Technical Analysis of Stocks and Commodities, May-June 1984
+see_also: [stochf, stochrsi, willr]

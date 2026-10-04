@@ -44,7 +44,29 @@ ATOL = 1e-12
 # closer of the two on 1468 rows to 18. A search over 6000 random series puts
 # the disagreement at 7.3e-11, inside the contract; hypothesis occasionally
 # constructs a series where the cancellation pushes it just past.
-ORACLE_IS_LOOSER = {"stddev": 1e-8, "var": 1e-8, "wma": 1e-8}
+#
+# The stochastic family joins them when the smoothing average is `trima`: %K
+# swings between 0 and 100 and back, and a triangular average carries that
+# swing in two running sums whose residue never cancels. Measured against exact
+# arithmetic over the committed dataset TrendLib's worst absolute error is
+# 3.1e-13 against ta-lib-python's 5.8e-11, and TrendLib is the closer of the
+# two on 1986 rows to 6. The Rust edge-case suite rebuilds the triangular
+# average from the window itself and pins how close TrendLib stays to it.
+ORACLE_IS_LOOSER = {
+    "stddev": 1e-8,
+    "var": 1e-8,
+    "wma": 1e-8,
+    "stoch": 1e-8,
+    "stochf": 1e-8,
+    "stochrsi": 1e-8,
+}
+
+# The same measurement sets the near-zero bound. Where %K has been pinned at an
+# end of its range for a while the exact answer is zero, so what is left is the
+# residue itself and there is no relative error to measure: TrendLib's 3.1e-13
+# against ta-lib-python's 5.8e-11. This is the figure the golden files carry as
+# `abs` for the same cases.
+ORACLE_IS_LOOSER_NEAR_ZERO = {"stoch": 2e-10, "stochf": 2e-10, "stochrsi": 2e-10}
 
 # Indicators whose output is a difference of two moving averages of the same
 # series. The difference is around 1e-5 of the averages, so one ULP on either
@@ -114,7 +136,8 @@ def compare(name, mine, theirs, indicator_name=None):
     defined = ~np.isnan(theirs) & np.isfinite(theirs)
     key = indicator_name or name
     rtol = CANCELS.get(key, ORACLE_IS_LOOSER.get(key, RTOL))
-    np.testing.assert_allclose(mine[defined], theirs[defined], rtol=rtol, atol=ATOL, err_msg=name)
+    atol = ORACLE_IS_LOOSER_NEAR_ZERO.get(key, ATOL)
+    np.testing.assert_allclose(mine[defined], theirs[defined], rtol=rtol, atol=atol, err_msg=name)
     # An infinity on one side has to be an infinity on the other.
     np.testing.assert_array_equal(np.isinf(mine), np.isinf(theirs), err_msg=f"{name}: infinities")
     if name in BITWISE:
