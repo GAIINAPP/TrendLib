@@ -2,8 +2,8 @@
 
 # Progress
 
-**182 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 22 not started.
+**186 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 18 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -17,12 +17,12 @@ something is done that is not. CI checks it is current.
 | Group | Shipped | Total |
 | --- | --- | --- |
 | Overlap studies | 19 | 25 |
-| Momentum | 44 | 47 |
+| Momentum | 46 | 47 |
 | Volatility | 6 | 7 |
 | Volume | 10 | 12 |
 | Price transforms | 6 | 6 |
 | Cycle | 0 | 5 |
-| Statistics | 9 | 11 |
+| Statistics | 11 | 11 |
 | Math transforms | 15 | 15 |
 | Math operators | 12 | 12 |
 | Candlestick patterns | 61 | 61 |
@@ -56,7 +56,7 @@ something is done that is not. CI checks it is current.
 - [x] `wma` (`WMA`) -- Weighted Moving Average *
 - [x] `zlema` (`ZLEMA`) -- Zero Lag Exponential Moving Average
 
-## Momentum (44 of 47)
+## Momentum (46 of 47)
 
 - [x] `ac` (`AC`) -- Accelerator Oscillator
 - [x] `adx` (`ADX`) -- Average Directional Movement Index *
@@ -75,9 +75,9 @@ something is done that is not. CI checks it is current.
 - [x] `er` (`ER`) -- Efficiency Ratio
 - [x] `eri` (`ERI`) -- Elder Ray Index
 - [x] `fosc` (`FOSC`) -- Forecast Oscillator
-- [ ] `fractal` (`FRACTAL`)
+- [x] `fractal` (`FRACTAL`) -- Fractal
 - [x] `imi` (`IMI`) -- Intraday Momentum Index
-- [ ] `kdj` (`KDJ`)
+- [x] `kdj` (`KDJ`) -- KDJ
 - [x] `macd` (`MACD`) -- Moving Average Convergence Divergence *
 - [x] `macdext` (`MACDEXT`) -- MACD with Selectable Averages
 - [x] `macdfix` (`MACDFIX`) -- MACD with Fixed Periods
@@ -148,10 +148,10 @@ something is done that is not. CI checks it is current.
 - [ ] `ht_sine` (`HT_SINE`)
 - [ ] `ht_trendmode` (`HT_TRENDMODE`)
 
-## Statistics (9 of 11)
+## Statistics (11 of 11)
 
-- [ ] `beta` (`BETA`)
-- [ ] `correl` (`CORREL`)
+- [x] `beta` (`BETA`) -- Beta
+- [x] `correl` (`CORREL`) -- Pearson Correlation
 - [x] `linearreg` (`LINEARREG`) -- Linear Regression
 - [x] `linearreg_angle` (`LINEARREG_ANGLE`) -- Linear Regression Angle
 - [x] `linearreg_intercept` (`LINEARREG_INTERCEPT`) -- Linear Regression Intercept

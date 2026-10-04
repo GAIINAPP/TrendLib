@@ -1,0 +1,28 @@
+name: correl
+title: Pearson Correlation
+group: statistic
+flags: [nan_inf_output]
+inputs:
+  - name: source0
+    kind: series
+  - name: source1
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 30
+    min: 1
+    max: 100000
+    doc: Number of bars the correlation is measured over
+outputs:
+  - name: correl
+    dtype: float64
+    plot: line
+    doc: Correlation between the two series over the window
+talib:
+  name: CORREL
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - TA-Lib, ta_CORREL.c
+see_also: [beta, var, stddev]

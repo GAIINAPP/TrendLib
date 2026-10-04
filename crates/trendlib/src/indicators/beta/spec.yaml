@@ -1,0 +1,27 @@
+name: beta
+title: Beta
+group: statistic
+inputs:
+  - name: source0
+    kind: series
+  - name: source1
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Number of returns the slope is fitted over
+outputs:
+  - name: beta
+    dtype: float64
+    plot: line
+    doc: Slope of the first series' returns against the second's
+talib:
+  name: BETA
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - TA-Lib, ta_BETA.c
+see_also: [correl, linearreg_slope, var]

@@ -49,6 +49,15 @@ SLOPE_CANCELS_AT_TWO = (
     "TrendLib's"
 )
 
+PAIRED_AT_TWO = (
+    "over two bars a correlation is exactly +1 or -1 and a beta is exactly the ratio of the two "
+    "returns, and almost every digit cancels on the way there; measured against those exact "
+    "values over this dataset TrendLib reaches the correlation exactly on 1384 rows where "
+    "ta-lib-python reaches it on 981 and strays 7.2e-10, and TrendLib's worst relative error on "
+    "beta is 4.4e-14 against ta-lib-python's 1.2e-9, closer on 1852 rows to 45, so the looser "
+    "bound covers the oracle's own error rather than TrendLib's"
+)
+
 FORECAST_CANCELS = (
     "the value is the gap between a bar and the line fitted to the bars before it, so a price-"
     "sized error of 1e-13 arrives as 1e-9 on a gap of 0.004; measured against exact arithmetic "
@@ -77,6 +86,10 @@ CASE_TOLERANCE = {
     ("stoch", "slowk_ma_type_trima"): ("rel=1e-8 abs=2e-10", TRIMA_RESIDUE),
     ("stoch", "slowd_ma_type_trima"): ("rel=1e-8 abs=2e-10", TRIMA_RESIDUE),
     ("stochrsi", "fastd_ma_type_trima"): ("rel=1e-8 abs=2e-10", TRIMA_RESIDUE),
+    ("kdj", "slowk_ma_type_trima"): ("rel=1e-8 abs=5e-10", TRIMA_RESIDUE),
+    ("kdj", "slowd_ma_type_trima"): ("rel=1e-8 abs=5e-10", TRIMA_RESIDUE),
+    ("correl", "min_period"): ("rel=1e-8 abs=1e-12", PAIRED_AT_TWO),
+    ("beta", "min_period"): ("rel=1e-5 abs=1e-12", PAIRED_AT_TWO),
     ("linearreg_slope", "min_period"): ("rel=2e-7 abs=1e-12", SLOPE_CANCELS_AT_TWO),
     ("linearreg_angle", "min_period"): ("rel=2e-7 abs=1e-12", SLOPE_CANCELS_AT_TWO),
 }
@@ -207,14 +220,16 @@ def cases(spec: dict) -> dict[str, dict]:
     """Every parameter case a golden file is written for.
 
     `default` is required by docs/SPEC_FORMAT.md section 4. `min_period` pins
-    every period-like parameter to its documented minimum, which is the
-    boundary most likely to be off by one in an implementation.
+    every whole-numbered parameter to its documented minimum, which is the
+    boundary most likely to be off by one in an implementation. It keeps that
+    name whatever the parameters are called: `fractal` counts bars either side
+    of a swing rather than a period, and the case means the same thing.
     """
     found = {"default": defaults(spec)}
     floors = {
         param["name"]: param["min"]
         for param in spec.get("params") or []
-        if param["type"] == "int" and "period" in param["name"] and "min" in param
+        if param["type"] == "int" and "min" in param
     }
     if floors:
         found["min_period"] = {**defaults(spec), **floors}

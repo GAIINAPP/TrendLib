@@ -1213,6 +1213,67 @@ mod bbands_adapter {
     }
 }
 
+mod beta_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::beta::Beta;
+    const INPUTS: usize = 2;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "period",
+        default: 5.0,
+        min: 1.0,
+        max: 100000.0,
+        integral: true,
+        choices: &[],
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::beta::Params {
+        trendlib::indicators::beta::Params {
+            period: values[0] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "beta takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::beta::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod bop_adapter {
     use super::*;
 
@@ -5073,6 +5134,67 @@ mod coppock_adapter {
     }
 }
 
+mod correl_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::correl::Correl;
+    const INPUTS: usize = 2;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "period",
+        default: 30.0,
+        min: 1.0,
+        max: 100000.0,
+        integral: true,
+        choices: &[],
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::correl::Params {
+        trendlib::indicators::correl::Params {
+            period: values[0] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "correl takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::correl::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: true,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod cos_adapter {
     use super::*;
 
@@ -6012,6 +6134,78 @@ mod fosc_adapter {
     }
 }
 
+mod fractal_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::fractal::Fractal;
+    const INPUTS: usize = 2;
+    const OUTPUTS: usize = 2;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "left_bars",
+            default: 2.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "right_bars",
+            default: 2.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::fractal::Params {
+        trendlib::indicators::fractal::Params {
+            left_bars: values[0] as usize,
+            right_bars: values[1] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "fractal takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::fractal::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[true, true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod ha_adapter {
     use super::*;
 
@@ -6315,6 +6509,105 @@ mod kc_adapter {
     pub fn registered() -> Registered {
         Registered {
             name: trendlib::indicators::kc::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[false, false, false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod kdj_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::kdj::Kdj;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 3;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "fastk_period",
+            default: 9.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "slowk_period",
+            default: 3.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "slowk_ma_type",
+            default: 10.0,
+            min: 0.0,
+            max: 10.0,
+            integral: false,
+            choices: MA_TYPES,
+        },
+        ParamSpec {
+            name: "slowd_period",
+            default: 3.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "slowd_ma_type",
+            default: 10.0,
+            min: 0.0,
+            max: 10.0,
+            integral: false,
+            choices: MA_TYPES,
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::kdj::Params {
+        trendlib::indicators::kdj::Params {
+            fastk_period: values[0] as usize,
+            slowk_period: values[1] as usize,
+            slowk_ma_type: ma_type_at(values[2]),
+            slowd_period: values[3] as usize,
+            slowd_ma_type: ma_type_at(values[4]),
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "kdj takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::kdj::NAME,
             inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
             outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
             params: PARAMS,
@@ -10995,6 +11288,7 @@ pub fn registered() -> Vec<Registered> {
         avgdev_adapter::registered(),
         avgprice_adapter::registered(),
         bbands_adapter::registered(),
+        beta_adapter::registered(),
         bop_adapter::registered(),
         cci_adapter::registered(),
         cdl_2crows_adapter::registered(),
@@ -11063,6 +11357,7 @@ pub fn registered() -> Vec<Registered> {
         cmo_adapter::registered(),
         cmou_adapter::registered(),
         coppock_adapter::registered(),
+        correl_adapter::registered(),
         cos_adapter::registered(),
         cosh_adapter::registered(),
         cumsum_adapter::registered(),
@@ -11079,11 +11374,13 @@ pub fn registered() -> Vec<Registered> {
         exp_adapter::registered(),
         floor_adapter::registered(),
         fosc_adapter::registered(),
+        fractal_adapter::registered(),
         ha_adapter::registered(),
         hma_adapter::registered(),
         imi_adapter::registered(),
         kama_adapter::registered(),
         kc_adapter::registered(),
+        kdj_adapter::registered(),
         linearreg_adapter::registered(),
         linearreg_angle_adapter::registered(),
         linearreg_intercept_adapter::registered(),

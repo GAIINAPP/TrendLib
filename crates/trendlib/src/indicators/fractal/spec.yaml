@@ -1,0 +1,37 @@
+name: fractal
+title: Fractal
+group: levels
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+params:
+  - name: left_bars
+    type: int
+    default: 2
+    min: 1
+    max: 100000
+    doc: Bars before the middle one that it must beat
+  - name: right_bars
+    type: int
+    default: 2
+    min: 1
+    max: 100000
+    doc: Bars after the middle one that it must beat
+outputs:
+  - name: fractal_swing_high
+    dtype: int32
+    plot: pattern
+    doc: Marks the bar where a swing high became confirmed
+  - name: fractal_swing_low
+    dtype: int32
+    plot: pattern
+    doc: Marks the bar where a swing low became confirmed
+talib:
+  name: FRACTAL
+  params: {left_bars: leftbars, right_bars: rightbars}
+  outputs: [swinghigh, swinglow]
+references:
+  - Bill Williams, Trading Chaos, Wiley, 1995
+see_also: [maxindex, minindex, donchian]

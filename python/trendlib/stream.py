@@ -33,6 +33,7 @@ __all__ = [
     "avgdev",
     "avgprice",
     "bbands",
+    "beta",
     "bop",
     "cci",
     "cdl_2crows",
@@ -101,6 +102,7 @@ __all__ = [
     "cmo",
     "cmou",
     "coppock",
+    "correl",
     "cos",
     "cosh",
     "cumsum",
@@ -117,11 +119,13 @@ __all__ = [
     "exp",
     "floor",
     "fosc",
+    "fractal",
     "ha",
     "hma",
     "imi",
     "kama",
     "kc",
+    "kdj",
     "linearreg",
     "linearreg_angle",
     "linearreg_intercept",
@@ -409,6 +413,19 @@ bbands = Factory(
         "bbands_middle",
         "bbands_lower",
     ),
+)
+beta = Factory(
+    "beta",
+    _core.BetaStream,
+    (
+        "source0",
+        "source1",
+    ),
+    (
+        "series",
+        "series",
+    ),
+    ("beta",),
 )
 bop = Factory(
     "bop",
@@ -1500,6 +1517,19 @@ cmf = Factory(
 cmo = Factory("cmo", _core.CmoStream, ("source",), ("series",), ("cmo",))
 cmou = Factory("cmou", _core.CmouStream, ("source",), ("series",), ("cmou",))
 coppock = Factory("coppock", _core.CoppockStream, ("source",), ("series",), ("coppock",))
+correl = Factory(
+    "correl",
+    _core.CorrelStream,
+    (
+        "source0",
+        "source1",
+    ),
+    (
+        "series",
+        "series",
+    ),
+    ("correl",),
+)
 cos = Factory("cos", _core.CosStream, ("source",), ("series",), ("cos",))
 cosh = Factory("cosh", _core.CoshStream, ("source",), ("series",), ("cosh",))
 cumsum = Factory("cumsum", _core.CumsumStream, ("source",), ("series",), ("cumsum",))
@@ -1599,6 +1629,22 @@ eri = Factory(
 exp = Factory("exp", _core.ExpStream, ("source",), ("series",), ("exp",))
 floor = Factory("floor", _core.FloorStream, ("source",), ("series",), ("floor",))
 fosc = Factory("fosc", _core.FoscStream, ("source",), ("series",), ("fosc",))
+fractal = Factory(
+    "fractal",
+    _core.FractalStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "fractal_swing_high",
+        "fractal_swing_low",
+    ),
+)
 ha = Factory(
     "ha",
     _core.HaStream,
@@ -1653,6 +1699,25 @@ kc = Factory(
         "kc_upper",
         "kc_middle",
         "kc_lower",
+    ),
+)
+kdj = Factory(
+    "kdj",
+    _core.KdjStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "kdj_k",
+        "kdj_d",
+        "kdj_j",
     ),
 )
 linearreg = Factory("linearreg", _core.LinearregStream, ("source",), ("series",), ("linearreg",))

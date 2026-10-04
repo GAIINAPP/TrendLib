@@ -1,0 +1,58 @@
+name: kdj
+title: KDJ
+group: momentum
+flags: [unstable, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: fastk_period
+    type: int
+    default: 9
+    min: 1
+    max: 100000
+    doc: Number of bars the high-low range is taken over
+  - name: slowk_period
+    type: int
+    default: 3
+    min: 1
+    max: 100000
+    doc: Number of bars the raw %K is smoothed over
+  - name: slowk_ma_type
+    type: enum:MaType
+    default: rma
+    doc: Moving average used to smooth the raw %K
+  - name: slowd_period
+    type: int
+    default: 3
+    min: 1
+    max: 100000
+    doc: Number of bars %K is smoothed over
+  - name: slowd_ma_type
+    type: enum:MaType
+    default: rma
+    doc: Moving average used to smooth %K into %D
+outputs:
+  - name: kdj_k
+    dtype: float64
+    plot: line
+    doc: Raw stochastic smoothed over slowk_period
+  - name: kdj_d
+    dtype: float64
+    plot: line
+    doc: The K line smoothed over slowd_period
+  - name: kdj_j
+    dtype: float64
+    plot: line
+    doc: Three times K less twice D, which runs outside both
+talib:
+  name: KDJ
+  params: {fastk_period: fastk_period, slowk_period: slowk_period, slowk_ma_type: slowk_matype, slowd_period: slowd_period, slowd_ma_type: slowd_matype}
+  outputs: [k, d, j]
+references:
+  - George C. Lane, Lane's Stochastics, Technical Analysis of Stocks and Commodities, May-June 1984
+see_also: [stoch, stochf, stochrsi]

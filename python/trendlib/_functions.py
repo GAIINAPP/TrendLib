@@ -32,6 +32,7 @@ __all__ = [
     "AVGDEV",
     "AVGPRICE",
     "BBANDS",
+    "BETA",
     "BOP",
     "CCI",
     "CDL2CROWS",
@@ -100,6 +101,7 @@ __all__ = [
     "CMO",
     "CMOU",
     "COPPOCK",
+    "CORREL",
     "COS",
     "COSH",
     "CUMSUM",
@@ -116,11 +118,13 @@ __all__ = [
     "EXP",
     "FLOOR",
     "FOSC",
+    "FRACTAL",
     "HA",
     "HMA",
     "IMI",
     "KAMA",
     "KC",
+    "KDJ",
     "LINEARREG",
     "LINEARREG_ANGLE",
     "LINEARREG_INTERCEPT",
@@ -214,6 +218,7 @@ __all__ = [
     "avgdev",
     "avgprice",
     "bbands",
+    "beta",
     "bop",
     "cci",
     "cdl_2crows",
@@ -282,6 +287,7 @@ __all__ = [
     "cmo",
     "cmou",
     "coppock",
+    "correl",
     "cos",
     "cosh",
     "cumsum",
@@ -298,11 +304,13 @@ __all__ = [
     "exp",
     "floor",
     "fosc",
+    "fractal",
     "ha",
     "hma",
     "imi",
     "kama",
     "kc",
+    "kdj",
     "linearreg",
     "linearreg_angle",
     "linearreg_intercept",
@@ -970,6 +978,36 @@ def bbands(
             "bbands_lower",
         ),
     )
+
+
+def beta(source0=None, source1=None, *, period: int = _PARAMS["beta"]["period"]["default"]) -> Any:
+    """Beta.
+
+    Parameters
+    ----------
+    period : int, default 5
+        Number of returns the slope is fitted over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Slope of the first series' returns against the second's.
+    """
+    period = _convert.as_int("beta", "period", period)
+    columns, carrier = _convert.bars(
+        "beta",
+        (source0, source1),
+        (
+            "source0",
+            "source1",
+        ),
+        (
+            "series",
+            "series",
+        ),
+    )
+    out = _core.beta(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("beta",))
 
 
 def bop(open=None, high=None, low=None, close=None) -> Any:
@@ -2968,6 +3006,38 @@ def coppock(
     return _convert.wrap_outputs(out, carrier, ("coppock",))
 
 
+def correl(
+    source0=None, source1=None, *, period: int = _PARAMS["correl"]["period"]["default"]
+) -> Any:
+    """Pearson Correlation.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the correlation is measured over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Correlation between the two series over the window.
+    """
+    period = _convert.as_int("correl", "period", period)
+    columns, carrier = _convert.bars(
+        "correl",
+        (source0, source1),
+        (
+            "source0",
+            "source1",
+        ),
+        (
+            "series",
+            "series",
+        ),
+    )
+    out = _core.correl(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("correl",))
+
+
 def cos(source=None) -> Any:
     """Vector Cosine.
 
@@ -3335,6 +3405,53 @@ def fosc(source=None, *, period: int = _PARAMS["fosc"]["period"]["default"]) -> 
     return _convert.wrap_outputs(out, carrier, ("fosc",))
 
 
+def fractal(
+    high=None,
+    low=None,
+    *,
+    left_bars: int = _PARAMS["fractal"]["left_bars"]["default"],
+    right_bars: int = _PARAMS["fractal"]["right_bars"]["default"],
+) -> Any:
+    """Fractal.
+
+    Parameters
+    ----------
+    left_bars : int, default 2
+        Bars before the middle one that it must beat, from 1 to 100000.
+    right_bars : int, default 2
+        Bars after the middle one that it must beat, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        fractal_swing_high: Marks the bar where a swing high became confirmed.
+        fractal_swing_low: Marks the bar where a swing low became confirmed.
+    """
+    left_bars = _convert.as_int("fractal", "left_bars", left_bars)
+    right_bars = _convert.as_int("fractal", "right_bars", right_bars)
+    columns, carrier = _convert.bars(
+        "fractal",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.fractal(*columns, left_bars=left_bars, right_bars=right_bars)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "fractal_swing_high",
+            "fractal_swing_low",
+        ),
+    )
+
+
 def ha(open=None, high=None, low=None, close=None) -> Any:
     """Heikin-Ashi Candles.
 
@@ -3495,6 +3612,77 @@ def kc(
             "kc_upper",
             "kc_middle",
             "kc_lower",
+        ),
+    )
+
+
+def kdj(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    fastk_period: int = _PARAMS["kdj"]["fastk_period"]["default"],
+    slowk_period: int = _PARAMS["kdj"]["slowk_period"]["default"],
+    slowk_ma_type: str = _PARAMS["kdj"]["slowk_ma_type"]["default"],
+    slowd_period: int = _PARAMS["kdj"]["slowd_period"]["default"],
+    slowd_ma_type: str = _PARAMS["kdj"]["slowd_ma_type"]["default"],
+) -> Any:
+    """KDJ.
+
+    Parameters
+    ----------
+    fastk_period : int, default 9
+        Number of bars the high-low range is taken over, from 1 to 100000.
+    slowk_period : int, default 3
+        Number of bars the raw %K is smoothed over, from 1 to 100000.
+    slowk_ma_type : str, default "rma"
+        Moving average used to smooth the raw %K.
+    slowd_period : int, default 3
+        Number of bars %K is smoothed over, from 1 to 100000.
+    slowd_ma_type : str, default "rma"
+        Moving average used to smooth %K into %D.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        kdj_k: Raw stochastic smoothed over slowk_period.
+        kdj_d: The K line smoothed over slowd_period.
+        kdj_j: Three times K less twice D, which runs outside both.
+    """
+    fastk_period = _convert.as_int("kdj", "fastk_period", fastk_period)
+    slowk_period = _convert.as_int("kdj", "slowk_period", slowk_period)
+    slowk_ma_type = _convert.as_text("kdj", "slowk_ma_type", slowk_ma_type)
+    slowd_period = _convert.as_int("kdj", "slowd_period", slowd_period)
+    slowd_ma_type = _convert.as_text("kdj", "slowd_ma_type", slowd_ma_type)
+    columns, carrier = _convert.bars(
+        "kdj",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.kdj(
+        *columns,
+        fastk_period=fastk_period,
+        slowk_period=slowk_period,
+        slowk_ma_type=slowk_ma_type,
+        slowd_period=slowd_period,
+        slowd_ma_type=slowd_ma_type,
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "kdj_k",
+            "kdj_d",
+            "kdj_j",
         ),
     )
 
@@ -5552,6 +5740,11 @@ def BBANDS(
     return bbands(source, period=timeperiod, nbdev_up=nbdevup, nbdev_dn=nbdevdn, ma_type=matype)
 
 
+def BETA(source0, source1, timeperiod: int = _PARAMS["beta"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`beta`."""
+    return beta(source0, source1, period=timeperiod)
+
+
 def BOP(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`bop`."""
     return bop(open, high, low, close)
@@ -5935,6 +6128,11 @@ def COPPOCK(
     return coppock(source, wma_period=wmaperiod, roc1_period=roc1period, roc2_period=roc2period)
 
 
+def CORREL(source0, source1, timeperiod: int = _PARAMS["correl"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`correl`."""
+    return correl(source0, source1, period=timeperiod)
+
+
 def COS(source) -> Any:
     """TA-Lib-style alias for :func:`cos`."""
     return cos(source)
@@ -6020,6 +6218,16 @@ def FOSC(source, timeperiod: int = _PARAMS["fosc"]["period"]["default"]) -> Any:
     return fosc(source, period=timeperiod)
 
 
+def FRACTAL(
+    high,
+    low,
+    leftbars: int = _PARAMS["fractal"]["left_bars"]["default"],
+    rightbars: int = _PARAMS["fractal"]["right_bars"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`fractal`."""
+    return fractal(high, low, left_bars=leftbars, right_bars=rightbars)
+
+
 def HA(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`ha`."""
     return ha(open, high, low, close)
@@ -6050,6 +6258,29 @@ def KC(
 ) -> Any:
     """TA-Lib-style alias for :func:`kc`."""
     return kc(high, low, close, period=timeperiod, atr_period=atrperiod, nbdev=nbdev)
+
+
+def KDJ(
+    high,
+    low,
+    close,
+    fastk_period: int = _PARAMS["kdj"]["fastk_period"]["default"],
+    slowk_period: int = _PARAMS["kdj"]["slowk_period"]["default"],
+    slowk_matype: str = _PARAMS["kdj"]["slowk_ma_type"]["default"],
+    slowd_period: int = _PARAMS["kdj"]["slowd_period"]["default"],
+    slowd_matype: str = _PARAMS["kdj"]["slowd_ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`kdj`."""
+    return kdj(
+        high,
+        low,
+        close,
+        fastk_period=fastk_period,
+        slowk_period=slowk_period,
+        slowk_ma_type=slowk_matype,
+        slowd_period=slowd_period,
+        slowd_ma_type=slowd_matype,
+    )
 
 
 def LINEARREG(source, timeperiod: int = _PARAMS["linearreg"]["period"]["default"]) -> Any:

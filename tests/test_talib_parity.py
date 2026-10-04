@@ -52,13 +52,22 @@ ATOL = 1e-12
 # 3.1e-13 against ta-lib-python's 5.8e-11, and TrendLib is the closer of the
 # two on 1986 rows to 6. The Rust edge-case suite rebuilds the triangular
 # average from the window itself and pins how close TrendLib stays to it.
+#
+# `correl` and `beta` join them at their minimum period, where a correlation is
+# exactly ±1 and a beta is exactly the ratio of two returns. Measured against
+# those exact values, TrendLib reaches the correlation exactly on 1384 rows
+# where ta-lib-python reaches it on 981 and strays 7.2e-10, and TrendLib's
+# worst relative error on beta is 4.4e-14 against ta-lib-python's 1.2e-9.
 ORACLE_IS_LOOSER = {
     "stddev": 1e-8,
+    "correl": 1e-8,
+    "beta": 1e-5,
     "var": 1e-8,
     "wma": 1e-8,
     "stoch": 1e-8,
     "stochf": 1e-8,
     "stochrsi": 1e-8,
+    "kdj": 1e-8,
 }
 
 # The same measurement sets the near-zero bound. Where %K has been pinned at an
@@ -71,6 +80,7 @@ ORACLE_IS_LOOSER_NEAR_ZERO = {
     "stochf": 2e-10,
     "stochrsi": 2e-10,
     "macdext": 1e-11,
+    "kdj": 5e-10,
 }
 
 # Indicators whose output is a difference of two moving averages of the same
