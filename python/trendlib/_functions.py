@@ -1033,7 +1033,8 @@ def cdl_darkcloudcover(
     Returns
     -------
     ndarray or Series
-        A black bar that opened above the previous high and closed well into the white body before it.
+        A black bar that opened above the previous high and closed well into the white body before
+        it.
     """
     penetration = _convert.as_float("cdl_darkcloudcover", "penetration", penetration)
     columns, carrier = _convert.bars(
@@ -1678,7 +1679,8 @@ def cdl_piercing(open=None, high=None, low=None, close=None) -> Any:
     Returns
     -------
     ndarray or Series
-        A long white bar that opened under the previous low and closed past the middle of the black body before it.
+        A long white bar that opened under the previous low and closed past the middle of the black
+        body before it.
     """
     columns, carrier = _convert.bars(
         "cdl_piercing",
@@ -1734,7 +1736,8 @@ def cdl_separatinglines(open=None, high=None, low=None, close=None) -> Any:
     Returns
     -------
     ndarray or Series
-        A long bar that opened where the opposite-coloured bar before it opened, and ran the other way.
+        A long bar that opened where the opposite-coloured bar before it opened, and ran the other
+        way.
     """
     columns, carrier = _convert.bars(
         "cdl_separatinglines",
@@ -1902,7 +1905,8 @@ def cdl_tasukigap(open=None, high=None, low=None, close=None) -> Any:
     Returns
     -------
     ndarray or Series
-        A gap, then a bar of the other colour that opens inside the gapping body and closes into the gap without filling it.
+        A gap, then a bar of the other colour that opens inside the gapping body and closes into the
+        gap without filling it.
     """
     columns, carrier = _convert.bars(
         "cdl_tasukigap",
@@ -1930,7 +1934,8 @@ def cdl_thrusting(open=None, high=None, low=None, close=None) -> Any:
     Returns
     -------
     ndarray or Series
-        A white bar that opened under the previous low and closed inside the black body but short of its middle.
+        A white bar that opened under the previous low and closed inside the black body but short of
+        its middle.
     """
     columns, carrier = _convert.bars(
         "cdl_thrusting",
@@ -1958,7 +1963,8 @@ def cdl_upsidegap2crows(open=None, high=None, low=None, close=None) -> Any:
     Returns
     -------
     ndarray or Series
-        A long white bar, then two black ones above it, the second swallowing the first without closing the gap.
+        A long white bar, then two black ones above it, the second swallowing the first without
+        closing the gap.
     """
     columns, carrier = _convert.bars(
         "cdl_upsidegap2crows",

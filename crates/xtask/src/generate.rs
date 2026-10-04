@@ -52,6 +52,35 @@ fn check_supported(specs: &[Spec]) -> Result<(), Vec<SpecError>> {
     }
 }
 
+/// `text` broken across lines so that no line of the docstring passes column
+/// 100, which is where the Python formatter draws the limit. Doc text is
+/// written as prose in `spec.yaml` and only becomes a docstring here, so this
+/// is the only place that knows how wide it ended up.
+fn wrapped(text: &str, indent: usize) -> String {
+    const WIDTH: usize = 100;
+    let pad = " ".repeat(indent);
+    let mut lines = Vec::new();
+    let mut line = String::new();
+    for word in text.split_whitespace() {
+        let would_be = if line.is_empty() {
+            indent + word.len()
+        } else {
+            indent + line.len() + 1 + word.len()
+        };
+        if !line.is_empty() && would_be > WIDTH {
+            lines.push(format!("{pad}{line}"));
+            line = word.to_string();
+        } else if line.is_empty() {
+            line = word.to_string();
+        } else {
+            line.push(' ');
+            line.push_str(word);
+        }
+    }
+    lines.push(format!("{pad}{line}"));
+    lines.join("\n").trim_start().to_string()
+}
+
 /// The Python annotation a parameter is declared with.
 fn python_type(ty: &ParamType) -> &'static str {
     match ty {
@@ -783,12 +812,11 @@ fn functions(specs: &[Spec]) -> String {
                 };
                 let _ = write!(
                     doc,
-                    "    {} : {}, default {}\n        {}{}.\n",
+                    "    {} : {}, default {}\n        {}\n",
                     param.name,
                     python_type(&param.ty),
                     py_default(param),
-                    param.doc,
-                    range
+                    wrapped(&format!("{}{}.", param.doc, range), 8)
                 );
             }
         }
@@ -796,13 +824,17 @@ fn functions(specs: &[Spec]) -> String {
         if spec.outputs.len() == 1 {
             let _ = write!(
                 doc,
-                "ndarray or Series\n        {}.\n    ",
-                spec.outputs[0].doc
+                "ndarray or Series\n        {}\n    ",
+                wrapped(&format!("{}.", spec.outputs[0].doc), 8)
             );
         } else {
             doc.push_str("tuple of ndarray, or DataFrame\n");
             for output in &spec.outputs {
-                let _ = writeln!(doc, "        {}: {}.", output.name, output.doc);
+                let _ = writeln!(
+                    doc,
+                    "        {}",
+                    wrapped(&format!("{}: {}.", output.name, output.doc), 8)
+                );
             }
             doc.push_str("    ");
         }
