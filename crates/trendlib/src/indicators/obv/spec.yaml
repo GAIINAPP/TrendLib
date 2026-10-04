@@ -1,0 +1,21 @@
+name: obv
+title: On Balance Volume
+group: volume
+flags: [path_dependent]
+inputs:
+  - name: close
+    kind: close
+  - name: volume
+    kind: volume
+outputs:
+  - name: obv
+    dtype: float64
+    plot: line
+    doc: Running total of volume, added on an up close and subtracted on a down close
+talib:
+  name: OBV
+  params: {}
+  outputs: [real]
+references:
+  - Joseph E. Granville, Granville's New Key to Stock Market Profits, Prentice-Hall, 1963
+see_also: [ad, adosc]

@@ -1,0 +1,25 @@
+name: ad
+title: Chaikin Accumulation Distribution Line
+group: volume
+flags: [path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+  - name: volume
+    kind: volume
+outputs:
+  - name: ad
+    dtype: float64
+    plot: line
+    doc: Running total of volume weighted by where each close sat in its own bar
+talib:
+  name: AD
+  params: {}
+  outputs: [real]
+references:
+  - Marc Chaikin, as described in Steven B. Achelis, Technical Analysis from A to Z, McGraw-Hill, 2000
+see_also: [obv, adosc]

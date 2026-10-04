@@ -1,0 +1,29 @@
+name: willr
+title: Williams Percent Range
+group: momentum
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 2
+    max: 100000
+    doc: Number of bars the high and low range is taken over
+outputs:
+  - name: willr
+    dtype: float64
+    plot: line
+    doc: Where the close sits in the recent range, from -100 at the low to 0 at the high
+talib:
+  name: WILLR
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Larry Williams, How I Made One Million Dollars Last Year Trading Commodities, Conceptual Management, 1973
+see_also: [stoch, cci]

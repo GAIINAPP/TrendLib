@@ -13,32 +13,68 @@ from typing import Any
 from trendlib import _convert, _core
 
 __all__ = [
+    "AD",
     "ATR",
+    "CCI",
     "DEMA",
     "EMA",
     "MACD",
     "NATR",
+    "OBV",
     "ROC",
     "RSI",
     "SMA",
     "TEMA",
     "TRANGE",
+    "WILLR",
     "WMA",
+    "ad",
     "atr",
+    "cci",
     "dema",
     "ema",
     "lookback",
     "macd",
     "natr",
+    "obv",
     "roc",
     "rsi",
     "sma",
     "tema",
     "trange",
+    "willr",
     "wma",
 ]
 
 _PARAMS = _core.PARAMS
+
+
+def ad(high=None, low=None, close=None, volume=None) -> Any:
+    """Chaikin Accumulation Distribution Line.
+
+    Returns
+    -------
+    ndarray or Series
+        Running total of volume weighted by where each close sat in its own bar.
+    """
+    columns, carrier = _convert.bars(
+        "ad",
+        (high, low, close, volume),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.ad(*columns)
+    return _convert.wrap_outputs(out, carrier, ("ad",))
 
 
 def atr(
@@ -73,6 +109,40 @@ def atr(
     )
     out = _core.atr(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("atr",))
+
+
+def cci(
+    high=None, low=None, close=None, *, period: int = _PARAMS["cci"]["period"]["default"]
+) -> Any:
+    """Commodity Channel Index.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the average and the deviation are taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Distance of the typical price from its average, in units of its own mean deviation.
+    """
+    period = _convert.as_int("cci", "period", period)
+    columns, carrier = _convert.bars(
+        "cci",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cci(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("cci",))
 
 
 def dema(source=None, *, period: int = _PARAMS["dema"]["period"]["default"]) -> Any:
@@ -190,6 +260,30 @@ def natr(
     return _convert.wrap_outputs(out, carrier, ("natr",))
 
 
+def obv(close=None, volume=None) -> Any:
+    """On Balance Volume.
+
+    Returns
+    -------
+    ndarray or Series
+        Running total of volume, added on an up close and subtracted on a down close.
+    """
+    columns, carrier = _convert.bars(
+        "obv",
+        (close, volume),
+        (
+            "close",
+            "volume",
+        ),
+        (
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.obv(*columns)
+    return _convert.wrap_outputs(out, carrier, ("obv",))
+
+
 def roc(source=None, *, period: int = _PARAMS["roc"]["period"]["default"]) -> Any:
     """Rate of Change.
 
@@ -292,6 +386,40 @@ def trange(high=None, low=None, close=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("trange",))
 
 
+def willr(
+    high=None, low=None, close=None, *, period: int = _PARAMS["willr"]["period"]["default"]
+) -> Any:
+    """Williams Percent Range.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the high and low range is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Where the close sits in the recent range, from -100 at the low to 0 at the high.
+    """
+    period = _convert.as_int("willr", "period", period)
+    columns, carrier = _convert.bars(
+        "willr",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.willr(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("willr",))
+
+
 def wma(source=None, *, period: int = _PARAMS["wma"]["period"]["default"]) -> Any:
     """Weighted Moving Average.
 
@@ -322,9 +450,19 @@ def lookback(name: str, **params: Any) -> int:
     return _core.lookback(name, **params)
 
 
+def AD(high, low, close, volume) -> Any:
+    """TA-Lib-style alias for :func:`ad`."""
+    return ad(high, low, close, volume)
+
+
 def ATR(high, low, close, timeperiod: int = _PARAMS["atr"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`atr`."""
     return atr(high, low, close, period=timeperiod)
+
+
+def CCI(high, low, close, timeperiod: int = _PARAMS["cci"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`cci`."""
+    return cci(high, low, close, period=timeperiod)
 
 
 def DEMA(source, timeperiod: int = _PARAMS["dema"]["period"]["default"]) -> Any:
@@ -352,6 +490,11 @@ def NATR(high, low, close, timeperiod: int = _PARAMS["natr"]["period"]["default"
     return natr(high, low, close, period=timeperiod)
 
 
+def OBV(close, volume) -> Any:
+    """TA-Lib-style alias for :func:`obv`."""
+    return obv(close, volume)
+
+
 def ROC(source, timeperiod: int = _PARAMS["roc"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`roc`."""
     return roc(source, period=timeperiod)
@@ -375,6 +518,11 @@ def TEMA(source, timeperiod: int = _PARAMS["tema"]["period"]["default"]) -> Any:
 def TRANGE(high, low, close) -> Any:
     """TA-Lib-style alias for :func:`trange`."""
     return trange(high, low, close)
+
+
+def WILLR(high, low, close, timeperiod: int = _PARAMS["willr"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`willr`."""
+    return willr(high, low, close, period=timeperiod)
 
 
 def WMA(source, timeperiod: int = _PARAMS["wma"]["period"]["default"]) -> Any:

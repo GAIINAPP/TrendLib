@@ -14,19 +14,40 @@ from trendlib import _convert, _core
 from trendlib._stream_base import Factory
 
 __all__ = [
+    "ad",
     "atr",
+    "cci",
     "dema",
     "ema",
     "macd",
     "natr",
+    "obv",
     "roc",
     "rsi",
     "sma",
     "tema",
     "trange",
+    "willr",
     "wma",
 ]
 
+ad = Factory(
+    "ad",
+    _core.AdStream,
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    ("ad",),
+)
 atr = Factory(
     "atr",
     _core.AtrStream,
@@ -41,6 +62,21 @@ atr = Factory(
         "close",
     ),
     ("atr",),
+)
+cci = Factory(
+    "cci",
+    _core.CciStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("cci",),
 )
 dema = Factory("dema", _core.DemaStream, ("source",), ("series",), ("dema",))
 ema = Factory("ema", _core.EmaStream, ("source",), ("series",), ("ema",))
@@ -70,6 +106,19 @@ natr = Factory(
     ),
     ("natr",),
 )
+obv = Factory(
+    "obv",
+    _core.ObvStream,
+    (
+        "close",
+        "volume",
+    ),
+    (
+        "close",
+        "volume",
+    ),
+    ("obv",),
+)
 roc = Factory("roc", _core.RocStream, ("source",), ("series",), ("roc",))
 rsi = Factory("rsi", _core.RsiStream, ("source",), ("series",), ("rsi",))
 sma = Factory("sma", _core.SmaStream, ("source",), ("series",), ("sma",))
@@ -88,6 +137,21 @@ trange = Factory(
         "close",
     ),
     ("trange",),
+)
+willr = Factory(
+    "willr",
+    _core.WillrStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("willr",),
 )
 wma = Factory("wma", _core.WmaStream, ("source",), ("series",), ("wma",))
 

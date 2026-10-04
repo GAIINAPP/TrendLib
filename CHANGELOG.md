@@ -37,6 +37,8 @@ Before 1.0, minor versions may break the API; every break is listed under
 - `wma`, `trange`, `atr` and `natr` are callable from Python.
 - Indicators `dema`, `tema`, `roc` and `macd`. `macd` is the first with
   several outputs, returned as a tuple or, from a DataFrame, as a frame.
+- Indicators `willr`, `cci`, `obv` and `ad`. `obv` and `ad` are the first
+  path-dependent ones and the first to reject a negative volume.
 - The Rust test registry is generated too, so every indicator is covered by
   the golden, parity and edge-case suites the moment its spec exists.
 - `docs/PROGRESS.md` tracks all 204 approved indicators, ticked from the

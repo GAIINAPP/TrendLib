@@ -1,0 +1,29 @@
+name: cci
+title: Commodity Channel Index
+group: momentum
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 2
+    max: 100000
+    doc: Number of bars the average and the deviation are taken over
+outputs:
+  - name: cci
+    dtype: float64
+    plot: line
+    doc: Distance of the typical price from its average, in units of its own mean deviation
+talib:
+  name: CCI
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Donald R. Lambert, Commodity Channel Index - Tool for Trading Cyclic Trends, Commodities, October 1980
+see_also: [willr, rsi]

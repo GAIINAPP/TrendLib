@@ -200,6 +200,203 @@ impl Ema {
     }
 }
 
+/// The highest or lowest value in the last `period` bars.
+///
+/// The extreme is tracked rather than rescanned: a new bar only has to beat the
+/// one on record, and the window is rescanned only on the bar where the record
+/// holder drops out of it. That keeps a batch run linear in the common case
+/// instead of multiplying bars by period.
+#[derive(Clone, Debug)]
+pub struct RollingExtreme {
+    window: Box<[f64]>,
+    head: usize,
+    seen: usize,
+    best: usize,
+    want_max: bool,
+}
+
+impl RollingExtreme {
+    pub fn highest(period: usize) -> Self {
+        Self::new(period, true)
+    }
+
+    pub fn lowest(period: usize) -> Self {
+        Self::new(period, false)
+    }
+
+    fn new(period: usize, want_max: bool) -> Self {
+        assert!(period > 0, "period must be at least 1");
+        Self {
+            window: vec![0.0; period].into_boxed_slice(),
+            head: 0,
+            seen: 0,
+            best: 0,
+            want_max,
+        }
+    }
+
+    fn beats(&self, candidate: f64, incumbent: f64) -> bool {
+        if self.want_max {
+            candidate > incumbent
+        } else {
+            candidate < incumbent
+        }
+    }
+
+    /// The best of the written slots, ignoring one. `None` when every slot was
+    /// ignored, which happens with `period = 1`: the bar being offered is then
+    /// the only candidate there is.
+    fn scan(&self, filled: usize, skip: Option<usize>) -> Option<usize> {
+        let mut best: Option<usize> = None;
+        for slot in 0..filled {
+            if Some(slot) == skip {
+                continue;
+            }
+            match best {
+                None => best = Some(slot),
+                Some(current) if self.beats(self.window[slot], self.window[current]) => {
+                    best = Some(slot)
+                }
+                _ => {}
+            }
+        }
+        best
+    }
+
+    pub fn push(&mut self, value: f64) -> Option<f64> {
+        let period = self.window.len();
+        let slot = self.head;
+        let dropped_record = self.seen >= period && slot == self.best;
+
+        self.window[slot] = value;
+        self.head = (self.head + 1) % period;
+        self.seen += 1;
+
+        if dropped_record {
+            self.best = self.scan(period, None).expect("a full window has a best");
+        } else if self.seen == 1 || self.beats(value, self.window[self.best]) {
+            self.best = slot;
+        }
+
+        (self.seen >= period).then(|| self.window[self.best])
+    }
+
+    pub fn preview(&self, value: f64) -> Option<f64> {
+        let period = self.window.len();
+        if self.seen + 1 < period {
+            return None;
+        }
+        let incumbent = if self.seen < period {
+            // The window fills exactly on this bar, so nothing drops out.
+            self.scan(self.seen, None)
+        } else if self.head == self.best {
+            self.scan(period, Some(self.head))
+        } else {
+            Some(self.best)
+        };
+        let Some(incumbent) = incumbent.map(|slot| self.window[slot]) else {
+            return Some(value);
+        };
+        Some(if self.beats(value, incumbent) {
+            value
+        } else {
+            incumbent
+        })
+    }
+}
+
+/// The last `period` values, for indicators that need the whole window rather
+/// than a running summary.
+#[derive(Clone, Debug)]
+pub struct RollingWindow {
+    window: Box<[f64]>,
+    head: usize,
+    seen: usize,
+    total: f64,
+}
+
+impl RollingWindow {
+    pub fn new(period: usize) -> Self {
+        assert!(period > 0, "period must be at least 1");
+        Self {
+            window: vec![0.0; period].into_boxed_slice(),
+            head: 0,
+            seen: 0,
+            total: 0.0,
+        }
+    }
+
+    pub fn period(&self) -> usize {
+        self.window.len()
+    }
+
+    pub fn is_full(&self) -> bool {
+        self.seen >= self.window.len()
+    }
+
+    pub fn push(&mut self, value: f64) -> bool {
+        if self.is_full() {
+            self.total -= self.window[self.head];
+        }
+        self.total += value;
+        self.window[self.head] = value;
+        self.head = (self.head + 1) % self.window.len();
+        self.seen += 1;
+        self.is_full()
+    }
+
+    /// The running mean. Cheap, but it carries the drift of every value ever
+    /// added; use [`Self::exact_mean`] where a later subtraction will magnify
+    /// that drift.
+    pub fn mean(&self) -> f64 {
+        self.total / self.window.len() as f64
+    }
+
+    /// The mean re-summed from the window, oldest value first.
+    ///
+    /// An indicator that subtracts this mean from a value of the same size
+    /// loses most of the significant digits in the subtraction, so a running
+    /// total's accumulated drift turns into a visible error. Re-summing costs
+    /// one pass over the window and removes it.
+    pub fn exact_mean(&self) -> f64 {
+        self.values().sum::<f64>() / self.window.len() as f64
+    }
+
+    /// The window oldest value first. When full, `head` is the oldest slot.
+    pub fn values(&self) -> impl Iterator<Item = f64> + '_ {
+        let period = self.window.len();
+        let start = if self.is_full() { self.head } else { 0 };
+        (0..period).map(move |offset| self.window[(start + offset) % period])
+    }
+
+    /// The window as it would be after pushing `value`, without pushing it.
+    pub fn preview_values(&self, value: f64) -> impl Iterator<Item = f64> + '_ {
+        let period = self.window.len();
+        let dropping = self.head;
+        let start = if self.preview_is_full() && self.is_full() {
+            (self.head + 1) % period
+        } else {
+            0
+        };
+        (0..period).map(move |offset| {
+            let slot = (start + offset) % period;
+            if slot == dropping {
+                value
+            } else {
+                self.window[slot]
+            }
+        })
+    }
+
+    pub fn preview_mean(&self, value: f64) -> f64 {
+        self.preview_values(value).sum::<f64>() / self.window.len() as f64
+    }
+
+    pub fn preview_is_full(&self) -> bool {
+        self.seen + 1 >= self.window.len()
+    }
+}
+
 /// The value `lag` bars ago, for indicators that compare now with then.
 #[derive(Clone, Debug)]
 pub struct Lagged {
@@ -286,7 +483,9 @@ impl Wilder {
 
 #[cfg(test)]
 mod tests {
-    use super::{Ema, Lagged, RollingMean, TrueRange, WeightedMean, Wilder};
+    use super::{
+        Ema, Lagged, RollingExtreme, RollingMean, RollingWindow, TrueRange, WeightedMean, Wilder,
+    };
 
     fn drive<F>(len: usize, mut step: F) -> Vec<Option<f64>>
     where
@@ -311,6 +510,62 @@ mod tests {
             assert_eq!(previewed, forked.push(9.5));
             mean.push(x);
         }
+    }
+
+    #[test]
+    fn rolling_extreme_matches_a_brute_force_scan() {
+        let mut rng: u64 = 0x5eed;
+        let mut next = || {
+            rng = rng
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
+            ((rng >> 33) as f64 / (1u64 << 31) as f64) * 200.0 - 100.0
+        };
+        let series: Vec<f64> = (0..400).map(|_| next()).collect();
+
+        for period in [1usize, 2, 3, 7, 20] {
+            let mut highest = RollingExtreme::highest(period);
+            let mut lowest = RollingExtreme::lowest(period);
+            for (row, &value) in series.iter().enumerate() {
+                let previewed_high = highest.preview(value);
+                let previewed_low = lowest.preview(value);
+                let got_high = highest.push(value);
+                let got_low = lowest.push(value);
+                assert_eq!(
+                    previewed_high, got_high,
+                    "high preview, period {period}, row {row}"
+                );
+                assert_eq!(
+                    previewed_low, got_low,
+                    "low preview, period {period}, row {row}"
+                );
+
+                if row + 1 >= period {
+                    let window = &series[row + 1 - period..=row];
+                    let want_high = window.iter().copied().fold(f64::NEG_INFINITY, f64::max);
+                    let want_low = window.iter().copied().fold(f64::INFINITY, f64::min);
+                    assert_eq!(got_high, Some(want_high), "period {period}, row {row}");
+                    assert_eq!(got_low, Some(want_low), "period {period}, row {row}");
+                } else {
+                    assert_eq!(got_high, None);
+                    assert_eq!(got_low, None);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn rolling_window_tracks_its_mean_and_contents() {
+        let mut window = RollingWindow::new(3);
+        assert!(!window.push(1.0));
+        assert!(!window.push(2.0));
+        assert!(window.push(3.0));
+        assert_eq!(window.mean(), 2.0);
+        assert_eq!(window.preview_mean(4.0), 3.0);
+        let previewed: Vec<f64> = window.preview_values(4.0).collect();
+        assert_eq!(previewed.iter().copied().fold(0.0, f64::max), 4.0);
+        window.push(4.0);
+        assert_eq!(window.mean(), 3.0);
     }
 
     #[test]

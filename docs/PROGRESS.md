@@ -2,8 +2,8 @@
 
 # Progress
 
-**11 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 193 not started.
+**15 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 189 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -17,9 +17,9 @@ something is done that is not. CI checks it is current.
 | Group | Shipped | Total |
 | --- | --- | --- |
 | Overlap studies | 5 | 25 |
-| Momentum | 3 | 47 |
+| Momentum | 5 | 47 |
 | Volatility | 3 | 7 |
-| Volume | 0 | 12 |
+| Volume | 2 | 12 |
 | Price transforms | 0 | 6 |
 | Cycle | 0 | 5 |
 | Statistics | 0 | 11 |
@@ -56,7 +56,7 @@ something is done that is not. CI checks it is current.
 - [x] `wma` (`WMA`) -- Weighted Moving Average *
 - [ ] `zlema` (`ZLEMA`)
 
-## Momentum (3 of 47)
+## Momentum (5 of 47)
 
 - [ ] `ac` (`AC`)
 - [ ] `adx` (`ADX`) *
@@ -66,7 +66,7 @@ something is done that is not. CI checks it is current.
 - [ ] `aroon` (`AROON`)
 - [ ] `aroonosc` (`AROONOSC`)
 - [ ] `bop` (`BOP`)
-- [ ] `cci` (`CCI`) *
+- [x] `cci` (`CCI`) -- Commodity Channel Index *
 - [ ] `cmo` (`CMO`)
 - [ ] `cmou` (`CMOU`)
 - [ ] `coppock` (`COPPOCK`)
@@ -104,7 +104,7 @@ something is done that is not. CI checks it is current.
 - [ ] `vhf` (`VHF`)
 - [ ] `vortex` (`VORTEX`)
 - [ ] `wad` (`WAD`)
-- [ ] `willr` (`WILLR`) *
+- [x] `willr` (`WILLR`) -- Williams Percent Range *
 
 ## Volatility (3 of 7)
 
@@ -116,15 +116,15 @@ something is done that is not. CI checks it is current.
 - [ ] `rvi` (`RVI`)
 - [x] `trange` (`TRANGE`) -- True Range *
 
-## Volume (0 of 12)
+## Volume (2 of 12)
 
-- [ ] `ad` (`AD`) *
+- [x] `ad` (`AD`) -- Chaikin Accumulation Distribution Line *
 - [ ] `adosc` (`ADOSC`) *
 - [ ] `cmf` (`CMF`)
 - [ ] `efi` (`EFI`)
 - [ ] `marketfi` (`MARKETFI`)
 - [ ] `nvi` (`NVI`)
-- [ ] `obv` (`OBV`) *
+- [x] `obv` (`OBV`) -- On Balance Volume *
 - [ ] `pvi` (`PVI`)
 - [ ] `pvo` (`PVO`)
 - [ ] `pvt` (`PVT`)

@@ -5,6 +5,55 @@
 use super::{AnyStream, Columns, OpenAndFillResult, ParamSpec, Registered, TlError};
 use trendlib::core::kernel::Kernel;
 
+mod ad_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::ad::Ad;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::ad::Params {
+        let _ = values;
+        trendlib::indicators::ad::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "ad takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::ad::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod atr_adapter {
     use super::*;
 
@@ -51,6 +100,62 @@ mod atr_adapter {
     pub fn registered() -> Registered {
         Registered {
             name: trendlib::indicators::atr::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod cci_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cci::Cci;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "period",
+        default: 14.0,
+        min: 2.0,
+        max: 100000.0,
+        integral: true,
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cci::Params {
+        trendlib::indicators::cci::Params {
+            period: values[0] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "cci takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cci::NAME,
             inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
             outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
             params: PARAMS,
@@ -293,6 +398,55 @@ mod natr_adapter {
     pub fn registered() -> Registered {
         Registered {
             name: trendlib::indicators::natr::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod obv_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::obv::Obv;
+    const INPUTS: usize = 2;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::obv::Params {
+        let _ = values;
+        trendlib::indicators::obv::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "obv takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::obv::NAME,
             inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
             outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
             params: PARAMS,
@@ -576,6 +730,62 @@ mod trange_adapter {
     }
 }
 
+mod willr_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::willr::Willr;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "period",
+        default: 14.0,
+        min: 2.0,
+        max: 100000.0,
+        integral: true,
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::willr::Params {
+        trendlib::indicators::willr::Params {
+            period: values[0] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "willr takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::willr::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod wma_adapter {
     use super::*;
 
@@ -634,16 +844,20 @@ mod wma_adapter {
 
 pub fn registered() -> Vec<Registered> {
     vec![
+        ad_adapter::registered(),
         atr_adapter::registered(),
+        cci_adapter::registered(),
         dema_adapter::registered(),
         ema_adapter::registered(),
         macd_adapter::registered(),
         natr_adapter::registered(),
+        obv_adapter::registered(),
         roc_adapter::registered(),
         rsi_adapter::registered(),
         sma_adapter::registered(),
         tema_adapter::registered(),
         trange_adapter::registered(),
+        willr_adapter::registered(),
         wma_adapter::registered(),
     ]
 }
