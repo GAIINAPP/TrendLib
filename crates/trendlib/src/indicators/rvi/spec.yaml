@@ -1,0 +1,32 @@
+name: rvi
+title: Relative Volatility Index
+group: volatility
+flags: [unstable, path_dependent, nan_inf_output]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 1
+    max: 100000
+    doc: Number of bars the deviations are smoothed over
+  - name: stddev_period
+    type: int
+    default: 10
+    min: 2
+    max: 100000
+    doc: Number of bars each standard deviation is taken over
+outputs:
+  - name: rvi
+    dtype: float64
+    plot: line
+    doc: Share of recent volatility that came on up bars, as a percentage
+talib:
+  name: RVI
+  params: {period: timeperiod, stddev_period: stddevperiod}
+  outputs: [real]
+references:
+  - Donald Dorsey, The Relative Volatility Index, Technical Analysis of Stocks and Commodities, June 1993
+see_also: [rsi, stddev, atr]

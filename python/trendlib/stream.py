@@ -161,6 +161,7 @@ __all__ = [
     "plus_dm",
     "ppo",
     "pvi",
+    "pvo",
     "pvt",
     "qstick",
     "rma",
@@ -169,10 +170,13 @@ __all__ = [
     "rocr",
     "rocr100",
     "rsi",
+    "rvi",
     "rvol",
+    "sar",
     "sin",
     "sinh",
     "sma",
+    "smi",
     "sqrt",
     "stddev",
     "stoch",
@@ -180,6 +184,7 @@ __all__ = [
     "stochrsi",
     "sub",
     "sum",
+    "supertrend",
     "t3",
     "tan",
     "tanh",
@@ -1997,6 +2002,7 @@ pvi = Factory(
     ),
     ("pvi",),
 )
+pvo = Factory("pvo", _core.PvoStream, ("volume",), ("volume",), ("pvo",))
 pvt = Factory(
     "pvt",
     _core.PvtStream,
@@ -2029,10 +2035,42 @@ rocp = Factory("rocp", _core.RocpStream, ("source",), ("series",), ("rocp",))
 rocr = Factory("rocr", _core.RocrStream, ("source",), ("series",), ("rocr",))
 rocr100 = Factory("rocr100", _core.Rocr100Stream, ("source",), ("series",), ("rocr100",))
 rsi = Factory("rsi", _core.RsiStream, ("source",), ("series",), ("rsi",))
+rvi = Factory("rvi", _core.RviStream, ("source",), ("series",), ("rvi",))
 rvol = Factory("rvol", _core.RvolStream, ("volume",), ("volume",), ("rvol",))
+sar = Factory(
+    "sar",
+    _core.SarStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("sar",),
+)
 sin = Factory("sin", _core.SinStream, ("source",), ("series",), ("sin",))
 sinh = Factory("sinh", _core.SinhStream, ("source",), ("series",), ("sinh",))
 sma = Factory("sma", _core.SmaStream, ("source",), ("series",), ("sma",))
+smi = Factory(
+    "smi",
+    _core.SmiStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "smi",
+        "smi_smisignal",
+    ),
+)
 sqrt = Factory("sqrt", _core.SqrtStream, ("source",), ("series",), ("sqrt",))
 stddev = Factory("stddev", _core.StddevStream, ("source",), ("series",), ("stddev",))
 stoch = Factory(
@@ -2095,6 +2133,24 @@ sub = Factory(
     ("sub",),
 )
 sum = Factory("sum", _core.SumStream, ("source",), ("series",), ("sum",))
+supertrend = Factory(
+    "supertrend",
+    _core.SupertrendStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "supertrend",
+        "supertrend_direction",
+    ),
+)
 t3 = Factory("t3", _core.T3Stream, ("source",), ("series",), ("t3",))
 tan = Factory("tan", _core.TanStream, ("source",), ("series",), ("tan",))
 tanh = Factory("tanh", _core.TanhStream, ("source",), ("series",), ("tanh",))

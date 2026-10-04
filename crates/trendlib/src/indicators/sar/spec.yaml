@@ -1,0 +1,32 @@
+name: sar
+title: Parabolic SAR
+group: overlap
+flags: [overlap, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+params:
+  - name: acceleration
+    type: float
+    default: 0.02
+    min: 0.0
+    doc: How much the step grows each time a new extreme is reached
+  - name: maximum
+    type: float
+    default: 0.2
+    min: 0.0
+    doc: Largest step the acceleration is allowed to reach
+outputs:
+  - name: sar
+    dtype: float64
+    plot: line
+    doc: Trailing stop that converges on price and flips when it is reached
+talib:
+  name: SAR
+  params: {acceleration: acceleration, maximum: maximum}
+  outputs: [real]
+references:
+  - J. Welles Wilder Jr., New Concepts in Technical Trading Systems, Trend Research, 1978
+see_also: [sarext, supertrend, adx]

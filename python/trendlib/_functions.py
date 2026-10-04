@@ -160,6 +160,7 @@ __all__ = [
     "PLUS_DM",
     "PPO",
     "PVI",
+    "PVO",
     "PVT",
     "QSTICK",
     "RMA",
@@ -168,10 +169,13 @@ __all__ = [
     "ROCR",
     "ROCR100",
     "RSI",
+    "RVI",
     "RVOL",
+    "SAR",
     "SIN",
     "SINH",
     "SMA",
+    "SMI",
     "SQRT",
     "STDDEV",
     "STOCH",
@@ -179,6 +183,7 @@ __all__ = [
     "STOCHRSI",
     "SUB",
     "SUM",
+    "SUPERTREND",
     "T3",
     "TAN",
     "TANH",
@@ -347,6 +352,7 @@ __all__ = [
     "plus_dm",
     "ppo",
     "pvi",
+    "pvo",
     "pvt",
     "qstick",
     "rma",
@@ -355,10 +361,13 @@ __all__ = [
     "rocr",
     "rocr100",
     "rsi",
+    "rvi",
     "rvol",
+    "sar",
     "sin",
     "sinh",
     "sma",
+    "smi",
     "sqrt",
     "stddev",
     "stoch",
@@ -366,6 +375,7 @@ __all__ = [
     "stochrsi",
     "sub",
     "sum",
+    "supertrend",
     "t3",
     "tan",
     "tanh",
@@ -4620,6 +4630,37 @@ def pvi(close=None, volume=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("pvi",))
 
 
+def pvo(
+    volume=None,
+    *,
+    fast_period: int = _PARAMS["pvo"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["pvo"]["slow_period"]["default"],
+    ma_type: str = _PARAMS["pvo"]["ma_type"]["default"],
+) -> Any:
+    """Percentage Volume Oscillator.
+
+    Parameters
+    ----------
+    fast_period : int, default 12
+        Number of bars in the shorter average, from 2 to 100000.
+    slow_period : int, default 26
+        Number of bars in the longer average, from 2 to 100000.
+    ma_type : str, default "ema"
+        Which moving average both stages use.
+
+    Returns
+    -------
+    ndarray or Series
+        Gap between a short and a long average of volume, as a percentage of the long one.
+    """
+    fast_period = _convert.as_int("pvo", "fast_period", fast_period)
+    slow_period = _convert.as_int("pvo", "slow_period", slow_period)
+    ma_type = _convert.as_text("pvo", "ma_type", ma_type)
+    columns, carrier = _convert.bars("pvo", (volume,), ("volume",), ("volume",))
+    out = _core.pvo(*columns, fast_period=fast_period, slow_period=slow_period, ma_type=ma_type)
+    return _convert.wrap_outputs(out, carrier, ("pvo",))
+
+
 def pvt(close=None, volume=None) -> Any:
     """Price Volume Trend.
 
@@ -4788,6 +4829,33 @@ def rsi(source=None, *, period: int = _PARAMS["rsi"]["period"]["default"]) -> An
     return _convert.wrap_outputs(out, carrier, ("rsi",))
 
 
+def rvi(
+    source=None,
+    *,
+    period: int = _PARAMS["rvi"]["period"]["default"],
+    stddev_period: int = _PARAMS["rvi"]["stddev_period"]["default"],
+) -> Any:
+    """Relative Volatility Index.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the deviations are smoothed over, from 1 to 100000.
+    stddev_period : int, default 10
+        Number of bars each standard deviation is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Share of recent volatility that came on up bars, as a percentage.
+    """
+    period = _convert.as_int("rvi", "period", period)
+    stddev_period = _convert.as_int("rvi", "stddev_period", stddev_period)
+    columns, carrier = _convert.bars("rvi", (source,), ("source",), ("series",))
+    out = _core.rvi(*columns, period=period, stddev_period=stddev_period)
+    return _convert.wrap_outputs(out, carrier, ("rvi",))
+
+
 def rvol(volume=None, *, period: int = _PARAMS["rvol"]["period"]["default"]) -> Any:
     """Relative Volume.
 
@@ -4805,6 +4873,45 @@ def rvol(volume=None, *, period: int = _PARAMS["rvol"]["period"]["default"]) -> 
     columns, carrier = _convert.bars("rvol", (volume,), ("volume",), ("volume",))
     out = _core.rvol(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("rvol",))
+
+
+def sar(
+    high=None,
+    low=None,
+    *,
+    acceleration: float = _PARAMS["sar"]["acceleration"]["default"],
+    maximum: float = _PARAMS["sar"]["maximum"]["default"],
+) -> Any:
+    """Parabolic SAR.
+
+    Parameters
+    ----------
+    acceleration : float, default 0.02
+        How much the step grows each time a new extreme is reached.
+    maximum : float, default 0.2
+        Largest step the acceleration is allowed to reach.
+
+    Returns
+    -------
+    ndarray or Series
+        Trailing stop that converges on price and flips when it is reached.
+    """
+    acceleration = _convert.as_float("sar", "acceleration", acceleration)
+    maximum = _convert.as_float("sar", "maximum", maximum)
+    columns, carrier = _convert.bars(
+        "sar",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.sar(*columns, acceleration=acceleration, maximum=maximum)
+    return _convert.wrap_outputs(out, carrier, ("sar",))
 
 
 def sin(source=None) -> Any:
@@ -4850,6 +4957,70 @@ def sma(source=None, *, period: int = _PARAMS["sma"]["period"]["default"]) -> An
     columns, carrier = _convert.bars("sma", (source,), ("source",), ("series",))
     out = _core.sma(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("sma",))
+
+
+def smi(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["smi"]["period"]["default"],
+    fast_period: int = _PARAMS["smi"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["smi"]["slow_period"]["default"],
+    signal_period: int = _PARAMS["smi"]["signal_period"]["default"],
+) -> Any:
+    """Stochastic Momentum Index.
+
+    Parameters
+    ----------
+    period : int, default 13
+        Number of bars the high-low range is taken over, from 2 to 100000.
+    fast_period : int, default 2
+        Number of bars in the second smoothing stage, from 2 to 100000.
+    slow_period : int, default 25
+        Number of bars in the first smoothing stage, from 2 to 100000.
+    signal_period : int, default 9
+        Number of bars the index is smoothed over, from 2 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        smi: Where the close sits relative to the middle of the recent range, smoothed twice.
+        smi_smisignal: Exponential average of the index.
+    """
+    period = _convert.as_int("smi", "period", period)
+    fast_period = _convert.as_int("smi", "fast_period", fast_period)
+    slow_period = _convert.as_int("smi", "slow_period", slow_period)
+    signal_period = _convert.as_int("smi", "signal_period", signal_period)
+    columns, carrier = _convert.bars(
+        "smi",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.smi(
+        *columns,
+        period=period,
+        fast_period=fast_period,
+        slow_period=slow_period,
+        signal_period=signal_period,
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "smi",
+            "smi_smisignal",
+        ),
+    )
 
 
 def sqrt(source=None) -> Any:
@@ -5107,6 +5278,57 @@ def sum(source=None, *, period: int = _PARAMS["sum"]["period"]["default"]) -> An
     columns, carrier = _convert.bars("sum", (source,), ("source",), ("series",))
     out = _core.sum(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("sum",))
+
+
+def supertrend(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["supertrend"]["period"]["default"],
+    multiplier: float = _PARAMS["supertrend"]["multiplier"]["default"],
+) -> Any:
+    """Supertrend.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Number of bars the average true range uses, from 2 to 100000.
+    multiplier : float, default 3.0
+        How many average true ranges the bands sit from the midpoint.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        supertrend: Whichever band the trend is currently following.
+        supertrend_direction: Plus one while the lower band is followed, minus one while the upper
+        is.
+    """
+    period = _convert.as_int("supertrend", "period", period)
+    multiplier = _convert.as_float("supertrend", "multiplier", multiplier)
+    columns, carrier = _convert.bars(
+        "supertrend",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.supertrend(*columns, period=period, multiplier=multiplier)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "supertrend",
+            "supertrend_direction",
+        ),
+    )
 
 
 def t3(
@@ -6507,6 +6729,16 @@ def PVI(close, volume) -> Any:
     return pvi(close, volume)
 
 
+def PVO(
+    volume,
+    fastperiod: int = _PARAMS["pvo"]["fast_period"]["default"],
+    slowperiod: int = _PARAMS["pvo"]["slow_period"]["default"],
+    matype: str = _PARAMS["pvo"]["ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`pvo`."""
+    return pvo(volume, fast_period=fastperiod, slow_period=slowperiod, ma_type=matype)
+
+
 def PVT(close, volume) -> Any:
     """TA-Lib-style alias for :func:`pvt`."""
     return pvt(close, volume)
@@ -6547,9 +6779,28 @@ def RSI(source, timeperiod: int = _PARAMS["rsi"]["period"]["default"]) -> Any:
     return rsi(source, period=timeperiod)
 
 
+def RVI(
+    source,
+    timeperiod: int = _PARAMS["rvi"]["period"]["default"],
+    stddevperiod: int = _PARAMS["rvi"]["stddev_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`rvi`."""
+    return rvi(source, period=timeperiod, stddev_period=stddevperiod)
+
+
 def RVOL(volume, timeperiod: int = _PARAMS["rvol"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`rvol`."""
     return rvol(volume, period=timeperiod)
+
+
+def SAR(
+    high,
+    low,
+    acceleration: float = _PARAMS["sar"]["acceleration"]["default"],
+    maximum: float = _PARAMS["sar"]["maximum"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`sar`."""
+    return sar(high, low, acceleration=acceleration, maximum=maximum)
 
 
 def SIN(source) -> Any:
@@ -6565,6 +6816,27 @@ def SINH(source) -> Any:
 def SMA(source, timeperiod: int = _PARAMS["sma"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`sma`."""
     return sma(source, period=timeperiod)
+
+
+def SMI(
+    high,
+    low,
+    close,
+    timeperiod: int = _PARAMS["smi"]["period"]["default"],
+    fastperiod: int = _PARAMS["smi"]["fast_period"]["default"],
+    slowperiod: int = _PARAMS["smi"]["slow_period"]["default"],
+    signalperiod: int = _PARAMS["smi"]["signal_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`smi`."""
+    return smi(
+        high,
+        low,
+        close,
+        period=timeperiod,
+        fast_period=fastperiod,
+        slow_period=slowperiod,
+        signal_period=signalperiod,
+    )
 
 
 def SQRT(source) -> Any:
@@ -6648,6 +6920,17 @@ def SUB(source0, source1) -> Any:
 def SUM(source, timeperiod: int = _PARAMS["sum"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`sum`."""
     return sum(source, period=timeperiod)
+
+
+def SUPERTREND(
+    high,
+    low,
+    close,
+    timeperiod: int = _PARAMS["supertrend"]["period"]["default"],
+    multiplier: float = _PARAMS["supertrend"]["multiplier"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`supertrend`."""
+    return supertrend(high, low, close, period=timeperiod, multiplier=multiplier)
 
 
 def T3(

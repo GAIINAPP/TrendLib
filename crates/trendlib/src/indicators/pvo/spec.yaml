@@ -1,0 +1,35 @@
+name: pvo
+title: Percentage Volume Oscillator
+group: volume
+inputs:
+  - name: volume
+    kind: volume
+params:
+  - name: fast_period
+    type: int
+    default: 12
+    min: 2
+    max: 100000
+    doc: Number of bars in the shorter average
+  - name: slow_period
+    type: int
+    default: 26
+    min: 2
+    max: 100000
+    doc: Number of bars in the longer average
+  - name: ma_type
+    type: enum:MaType
+    default: ema
+    doc: Which moving average both stages use
+outputs:
+  - name: pvo
+    dtype: float64
+    plot: histogram
+    doc: Gap between a short and a long average of volume, as a percentage of the long one
+talib:
+  name: PVO
+  params: {fast_period: fastperiod, slow_period: slowperiod, ma_type: matype}
+  outputs: [real]
+references:
+  - Gerald Appel, Technical Analysis - Power Tools for Active Investors, FT Press, 2005
+see_also: [ppo, apo, rvol]

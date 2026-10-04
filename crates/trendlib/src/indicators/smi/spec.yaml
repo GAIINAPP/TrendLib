@@ -1,0 +1,52 @@
+name: smi
+title: Stochastic Momentum Index
+group: momentum
+flags: [unstable, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 13
+    min: 2
+    max: 100000
+    doc: Number of bars the high-low range is taken over
+  - name: fast_period
+    type: int
+    default: 2
+    min: 2
+    max: 100000
+    doc: Number of bars in the second smoothing stage
+  - name: slow_period
+    type: int
+    default: 25
+    min: 2
+    max: 100000
+    doc: Number of bars in the first smoothing stage
+  - name: signal_period
+    type: int
+    default: 9
+    min: 2
+    max: 100000
+    doc: Number of bars the index is smoothed over
+outputs:
+  - name: smi
+    dtype: float64
+    plot: line
+    doc: Where the close sits relative to the middle of the recent range, smoothed twice
+  - name: smi_smisignal
+    dtype: float64
+    plot: line
+    doc: Exponential average of the index
+talib:
+  name: SMI
+  params: {period: timeperiod, fast_period: fastperiod, slow_period: slowperiod, signal_period: signalperiod}
+  outputs: [smi, smisignal]
+references:
+  - William Blau, Momentum, Direction and Divergence, Wiley, 1995
+see_also: [stoch, stochf, tsi]

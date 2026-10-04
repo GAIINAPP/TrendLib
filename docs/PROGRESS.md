@@ -2,8 +2,8 @@
 
 # Progress
 
-**186 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 18 not started.
+**191 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 13 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -16,10 +16,10 @@ something is done that is not. CI checks it is current.
 
 | Group | Shipped | Total |
 | --- | --- | --- |
-| Overlap studies | 19 | 25 |
-| Momentum | 46 | 47 |
-| Volatility | 6 | 7 |
-| Volume | 10 | 12 |
+| Overlap studies | 21 | 25 |
+| Momentum | 47 | 47 |
+| Volatility | 7 | 7 |
+| Volume | 11 | 12 |
 | Price transforms | 6 | 6 |
 | Cycle | 0 | 5 |
 | Statistics | 11 | 11 |
@@ -28,7 +28,7 @@ something is done that is not. CI checks it is current.
 | Candlestick patterns | 61 | 61 |
 | Levels | 0 | 3 |
 
-## Overlap studies (19 of 25)
+## Overlap studies (21 of 25)
 
 - [x] `accbands` (`ACCBANDS`) -- Acceleration Bands
 - [x] `bbands` (`BBANDS`) -- Bollinger Bands *
@@ -45,10 +45,10 @@ something is done that is not. CI checks it is current.
 - [x] `midpoint` (`MIDPOINT`) -- Midpoint
 - [x] `midprice` (`MIDPRICE`) -- Midprice
 - [x] `rma` (`RMA`) -- Wilder Smoothed Moving Average
-- [ ] `sar` (`SAR`)
+- [x] `sar` (`SAR`) -- Parabolic SAR
 - [ ] `sarext` (`SAREXT`)
 - [x] `sma` (`SMA`) -- Simple Moving Average *
-- [ ] `supertrend` (`SUPERTREND`) *
+- [x] `supertrend` (`SUPERTREND`) -- Supertrend *
 - [x] `t3` (`T3`) -- Tillson T3
 - [x] `tema` (`TEMA`) -- Triple Exponential Moving Average *
 - [x] `trima` (`TRIMA`) -- Triangular Moving Average
@@ -56,7 +56,7 @@ something is done that is not. CI checks it is current.
 - [x] `wma` (`WMA`) -- Weighted Moving Average *
 - [x] `zlema` (`ZLEMA`) -- Zero Lag Exponential Moving Average
 
-## Momentum (46 of 47)
+## Momentum (47 of 47)
 
 - [x] `ac` (`AC`) -- Accelerator Oscillator
 - [x] `adx` (`ADX`) -- Average Directional Movement Index *
@@ -94,7 +94,7 @@ something is done that is not. CI checks it is current.
 - [x] `rocr` (`ROCR`) -- Rate of Change Ratio
 - [x] `rocr100` (`ROCR100`) -- Rate of Change Ratio Times 100
 - [x] `rsi` (`RSI`) -- Relative Strength Index *
-- [ ] `smi` (`SMI`)
+- [x] `smi` (`SMI`) -- Stochastic Momentum Index
 - [x] `stoch` (`STOCH`) -- Slow Stochastic *
 - [x] `stochf` (`STOCHF`) -- Fast Stochastic
 - [x] `stochrsi` (`STOCHRSI`) -- Stochastic RSI
@@ -106,17 +106,17 @@ something is done that is not. CI checks it is current.
 - [x] `wad` (`WAD`) -- Williams Accumulation/Distribution
 - [x] `willr` (`WILLR`) -- Williams Percent Range *
 
-## Volatility (6 of 7)
+## Volatility (7 of 7)
 
 - [x] `adr` (`ADR`) -- Average Day Range
 - [x] `atr` (`ATR`) -- Average True Range *
 - [x] `cvi` (`CVI`) -- Chaikin Volatility
 - [x] `massi` (`MASSI`) -- Mass Index
 - [x] `natr` (`NATR`) -- Normalized Average True Range *
-- [ ] `rvi` (`RVI`)
+- [x] `rvi` (`RVI`) -- Relative Volatility Index
 - [x] `trange` (`TRANGE`) -- True Range *
 
-## Volume (10 of 12)
+## Volume (11 of 12)
 
 - [x] `ad` (`AD`) -- Chaikin Accumulation Distribution Line *
 - [x] `adosc` (`ADOSC`) -- Chaikin Accumulation/Distribution Oscillator *
@@ -126,7 +126,7 @@ something is done that is not. CI checks it is current.
 - [x] `nvi` (`NVI`) -- Negative Volume Index
 - [x] `obv` (`OBV`) -- On Balance Volume *
 - [x] `pvi` (`PVI`) -- Positive Volume Index
-- [ ] `pvo` (`PVO`)
+- [x] `pvo` (`PVO`) -- Percentage Volume Oscillator
 - [x] `pvt` (`PVT`) -- Price Volume Trend
 - [x] `rvol` (`RVOL`) -- Relative Volume
 - [ ] `vwap` (`VWAP`) *

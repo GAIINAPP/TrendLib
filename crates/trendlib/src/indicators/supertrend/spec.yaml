@@ -1,0 +1,39 @@
+name: supertrend
+title: Supertrend
+group: overlap
+flags: [overlap, unstable, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 10
+    min: 2
+    max: 100000
+    doc: Number of bars the average true range uses
+  - name: multiplier
+    type: float
+    default: 3.0
+    min: 0.0
+    doc: How many average true ranges the bands sit from the midpoint
+outputs:
+  - name: supertrend
+    dtype: float64
+    plot: line
+    doc: Whichever band the trend is currently following
+  - name: supertrend_direction
+    dtype: int32
+    plot: direction
+    doc: Plus one while the lower band is followed, minus one while the upper is
+talib:
+  name: SUPERTREND
+  params: {period: timeperiod, multiplier: multiplier}
+  outputs: [supertrend, trend]
+references:
+  - Olivier Seban, as described in INDICATORS.md section 3.5
+see_also: [atr, kc, donchian]
