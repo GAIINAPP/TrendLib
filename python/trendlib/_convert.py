@@ -213,6 +213,18 @@ def wrap_outputs(values: Any, carrier: Carrier, names: tuple[str, ...]) -> Any:
     return tuple(values)
 
 
+def as_text(indicator: str, param: str, value: Any) -> str:
+    """Accept a string and nothing else.
+
+    Which strings are accepted stays in Rust, which owns the list of averages
+    it can actually build and names the ones that are still to come.
+    """
+    if not isinstance(value, str):
+        kind = type(value).__name__
+        raise InvalidInput(f"{indicator}: {param} must be a string, got {kind}")
+    return value
+
+
 def as_float(indicator: str, param: str, value: Any) -> float:
     """Accept anything that is a real number and nothing else.
 

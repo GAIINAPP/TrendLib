@@ -5,6 +5,8 @@
 //! construction rather than by review. `push` commits a bar; `preview` returns
 //! what the next `push` would return and touches nothing.
 
+use crate::TlError;
+
 /// Mean of the last `period` values, kept as a running sum.
 ///
 /// The sum is advanced the way TA-Lib advances it: add the newest value,
@@ -730,11 +732,56 @@ impl Wilder {
     }
 }
 
+/// Two moving averages of one series, the shorter period first.
+///
+/// TA-Lib sorts the two periods before it starts, so asking for a fast period
+/// longer than the slow one gives the same answer as asking for them the other
+/// way round, not the negated one.
+#[derive(Clone, Debug)]
+pub struct MaPair {
+    fast: MovingAverage,
+    slow: MovingAverage,
+}
+
+impl MaPair {
+    pub fn new(kind: MaType, fast_period: usize, slow_period: usize) -> Self {
+        let (fast, slow) = Self::sorted(fast_period, slow_period);
+        Self {
+            fast: kind.state(fast),
+            slow: kind.state(slow),
+        }
+    }
+
+    pub fn sorted(fast: usize, slow: usize) -> (usize, usize) {
+        if fast > slow {
+            (slow, fast)
+        } else {
+            (fast, slow)
+        }
+    }
+
+    pub fn lookback(kind: MaType, fast: usize, slow: usize) -> usize {
+        kind.lookback(Self::sorted(fast, slow).1)
+    }
+
+    pub fn push(&mut self, value: f64) -> Option<(f64, f64)> {
+        // The shorter average is ready first and has to keep being fed while
+        // the longer one warms up; returning early here would starve it.
+        let fast = self.fast.push(value);
+        let slow = self.slow.push(value)?;
+        Some((fast?, slow))
+    }
+
+    pub fn preview(&self, value: f64) -> Option<(f64, f64)> {
+        Some((self.fast.preview(value)?, self.slow.preview(value)?))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::{
-        Ema, Lagged, RollingExtreme, RollingMean, RollingWindow, TrueRange, WeightedMean, Wilder,
-        WilderSum,
+        Ema, Lagged, MaType, RollingExtreme, RollingMean, RollingWindow, TrueRange, WeightedMean,
+        Wilder, WilderSum,
     };
 
     fn drive<F>(len: usize, mut step: F) -> Vec<Option<f64>>
@@ -892,6 +939,60 @@ mod tests {
     }
 
     #[test]
+    fn every_moving_average_reproduces_its_own_indicator() {
+        let series: Vec<f64> = (1..=40).map(|i| i as f64 * 1.37).collect();
+        for (name, kind) in MaType::ALL {
+            let mut dispatch = kind.state(5);
+            let mut direct: Box<dyn FnMut(f64) -> Option<f64>> = match *kind {
+                MaType::Sma => {
+                    let mut inner = RollingMean::new(5);
+                    Box::new(move |x| inner.push(x))
+                }
+                MaType::Ema => {
+                    let mut inner = Ema::new(5);
+                    Box::new(move |x| inner.push(x))
+                }
+                MaType::Wma => {
+                    let mut inner = WeightedMean::new(5);
+                    Box::new(move |x| inner.push(x))
+                }
+                MaType::Rma => {
+                    let mut inner = Wilder::new(5);
+                    Box::new(move |x| inner.push(x))
+                }
+                _ => continue,
+            };
+            for &value in &series {
+                assert_eq!(dispatch.push(value), direct(value), "{name}");
+            }
+        }
+    }
+
+    #[test]
+    fn moving_average_preview_equals_the_next_push() {
+        let series: Vec<f64> = (1..=40).map(|i| (i as f64).sin() * 10.0 + 50.0).collect();
+        for (name, kind) in MaType::ALL {
+            let mut average = kind.state(4);
+            for &value in &series {
+                let previewed = average.preview(7.5);
+                let mut forked = average.clone();
+                assert_eq!(previewed, forked.push(7.5), "{name}");
+                average.push(value);
+            }
+        }
+    }
+
+    #[test]
+    fn moving_average_lookbacks_match_the_indicators() {
+        assert_eq!(MaType::Sma.lookback(30), 29);
+        assert_eq!(MaType::Dema.lookback(30), 58);
+        assert_eq!(MaType::Tema.lookback(30), 87);
+        assert_eq!(MaType::Trima.lookback(30), 29);
+        assert_eq!(MaType::from_name("rma"), Some(MaType::Rma));
+        assert_eq!(MaType::from_name("kama"), None);
+    }
+
+    #[test]
     fn lagged_returns_the_value_that_many_bars_ago() {
         let mut lagged = Lagged::new(3);
         assert_eq!(drive(3, |x| lagged.push(x)), vec![None, None, None]);
@@ -1008,6 +1109,171 @@ mod tests {
             let mut forked = wilder.clone();
             assert_eq!(previewed, forked.push(0.75));
             wilder.push(x);
+        }
+    }
+}
+
+/// The moving averages an indicator can be asked to use.
+///
+/// `spec.yaml` names these in lowercase and the uppercase TA-Lib aliases accept
+/// TA-Lib's integers for them (D12). A value whose indicator has not shipped
+/// yet is rejected by name rather than quietly standing in for another average.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum MaType {
+    Sma,
+    Ema,
+    Wma,
+    Dema,
+    Tema,
+    Trima,
+    Rma,
+}
+
+impl MaType {
+    pub const ALL: &'static [(&'static str, MaType)] = &[
+        ("sma", MaType::Sma),
+        ("ema", MaType::Ema),
+        ("wma", MaType::Wma),
+        ("dema", MaType::Dema),
+        ("tema", MaType::Tema),
+        ("trima", MaType::Trima),
+        ("rma", MaType::Rma),
+    ];
+
+    /// Values `INDICATORS.md` approves that no kernel builds yet. They are
+    /// named in the error rather than treated as unknown, so a caller asking
+    /// for one is told it is coming, not that it was a typo, and the enum never
+    /// quietly falls back to a different average.
+    pub const PENDING: &'static [&'static str] = &["kama", "mama", "t3", "hma", "zlema"];
+
+    /// The average `name` asks for, or the error the Python layer reports.
+    pub fn parse(indicator: &str, param: &str, name: &str) -> Result<Self, TlError> {
+        if let Some(kind) = Self::from_name(name) {
+            return Ok(kind);
+        }
+        let known: Vec<&str> = Self::ALL.iter().map(|(name, _)| *name).collect();
+        Err(TlError::InvalidInput(if Self::PENDING.contains(&name) {
+            format!(
+                "{indicator}: {param}={name:?} is not implemented yet; \
+                 the averages available now are {}",
+                known.join(", ")
+            )
+        } else {
+            format!(
+                "{indicator}: {param} must be one of {}, got {name:?}",
+                known.join(", ")
+            )
+        }))
+    }
+
+    pub fn from_name(name: &str) -> Option<Self> {
+        Self::ALL
+            .iter()
+            .find(|(known, _)| *known == name)
+            .map(|(_, kind)| *kind)
+    }
+
+    pub fn name(self) -> &'static str {
+        Self::ALL
+            .iter()
+            .find(|(_, kind)| *kind == self)
+            .map(|(name, _)| *name)
+            .unwrap_or("sma")
+    }
+
+    /// Warm-up bars this average costs at the given period.
+    pub fn lookback(self, period: usize) -> usize {
+        let one = period.saturating_sub(1);
+        match self {
+            Self::Sma | Self::Wma | Self::Trima | Self::Rma | Self::Ema => one,
+            Self::Dema => 2 * one,
+            Self::Tema => 3 * one,
+        }
+    }
+
+    pub fn state(self, period: usize) -> MovingAverage {
+        match self {
+            Self::Sma => MovingAverage::Simple(RollingMean::new(period)),
+            Self::Ema => MovingAverage::Exponential(Ema::new(period)),
+            Self::Wma => MovingAverage::Weighted(WeightedMean::new(period)),
+            Self::Rma => MovingAverage::Smoothed(Wilder::new(period)),
+            Self::Dema => MovingAverage::Double(Ema::new(period), Ema::new(period)),
+            Self::Tema => {
+                MovingAverage::Triple(Ema::new(period), Ema::new(period), Ema::new(period))
+            }
+            Self::Trima => {
+                // Averaging twice over halves of the window is what puts the
+                // triangular weighting in; an even period gives the extra bar
+                // to the second stage, which is where TA-Lib puts it.
+                let half = period / 2;
+                let (first, second) = if period % 2 == 1 {
+                    (half + 1, half + 1)
+                } else {
+                    (half, half + 1)
+                };
+                MovingAverage::Triangular(RollingMean::new(first), RollingMean::new(second))
+            }
+        }
+    }
+}
+
+/// One moving average, chosen at construction and then driven like any other
+/// step function.
+#[derive(Clone, Debug)]
+pub enum MovingAverage {
+    Simple(RollingMean),
+    Exponential(Ema),
+    Weighted(WeightedMean),
+    Smoothed(Wilder),
+    Double(Ema, Ema),
+    Triple(Ema, Ema, Ema),
+    Triangular(RollingMean, RollingMean),
+}
+
+impl MovingAverage {
+    pub fn push(&mut self, value: f64) -> Option<f64> {
+        match self {
+            Self::Simple(inner) => inner.push(value),
+            Self::Exponential(inner) => inner.push(value),
+            Self::Weighted(inner) => inner.push(value),
+            Self::Smoothed(inner) => inner.push(value),
+            Self::Double(first, second) => {
+                let one = first.push(value)?;
+                second.push(one).map(|two| 2.0 * one - two)
+            }
+            Self::Triple(first, second, third) => {
+                let one = first.push(value)?;
+                let two = second.push(one)?;
+                third.push(two).map(|three| 3.0 * one - 3.0 * two + three)
+            }
+            Self::Triangular(first, second) => {
+                let one = first.push(value)?;
+                second.push(one)
+            }
+        }
+    }
+
+    pub fn preview(&self, value: f64) -> Option<f64> {
+        match self {
+            Self::Simple(inner) => inner.preview(value),
+            Self::Exponential(inner) => inner.preview(value),
+            Self::Weighted(inner) => inner.preview(value),
+            Self::Smoothed(inner) => inner.preview(value),
+            Self::Double(first, second) => {
+                let one = first.preview(value)?;
+                second.preview(one).map(|two| 2.0 * one - two)
+            }
+            Self::Triple(first, second, third) => {
+                let one = first.preview(value)?;
+                let two = second.preview(one)?;
+                third
+                    .preview(two)
+                    .map(|three| 3.0 * one - 3.0 * two + three)
+            }
+            Self::Triangular(first, second) => {
+                let one = first.preview(value)?;
+                second.preview(one)
+            }
         }
     }
 }

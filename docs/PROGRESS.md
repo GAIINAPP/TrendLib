@@ -2,8 +2,8 @@
 
 # Progress
 
-**68 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 136 not started.
+**72 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 132 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -16,8 +16,8 @@ something is done that is not. CI checks it is current.
 
 | Group | Shipped | Total |
 | --- | --- | --- |
-| Overlap studies | 9 | 25 |
-| Momentum | 20 | 47 |
+| Overlap studies | 11 | 25 |
+| Momentum | 22 | 47 |
 | Volatility | 3 | 7 |
 | Volume | 2 | 12 |
 | Price transforms | 5 | 6 |
@@ -28,10 +28,10 @@ something is done that is not. CI checks it is current.
 | Candlestick patterns | 0 | 61 |
 | Levels | 0 | 3 |
 
-## Overlap studies (9 of 25)
+## Overlap studies (11 of 25)
 
 - [ ] `accbands` (`ACCBANDS`)
-- [ ] `bbands` (`BBANDS`) *
+- [x] `bbands` (`BBANDS`) -- Bollinger Bands *
 - [x] `dema` (`DEMA`) -- Double Exponential Moving Average *
 - [ ] `donchian` (`DONCHIAN`)
 - [x] `ema` (`EMA`) -- Exponential Moving Average *
@@ -39,7 +39,7 @@ something is done that is not. CI checks it is current.
 - [ ] `ht_trendline` (`HT_TRENDLINE`)
 - [ ] `kama` (`KAMA`)
 - [ ] `kc` (`KC`)
-- [ ] `ma` (`MA`)
+- [x] `ma` (`MA`) -- Moving Average
 - [ ] `mama` (`MAMA`)
 - [ ] `mavp` (`MAVP`)
 - [x] `midpoint` (`MIDPOINT`) -- Midpoint over Period
@@ -56,13 +56,13 @@ something is done that is not. CI checks it is current.
 - [x] `wma` (`WMA`) -- Weighted Moving Average *
 - [ ] `zlema` (`ZLEMA`)
 
-## Momentum (20 of 47)
+## Momentum (22 of 47)
 
 - [ ] `ac` (`AC`)
 - [x] `adx` (`ADX`) -- Average Directional Movement Index *
 - [x] `adxr` (`ADXR`) -- Average Directional Movement Index Rating
 - [ ] `ao` (`AO`)
-- [ ] `apo` (`APO`)
+- [x] `apo` (`APO`) -- Absolute Price Oscillator
 - [x] `aroon` (`AROON`) -- Aroon
 - [x] `aroonosc` (`AROONOSC`) -- Aroon Oscillator
 - [x] `bop` (`BOP`) -- Balance of Power
@@ -87,7 +87,7 @@ something is done that is not. CI checks it is current.
 - [x] `mom` (`MOM`) -- Momentum
 - [x] `plus_di` (`PLUS_DI`) -- Plus Directional Indicator
 - [x] `plus_dm` (`PLUS_DM`) -- Plus Directional Movement
-- [ ] `ppo` (`PPO`)
+- [x] `ppo` (`PPO`) -- Percentage Price Oscillator
 - [ ] `qstick` (`QSTICK`)
 - [x] `roc` (`ROC`) -- Rate of Change *
 - [x] `rocp` (`ROCP`) -- Rate of Change Percentage

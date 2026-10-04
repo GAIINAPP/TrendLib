@@ -132,11 +132,46 @@ def test_an_out_of_range_parameter_names_the_range(bars, indicator):
             )
 
 
-def test_a_non_integer_parameter_is_rejected(bars, indicator):
+def test_a_parameter_of_the_wrong_type_is_rejected(bars, indicator):
+    """A name where a number belongs, or a number where a name belongs."""
     columns = indicator.columns(bars, 60)
-    for name in indicator.params:
-        with pytest.raises(tl.InvalidInput, match=r"must be an integer|must be a number"):
+    for name, spec in indicator.params.items():
+        if spec["choices"]:
+            wrong, expected = 3, "must be a string"
+        else:
+            wrong, expected = "nonsense", r"must be an integer|must be a number"
+        with pytest.raises(tl.InvalidInput, match=expected):
+            getattr(tl, indicator.name)(*columns, **{name: wrong})
+
+
+def test_an_unknown_choice_lists_the_ones_that_work(bars, indicator):
+    columns = indicator.columns(bars, 60)
+    for name, spec in indicator.params.items():
+        if not spec["choices"]:
+            continue
+        with pytest.raises(tl.InvalidInput) as caught:
             getattr(tl, indicator.name)(*columns, **{name: "nonsense"})
+        message = str(caught.value)
+        assert message.startswith(f"{indicator.name}: {name} must be one of ")
+        for choice in spec["choices"]:
+            assert choice in message, message
+
+
+def test_an_average_that_is_not_built_yet_is_refused_by_name(repo_root, bars, indicator):
+    """INDICATORS.md section 1: a value the contract has but the code does not
+    is an error that says so, never a quiet stand-in for a different average."""
+    import yaml
+
+    columns = indicator.columns(bars, 60)
+    enums = yaml.safe_load((repo_root / "crates/trendlib/src/indicators/_enums.yaml").read_text())
+    for name, spec in indicator.params.items():
+        if not spec["choices"]:
+            continue
+        for value in enums["MaType"]["values"]:
+            if value in spec["choices"]:
+                continue
+            with pytest.raises(tl.InvalidInput, match="not implemented yet"):
+                getattr(tl, indicator.name)(*columns, **{name: value})
 
 
 def test_errors_are_value_errors():

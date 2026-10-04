@@ -1,0 +1,35 @@
+name: apo
+title: Absolute Price Oscillator
+group: momentum
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: fast_period
+    type: int
+    default: 12
+    min: 2
+    max: 100000
+    doc: Number of bars in the shorter moving average
+  - name: slow_period
+    type: int
+    default: 26
+    min: 2
+    max: 100000
+    doc: Number of bars in the longer moving average
+  - name: ma_type
+    type: enum:MaType
+    default: ema
+    doc: Which moving average both stages use
+outputs:
+  - name: apo
+    dtype: float64
+    plot: line
+    doc: Difference between the fast and the slow moving average
+talib:
+  name: APO
+  params: {fast_period: fastperiod, slow_period: slowperiod, ma_type: matype}
+  outputs: [real]
+references:
+  - Gerald Appel, Technical Analysis - Power Tools for Active Investors, FT Press, 2005
+see_also: [macd, ma]

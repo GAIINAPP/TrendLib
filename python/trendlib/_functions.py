@@ -18,6 +18,7 @@ __all__ = [
     "ADD",
     "ADX",
     "ADXR",
+    "APO",
     "AROON",
     "AROONOSC",
     "ASIN",
@@ -25,6 +26,7 @@ __all__ = [
     "ATR",
     "AVGDEV",
     "AVGPRICE",
+    "BBANDS",
     "BOP",
     "CCI",
     "CEIL",
@@ -40,6 +42,7 @@ __all__ = [
     "FLOOR",
     "LN",
     "LOG10",
+    "MA",
     "MACD",
     "MAX",
     "MAXINDEX",
@@ -58,6 +61,7 @@ __all__ = [
     "OBV",
     "PLUS_DI",
     "PLUS_DM",
+    "PPO",
     "RMA",
     "ROC",
     "ROCP",
@@ -86,6 +90,7 @@ __all__ = [
     "add",
     "adx",
     "adxr",
+    "apo",
     "aroon",
     "aroonosc",
     "asin",
@@ -93,6 +98,7 @@ __all__ = [
     "atr",
     "avgdev",
     "avgprice",
+    "bbands",
     "bop",
     "cci",
     "ceil",
@@ -109,6 +115,7 @@ __all__ = [
     "ln",
     "log10",
     "lookback",
+    "ma",
     "macd",
     "max",
     "maxindex",
@@ -127,6 +134,7 @@ __all__ = [
     "obv",
     "plus_di",
     "plus_dm",
+    "ppo",
     "rma",
     "roc",
     "rocp",
@@ -286,6 +294,37 @@ def adxr(
     )
     out = _core.adxr(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("adxr",))
+
+
+def apo(
+    source=None,
+    *,
+    fast_period: int = _PARAMS["apo"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["apo"]["slow_period"]["default"],
+    ma_type: str = _PARAMS["apo"]["ma_type"]["default"],
+) -> Any:
+    """Absolute Price Oscillator.
+
+    Parameters
+    ----------
+    fast_period : int, default 12
+        Number of bars in the shorter moving average, from 2 to 100000.
+    slow_period : int, default 26
+        Number of bars in the longer moving average, from 2 to 100000.
+    ma_type : str, default "ema"
+        Which moving average both stages use.
+
+    Returns
+    -------
+    ndarray or Series
+        Difference between the fast and the slow moving average.
+    """
+    fast_period = _convert.as_int("apo", "fast_period", fast_period)
+    slow_period = _convert.as_int("apo", "slow_period", slow_period)
+    ma_type = _convert.as_text("apo", "ma_type", ma_type)
+    columns, carrier = _convert.bars("apo", (source,), ("source",), ("series",))
+    out = _core.apo(*columns, fast_period=fast_period, slow_period=slow_period, ma_type=ma_type)
+    return _convert.wrap_outputs(out, carrier, ("apo",))
 
 
 def aroon(high=None, low=None, *, period: int = _PARAMS["aroon"]["period"]["default"]) -> Any:
@@ -461,6 +500,53 @@ def avgprice(open=None, high=None, low=None, close=None) -> Any:
     )
     out = _core.avgprice(*columns)
     return _convert.wrap_outputs(out, carrier, ("avgprice",))
+
+
+def bbands(
+    source=None,
+    *,
+    period: int = _PARAMS["bbands"]["period"]["default"],
+    nbdev_up: float = _PARAMS["bbands"]["nbdev_up"]["default"],
+    nbdev_dn: float = _PARAMS["bbands"]["nbdev_dn"]["default"],
+    ma_type: str = _PARAMS["bbands"]["ma_type"]["default"],
+) -> Any:
+    """Bollinger Bands.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Number of bars in the average and the deviation window, from 2 to 100000.
+    nbdev_up : float, default 2.0
+        Standard deviations added to the middle band.
+    nbdev_dn : float, default 2.0
+        Standard deviations subtracted from the middle band.
+    ma_type : str, default "sma"
+        Moving average used for the middle band.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        bbands_upper: Middle band plus nbdev_up standard deviations.
+        bbands_middle: Moving average of source.
+        bbands_lower: Middle band minus nbdev_dn standard deviations.
+    """
+    period = _convert.as_int("bbands", "period", period)
+    nbdev_up = _convert.as_float("bbands", "nbdev_up", nbdev_up)
+    nbdev_dn = _convert.as_float("bbands", "nbdev_dn", nbdev_dn)
+    ma_type = _convert.as_text("bbands", "ma_type", ma_type)
+    columns, carrier = _convert.bars("bbands", (source,), ("source",), ("series",))
+    out = _core.bbands(
+        *columns, period=period, nbdev_up=nbdev_up, nbdev_dn=nbdev_dn, ma_type=ma_type
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "bbands_upper",
+            "bbands_middle",
+            "bbands_lower",
+        ),
+    )
 
 
 def bop(open=None, high=None, low=None, close=None) -> Any:
@@ -740,6 +826,33 @@ def log10(source=None) -> Any:
     columns, carrier = _convert.bars("log10", (source,), ("source",), ("series",))
     out = _core.log10(*columns)
     return _convert.wrap_outputs(out, carrier, ("log10",))
+
+
+def ma(
+    source=None,
+    *,
+    period: int = _PARAMS["ma"]["period"]["default"],
+    ma_type: str = _PARAMS["ma"]["ma_type"]["default"],
+) -> Any:
+    """Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the average is taken over, from 1 to 100000.
+    ma_type : str, default "sma"
+        Which moving average to apply.
+
+    Returns
+    -------
+    ndarray or Series
+        Chosen moving average of source.
+    """
+    period = _convert.as_int("ma", "period", period)
+    ma_type = _convert.as_text("ma", "ma_type", ma_type)
+    columns, carrier = _convert.bars("ma", (source,), ("source",), ("series",))
+    out = _core.ma(*columns, period=period, ma_type=ma_type)
+    return _convert.wrap_outputs(out, carrier, ("ma",))
 
 
 def macd(
@@ -1215,6 +1328,37 @@ def plus_dm(high=None, low=None, *, period: int = _PARAMS["plus_dm"]["period"]["
     )
     out = _core.plus_dm(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("plus_dm",))
+
+
+def ppo(
+    source=None,
+    *,
+    fast_period: int = _PARAMS["ppo"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["ppo"]["slow_period"]["default"],
+    ma_type: str = _PARAMS["ppo"]["ma_type"]["default"],
+) -> Any:
+    """Percentage Price Oscillator.
+
+    Parameters
+    ----------
+    fast_period : int, default 12
+        Number of bars in the shorter moving average, from 2 to 100000.
+    slow_period : int, default 26
+        Number of bars in the longer moving average, from 2 to 100000.
+    ma_type : str, default "ema"
+        Which moving average both stages use.
+
+    Returns
+    -------
+    ndarray or Series
+        Difference between the fast and the slow moving average as a percentage of the slow one.
+    """
+    fast_period = _convert.as_int("ppo", "fast_period", fast_period)
+    slow_period = _convert.as_int("ppo", "slow_period", slow_period)
+    ma_type = _convert.as_text("ppo", "ma_type", ma_type)
+    columns, carrier = _convert.bars("ppo", (source,), ("source",), ("series",))
+    out = _core.ppo(*columns, fast_period=fast_period, slow_period=slow_period, ma_type=ma_type)
+    return _convert.wrap_outputs(out, carrier, ("ppo",))
 
 
 def rma(source=None, *, period: int = _PARAMS["rma"]["period"]["default"]) -> Any:
@@ -1717,6 +1861,16 @@ def ADXR(high, low, close, timeperiod: int = _PARAMS["adxr"]["period"]["default"
     return adxr(high, low, close, period=timeperiod)
 
 
+def APO(
+    source,
+    fastperiod: int = _PARAMS["apo"]["fast_period"]["default"],
+    slowperiod: int = _PARAMS["apo"]["slow_period"]["default"],
+    matype: str = _PARAMS["apo"]["ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`apo`."""
+    return apo(source, fast_period=fastperiod, slow_period=slowperiod, ma_type=matype)
+
+
 def AROON(high, low, timeperiod: int = _PARAMS["aroon"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`aroon`."""
     return aroon(high, low, period=timeperiod)
@@ -1750,6 +1904,17 @@ def AVGDEV(source, timeperiod: int = _PARAMS["avgdev"]["period"]["default"]) -> 
 def AVGPRICE(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`avgprice`."""
     return avgprice(open, high, low, close)
+
+
+def BBANDS(
+    source,
+    timeperiod: int = _PARAMS["bbands"]["period"]["default"],
+    nbdevup: float = _PARAMS["bbands"]["nbdev_up"]["default"],
+    nbdevdn: float = _PARAMS["bbands"]["nbdev_dn"]["default"],
+    matype: str = _PARAMS["bbands"]["ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`bbands`."""
+    return bbands(source, period=timeperiod, nbdev_up=nbdevup, nbdev_dn=nbdevdn, ma_type=matype)
 
 
 def BOP(open, high, low, close) -> Any:
@@ -1825,6 +1990,15 @@ def LN(source) -> Any:
 def LOG10(source) -> Any:
     """TA-Lib-style alias for :func:`log10`."""
     return log10(source)
+
+
+def MA(
+    source,
+    timeperiod: int = _PARAMS["ma"]["period"]["default"],
+    matype: str = _PARAMS["ma"]["ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`ma`."""
+    return ma(source, period=timeperiod, ma_type=matype)
 
 
 def MACD(
@@ -1920,6 +2094,16 @@ def PLUS_DI(high, low, close, timeperiod: int = _PARAMS["plus_di"]["period"]["de
 def PLUS_DM(high, low, timeperiod: int = _PARAMS["plus_dm"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`plus_dm`."""
     return plus_dm(high, low, period=timeperiod)
+
+
+def PPO(
+    source,
+    fastperiod: int = _PARAMS["ppo"]["fast_period"]["default"],
+    slowperiod: int = _PARAMS["ppo"]["slow_period"]["default"],
+    matype: str = _PARAMS["ppo"]["ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`ppo`."""
+    return ppo(source, fast_period=fastperiod, slow_period=slowperiod, ma_type=matype)
 
 
 def RMA(source, timeperiod: int = _PARAMS["rma"]["period"]["default"]) -> Any:

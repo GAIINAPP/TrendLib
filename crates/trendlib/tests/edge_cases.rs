@@ -393,6 +393,55 @@ fn var_of_two_bars_is_the_square_of_half_their_difference() {
     }
 }
 
+/// `apo` and `ppo` carry a looser golden tolerance because subtracting two
+/// averages of one series cancels most of the digits away. The claim is only
+/// worth making if the parts that do not cancel are pinned, so this checks the
+/// two exact properties the cancellation cannot touch: equal periods subtract
+/// an average from itself and give exactly zero, and swapping the periods is
+/// the same question asked the other way round, so it gives the same bits.
+#[test]
+fn equal_periods_make_the_price_oscillators_exactly_zero() {
+    let closes = support::daily_column("close");
+    for name in ["apo", "ppo"] {
+        let indicator = support::find(name).expect("registered");
+        for choice in 0..support::registry::MA_TYPES.len() {
+            let mut params = indicator.defaults();
+            params[0] = 9.0;
+            params[1] = 9.0;
+            params[2] = choice as f64;
+            let out = (indicator.batch)(&[&closes], &params).unwrap();
+            let lookback = (indicator.lookback)(&params);
+            for (row, value) in out[0].iter().enumerate().skip(lookback) {
+                assert_eq!(
+                    *value,
+                    0.0,
+                    "{name} with ma_type={} and equal periods is {value} at row {row}, not zero",
+                    support::registry::MA_TYPES[choice],
+                );
+            }
+        }
+    }
+}
+
+#[test]
+fn swapping_the_price_oscillator_periods_changes_nothing() {
+    let closes = support::daily_column("close");
+    for name in ["apo", "ppo"] {
+        let indicator = support::find(name).expect("registered");
+        let mut forward = indicator.defaults();
+        forward[0] = 7.0;
+        forward[1] = 23.0;
+        let mut backward = forward.clone();
+        backward.swap(0, 1);
+        let one = (indicator.batch)(&[&closes], &forward).unwrap();
+        let two = (indicator.batch)(&[&closes], &backward).unwrap();
+        assert!(
+            bitwise_equal(&one[0], &two[0]),
+            "{name} answers differently when the periods arrive the other way round"
+        );
+    }
+}
+
 /// Deviation 7: the directional indicators stay a percentage at every period,
 /// including the one where TA-Lib returns the raw fraction, so the oracle
 /// cannot pin those rows and a test must.

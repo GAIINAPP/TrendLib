@@ -79,7 +79,7 @@ Total: **201 functions**.
 | `adx` | `ADX` | `high`, `low`, `close` | `period` 14 [2, 100000] | `adx` |
 | `adxr` | `ADXR` | `high`, `low`, `close` | `period` 14 [2, 100000] | `adxr` |
 | `ao` | `AO` | `high`, `low` | `fast_period` 5 [2, 100000]; `slow_period` 34 [2, 100000] | `ao` |
-| `apo` | `APO` | `source` | `fast_period` 12 [2, 100000]; `slow_period` 26 [2, 100000]; `ma_type` "<int 1>" (MaType) | `apo` |
+| `apo` | `APO` | `source` | `fast_period` 12 [2, 100000]; `slow_period` 26 [2, 100000]; `ma_type` "ema" (MaType) | `apo` |
 | `aroon` | `AROON` | `high`, `low` | `period` 14 [2, 100000] | `aroon_down`, `aroon_up` |
 | `aroonosc` | `AROONOSC` | `high`, `low` | `period` 14 [2, 100000] | `aroonosc` |
 | `bop` | `BOP` | `open`, `high`, `low`, `close` | -- | `bop` |
@@ -94,7 +94,7 @@ Total: **201 functions**.
 | `fosc` | `FOSC` | `source` | `period` 5 [2, 100000] | `fosc` |
 | `fractal` | `FRACTAL` | `high`, `low` | `left_bars` 2 [1, 100000]; `right_bars` 2 [1, 100000] | `fractal_swing_high`, `fractal_swing_low` |
 | `imi` | `IMI` | `open`, `close` | `period` 14 [2, 100000] | `imi` |
-| `kdj` | `KDJ` | `high`, `low`, `close` | `fastk_period` 9 [1, 100000]; `slowk_period` 3 [1, 100000]; `slowk_ma_type` "<int 13>" (MaType); `slowd_period` 3 [1, 100000]; `slowd_ma_type` "<int 13>" (MaType) | `kdj_k`, `kdj_d`, `kdj_j` |
+| `kdj` | `KDJ` | `high`, `low`, `close` | `fastk_period` 9 [1, 100000]; `slowk_period` 3 [1, 100000]; `slowk_ma_type` "rma" (MaType); `slowd_period` 3 [1, 100000]; `slowd_ma_type` "rma" (MaType) | `kdj_k`, `kdj_d`, `kdj_j` |
 | `macd` | `MACD` | `source` | `fast_period` 12 [2, 100000]; `slow_period` 26 [2, 100000]; `signal_period` 9 [1, 100000] | `macd`, `macd_signal`, `macd_hist` |
 | `macdext` | `MACDEXT` | `source` | `fast_period` 12 [2, 100000]; `fast_ma_type` "sma" (MaType); `slow_period` 26 [2, 100000]; `slow_ma_type` "sma" (MaType); `signal_period` 9 [1, 100000]; `signal_ma_type` "sma" (MaType) | `macdext_macd`, `macdext_signal`, `macdext_hist` |
 | `macdfix` | `MACDFIX` | `source` | `signal_period` 9 [1, 100000] | `macdfix_macd`, `macdfix_signal`, `macdfix_hist` |
@@ -104,7 +104,7 @@ Total: **201 functions**.
 | `mom` | `MOM` | `source` | `period` 10 [1, 100000] | `mom` |
 | `plus_di` | `PLUS_DI` | `high`, `low`, `close` | `period` 14 [1, 100000] | `plus_di` |
 | `plus_dm` | `PLUS_DM` | `high`, `low` | `period` 14 [1, 100000] | `plus_dm` |
-| `ppo` | `PPO` | `source` | `fast_period` 12 [2, 100000]; `slow_period` 26 [2, 100000]; `ma_type` "<int 1>" (MaType) | `ppo` |
+| `ppo` | `PPO` | `source` | `fast_period` 12 [2, 100000]; `slow_period` 26 [2, 100000]; `ma_type` "ema" (MaType) | `ppo` |
 | `qstick` | `QSTICK` | `open`, `close` | `period` 10 [1, 100000] | `qstick` |
 | `roc` | `ROC` | `source` | `period` 10 [1, 100000] | `roc` |
 | `rocp` | `ROCP` | `source` | `period` 10 [1, 100000] | `rocp` |
@@ -151,7 +151,7 @@ Total: **201 functions**.
 | `nvi` | `NVI` | `close`, `volume` | -- | `nvi` |
 | `obv` | `OBV` | `close`, `volume` | -- | `obv` |
 | `pvi` | `PVI` | `close`, `volume` | -- | `pvi` |
-| `pvo` | `PVO` | `volume` | `fast_period` 12 [2, 100000]; `slow_period` 26 [2, 100000]; `ma_type` "<int 1>" (MaType) | `pvo` |
+| `pvo` | `PVO` | `volume` | `fast_period` 12 [2, 100000]; `slow_period` 26 [2, 100000]; `ma_type` "ema" (MaType) | `pvo` |
 | `pvt` | `PVT` | `close`, `volume` | -- | `pvt` |
 | `rvol` | `RVOL` | `volume` | `period` 20 [1, 100000] | `rvol` |
 | `vwap` &dagger; | `VWAP` | `high`, `low`, `close`, `volume` | -- | `vwap` |

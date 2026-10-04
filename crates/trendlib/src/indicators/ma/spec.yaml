@@ -1,0 +1,30 @@
+name: ma
+title: Moving Average
+group: overlap
+flags: [overlap]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 30
+    min: 1
+    max: 100000
+    doc: Number of bars the average is taken over
+  - name: ma_type
+    type: enum:MaType
+    default: sma
+    doc: Which moving average to apply
+outputs:
+  - name: ma
+    dtype: float64
+    plot: line
+    doc: Chosen moving average of source
+talib:
+  name: MA
+  params: {period: timeperiod, ma_type: matype}
+  outputs: [real]
+references:
+  - TA-Lib, ta_MA.c, moving average dispatch over the MA type table
+see_also: [sma, ema, wma]

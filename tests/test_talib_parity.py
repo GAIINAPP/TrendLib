@@ -8,6 +8,8 @@ Where TrendLib happens to reproduce TA-Lib bit for bit that is asserted too,
 because a `doc.md` claims it and an unasserted claim rots.
 """
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 from hypothesis import HealthCheck, given, settings
@@ -22,6 +24,8 @@ yaml = pytest.importorskip("yaml")
 from talib import abstract  # noqa: E402
 
 pytestmark = pytest.mark.talib
+
+ENUMS = Path(__file__).resolve().parents[1] / "crates/trendlib/src/indicators/_enums.yaml"
 
 RTOL = 1e-10
 ATOL = 1e-12
@@ -41,6 +45,17 @@ ATOL = 1e-12
 # the disagreement at 7.3e-11, inside the contract; hypothesis occasionally
 # constructs a series where the cancellation pushes it just past.
 ORACLE_IS_LOOSER = {"stddev": 1e-8, "var": 1e-8, "wma": 1e-8}
+
+# Indicators whose output is a difference of two moving averages of the same
+# series. The difference is around 1e-5 of the averages, so one ULP on either
+# of them lands as ~1e-11 on the output and neither implementation can hold
+# RTOL. Measured against exact arithmetic over the committed dataset, the worst
+# relative error is 4.7e-10 for TrendLib (rma) and 1.1e-9 for ta-lib-python
+# (trima); on wma and trima TrendLib is the closer of the two by a factor of
+# ten. The bound is the two added, and the Rust edge-case suite pins the two
+# properties cancellation cannot touch: equal periods give exactly zero, and
+# swapping the periods gives the same bits.
+CANCELS = {"apo": 2e-9, "ppo": 2e-9}
 
 # SMA is pure addition, subtraction and one division, so there is no
 # multiply-add for a compiler to contract and TrendLib reproduces TA-Lib
@@ -76,9 +91,17 @@ def columns_for(indicator, bars, rows=None):
     return columns
 
 
+def ma_type_ints():
+    return yaml.safe_load(ENUMS.read_text())["MaType"]["talib_int"]
+
+
 def talib_kwargs(alias, params):
     renames = alias.get("params") or {}
-    return {renames.get(key, key): value for key, value in params.items()}
+    numbers = ma_type_ints()
+    return {
+        renames.get(key, key): numbers[value] if isinstance(value, str) else value
+        for key, value in params.items()
+    }
 
 
 def compare(name, mine, theirs, indicator_name=None):
@@ -89,7 +112,8 @@ def compare(name, mine, theirs, indicator_name=None):
         np.isnan(mine), np.isnan(theirs), err_msg=f"{name}: NaN rows differ"
     )
     defined = ~np.isnan(theirs) & np.isfinite(theirs)
-    rtol = ORACLE_IS_LOOSER.get(indicator_name or name, RTOL)
+    key = indicator_name or name
+    rtol = CANCELS.get(key, ORACLE_IS_LOOSER.get(key, RTOL))
     np.testing.assert_allclose(mine[defined], theirs[defined], rtol=rtol, atol=ATOL, err_msg=name)
     # An infinity on one side has to be an infinity on the other.
     np.testing.assert_array_equal(np.isinf(mine), np.isinf(theirs), err_msg=f"{name}: infinities")
@@ -113,6 +137,24 @@ def test_the_committed_dataset_agrees_with_talib(bars, indicator, alias):
     mine, theirs = run_both(indicator, alias, bars)
     for name, ours, oracle in zip(indicator.outputs, mine, theirs, strict=True):
         compare(indicator.name if len(mine) == 1 else name, ours, oracle, indicator.name)
+
+
+def test_every_average_agrees_with_talib(bars, indicator, alias):
+    """An enum parameter is only as good as its least-used value, so each one
+    is run rather than only the default."""
+    choices = {name: spec["choices"] for name, spec in indicator.params.items() if spec["choices"]}
+    if not choices:
+        pytest.skip("no enum parameters")
+    for name, values in choices.items():
+        for value in values:
+            mine, theirs = run_both(indicator, alias, bars, **{name: value})
+            for output, ours, oracle in zip(indicator.outputs, mine, theirs, strict=True):
+                compare(
+                    f"{indicator.name}[{name}={value}] {output}",
+                    ours,
+                    oracle,
+                    indicator.name,
+                )
 
 
 def test_varied_parameters_agree_with_talib(bars, indicator, alias):

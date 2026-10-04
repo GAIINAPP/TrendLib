@@ -2,8 +2,12 @@
 
 #![allow(dead_code)]
 
-use super::{AnyStream, Columns, OpenAndFillResult, ParamSpec, Registered, TlError};
+use super::{AnyStream, Columns, OpenAndFillResult, ParamSpec, Registered, TlError, ma_type_at};
 use trendlib::core::kernel::Kernel;
+
+/// The averages an `ma_type` parameter accepts, in the order its index
+/// encoding uses.
+pub const MA_TYPES: &[&str] = &["sma", "ema", "wma", "dema", "tema", "trima", "rma"];
 
 mod acos_adapter {
     use super::*;
@@ -177,6 +181,7 @@ mod adx_adapter {
         min: 2.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::adx::Params {
@@ -237,6 +242,7 @@ mod adxr_adapter {
         min: 2.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::adxr::Params {
@@ -284,6 +290,87 @@ mod adxr_adapter {
     }
 }
 
+mod apo_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::apo::Apo;
+    const INPUTS: usize = 1;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "fast_period",
+            default: 12.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "slow_period",
+            default: 26.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "ma_type",
+            default: 1.0,
+            min: 0.0,
+            max: 6.0,
+            integral: false,
+            choices: MA_TYPES,
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::apo::Params {
+        trendlib::indicators::apo::Params {
+            fast_period: values[0] as usize,
+            slow_period: values[1] as usize,
+            ma_type: ma_type_at(values[2]),
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "apo takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::apo::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod aroon_adapter {
     use super::*;
 
@@ -297,6 +384,7 @@ mod aroon_adapter {
         min: 2.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::aroon::Params {
@@ -357,6 +445,7 @@ mod aroonosc_adapter {
         min: 2.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::aroonosc::Params {
@@ -523,6 +612,7 @@ mod atr_adapter {
         min: 1.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::atr::Params {
@@ -583,6 +673,7 @@ mod avgdev_adapter {
         min: 2.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::avgdev::Params {
@@ -683,6 +774,96 @@ mod avgprice_adapter {
     }
 }
 
+mod bbands_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::bbands::Bbands;
+    const INPUTS: usize = 1;
+    const OUTPUTS: usize = 3;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "period",
+            default: 20.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "nbdev_up",
+            default: 2.0,
+            min: f64::NEG_INFINITY,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "nbdev_dn",
+            default: 2.0,
+            min: f64::NEG_INFINITY,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "ma_type",
+            default: 0.0,
+            min: 0.0,
+            max: 6.0,
+            integral: false,
+            choices: MA_TYPES,
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::bbands::Params {
+        trendlib::indicators::bbands::Params {
+            period: values[0] as usize,
+            nbdev_up: values[1],
+            nbdev_dn: values[2],
+            ma_type: ma_type_at(values[3]),
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "bbands takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::bbands::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: true,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false, false, false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod bop_adapter {
     use super::*;
 
@@ -749,6 +930,7 @@ mod cci_adapter {
         min: 2.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::cci::Params {
@@ -862,6 +1044,7 @@ mod cmo_adapter {
         min: 2.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::cmo::Params {
@@ -1081,6 +1264,7 @@ mod dema_adapter {
         min: 1.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::dema::Params {
@@ -1194,6 +1378,7 @@ mod dx_adapter {
         min: 2.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::dx::Params {
@@ -1254,6 +1439,7 @@ mod ema_adapter {
         min: 1.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::ema::Params {
@@ -1513,6 +1699,78 @@ mod log10_adapter {
     }
 }
 
+mod ma_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::ma::Ma;
+    const INPUTS: usize = 1;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "period",
+            default: 30.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "ma_type",
+            default: 0.0,
+            min: 0.0,
+            max: 6.0,
+            integral: false,
+            choices: MA_TYPES,
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::ma::Params {
+        trendlib::indicators::ma::Params {
+            period: values[0] as usize,
+            ma_type: ma_type_at(values[1]),
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "ma takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::ma::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod macd_adapter {
     use super::*;
 
@@ -1527,6 +1785,7 @@ mod macd_adapter {
             min: 2.0,
             max: 100000.0,
             integral: true,
+            choices: &[],
         },
         ParamSpec {
             name: "slow_period",
@@ -1534,6 +1793,7 @@ mod macd_adapter {
             min: 2.0,
             max: 100000.0,
             integral: true,
+            choices: &[],
         },
         ParamSpec {
             name: "signal_period",
@@ -1541,6 +1801,7 @@ mod macd_adapter {
             min: 1.0,
             max: 100000.0,
             integral: true,
+            choices: &[],
         },
     ];
 
@@ -1604,6 +1865,7 @@ mod max_adapter {
         min: 2.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::max::Params {
@@ -1664,6 +1926,7 @@ mod maxindex_adapter {
         min: 2.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::maxindex::Params {
@@ -1777,6 +2040,7 @@ mod midpoint_adapter {
         min: 2.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::midpoint::Params {
@@ -1837,6 +2101,7 @@ mod midprice_adapter {
         min: 2.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::midprice::Params {
@@ -1897,6 +2162,7 @@ mod min_adapter {
         min: 2.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::min::Params {
@@ -1957,6 +2223,7 @@ mod minindex_adapter {
         min: 2.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::minindex::Params {
@@ -2017,6 +2284,7 @@ mod minmax_adapter {
         min: 2.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::minmax::Params {
@@ -2077,6 +2345,7 @@ mod minmaxindex_adapter {
         min: 2.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::minmaxindex::Params {
@@ -2137,6 +2406,7 @@ mod minus_di_adapter {
         min: 1.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::minus_di::Params {
@@ -2197,6 +2467,7 @@ mod minus_dm_adapter {
         min: 1.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::minus_dm::Params {
@@ -2257,6 +2528,7 @@ mod mom_adapter {
         min: 1.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::mom::Params {
@@ -2370,6 +2642,7 @@ mod natr_adapter {
         min: 1.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::natr::Params {
@@ -2483,6 +2756,7 @@ mod plus_di_adapter {
         min: 1.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::plus_di::Params {
@@ -2543,6 +2817,7 @@ mod plus_dm_adapter {
         min: 1.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::plus_dm::Params {
@@ -2590,6 +2865,87 @@ mod plus_dm_adapter {
     }
 }
 
+mod ppo_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::ppo::Ppo;
+    const INPUTS: usize = 1;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "fast_period",
+            default: 12.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "slow_period",
+            default: 26.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "ma_type",
+            default: 1.0,
+            min: 0.0,
+            max: 6.0,
+            integral: false,
+            choices: MA_TYPES,
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::ppo::Params {
+        trendlib::indicators::ppo::Params {
+            fast_period: values[0] as usize,
+            slow_period: values[1] as usize,
+            ma_type: ma_type_at(values[2]),
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "ppo takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::ppo::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod rma_adapter {
     use super::*;
 
@@ -2603,6 +2959,7 @@ mod rma_adapter {
         min: 1.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::rma::Params {
@@ -2663,6 +3020,7 @@ mod roc_adapter {
         min: 1.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::roc::Params {
@@ -2723,6 +3081,7 @@ mod rocp_adapter {
         min: 1.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::rocp::Params {
@@ -2783,6 +3142,7 @@ mod rocr_adapter {
         min: 1.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::rocr::Params {
@@ -2843,6 +3203,7 @@ mod rocr100_adapter {
         min: 1.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::rocr100::Params {
@@ -2903,6 +3264,7 @@ mod rsi_adapter {
         min: 2.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::rsi::Params {
@@ -3069,6 +3431,7 @@ mod sma_adapter {
         min: 1.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::sma::Params {
@@ -3183,6 +3546,7 @@ mod stddev_adapter {
             min: 2.0,
             max: 100000.0,
             integral: true,
+            choices: &[],
         },
         ParamSpec {
             name: "nbdev",
@@ -3190,6 +3554,7 @@ mod stddev_adapter {
             min: f64::NEG_INFINITY,
             max: f64::INFINITY,
             integral: false,
+            choices: &[],
         },
     ];
 
@@ -3305,6 +3670,7 @@ mod sum_adapter {
         min: 2.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::sum::Params {
@@ -3471,6 +3837,7 @@ mod tema_adapter {
         min: 1.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::tema::Params {
@@ -3584,6 +3951,7 @@ mod trima_adapter {
         min: 1.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::trima::Params {
@@ -3698,6 +4066,7 @@ mod var_adapter {
             min: 1.0,
             max: 100000.0,
             integral: true,
+            choices: &[],
         },
         ParamSpec {
             name: "nbdev",
@@ -3705,6 +4074,7 @@ mod var_adapter {
             min: f64::NEG_INFINITY,
             max: f64::INFINITY,
             integral: false,
+            choices: &[],
         },
     ];
 
@@ -3820,6 +4190,7 @@ mod willr_adapter {
         min: 2.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::willr::Params {
@@ -3880,6 +4251,7 @@ mod wma_adapter {
         min: 1.0,
         max: 100000.0,
         integral: true,
+        choices: &[],
     }];
 
     fn params(values: &[f64]) -> trendlib::indicators::wma::Params {
@@ -3934,6 +4306,7 @@ pub fn registered() -> Vec<Registered> {
         add_adapter::registered(),
         adx_adapter::registered(),
         adxr_adapter::registered(),
+        apo_adapter::registered(),
         aroon_adapter::registered(),
         aroonosc_adapter::registered(),
         asin_adapter::registered(),
@@ -3941,6 +4314,7 @@ pub fn registered() -> Vec<Registered> {
         atr_adapter::registered(),
         avgdev_adapter::registered(),
         avgprice_adapter::registered(),
+        bbands_adapter::registered(),
         bop_adapter::registered(),
         cci_adapter::registered(),
         ceil_adapter::registered(),
@@ -3956,6 +4330,7 @@ pub fn registered() -> Vec<Registered> {
         floor_adapter::registered(),
         ln_adapter::registered(),
         log10_adapter::registered(),
+        ma_adapter::registered(),
         macd_adapter::registered(),
         max_adapter::registered(),
         maxindex_adapter::registered(),
@@ -3974,6 +4349,7 @@ pub fn registered() -> Vec<Registered> {
         obv_adapter::registered(),
         plus_di_adapter::registered(),
         plus_dm_adapter::registered(),
+        ppo_adapter::registered(),
         rma_adapter::registered(),
         roc_adapter::registered(),
         rocp_adapter::registered(),

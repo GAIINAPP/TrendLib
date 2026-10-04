@@ -19,6 +19,7 @@ __all__ = [
     "add",
     "adx",
     "adxr",
+    "apo",
     "aroon",
     "aroonosc",
     "asin",
@@ -26,6 +27,7 @@ __all__ = [
     "atr",
     "avgdev",
     "avgprice",
+    "bbands",
     "bop",
     "cci",
     "ceil",
@@ -41,6 +43,7 @@ __all__ = [
     "floor",
     "ln",
     "log10",
+    "ma",
     "macd",
     "max",
     "maxindex",
@@ -59,6 +62,7 @@ __all__ = [
     "obv",
     "plus_di",
     "plus_dm",
+    "ppo",
     "rma",
     "roc",
     "rocp",
@@ -145,6 +149,7 @@ adxr = Factory(
     ),
     ("adxr",),
 )
+apo = Factory("apo", _core.ApoStream, ("source",), ("series",), ("apo",))
 aroon = Factory(
     "aroon",
     _core.AroonStream,
@@ -208,6 +213,17 @@ avgprice = Factory(
         "close",
     ),
     ("avgprice",),
+)
+bbands = Factory(
+    "bbands",
+    _core.BbandsStream,
+    ("source",),
+    ("series",),
+    (
+        "bbands_upper",
+        "bbands_middle",
+        "bbands_lower",
+    ),
 )
 bop = Factory(
     "bop",
@@ -280,6 +296,7 @@ exp = Factory("exp", _core.ExpStream, ("source",), ("series",), ("exp",))
 floor = Factory("floor", _core.FloorStream, ("source",), ("series",), ("floor",))
 ln = Factory("ln", _core.LnStream, ("source",), ("series",), ("ln",))
 log10 = Factory("log10", _core.Log10Stream, ("source",), ("series",), ("log10",))
+ma = Factory("ma", _core.MaStream, ("source",), ("series",), ("ma",))
 macd = Factory(
     "macd",
     _core.MacdStream,
@@ -440,6 +457,7 @@ plus_dm = Factory(
     ),
     ("plus_dm",),
 )
+ppo = Factory("ppo", _core.PpoStream, ("source",), ("series",), ("ppo",))
 rma = Factory("rma", _core.RmaStream, ("source",), ("series",), ("rma",))
 roc = Factory("roc", _core.RocStream, ("source",), ("series",), ("roc",))
 rocp = Factory("rocp", _core.RocpStream, ("source",), ("series",), ("rocp",))

@@ -12,6 +12,7 @@ use std::path::{Path, PathBuf};
 
 use trendlib::TlError;
 use trendlib::core::kernel::{BarStream, Kernel};
+use trendlib::core::math::MaType;
 use trendlib::core::traits::Stream;
 
 pub fn repo_root() -> PathBuf {
@@ -73,6 +74,19 @@ pub struct ParamSpec {
     pub min: f64,
     pub max: f64,
     pub integral: bool,
+    /// Non-empty for an enum parameter: the values it accepts, in the order
+    /// `default`, `min` and `max` index into.
+    pub choices: &'static [&'static str],
+}
+
+/// An enum parameter travels through the registry as its index in `MA_TYPES`,
+/// so a parameter vector stays `&[f64]` whatever the indicator takes.
+pub fn ma_type_at(index: f64) -> MaType {
+    let index = index as usize;
+    MaType::ALL
+        .get(index)
+        .map(|(_, kind)| *kind)
+        .unwrap_or_else(|| panic!("ma_type index {index} is out of range"))
 }
 
 pub type Columns = Vec<Vec<f64>>;
@@ -143,7 +157,7 @@ impl Registered {
     }
 }
 
-mod registry;
+pub mod registry;
 
 pub use registry::registered;
 
@@ -184,9 +198,24 @@ impl Golden {
                 self.params
                     .get(param.name)
                     .map(|value| {
-                        value.parse().unwrap_or_else(|_| {
-                            panic!("{}: {} is not a number", self.path.display(), param.name)
-                        })
+                        if param.choices.is_empty() {
+                            value.parse().unwrap_or_else(|_| {
+                                panic!("{}: {} is not a number", self.path.display(), param.name)
+                            })
+                        } else {
+                            param
+                                .choices
+                                .iter()
+                                .position(|choice| choice == value)
+                                .unwrap_or_else(|| {
+                                    panic!(
+                                        "{}: {}={value} is not one of {:?}",
+                                        self.path.display(),
+                                        param.name,
+                                        param.choices
+                                    )
+                                }) as f64
+                        }
                     })
                     .unwrap_or(param.default)
             })

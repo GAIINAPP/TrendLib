@@ -1,0 +1,46 @@
+name: bbands
+title: Bollinger Bands
+group: overlap
+flags: [overlap, nan_inf_output]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 20
+    min: 2
+    max: 100000
+    doc: Number of bars in the average and the deviation window
+  - name: nbdev_up
+    type: float
+    default: 2.0
+    doc: Standard deviations added to the middle band
+  - name: nbdev_dn
+    type: float
+    default: 2.0
+    doc: Standard deviations subtracted from the middle band
+  - name: ma_type
+    type: enum:MaType
+    default: sma
+    doc: Moving average used for the middle band
+outputs:
+  - name: bbands_upper
+    dtype: float64
+    plot: upper_band
+    doc: Middle band plus nbdev_up standard deviations
+  - name: bbands_middle
+    dtype: float64
+    plot: middle_band
+    doc: Moving average of source
+  - name: bbands_lower
+    dtype: float64
+    plot: lower_band
+    doc: Middle band minus nbdev_dn standard deviations
+talib:
+  name: BBANDS
+  params: {period: timeperiod, nbdev_up: nbdevup, nbdev_dn: nbdevdn, ma_type: matype}
+  outputs: [upperband, middleband, lowerband]
+references:
+  - John Bollinger, Bollinger on Bollinger Bands, McGraw-Hill, 2001
+see_also: [ma, stddev]

@@ -4,6 +4,7 @@
 use numpy::PyReadonlyArray1;
 use pyo3::prelude::*;
 use trendlib::TlError;
+use trendlib::core::math::MaType;
 
 /// Map a core error onto the Python class `docs/PYTHON_API.md` promises. The
 /// module is imported on the error path only, so the happy path pays nothing
@@ -68,4 +69,12 @@ pub fn float_param(
         ));
     }
     Ok(value)
+}
+
+/// Resolve a moving-average name, listing what is accepted when it is not one.
+///
+/// An average whose indicator has not shipped yet is rejected rather than
+/// quietly standing in for another one (`docs/INDICATORS.md` section 1).
+pub fn ma_type_param(indicator: &str, name: &str, value: &str) -> Result<MaType, TlError> {
+    MaType::parse(indicator, name, value)
 }

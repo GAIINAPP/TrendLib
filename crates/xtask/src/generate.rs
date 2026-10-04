@@ -38,7 +38,9 @@ fn check_supported(specs: &[Spec]) -> Result<(), Vec<SpecError>> {
     let mut errors = Vec::new();
     for spec in specs {
         for param in &spec.params {
-            if !matches!(param.ty, ParamType::Int | ParamType::Float) {
+            let known = matches!(param.ty, ParamType::Int | ParamType::Float)
+                || matches!(&param.ty, ParamType::Enum(name) if name == "MaType");
+            if !known {
                 errors.push(unsupported(spec, param));
             }
         }
@@ -47,6 +49,24 @@ fn check_supported(specs: &[Spec]) -> Result<(), Vec<SpecError>> {
         Ok(())
     } else {
         Err(errors)
+    }
+}
+
+/// The Python annotation a parameter is declared with.
+fn python_type(ty: &ParamType) -> &'static str {
+    match ty {
+        ParamType::Int => "int",
+        ParamType::Float => "float",
+        _ => "str",
+    }
+}
+
+/// The Rust type a parameter arrives as from Python.
+fn binding_type(ty: &ParamType) -> &'static str {
+    match ty {
+        ParamType::Int => "i64",
+        ParamType::Float => "f64",
+        _ => "&str",
     }
 }
 
@@ -96,6 +116,9 @@ fn helpers_needed(specs: &[Spec]) -> String {
     {
         needed.push("float_param");
     }
+    if has_enum(specs) {
+        needed.push("ma_type_param");
+    }
     needed.sort();
     needed.iter().map(|name| format!("{name}, ")).collect()
 }
@@ -118,9 +141,14 @@ fn bindings(specs: &[Spec]) -> String {
          use pyo3::types::PyDict;\n\
          use trendlib::TlError;\n\
          use trendlib::core::kernel::{{BarStream, Kernel}};\n\
-         use trendlib::core::traits::Stream;\n\
+         use trendlib::core::traits::Stream;\n{ma_type}\
          use crate::shared::{{as_slice, {helpers}to_py_err}};\n",
         helpers = helpers_needed(specs),
+        ma_type = if has_enum(specs) {
+            "use trendlib::core::math::MaType;\n"
+        } else {
+            ""
+        },
     );
 
     for spec in specs {
@@ -139,16 +167,7 @@ fn bindings(specs: &[Spec]) -> String {
         let param_args: String = spec
             .params
             .iter()
-            .map(|p| {
-                format!(
-                    ",\n    {}: {}",
-                    p.name,
-                    match p.ty {
-                        ParamType::Int => "i64",
-                        _ => "f64",
-                    }
-                )
-            })
+            .map(|p| format!(",\n    {}: {}", p.name, binding_type(&p.ty)))
             .collect();
         let signature_params: String = spec
             .params
@@ -407,7 +426,11 @@ fn params_builder(spec: &Spec) -> String {
     }
     let mut out = String::new();
     for param in &spec.params {
-        let check = match param.ty {
+        let check = match &param.ty {
+            ParamType::Enum(_) => format!(
+                "    let {0} = ma_type_param(\"{1}\", \"{0}\", {0}).map_err(|e| to_py_err(py, &e))?;\n",
+                param.name, spec.name,
+            ),
             ParamType::Int => format!(
                 "    let {0} = int_param(\"{1}\", \"{0}\", {0}, {2}, {3}).map_err(|e| to_py_err(py, &e))?;\n",
                 param.name,
@@ -473,7 +496,7 @@ fn registration(specs: &[Spec]) -> String {
         for param in &spec.params {
             let _ = writeln!(
                 out,
-                "        {{\n            let entry = PyDict::new(py);\n            entry.set_item(\"default\", {})?;\n            entry.set_item(\"min\", {})?;\n            entry.set_item(\"max\", {})?;\n            params.set_item(\"{}\", entry)?;\n        }}",
+                "        {{\n            let entry = PyDict::new(py);\n            entry.set_item(\"default\", {})?;\n            entry.set_item(\"min\", {})?;\n            entry.set_item(\"max\", {})?;\n            entry.set_item(\"choices\", {})?;\n            params.set_item(\"{}\", entry)?;\n        }}",
                 rust_literal(param, &param.default),
                 param
                     .min
@@ -485,6 +508,11 @@ fn registration(specs: &[Spec]) -> String {
                     .as_ref()
                     .map(|v| rust_literal(param, v))
                     .unwrap_or_else(|| "py.None()".into()),
+                match &param.ty {
+                    ParamType::Enum(_) =>
+                        "MaType::ALL.iter().map(|(name, _)| *name).collect::<Vec<_>>()",
+                    _ => "py.None()",
+                },
                 param.name
             );
         }
@@ -582,10 +610,24 @@ fn registration(specs: &[Spec]) -> String {
 
 /// `tl.lookback(name, **params)` without a registry: a match over the specs,
 /// with each parameter read from the keyword dict or left at its default.
+/// `true` when some indicator takes an enum parameter, so the generated file
+/// imports and reads one only where there is something to read.
+fn has_enum(specs: &[Spec]) -> bool {
+    specs
+        .iter()
+        .any(|s| s.params.iter().any(|p| matches!(p.ty, ParamType::Enum(_))))
+}
+
 fn lookback_table(specs: &[Spec]) -> String {
     let mut out = String::from(
-        "pub fn lookback_of(\n    py: Python<'_>,\n    name: &str,\n    params: Option<&Bound<'_, PyDict>>,\n) -> PyResult<usize> {\n         \x20   let get = |key: &str| -> PyResult<Option<i64>> {\n        match params.and_then(|p| p.get_item(key).transpose()) {\n            Some(value) => Ok(Some(value?.extract()?)),\n            None => Ok(None),\n        }\n    };\n         \x20   match name {\n",
+        "pub fn lookback_of(\n    py: Python<'_>,\n    name: &str,\n    params: Option<&Bound<'_, PyDict>>,\n) -> PyResult<usize> {\n         \x20   let get = |key: &str| -> PyResult<Option<i64>> {\n        match params.and_then(|p| p.get_item(key).transpose()) {\n            Some(value) => Ok(Some(value?.extract()?)),\n            None => Ok(None),\n        }\n    };\n",
     );
+    if has_enum(specs) {
+        out.push_str(
+            "    let text = |key: &str| -> PyResult<Option<String>> {\n        match params.and_then(|p| p.get_item(key).transpose()) {\n            Some(value) => Ok(Some(value?.extract()?)),\n            None => Ok(None),\n        }\n    };\n",
+        );
+    }
+    out.push_str("    match name {\n");
     for spec in specs {
         let path = format!("trendlib::indicators::{}", spec.name);
         let ty = format!("{path}::{}", spec.type_name());
@@ -604,6 +646,13 @@ fn lookback_table(specs: &[Spec]) -> String {
                         param.min.clone().unwrap_or_else(|| "0".into()),
                         param.max.clone().unwrap_or_else(|| "i64::MAX".into()),
                         param.default,
+                    );
+                }
+                ParamType::Enum(_) => {
+                    let _ = write!(
+                        body,
+                        "            let {0} = ma_type_param(\"{1}\", \"{0}\", match text(\"{0}\")? {{\n                Some(ref value) => value,\n                None => {2:?},\n            }}).map_err(|e| to_py_err(py, &e))?;\n",
+                        param.name, spec.name, param.default,
                     );
                 }
                 _ => {
@@ -673,11 +722,7 @@ fn functions(specs: &[Spec]) -> String {
                 format!(
                     "{}: {} = _PARAMS[{:?}][{:?}][\"default\"]",
                     p.name,
-                    if p.ty == ParamType::Int {
-                        "int"
-                    } else {
-                        "float"
-                    },
+                    python_type(&p.ty),
                     spec.name,
                     p.name
                 )
@@ -725,11 +770,7 @@ fn functions(specs: &[Spec]) -> String {
                     doc,
                     "    {} : {}, default {}\n        {}{}.\n",
                     param.name,
-                    if param.ty == ParamType::Int {
-                        "int"
-                    } else {
-                        "float"
-                    },
+                    python_type(&param.ty),
                     py_default(param),
                     param.doc,
                     range
@@ -759,8 +800,12 @@ fn functions(specs: &[Spec]) -> String {
                     "    {0} = _convert.as_int({1:?}, {0:?}, {0})\n",
                     p.name, spec.name
                 ),
-                _ => format!(
+                ParamType::Float => format!(
                     "    {0} = _convert.as_float({1:?}, {0:?}, {0})\n",
+                    p.name, spec.name
+                ),
+                _ => format!(
+                    "    {0} = _convert.as_text({1:?}, {0:?}, {0})\n",
                     p.name, spec.name
                 ),
             })
@@ -805,11 +850,7 @@ fn functions(specs: &[Spec]) -> String {
                 let theirs = alias.params.get(&p.name).cloned().unwrap_or(p.name.clone());
                 format!(
                     "{theirs}: {} = _PARAMS[{:?}][{:?}][\"default\"]",
-                    if p.ty == ParamType::Int {
-                        "int"
-                    } else {
-                        "float"
-                    },
+                    python_type(&p.ty),
                     spec.name,
                     p.name
                 )
@@ -900,17 +941,7 @@ fn stubs(specs: &[Spec]) -> String {
         let params: Vec<String> = spec
             .params
             .iter()
-            .map(|p| {
-                format!(
-                    "{}: {}",
-                    p.name,
-                    if p.ty == ParamType::Int {
-                        "int"
-                    } else {
-                        "float"
-                    }
-                )
-            })
+            .map(|p| format!("{}: {}", p.name, python_type(&p.ty)))
             .collect();
         let signature = if params.is_empty() {
             args.join(", ")
@@ -1014,12 +1045,29 @@ fn formatted(path: &Path, text: &str) -> Result<String, SpecError> {
 /// it or it is simply untested, and a list people maintain by hand is a list
 /// that silently falls behind. Parameters travel as `f64` in spec order so one
 /// signature covers an indicator with no parameters and one with three.
-fn test_registry(specs: &[Spec]) -> String {
+/// The enum values that have an indicator of the same name, in the order the
+/// enum declares them: the averages the core can actually build. `MaType::ALL`
+/// follows the same rule, and `the_registry_lists_every_average_the_core_has`
+/// holds the two together.
+fn shipped(values: &[String], specs: &[Spec]) -> Vec<String> {
+    values
+        .iter()
+        .filter(|value| specs.iter().any(|spec| &spec.name == *value))
+        .cloned()
+        .collect()
+}
+
+fn test_registry(specs: &[Spec], ma_types: &[String]) -> String {
+    let listed: Vec<String> = ma_types.iter().map(|name| format!("{name:?}")).collect();
     let mut out = format!(
         "{RUST_BANNER}\n\n\
          #![allow(dead_code)]\n\n\
-         use super::{{AnyStream, Columns, OpenAndFillResult, ParamSpec, Registered, TlError}};\n\
-         use trendlib::core::kernel::Kernel;\n\n"
+         use super::{{AnyStream, Columns, ma_type_at, OpenAndFillResult, ParamSpec, Registered, TlError}};\n\
+         use trendlib::core::kernel::Kernel;\n\n\
+         /// The averages an `ma_type` parameter accepts, in the order its index\n\
+         /// encoding uses.\n\
+         pub const MA_TYPES: &[&str] = &[{listed}];\n\n",
+        listed = listed.join(", "),
     );
 
     for spec in specs {
@@ -1034,6 +1082,9 @@ fn test_registry(specs: &[Spec]) -> String {
             .enumerate()
             .map(|(index, param)| match param.ty {
                 ParamType::Int => format!("{}: values[{index}] as usize, ", param.name),
+                ParamType::Enum(_) => {
+                    format!("{}: ma_type_at(values[{index}]), ", param.name)
+                }
                 _ => format!("{}: values[{index}], ", param.name),
             })
             .collect();
@@ -1047,21 +1098,45 @@ fn test_registry(specs: &[Spec]) -> String {
             .params
             .iter()
             .map(|param| {
+                let (default, min, max, choices) = match &param.ty {
+                    // An enum travels as its index in `choices`, so a parameter
+                    // vector stays `&[f64]`. It is not `integral`: an index out
+                    // of range is unrepresentable in Rust, so the suite that
+                    // checks out-of-range values are refused has nothing to
+                    // offer here, and the Python layer tests the name instead.
+                    ParamType::Enum(_) => (
+                        ma_types
+                            .iter()
+                            .position(|name| name == &param.default)
+                            .map(|index| format!("{index}.0"))
+                            .unwrap_or_else(|| "0.0".into()),
+                        "0.0".to_string(),
+                        format!("{}.0", ma_types.len().saturating_sub(1)),
+                        "MA_TYPES",
+                    ),
+                    _ => (
+                        as_float(&param.default),
+                        param
+                            .min
+                            .as_deref()
+                            .map(as_float)
+                            .unwrap_or_else(|| "f64::NEG_INFINITY".into()),
+                        param
+                            .max
+                            .as_deref()
+                            .map(as_float)
+                            .unwrap_or_else(|| "f64::INFINITY".into()),
+                        "&[]",
+                    ),
+                };
                 format!(
-                    "        ParamSpec {{ name: {:?}, default: {}, min: {}, max: {}, integral: {} }},\n",
+                    "        ParamSpec {{ name: {:?}, default: {}, min: {}, max: {}, integral: {}, choices: {} }},\n",
                     param.name,
-                    as_float(&param.default),
-                    param
-                        .min
-                        .as_deref()
-                        .map(as_float)
-                        .unwrap_or_else(|| "f64::NEG_INFINITY".into()),
-                    param
-                        .max
-                        .as_deref()
-                        .map(as_float)
-                        .unwrap_or_else(|| "f64::INFINITY".into()),
+                    default,
+                    min,
+                    max,
                     param.ty == ParamType::Int,
+                    choices,
                 )
             })
             .collect();
@@ -1132,6 +1207,11 @@ pub fn generate(root: &Path) -> Result<Vec<Generated>, Vec<SpecError>> {
     let indicators = root.join("crates/trendlib/src/indicators");
     let specs = crate::spec::read_all(&indicators)?;
     check_supported(&specs)?;
+    let enums = crate::spec::read_enums(&indicators.join("_enums.yaml")).map_err(|e| vec![e])?;
+    let ma_types = shipped(
+        enums.get("MaType").map(Vec::as_slice).unwrap_or_default(),
+        &specs,
+    );
 
     let raw = vec![
         (indicators.join("mod.rs"), indicators_mod(&specs)),
@@ -1147,7 +1227,7 @@ pub fn generate(root: &Path) -> Result<Vec<Generated>, Vec<SpecError>> {
         (root.join("python/trendlib/_core.pyi"), stubs(&specs)),
         (
             root.join("crates/trendlib/tests/support/registry.rs"),
-            test_registry(&specs),
+            test_registry(&specs, &ma_types),
         ),
     ];
 
