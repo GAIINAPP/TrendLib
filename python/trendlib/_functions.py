@@ -179,6 +179,7 @@ __all__ = [
     "RVI",
     "RVOL",
     "SAR",
+    "SAREXT",
     "SIN",
     "SINH",
     "SMA",
@@ -378,6 +379,7 @@ __all__ = [
     "rvi",
     "rvol",
     "sar",
+    "sarext",
     "sin",
     "sinh",
     "sma",
@@ -5057,6 +5059,87 @@ def sar(
     return _convert.wrap_outputs(out, carrier, ("sar",))
 
 
+def sarext(
+    high=None,
+    low=None,
+    *,
+    start_value: float = _PARAMS["sarext"]["start_value"]["default"],
+    offset_on_reverse: float = _PARAMS["sarext"]["offset_on_reverse"]["default"],
+    acceleration_init_long: float = _PARAMS["sarext"]["acceleration_init_long"]["default"],
+    acceleration_long: float = _PARAMS["sarext"]["acceleration_long"]["default"],
+    acceleration_max_long: float = _PARAMS["sarext"]["acceleration_max_long"]["default"],
+    acceleration_init_short: float = _PARAMS["sarext"]["acceleration_init_short"]["default"],
+    acceleration_short: float = _PARAMS["sarext"]["acceleration_short"]["default"],
+    acceleration_max_short: float = _PARAMS["sarext"]["acceleration_max_short"]["default"],
+) -> Any:
+    """Parabolic SAR Extended.
+
+    Parameters
+    ----------
+    start_value : float, default 0.0
+        Where and which way to start; zero reads the direction from the first two bars.
+    offset_on_reverse : float, default 0.0
+        Fraction the stop is pushed further away by when it flips.
+    acceleration_init_long : float, default 0.02
+        Step a rising stop starts at.
+    acceleration_long : float, default 0.02
+        How much a rising stop's step grows at each new high.
+    acceleration_max_long : float, default 0.2
+        Largest step a rising stop reaches.
+    acceleration_init_short : float, default 0.02
+        Step a falling stop starts at.
+    acceleration_short : float, default 0.02
+        How much a falling stop's step grows at each new low.
+    acceleration_max_short : float, default 0.2
+        Largest step a falling stop reaches.
+
+    Returns
+    -------
+    ndarray or Series
+        The stop, signed negative while it sits above price.
+    """
+    start_value = _convert.as_float("sarext", "start_value", start_value)
+    offset_on_reverse = _convert.as_float("sarext", "offset_on_reverse", offset_on_reverse)
+    acceleration_init_long = _convert.as_float(
+        "sarext", "acceleration_init_long", acceleration_init_long
+    )
+    acceleration_long = _convert.as_float("sarext", "acceleration_long", acceleration_long)
+    acceleration_max_long = _convert.as_float(
+        "sarext", "acceleration_max_long", acceleration_max_long
+    )
+    acceleration_init_short = _convert.as_float(
+        "sarext", "acceleration_init_short", acceleration_init_short
+    )
+    acceleration_short = _convert.as_float("sarext", "acceleration_short", acceleration_short)
+    acceleration_max_short = _convert.as_float(
+        "sarext", "acceleration_max_short", acceleration_max_short
+    )
+    columns, carrier = _convert.bars(
+        "sarext",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.sarext(
+        *columns,
+        start_value=start_value,
+        offset_on_reverse=offset_on_reverse,
+        acceleration_init_long=acceleration_init_long,
+        acceleration_long=acceleration_long,
+        acceleration_max_long=acceleration_max_long,
+        acceleration_init_short=acceleration_init_short,
+        acceleration_short=acceleration_short,
+        acceleration_max_short=acceleration_max_short,
+    )
+    return _convert.wrap_outputs(out, carrier, ("sarext",))
+
+
 def sin(source=None) -> Any:
     """Vector Sine.
 
@@ -6983,6 +7066,33 @@ def SAR(
 ) -> Any:
     """TA-Lib-style alias for :func:`sar`."""
     return sar(high, low, acceleration=acceleration, maximum=maximum)
+
+
+def SAREXT(
+    high,
+    low,
+    startvalue: float = _PARAMS["sarext"]["start_value"]["default"],
+    offsetonreverse: float = _PARAMS["sarext"]["offset_on_reverse"]["default"],
+    accelerationinitlong: float = _PARAMS["sarext"]["acceleration_init_long"]["default"],
+    accelerationlong: float = _PARAMS["sarext"]["acceleration_long"]["default"],
+    accelerationmaxlong: float = _PARAMS["sarext"]["acceleration_max_long"]["default"],
+    accelerationinitshort: float = _PARAMS["sarext"]["acceleration_init_short"]["default"],
+    accelerationshort: float = _PARAMS["sarext"]["acceleration_short"]["default"],
+    accelerationmaxshort: float = _PARAMS["sarext"]["acceleration_max_short"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`sarext`."""
+    return sarext(
+        high,
+        low,
+        start_value=startvalue,
+        offset_on_reverse=offsetonreverse,
+        acceleration_init_long=accelerationinitlong,
+        acceleration_long=accelerationlong,
+        acceleration_max_long=accelerationmaxlong,
+        acceleration_init_short=accelerationinitshort,
+        acceleration_short=accelerationshort,
+        acceleration_max_short=accelerationmaxshort,
+    )
 
 
 def SIN(source) -> Any:

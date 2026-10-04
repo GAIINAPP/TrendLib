@@ -22244,6 +22244,371 @@ impl PySarStream {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+#[pyo3(name = "sarext", signature = (high, low, *, start_value, offset_on_reverse, acceleration_init_long, acceleration_long, acceleration_max_long, acceleration_init_short, acceleration_short, acceleration_max_short))]
+pub fn sarext<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    start_value: f64,
+    offset_on_reverse: f64,
+    acceleration_init_long: f64,
+    acceleration_long: f64,
+    acceleration_max_long: f64,
+    acceleration_init_short: f64,
+    acceleration_short: f64,
+    acceleration_max_short: f64,
+) -> PyResult<Bound<'py, PyArray1<f64>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let start_value = float_param(
+        "sarext",
+        "start_value",
+        start_value,
+        f64::NEG_INFINITY,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let offset_on_reverse = float_param(
+        "sarext",
+        "offset_on_reverse",
+        offset_on_reverse,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let acceleration_init_long = float_param(
+        "sarext",
+        "acceleration_init_long",
+        acceleration_init_long,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let acceleration_long = float_param(
+        "sarext",
+        "acceleration_long",
+        acceleration_long,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let acceleration_max_long = float_param(
+        "sarext",
+        "acceleration_max_long",
+        acceleration_max_long,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let acceleration_init_short = float_param(
+        "sarext",
+        "acceleration_init_short",
+        acceleration_init_short,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let acceleration_short = float_param(
+        "sarext",
+        "acceleration_short",
+        acceleration_short,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let acceleration_max_short = float_param(
+        "sarext",
+        "acceleration_max_short",
+        acceleration_max_short,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::sarext::Params {
+        start_value,
+        offset_on_reverse,
+        acceleration_init_long,
+        acceleration_long,
+        acceleration_max_long,
+        acceleration_init_short,
+        acceleration_short,
+        acceleration_max_short,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::sarext::Sarext as Kernel<2, 1>>::batch([high, low], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok(std::mem::take(&mut out[0]).into_pyarray(py))
+}
+
+#[pyclass(module = "trendlib._core", name = "SarextStream", skip_from_py_object)]
+#[derive(Clone, Debug)]
+pub struct PySarextStream {
+    inner: BarStream<trendlib::indicators::sarext::Sarext, 2, 1>,
+}
+
+#[pymethods]
+impl PySarextStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, start_value, offset_on_reverse, acceleration_init_long, acceleration_long, acceleration_max_long, acceleration_init_short, acceleration_short, acceleration_max_short))]
+    #[allow(clippy::too_many_arguments)]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        start_value: f64,
+        offset_on_reverse: f64,
+        acceleration_init_long: f64,
+        acceleration_long: f64,
+        acceleration_max_long: f64,
+        acceleration_init_short: f64,
+        acceleration_short: f64,
+        acceleration_max_short: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let start_value = float_param(
+            "sarext",
+            "start_value",
+            start_value,
+            f64::NEG_INFINITY,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let offset_on_reverse = float_param(
+            "sarext",
+            "offset_on_reverse",
+            offset_on_reverse,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let acceleration_init_long = float_param(
+            "sarext",
+            "acceleration_init_long",
+            acceleration_init_long,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let acceleration_long = float_param(
+            "sarext",
+            "acceleration_long",
+            acceleration_long,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let acceleration_max_long = float_param(
+            "sarext",
+            "acceleration_max_long",
+            acceleration_max_long,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let acceleration_init_short = float_param(
+            "sarext",
+            "acceleration_init_short",
+            acceleration_init_short,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let acceleration_short = float_param(
+            "sarext",
+            "acceleration_short",
+            acceleration_short,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let acceleration_max_short = float_param(
+            "sarext",
+            "acceleration_max_short",
+            acceleration_max_short,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::sarext::Params {
+            start_value,
+            offset_on_reverse,
+            acceleration_init_long,
+            acceleration_long,
+            acceleration_max_long,
+            acceleration_init_short,
+            acceleration_short,
+            acceleration_max_short,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::sarext::Sarext, 2, 1> as Stream>::open(
+                    [high, low],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, start_value, offset_on_reverse, acceleration_init_long, acceleration_long, acceleration_max_long, acceleration_init_short, acceleration_short, acceleration_max_short))]
+    #[allow(clippy::too_many_arguments)]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        start_value: f64,
+        offset_on_reverse: f64,
+        acceleration_init_long: f64,
+        acceleration_long: f64,
+        acceleration_max_long: f64,
+        acceleration_init_short: f64,
+        acceleration_short: f64,
+        acceleration_max_short: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let start_value = float_param(
+            "sarext",
+            "start_value",
+            start_value,
+            f64::NEG_INFINITY,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let offset_on_reverse = float_param(
+            "sarext",
+            "offset_on_reverse",
+            offset_on_reverse,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let acceleration_init_long = float_param(
+            "sarext",
+            "acceleration_init_long",
+            acceleration_init_long,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let acceleration_long = float_param(
+            "sarext",
+            "acceleration_long",
+            acceleration_long,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let acceleration_max_long = float_param(
+            "sarext",
+            "acceleration_max_long",
+            acceleration_max_long,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let acceleration_init_short = float_param(
+            "sarext",
+            "acceleration_init_short",
+            acceleration_init_short,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let acceleration_short = float_param(
+            "sarext",
+            "acceleration_short",
+            acceleration_short,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let acceleration_max_short = float_param(
+            "sarext",
+            "acceleration_max_short",
+            acceleration_max_short,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::sarext::Params {
+            start_value,
+            offset_on_reverse,
+            acceleration_init_long,
+            acceleration_long,
+            acceleration_max_long,
+            acceleration_init_short,
+            acceleration_short,
+            acceleration_max_short,
+        };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::sarext::Sarext as Kernel<2, 1>>::open_and_fill(
+                    [high, low],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            std::mem::take(&mut out[0]).into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64) -> PyResult<f64> {
+        let row = self
+            .inner
+            .update([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64) -> PyResult<f64> {
+        let row = self
+            .inner
+            .peek([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value().map(|row| row[0])
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "sarext"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream sarext bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
 #[pyfunction]
 #[pyo3(name = "sin", signature = (source))]
 pub fn sin<'py>(
@@ -26462,6 +26827,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(rvi, m)?)?;
     m.add_function(wrap_pyfunction!(rvol, m)?)?;
     m.add_function(wrap_pyfunction!(sar, m)?)?;
+    m.add_function(wrap_pyfunction!(sarext, m)?)?;
     m.add_function(wrap_pyfunction!(sin, m)?)?;
     m.add_function(wrap_pyfunction!(sinh, m)?)?;
     m.add_function(wrap_pyfunction!(sma, m)?)?;
@@ -26660,6 +27026,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyRviStream>()?;
     m.add_class::<PyRvolStream>()?;
     m.add_class::<PySarStream>()?;
+    m.add_class::<PySarextStream>()?;
     m.add_class::<PySinStream>()?;
     m.add_class::<PySinhStream>()?;
     m.add_class::<PySmaStream>()?;
@@ -28374,6 +28741,74 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     }
     {
         let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.0)?;
+            entry.set_item("min", py.None())?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("start_value", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.0)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("offset_on_reverse", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.02)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("acceleration_init_long", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.02)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("acceleration_long", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.2)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("acceleration_max_long", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.02)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("acceleration_init_short", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.02)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("acceleration_short", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.2)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("acceleration_max_short", entry)?;
+        }
+        table.set_item("sarext", params)?;
+    }
+    {
+        let params = PyDict::new(py);
         table.set_item("sin", params)?;
     }
     {
@@ -29024,6 +29459,7 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("rvi", vec!["source"])?;
     table.set_item("rvol", vec!["volume"])?;
     table.set_item("sar", vec!["high", "low"])?;
+    table.set_item("sarext", vec!["high", "low"])?;
     table.set_item("sin", vec!["source"])?;
     table.set_item("sinh", vec!["source"])?;
     table.set_item("sma", vec!["source"])?;
@@ -29249,6 +29685,7 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("rvi", vec!["rvi"])?;
     table.set_item("rvol", vec!["rvol"])?;
     table.set_item("sar", vec!["sar"])?;
+    table.set_item("sarext", vec!["sarext"])?;
     table.set_item("sin", vec!["sin"])?;
     table.set_item("sinh", vec!["sinh"])?;
     table.set_item("sma", vec!["sma"])?;
@@ -29453,6 +29890,7 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("rvi", vec!["float64"])?;
     table.set_item("rvol", vec!["float64"])?;
     table.set_item("sar", vec!["float64"])?;
+    table.set_item("sarext", vec!["float64"])?;
     table.set_item("sin", vec!["float64"])?;
     table.set_item("sinh", vec!["float64"])?;
     table.set_item("sma", vec!["float64"])?;
@@ -29660,6 +30098,7 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("rvi", vec!["unstable", "path_dependent", "nan_inf_output"])?;
     table.set_item("rvol", vec!["nan_inf_output"])?;
     table.set_item("sar", vec!["overlap", "path_dependent"])?;
+    table.set_item("sarext", vec!["overlap", "path_dependent"])?;
     table.set_item("sin", vec!["nan_inf_output"])?;
     table.set_item("sinh", vec!["nan_inf_output"])?;
     table.set_item("sma", vec!["overlap"])?;
@@ -29864,6 +30303,7 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("rvi", "volatility")?;
     table.set_item("rvol", "volume")?;
     table.set_item("sar", "overlap")?;
+    table.set_item("sarext", "overlap")?;
     table.set_item("sin", "math")?;
     table.set_item("sinh", "math")?;
     table.set_item("sma", "overlap")?;
@@ -30841,6 +31281,17 @@ pub fn lookback_of(
             let acceleration = 0.02;
             let maximum = 0.2;
             Ok(<trendlib::indicators::sar::Sar as Kernel<2, 1>>::lookback(&trendlib::indicators::sar::Params { acceleration, maximum, }))
+        }
+        "sarext" => {
+            let start_value = 0.0;
+            let offset_on_reverse = 0.0;
+            let acceleration_init_long = 0.02;
+            let acceleration_long = 0.02;
+            let acceleration_max_long = 0.2;
+            let acceleration_init_short = 0.02;
+            let acceleration_short = 0.02;
+            let acceleration_max_short = 0.2;
+            Ok(<trendlib::indicators::sarext::Sarext as Kernel<2, 1>>::lookback(&trendlib::indicators::sarext::Params { start_value, offset_on_reverse, acceleration_init_long, acceleration_long, acceleration_max_long, acceleration_init_short, acceleration_short, acceleration_max_short, }))
         }
         "sin" => {
             Ok(<trendlib::indicators::sin::Sin as Kernel<1, 1>>::lookback(&trendlib::indicators::sin::Params { }))

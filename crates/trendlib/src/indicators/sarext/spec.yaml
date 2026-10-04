@@ -1,0 +1,61 @@
+name: sarext
+title: Parabolic SAR Extended
+group: overlap
+flags: [overlap, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+params:
+  - name: start_value
+    type: float
+    default: 0.0
+    doc: Where and which way to start; zero reads the direction from the first two bars
+  - name: offset_on_reverse
+    type: float
+    default: 0.0
+    min: 0.0
+    doc: Fraction the stop is pushed further away by when it flips
+  - name: acceleration_init_long
+    type: float
+    default: 0.02
+    min: 0.0
+    doc: Step a rising stop starts at
+  - name: acceleration_long
+    type: float
+    default: 0.02
+    min: 0.0
+    doc: How much a rising stop's step grows at each new high
+  - name: acceleration_max_long
+    type: float
+    default: 0.2
+    min: 0.0
+    doc: Largest step a rising stop reaches
+  - name: acceleration_init_short
+    type: float
+    default: 0.02
+    min: 0.0
+    doc: Step a falling stop starts at
+  - name: acceleration_short
+    type: float
+    default: 0.02
+    min: 0.0
+    doc: How much a falling stop's step grows at each new low
+  - name: acceleration_max_short
+    type: float
+    default: 0.2
+    min: 0.0
+    doc: Largest step a falling stop reaches
+outputs:
+  - name: sarext
+    dtype: float64
+    plot: line
+    doc: The stop, signed negative while it sits above price
+talib:
+  name: SAREXT
+  params: {start_value: startvalue, offset_on_reverse: offsetonreverse, acceleration_init_long: accelerationinitlong, acceleration_long: accelerationlong, acceleration_max_long: accelerationmaxlong, acceleration_init_short: accelerationinitshort, acceleration_short: accelerationshort, acceleration_max_short: accelerationmaxshort}
+  outputs: [real]
+references:
+  - J. Welles Wilder Jr., New Concepts in Technical Trading Systems, Trend Research, 1978
+see_also: [sar, supertrend, adx]

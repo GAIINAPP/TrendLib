@@ -166,6 +166,7 @@ pub mod rsi;
 pub mod rvi;
 pub mod rvol;
 pub mod sar;
+pub mod sarext;
 pub mod sin;
 pub mod sinh;
 pub mod sma;

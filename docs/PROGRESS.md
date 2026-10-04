@@ -2,8 +2,8 @@
 
 # Progress
 
-**198 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 6 not started.
+**199 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 5 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -16,7 +16,7 @@ something is done that is not. CI checks it is current.
 
 | Group | Shipped | Total |
 | --- | --- | --- |
-| Overlap studies | 23 | 25 |
+| Overlap studies | 24 | 25 |
 | Momentum | 47 | 47 |
 | Volatility | 7 | 7 |
 | Volume | 11 | 12 |
@@ -28,7 +28,7 @@ something is done that is not. CI checks it is current.
 | Candlestick patterns | 61 | 61 |
 | Levels | 0 | 3 |
 
-## Overlap studies (23 of 25)
+## Overlap studies (24 of 25)
 
 - [x] `accbands` (`ACCBANDS`) -- Acceleration Bands
 - [x] `bbands` (`BBANDS`) -- Bollinger Bands *
@@ -46,7 +46,7 @@ something is done that is not. CI checks it is current.
 - [x] `midprice` (`MIDPRICE`) -- Midprice
 - [x] `rma` (`RMA`) -- Wilder Smoothed Moving Average
 - [x] `sar` (`SAR`) -- Parabolic SAR
-- [ ] `sarext` (`SAREXT`)
+- [x] `sarext` (`SAREXT`) -- Parabolic SAR Extended
 - [x] `sma` (`SMA`) -- Simple Moving Average *
 - [x] `supertrend` (`SUPERTREND`) -- Supertrend *
 - [x] `t3` (`T3`) -- Tillson T3

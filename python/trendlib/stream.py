@@ -180,6 +180,7 @@ __all__ = [
     "rvi",
     "rvol",
     "sar",
+    "sarext",
     "sin",
     "sinh",
     "sma",
@@ -2096,6 +2097,19 @@ sar = Factory(
         "low",
     ),
     ("sar",),
+)
+sarext = Factory(
+    "sarext",
+    _core.SarextStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("sarext",),
 )
 sin = Factory("sin", _core.SinStream, ("source",), ("series",), ("sin",))
 sinh = Factory("sinh", _core.SinhStream, ("source",), ("series",), ("sinh",))
