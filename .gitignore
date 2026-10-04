@@ -223,8 +223,10 @@ __marimo__/
 /target/
 **/*.rs.bk
 
-# The compiled extension module, dropped in place by `maturin develop`
+# The compiled extension module, dropped in place by `maturin develop`.
+# The type stub beside it has the same stem but is generated and committed.
 /python/trendlib/_core.*
+!/python/trendlib/_core.pyi
 
 # MkDocs output (M5)
 /site/
