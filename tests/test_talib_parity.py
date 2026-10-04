@@ -77,7 +77,20 @@ ORACLE_IS_LOOSER_NEAR_ZERO = {"stoch": 2e-10, "stochf": 2e-10, "stochrsi": 2e-10
 # ten. The bound is the two added, and the Rust edge-case suite pins the two
 # properties cancellation cannot touch: equal periods give exactly zero, and
 # swapping the periods gives the same bits.
-CANCELS = {"apo": 2e-9, "ppo": 2e-9}
+#
+# The fitted slope is the same shape of problem: a difference of two sums of
+# the same size, where almost every digit cancels. Measured against exact
+# arithmetic over the committed dataset at the default period TrendLib's worst
+# relative error is 2.8e-11 against ta-lib-python's 8.9e-10, and at the minimum
+# period 2.8e-10 against 8.0e-8; TrendLib is the closer of the two on 1896 and
+# 1911 rows respectively. The edge-case suite fits a line to a series that
+# already is one and pins that TrendLib reproduces it bit for bit.
+CANCELS = {
+    "apo": 2e-9,
+    "ppo": 2e-9,
+    "linearreg_slope": 2e-7,
+    "linearreg_angle": 2e-7,
+}
 
 # SMA is pure addition, subtraction and one division, so there is no
 # multiply-add for a compiler to contract and TrendLib reproduces TA-Lib

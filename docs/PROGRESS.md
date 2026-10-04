@@ -2,8 +2,8 @@
 
 # Progress
 
-**75 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 129 not started.
+**80 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 124 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -22,7 +22,7 @@ something is done that is not. CI checks it is current.
 | Volume | 2 | 12 |
 | Price transforms | 5 | 6 |
 | Cycle | 0 | 5 |
-| Statistics | 2 | 11 |
+| Statistics | 7 | 11 |
 | Math transforms | 15 | 15 |
 | Math operators | 12 | 12 |
 | Candlestick patterns | 0 | 61 |
@@ -148,18 +148,18 @@ something is done that is not. CI checks it is current.
 - [ ] `ht_sine` (`HT_SINE`)
 - [ ] `ht_trendmode` (`HT_TRENDMODE`)
 
-## Statistics (2 of 11)
+## Statistics (7 of 11)
 
 - [ ] `beta` (`BETA`)
 - [ ] `correl` (`CORREL`)
-- [ ] `linearreg` (`LINEARREG`)
-- [ ] `linearreg_angle` (`LINEARREG_ANGLE`)
-- [ ] `linearreg_intercept` (`LINEARREG_INTERCEPT`)
-- [ ] `linearreg_slope` (`LINEARREG_SLOPE`)
+- [x] `linearreg` (`LINEARREG`) -- Linear Regression
+- [x] `linearreg_angle` (`LINEARREG_ANGLE`) -- Linear Regression Angle
+- [x] `linearreg_intercept` (`LINEARREG_INTERCEPT`) -- Linear Regression Intercept
+- [x] `linearreg_slope` (`LINEARREG_SLOPE`) -- Linear Regression Slope
 - [ ] `percentile` (`PERCENTILE`)
 - [ ] `percentrank` (`PERCENTRANK`)
 - [x] `stddev` (`STDDEV`) -- Standard Deviation
-- [ ] `tsf` (`TSF`)
+- [x] `tsf` (`TSF`) -- Time Series Forecast
 - [x] `var` (`VAR`) -- Variance
 
 ## Math transforms (15 of 15)

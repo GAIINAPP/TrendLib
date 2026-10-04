@@ -41,6 +41,10 @@ __all__ = [
     "ema",
     "exp",
     "floor",
+    "linearreg",
+    "linearreg_angle",
+    "linearreg_intercept",
+    "linearreg_slope",
     "ln",
     "log10",
     "ma",
@@ -84,6 +88,7 @@ __all__ = [
     "tema",
     "trange",
     "trima",
+    "tsf",
     "typprice",
     "var",
     "wclprice",
@@ -297,6 +302,20 @@ dx = Factory(
 ema = Factory("ema", _core.EmaStream, ("source",), ("series",), ("ema",))
 exp = Factory("exp", _core.ExpStream, ("source",), ("series",), ("exp",))
 floor = Factory("floor", _core.FloorStream, ("source",), ("series",), ("floor",))
+linearreg = Factory("linearreg", _core.LinearregStream, ("source",), ("series",), ("linearreg",))
+linearreg_angle = Factory(
+    "linearreg_angle", _core.LinearregAngleStream, ("source",), ("series",), ("linearreg_angle",)
+)
+linearreg_intercept = Factory(
+    "linearreg_intercept",
+    _core.LinearregInterceptStream,
+    ("source",),
+    ("series",),
+    ("linearreg_intercept",),
+)
+linearreg_slope = Factory(
+    "linearreg_slope", _core.LinearregSlopeStream, ("source",), ("series",), ("linearreg_slope",)
+)
 ln = Factory("ln", _core.LnStream, ("source",), ("series",), ("ln",))
 log10 = Factory("log10", _core.Log10Stream, ("source",), ("series",), ("log10",))
 ma = Factory("ma", _core.MaStream, ("source",), ("series",), ("ma",))
@@ -551,6 +570,7 @@ trange = Factory(
     ("trange",),
 )
 trima = Factory("trima", _core.TrimaStream, ("source",), ("series",), ("trima",))
+tsf = Factory("tsf", _core.TsfStream, ("source",), ("series",), ("tsf",))
 typprice = Factory(
     "typprice",
     _core.TyppriceStream,

@@ -1,0 +1,25 @@
+name: linearreg_intercept
+title: Linear Regression Intercept
+group: statistic
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 2
+    max: 100000
+    doc: Number of bars the line is fitted to
+outputs:
+  - name: linearreg_intercept
+    dtype: float64
+    plot: line
+    doc: Value of the fitted line at the oldest bar in the window
+talib:
+  name: LINEARREG_INTERCEPT
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - TA-Lib, ta_LINEARREG.c, least squares fit over a rolling window
+see_also: [linearreg, linearreg_slope, tsf]

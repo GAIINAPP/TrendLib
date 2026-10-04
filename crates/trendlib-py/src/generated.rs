@@ -3270,6 +3270,465 @@ impl PyFloorStream {
 }
 
 #[pyfunction]
+#[pyo3(name = "linearreg", signature = (source, *, period))]
+pub fn linearreg<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+    period: i64,
+) -> PyResult<Bound<'py, PyArray1<f64>>> {
+    let source = as_slice(&source, "source")?;
+    let period =
+        int_param("linearreg", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::linearreg::Params { period };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::linearreg::Linearreg as Kernel<1, 1>>::batch([source], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok(std::mem::take(&mut out[0]).into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "LinearregStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyLinearregStream {
+    inner: BarStream<trendlib::indicators::linearreg::Linearreg, 1, 1>,
+}
+
+#[pymethods]
+impl PyLinearregStream {
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("linearreg", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::linearreg::Params { period };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::linearreg::Linearreg, 1, 1> as Stream>::open(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("linearreg", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::linearreg::Params { period };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::linearreg::Linearreg as Kernel<1, 1>>::open_and_fill(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            std::mem::take(&mut out[0]).into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(&mut self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(&self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value().map(|row| row[0])
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "linearreg"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream linearreg bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "linearreg_angle", signature = (source, *, period))]
+pub fn linearreg_angle<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+    period: i64,
+) -> PyResult<Bound<'py, PyArray1<f64>>> {
+    let source = as_slice(&source, "source")?;
+    let period =
+        int_param("linearreg_angle", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::linearreg_angle::Params { period };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::linearreg_angle::LinearregAngle as Kernel<1, 1>>::batch(
+                [source],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok(std::mem::take(&mut out[0]).into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "LinearregAngleStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyLinearregAngleStream {
+    inner: BarStream<trendlib::indicators::linearreg_angle::LinearregAngle, 1, 1>,
+}
+
+#[pymethods]
+impl PyLinearregAngleStream {
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let period = int_param("linearreg_angle", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::linearreg_angle::Params { period };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::linearreg_angle::LinearregAngle, 1, 1> as Stream>::open([source], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
+        let source = as_slice(&source, "source")?;
+        let period = int_param("linearreg_angle", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::linearreg_angle::Params { period };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::linearreg_angle::LinearregAngle as Kernel<1, 1>>::open_and_fill([source], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            std::mem::take(&mut out[0]).into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(&mut self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(&self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value().map(|row| row[0])
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "linearreg_angle"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream linearreg_angle bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "linearreg_intercept", signature = (source, *, period))]
+pub fn linearreg_intercept<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+    period: i64,
+) -> PyResult<Bound<'py, PyArray1<f64>>> {
+    let source = as_slice(&source, "source")?;
+    let period = int_param("linearreg_intercept", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::linearreg_intercept::Params { period };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::linearreg_intercept::LinearregIntercept as Kernel<1, 1>>::batch(
+                [source],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok(std::mem::take(&mut out[0]).into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "LinearregInterceptStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyLinearregInterceptStream {
+    inner: BarStream<trendlib::indicators::linearreg_intercept::LinearregIntercept, 1, 1>,
+}
+
+#[pymethods]
+impl PyLinearregInterceptStream {
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let period = int_param("linearreg_intercept", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::linearreg_intercept::Params { period };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::linearreg_intercept::LinearregIntercept, 1, 1> as Stream>::open([source], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
+        let source = as_slice(&source, "source")?;
+        let period = int_param("linearreg_intercept", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::linearreg_intercept::Params { period };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::linearreg_intercept::LinearregIntercept as Kernel<1, 1>>::open_and_fill([source], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            std::mem::take(&mut out[0]).into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(&mut self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(&self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value().map(|row| row[0])
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "linearreg_intercept"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream linearreg_intercept bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "linearreg_slope", signature = (source, *, period))]
+pub fn linearreg_slope<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+    period: i64,
+) -> PyResult<Bound<'py, PyArray1<f64>>> {
+    let source = as_slice(&source, "source")?;
+    let period =
+        int_param("linearreg_slope", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::linearreg_slope::Params { period };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::linearreg_slope::LinearregSlope as Kernel<1, 1>>::batch(
+                [source],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok(std::mem::take(&mut out[0]).into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "LinearregSlopeStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyLinearregSlopeStream {
+    inner: BarStream<trendlib::indicators::linearreg_slope::LinearregSlope, 1, 1>,
+}
+
+#[pymethods]
+impl PyLinearregSlopeStream {
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let period = int_param("linearreg_slope", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::linearreg_slope::Params { period };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::linearreg_slope::LinearregSlope, 1, 1> as Stream>::open([source], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
+        let source = as_slice(&source, "source")?;
+        let period = int_param("linearreg_slope", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::linearreg_slope::Params { period };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::linearreg_slope::LinearregSlope as Kernel<1, 1>>::open_and_fill([source], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            std::mem::take(&mut out[0]).into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(&mut self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(&self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value().map(|row| row[0])
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "linearreg_slope"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream linearreg_slope bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
 #[pyo3(name = "ln", signature = (source))]
 pub fn ln<'py>(
     py: Python<'py>,
@@ -8480,6 +8939,113 @@ impl PyTrimaStream {
 }
 
 #[pyfunction]
+#[pyo3(name = "tsf", signature = (source, *, period))]
+pub fn tsf<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+    period: i64,
+) -> PyResult<Bound<'py, PyArray1<f64>>> {
+    let source = as_slice(&source, "source")?;
+    let period = int_param("tsf", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::tsf::Params { period };
+    let out = py
+        .detach(|| <trendlib::indicators::tsf::Tsf as Kernel<1, 1>>::batch([source], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok(std::mem::take(&mut out[0]).into_pyarray(py))
+}
+
+#[pyclass(module = "trendlib._core", name = "TsfStream", skip_from_py_object)]
+#[derive(Clone, Debug)]
+pub struct PyTsfStream {
+    inner: BarStream<trendlib::indicators::tsf::Tsf, 1, 1>,
+}
+
+#[pymethods]
+impl PyTsfStream {
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("tsf", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::tsf::Params { period };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::tsf::Tsf, 1, 1> as Stream>::open([source], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("tsf", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::tsf::Params { period };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::tsf::Tsf as Kernel<1, 1>>::open_and_fill([source], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            std::mem::take(&mut out[0]).into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(&mut self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(&self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value().map(|row| row[0])
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "tsf"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream tsf bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
 #[pyo3(name = "typprice", signature = (high, low, close))]
 pub fn typprice<'py>(
     py: Python<'py>,
@@ -9127,6 +9693,10 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(ema, m)?)?;
     m.add_function(wrap_pyfunction!(exp, m)?)?;
     m.add_function(wrap_pyfunction!(floor, m)?)?;
+    m.add_function(wrap_pyfunction!(linearreg, m)?)?;
+    m.add_function(wrap_pyfunction!(linearreg_angle, m)?)?;
+    m.add_function(wrap_pyfunction!(linearreg_intercept, m)?)?;
+    m.add_function(wrap_pyfunction!(linearreg_slope, m)?)?;
     m.add_function(wrap_pyfunction!(ln, m)?)?;
     m.add_function(wrap_pyfunction!(log10, m)?)?;
     m.add_function(wrap_pyfunction!(ma, m)?)?;
@@ -9170,6 +9740,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(tema, m)?)?;
     m.add_function(wrap_pyfunction!(trange, m)?)?;
     m.add_function(wrap_pyfunction!(trima, m)?)?;
+    m.add_function(wrap_pyfunction!(tsf, m)?)?;
     m.add_function(wrap_pyfunction!(typprice, m)?)?;
     m.add_function(wrap_pyfunction!(var, m)?)?;
     m.add_function(wrap_pyfunction!(wclprice, m)?)?;
@@ -9202,6 +9773,10 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyEmaStream>()?;
     m.add_class::<PyExpStream>()?;
     m.add_class::<PyFloorStream>()?;
+    m.add_class::<PyLinearregStream>()?;
+    m.add_class::<PyLinearregAngleStream>()?;
+    m.add_class::<PyLinearregInterceptStream>()?;
+    m.add_class::<PyLinearregSlopeStream>()?;
     m.add_class::<PyLnStream>()?;
     m.add_class::<PyLog10Stream>()?;
     m.add_class::<PyMaStream>()?;
@@ -9245,6 +9820,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyTemaStream>()?;
     m.add_class::<PyTrangeStream>()?;
     m.add_class::<PyTrimaStream>()?;
+    m.add_class::<PyTsfStream>()?;
     m.add_class::<PyTyppriceStream>()?;
     m.add_class::<PyVarStream>()?;
     m.add_class::<PyWclpriceStream>()?;
@@ -9525,6 +10101,54 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     {
         let params = PyDict::new(py);
         table.set_item("floor", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 14)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        table.set_item("linearreg", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 14)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        table.set_item("linearreg_angle", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 14)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        table.set_item("linearreg_intercept", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 14)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        table.set_item("linearreg_slope", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -10104,6 +10728,18 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     }
     {
         let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 14)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        table.set_item("tsf", params)?;
+    }
+    {
+        let params = PyDict::new(py);
         table.set_item("typprice", params)?;
     }
     {
@@ -10187,6 +10823,10 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("ema", vec!["source"])?;
     table.set_item("exp", vec!["source"])?;
     table.set_item("floor", vec!["source"])?;
+    table.set_item("linearreg", vec!["source"])?;
+    table.set_item("linearreg_angle", vec!["source"])?;
+    table.set_item("linearreg_intercept", vec!["source"])?;
+    table.set_item("linearreg_slope", vec!["source"])?;
     table.set_item("ln", vec!["source"])?;
     table.set_item("log10", vec!["source"])?;
     table.set_item("ma", vec!["source"])?;
@@ -10230,6 +10870,7 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("tema", vec!["source"])?;
     table.set_item("trange", vec!["high", "low", "close"])?;
     table.set_item("trima", vec!["source"])?;
+    table.set_item("tsf", vec!["source"])?;
     table.set_item("typprice", vec!["high", "low", "close"])?;
     table.set_item("var", vec!["source"])?;
     table.set_item("wclprice", vec!["high", "low", "close"])?;
@@ -10271,6 +10912,10 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("ema", vec!["ema"])?;
     table.set_item("exp", vec!["exp"])?;
     table.set_item("floor", vec!["floor"])?;
+    table.set_item("linearreg", vec!["linearreg"])?;
+    table.set_item("linearreg_angle", vec!["linearreg_angle"])?;
+    table.set_item("linearreg_intercept", vec!["linearreg_intercept"])?;
+    table.set_item("linearreg_slope", vec!["linearreg_slope"])?;
     table.set_item("ln", vec!["ln"])?;
     table.set_item("log10", vec!["log10"])?;
     table.set_item("ma", vec!["ma"])?;
@@ -10317,6 +10962,7 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("tema", vec!["tema"])?;
     table.set_item("trange", vec!["trange"])?;
     table.set_item("trima", vec!["trima"])?;
+    table.set_item("tsf", vec!["tsf"])?;
     table.set_item("typprice", vec!["typprice"])?;
     table.set_item("var", vec!["var"])?;
     table.set_item("wclprice", vec!["wclprice"])?;
@@ -10355,6 +11001,10 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("ema", vec!["float64"])?;
     table.set_item("exp", vec!["float64"])?;
     table.set_item("floor", vec!["float64"])?;
+    table.set_item("linearreg", vec!["float64"])?;
+    table.set_item("linearreg_angle", vec!["float64"])?;
+    table.set_item("linearreg_intercept", vec!["float64"])?;
+    table.set_item("linearreg_slope", vec!["float64"])?;
     table.set_item("ln", vec!["float64"])?;
     table.set_item("log10", vec!["float64"])?;
     table.set_item("ma", vec!["float64"])?;
@@ -10398,6 +11048,7 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("tema", vec!["float64"])?;
     table.set_item("trange", vec!["float64"])?;
     table.set_item("trima", vec!["float64"])?;
+    table.set_item("tsf", vec!["float64"])?;
     table.set_item("typprice", vec!["float64"])?;
     table.set_item("var", vec!["float64"])?;
     table.set_item("wclprice", vec!["float64"])?;
@@ -10436,6 +11087,10 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("ema", vec!["overlap", "unstable"])?;
     table.set_item("exp", vec!["nan_inf_output"])?;
     table.set_item("floor", vec!["nan_inf_output"])?;
+    table.set_item("linearreg", Vec::<&str>::new())?;
+    table.set_item("linearreg_angle", Vec::<&str>::new())?;
+    table.set_item("linearreg_intercept", Vec::<&str>::new())?;
+    table.set_item("linearreg_slope", Vec::<&str>::new())?;
     table.set_item("ln", vec!["nan_inf_output"])?;
     table.set_item("log10", vec!["nan_inf_output"])?;
     table.set_item("ma", vec!["overlap"])?;
@@ -10479,6 +11134,7 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("tema", vec!["overlap", "unstable"])?;
     table.set_item("trange", Vec::<&str>::new())?;
     table.set_item("trima", vec!["overlap"])?;
+    table.set_item("tsf", Vec::<&str>::new())?;
     table.set_item("typprice", vec!["overlap"])?;
     table.set_item("var", vec!["nan_inf_output"])?;
     table.set_item("wclprice", vec!["overlap"])?;
@@ -10517,6 +11173,10 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("ema", "overlap")?;
     table.set_item("exp", "math")?;
     table.set_item("floor", "math")?;
+    table.set_item("linearreg", "statistic")?;
+    table.set_item("linearreg_angle", "statistic")?;
+    table.set_item("linearreg_intercept", "statistic")?;
+    table.set_item("linearreg_slope", "statistic")?;
     table.set_item("ln", "math")?;
     table.set_item("log10", "math")?;
     table.set_item("ma", "overlap")?;
@@ -10560,6 +11220,7 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("tema", "overlap")?;
     table.set_item("trange", "volatility")?;
     table.set_item("trima", "overlap")?;
+    table.set_item("tsf", "statistic")?;
     table.set_item("typprice", "price")?;
     table.set_item("var", "statistic")?;
     table.set_item("wclprice", "price")?;
@@ -10829,6 +11490,51 @@ pub fn lookback_of(
                 &trendlib::indicators::floor::Params {},
             ),
         ),
+        "linearreg" => {
+            let period = match get("period")? {
+                Some(value) => int_param("linearreg", "period", value, 2, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 14,
+            };
+            Ok(<trendlib::indicators::linearreg::Linearreg as Kernel<
+                1,
+                1,
+            >>::lookback(
+                &trendlib::indicators::linearreg::Params { period },
+            ))
+        }
+        "linearreg_angle" => {
+            let period = match get("period")? {
+                Some(value) => int_param("linearreg_angle", "period", value, 2, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 14,
+            };
+            Ok(
+                <trendlib::indicators::linearreg_angle::LinearregAngle as Kernel<1, 1>>::lookback(
+                    &trendlib::indicators::linearreg_angle::Params { period },
+                ),
+            )
+        }
+        "linearreg_intercept" => {
+            let period = match get("period")? {
+                Some(value) => int_param("linearreg_intercept", "period", value, 2, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 14,
+            };
+            Ok(<trendlib::indicators::linearreg_intercept::LinearregIntercept as Kernel<1, 1>>::lookback(&trendlib::indicators::linearreg_intercept::Params { period, }))
+        }
+        "linearreg_slope" => {
+            let period = match get("period")? {
+                Some(value) => int_param("linearreg_slope", "period", value, 2, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 14,
+            };
+            Ok(
+                <trendlib::indicators::linearreg_slope::LinearregSlope as Kernel<1, 1>>::lookback(
+                    &trendlib::indicators::linearreg_slope::Params { period },
+                ),
+            )
+        }
         "ln" => Ok(<trendlib::indicators::ln::Ln as Kernel<1, 1>>::lookback(
             &trendlib::indicators::ln::Params {},
         )),
@@ -11363,6 +12069,17 @@ pub fn lookback_of(
                     &trendlib::indicators::trima::Params { period },
                 ),
             )
+        }
+        "tsf" => {
+            let period = match get("period")? {
+                Some(value) => {
+                    int_param("tsf", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?
+                }
+                None => 14,
+            };
+            Ok(<trendlib::indicators::tsf::Tsf as Kernel<1, 1>>::lookback(
+                &trendlib::indicators::tsf::Params { period },
+            ))
         }
         "typprice" => Ok(
             <trendlib::indicators::typprice::Typprice as Kernel<3, 1>>::lookback(

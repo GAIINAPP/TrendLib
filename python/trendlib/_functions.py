@@ -40,6 +40,10 @@ __all__ = [
     "EMA",
     "EXP",
     "FLOOR",
+    "LINEARREG",
+    "LINEARREG_ANGLE",
+    "LINEARREG_INTERCEPT",
+    "LINEARREG_SLOPE",
     "LN",
     "LOG10",
     "MA",
@@ -83,6 +87,7 @@ __all__ = [
     "TEMA",
     "TRANGE",
     "TRIMA",
+    "TSF",
     "TYPPRICE",
     "VAR",
     "WCLPRICE",
@@ -115,6 +120,10 @@ __all__ = [
     "ema",
     "exp",
     "floor",
+    "linearreg",
+    "linearreg_angle",
+    "linearreg_intercept",
+    "linearreg_slope",
     "ln",
     "log10",
     "lookback",
@@ -159,6 +168,7 @@ __all__ = [
     "tema",
     "trange",
     "trima",
+    "tsf",
     "typprice",
     "var",
     "wclprice",
@@ -806,6 +816,88 @@ def floor(source=None) -> Any:
     columns, carrier = _convert.bars("floor", (source,), ("source",), ("series",))
     out = _core.floor(*columns)
     return _convert.wrap_outputs(out, carrier, ("floor",))
+
+
+def linearreg(source=None, *, period: int = _PARAMS["linearreg"]["period"]["default"]) -> Any:
+    """Linear Regression.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the line is fitted to, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Value of the fitted line at the newest bar.
+    """
+    period = _convert.as_int("linearreg", "period", period)
+    columns, carrier = _convert.bars("linearreg", (source,), ("source",), ("series",))
+    out = _core.linearreg(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("linearreg",))
+
+
+def linearreg_angle(
+    source=None, *, period: int = _PARAMS["linearreg_angle"]["period"]["default"]
+) -> Any:
+    """Linear Regression Angle.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the line is fitted to, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Slope of the fitted line as an angle in degrees.
+    """
+    period = _convert.as_int("linearreg_angle", "period", period)
+    columns, carrier = _convert.bars("linearreg_angle", (source,), ("source",), ("series",))
+    out = _core.linearreg_angle(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("linearreg_angle",))
+
+
+def linearreg_intercept(
+    source=None, *, period: int = _PARAMS["linearreg_intercept"]["period"]["default"]
+) -> Any:
+    """Linear Regression Intercept.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the line is fitted to, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Value of the fitted line at the oldest bar in the window.
+    """
+    period = _convert.as_int("linearreg_intercept", "period", period)
+    columns, carrier = _convert.bars("linearreg_intercept", (source,), ("source",), ("series",))
+    out = _core.linearreg_intercept(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("linearreg_intercept",))
+
+
+def linearreg_slope(
+    source=None, *, period: int = _PARAMS["linearreg_slope"]["period"]["default"]
+) -> Any:
+    """Linear Regression Slope.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the line is fitted to, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Slope of the fitted line, in units of source per bar.
+    """
+    period = _convert.as_int("linearreg_slope", "period", period)
+    columns, carrier = _convert.bars("linearreg_slope", (source,), ("source",), ("series",))
+    out = _core.linearreg_slope(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("linearreg_slope",))
 
 
 def ln(source=None) -> Any:
@@ -1873,6 +1965,25 @@ def trima(source=None, *, period: int = _PARAMS["trima"]["period"]["default"]) -
     return _convert.wrap_outputs(out, carrier, ("trima",))
 
 
+def tsf(source=None, *, period: int = _PARAMS["tsf"]["period"]["default"]) -> Any:
+    """Time Series Forecast.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the line is fitted to, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Fitted line carried one bar past the newest.
+    """
+    period = _convert.as_int("tsf", "period", period)
+    columns, carrier = _convert.bars("tsf", (source,), ("source",), ("series",))
+    out = _core.tsf(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("tsf",))
+
+
 def typprice(high=None, low=None, close=None) -> Any:
     """Typical Price.
 
@@ -2162,6 +2273,32 @@ def FLOOR(source) -> Any:
     return floor(source)
 
 
+def LINEARREG(source, timeperiod: int = _PARAMS["linearreg"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`linearreg`."""
+    return linearreg(source, period=timeperiod)
+
+
+def LINEARREG_ANGLE(
+    source, timeperiod: int = _PARAMS["linearreg_angle"]["period"]["default"]
+) -> Any:
+    """TA-Lib-style alias for :func:`linearreg_angle`."""
+    return linearreg_angle(source, period=timeperiod)
+
+
+def LINEARREG_INTERCEPT(
+    source, timeperiod: int = _PARAMS["linearreg_intercept"]["period"]["default"]
+) -> Any:
+    """TA-Lib-style alias for :func:`linearreg_intercept`."""
+    return linearreg_intercept(source, period=timeperiod)
+
+
+def LINEARREG_SLOPE(
+    source, timeperiod: int = _PARAMS["linearreg_slope"]["period"]["default"]
+) -> Any:
+    """TA-Lib-style alias for :func:`linearreg_slope`."""
+    return linearreg_slope(source, period=timeperiod)
+
+
 def LN(source) -> Any:
     """TA-Lib-style alias for :func:`ln`."""
     return ln(source)
@@ -2437,6 +2574,11 @@ def TRANGE(high, low, close) -> Any:
 def TRIMA(source, timeperiod: int = _PARAMS["trima"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`trima`."""
     return trima(source, period=timeperiod)
+
+
+def TSF(source, timeperiod: int = _PARAMS["tsf"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`tsf`."""
+    return tsf(source, period=timeperiod)
 
 
 def TYPPRICE(high, low, close) -> Any:

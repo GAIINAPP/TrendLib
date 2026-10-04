@@ -1,0 +1,25 @@
+name: linearreg_angle
+title: Linear Regression Angle
+group: statistic
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 2
+    max: 100000
+    doc: Number of bars the line is fitted to
+outputs:
+  - name: linearreg_angle
+    dtype: float64
+    plot: line
+    doc: Slope of the fitted line as an angle in degrees
+talib:
+  name: LINEARREG_ANGLE
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - TA-Lib, ta_LINEARREG.c, least squares fit over a rolling window
+see_also: [linearreg, linearreg_slope, tsf]

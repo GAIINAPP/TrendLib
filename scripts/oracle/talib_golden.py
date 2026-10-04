@@ -33,6 +33,22 @@ TOLERANCE = "rel=1e-10 abs=1e-12"
 # default tolerance would be measuring TA-Lib's error rather than ours.
 # `docs/SPEC_FORMAT.md` section 4 allows a looser per-file tolerance with a
 # written reason; the reason goes in the header beside it.
+SLOPE_CANCELS = (
+    "the fitted slope is the difference of two sums of the same size, so almost every digit "
+    "cancels; measured against exact arithmetic over this dataset at the default period "
+    "TrendLib's worst relative error is 2.8e-11 and ta-lib-python's is 8.9e-10, and TrendLib "
+    "is the closer of the two on 1896 rows to 45, so the looser bound covers the oracle's own "
+    "error rather than TrendLib's"
+)
+
+SLOPE_CANCELS_AT_TWO = (
+    "over two bars the fitted slope is the difference between them and nothing else survives "
+    "the cancellation; measured against exact arithmetic over this dataset TrendLib's worst "
+    "relative error is 2.8e-10 and ta-lib-python's is 8.0e-8, with TrendLib the closer of the "
+    "two on 1911 rows to 9, so the looser bound covers the oracle's own error rather than "
+    "TrendLib's"
+)
+
 TRIMA_RESIDUE = (
     "%K swings between 0 and 100 and back, and a triangular average carries that swing in two "
     "running sums whose residue never cancels; measured against exact arithmetic over this "
@@ -53,6 +69,8 @@ CASE_TOLERANCE = {
     ("stoch", "slowk_ma_type_trima"): ("rel=1e-8 abs=2e-10", TRIMA_RESIDUE),
     ("stoch", "slowd_ma_type_trima"): ("rel=1e-8 abs=2e-10", TRIMA_RESIDUE),
     ("stochrsi", "fastd_ma_type_trima"): ("rel=1e-8 abs=2e-10", TRIMA_RESIDUE),
+    ("linearreg_slope", "min_period"): ("rel=2e-7 abs=1e-12", SLOPE_CANCELS_AT_TWO),
+    ("linearreg_angle", "min_period"): ("rel=2e-7 abs=1e-12", SLOPE_CANCELS_AT_TWO),
 }
 
 # Which committed dataset a case reads. Session-anchored indicators need the
@@ -78,6 +96,8 @@ CANCELLATION = (
 INDICATOR_TOLERANCE = {
     "apo": ("rel=2e-9 abs=1e-12", CANCELLATION),
     "ppo": ("rel=2e-9 abs=1e-12", CANCELLATION),
+    "linearreg_slope": ("rel=2e-9 abs=1e-12", SLOPE_CANCELS),
+    "linearreg_angle": ("rel=2e-9 abs=1e-12", SLOPE_CANCELS),
 }
 
 

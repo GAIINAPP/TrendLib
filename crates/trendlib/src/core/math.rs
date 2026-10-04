@@ -820,6 +820,88 @@ impl Stochastic {
     }
 }
 
+/// A least squares line fitted to the last `period` values.
+///
+/// The x axis runs backwards, `period - 1` at the oldest bar down to 0 at the
+/// newest, and the divisor is negated to match. That is how TA-Lib arranges
+/// it; the two signs cancel, so the slope is the ordinary one.
+#[derive(Clone, Debug)]
+pub struct LinearRegression {
+    window: RollingWindow,
+    sum_x: f64,
+    divisor: f64,
+}
+
+/// The line fitted over one window.
+#[derive(Clone, Copy, Debug)]
+pub struct Fit {
+    pub slope: f64,
+    pub intercept: f64,
+    period: f64,
+}
+
+impl Fit {
+    /// The fitted value at the newest bar in the window.
+    pub fn at_last_bar(self) -> f64 {
+        self.intercept + self.slope * (self.period - 1.0)
+    }
+
+    /// The line carried one bar past the newest.
+    pub fn one_bar_ahead(self) -> f64 {
+        self.intercept + self.slope * self.period
+    }
+
+    /// The slope as an angle in degrees.
+    pub fn angle(self) -> f64 {
+        self.slope.atan() * (180.0 / std::f64::consts::PI)
+    }
+}
+
+impl LinearRegression {
+    pub fn new(period: usize) -> Self {
+        let n = period as u64;
+        let sum_x = (n * (n - 1)) as f64 * 0.5;
+        // Always divisible by 6, so integer division loses nothing.
+        let sum_xx = (n * (n - 1) * (2 * n - 1) / 6) as f64;
+        Self {
+            window: RollingWindow::new(period),
+            sum_x,
+            divisor: sum_x * sum_x - period as f64 * sum_xx,
+        }
+    }
+
+    pub fn push(&mut self, value: f64) -> Option<Fit> {
+        if !self.window.push(value) {
+            return None;
+        }
+        Some(self.fit(self.window.values()))
+    }
+
+    pub fn preview(&self, value: f64) -> Option<Fit> {
+        if !self.window.preview_is_full() {
+            return None;
+        }
+        Some(self.fit(self.window.preview_values(value)))
+    }
+
+    fn fit(&self, values: impl Iterator<Item = f64>) -> Fit {
+        let period = self.window.period();
+        let n = period as f64;
+        let mut sum_y = 0.0;
+        let mut sum_xy = 0.0;
+        for (offset, value) in values.enumerate() {
+            sum_y += value;
+            sum_xy += (period - 1 - offset) as f64 * value;
+        }
+        let slope = (n * sum_xy - self.sum_x * sum_y) / self.divisor;
+        Fit {
+            slope,
+            intercept: (sum_y - slope * self.sum_x) / n,
+            period: n,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::{

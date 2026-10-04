@@ -393,6 +393,62 @@ fn var_of_two_bars_is_the_square_of_half_their_difference() {
     }
 }
 
+/// `linearreg_slope` and `linearreg_angle` carry a looser golden tolerance
+/// because the fitted slope is a difference of two sums of the same size and
+/// almost every digit cancels. Where the answer is exact TrendLib's has to be
+/// exact too, so this fits a line to a series that already is one: the slope
+/// is the step, the fit is the series and the forecast is one step past it,
+/// bit for bit at every period.
+#[test]
+fn fitting_a_line_to_a_line_reproduces_it_exactly() {
+    let series: Vec<f64> = (0..60).map(|i| 100.0 + 0.5 * i as f64).collect();
+    let expected: [(&str, fn(usize) -> f64); 4] = [
+        ("linearreg_slope", |_| 0.5),
+        ("linearreg_angle", |_| {
+            0.5f64.atan() * (180.0 / std::f64::consts::PI)
+        }),
+        ("linearreg", |row| 100.0 + 0.5 * row as f64),
+        ("tsf", |row| 100.5 + 0.5 * row as f64),
+    ];
+    for period in [2usize, 3, 14, 30] {
+        for (name, value) in expected {
+            let indicator = support::find(name).expect("registered");
+            let params = indicator.with("period", period as f64);
+            let out = (indicator.batch)(&[&series], &params).unwrap();
+            for (row, got) in out[0].iter().enumerate().skip(period - 1) {
+                assert_eq!(
+                    got.to_bits(),
+                    value(row).to_bits(),
+                    "{name}(period={period}) at row {row} is {got}, not {}",
+                    value(row)
+                );
+            }
+        }
+    }
+}
+
+/// The same bound at the minimum period, where the fitted slope is the
+/// difference between two bars and nothing else survives. The oracle reaches
+/// 8.0e-8 there; this pins where TrendLib stays.
+#[test]
+fn the_slope_over_two_bars_is_the_difference_between_them() {
+    let closes = support::daily_column("close");
+    let indicator = support::find("linearreg_slope").expect("registered");
+    let out = (indicator.batch)(&[&closes], &indicator.with("period", 2.0)).unwrap();
+
+    for row in 1..closes.len() {
+        let expected = closes[row] - closes[row - 1];
+        if expected == 0.0 {
+            continue;
+        }
+        let error = (out[0][row] - expected).abs() / expected.abs();
+        assert!(
+            error <= 1.0e-9,
+            "linearreg_slope(period=2) at row {row} is {error} away from the bar-to-bar difference"
+        );
+    }
+}
+
 /// The stochastic family carries a looser golden tolerance on its `trima`
 /// cases, on the grounds that TA-Lib's running sums keep a residue across the
 /// swing from 0 to 100 and back. That claim is only worth making if TrendLib's
