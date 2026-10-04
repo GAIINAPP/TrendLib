@@ -1,0 +1,94 @@
+name: New indicator spec
+description: Propose an indicator for TrendLib. A maintainer approves the spec before anyone implements it.
+title: "spec: <indicator name>"
+labels: ["indicator-spec"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Defaults and ranges are decided here, never during implementation
+        (`CONTRIBUTING.md`). Everything below lands verbatim in `spec.yaml`,
+        so please be exact.
+  - type: input
+    id: name
+    attributes:
+      label: Function name
+      description: lowercase snake_case; it is also the folder name
+      placeholder: keltner_channel
+    validations:
+      required: true
+  - type: input
+    id: title
+    attributes:
+      label: Title
+      description: one line, no trailing period
+      placeholder: Keltner Channel
+    validations:
+      required: true
+  - type: dropdown
+    id: group
+    attributes:
+      label: Group
+      options: [overlap, momentum, volatility, volume, levels, patterns]
+    validations:
+      required: true
+  - type: textarea
+    id: inputs
+    attributes:
+      label: Inputs
+      description: one per line, in Python positional order, using the names from `docs/INDICATORS.md` section 1
+      placeholder: |
+        high
+        low
+        close
+    validations:
+      required: true
+  - type: textarea
+    id: params
+    attributes:
+      label: Parameters
+      description: name, type, default, inclusive range, one-line doc. Keyword-only in Python.
+      placeholder: |
+        period: int, default 20, range [2, 100000] - Number of bars in the average
+        multiplier: float, default 2.0, range [0, any] - Multiples of ATR for the band width
+    validations:
+      required: true
+  - type: textarea
+    id: outputs
+    attributes:
+      label: Outputs
+      description: name, dtype (float64 or int32), plot hint, one-line doc. Names are unique across the whole catalogue.
+      placeholder: |
+        kc_upper: float64, upper_band - Middle line plus multiplier times ATR
+    validations:
+      required: true
+  - type: textarea
+    id: formula
+    attributes:
+      label: Formula
+      description: the original algebra, with no zero guards, epsilons or special cases
+    validations:
+      required: true
+  - type: textarea
+    id: oracle
+    attributes:
+      label: Which oracle can verify this?
+      description: |
+        A runnable implementation (name and version), or a published table of
+        reference values with a citable source. "I will compute it with the
+        formula above" is not an oracle (`docs/TESTING.md` section 2).
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: book, paper or original publication
+    validations:
+      required: true
+  - type: input
+    id: talib
+    attributes:
+      label: TA-Lib equivalent, if any
+      description: the TA-Lib function name and its parameter and output names, so an alias can be generated
+      placeholder: "none"

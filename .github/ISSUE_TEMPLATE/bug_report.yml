@@ -1,0 +1,36 @@
+name: Bug report
+description: A wrong number, a crash, or behaviour that contradicts the docs.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproduction
+      description: input, parameters, and the call you made
+      render: python
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected versus actual
+      description: |
+        If this is a wrong number, say where the expected value comes from:
+        which library and version, which chart, or which published table.
+        "Another tool shows something else" is a useful report; say which tool.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: TrendLib version
+      description: output of `python -c "import trendlib; print(trendlib.__version__)"`
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: OS and Python version
+      placeholder: "Ubuntu 24.04, Python 3.12"
+    validations:
+      required: true
