@@ -10,9 +10,10 @@ check passes, or a human accepts the listed exceptions.
 | M1 | First indicators end to end | SMA, EMA, RSI with batch, stream, Python, golden + parity + edge tests |
 | M2 | Code generator | Specs drive registry, bindings, wrappers, stubs, docs, generated tests |
 | M3 | Packaging + TestPyPI | Wheels for all platforms published by CI; `0.1.0a1` on PyPI |
-| M4 | v0.1 indicator set | All 27 functions in `INDICATORS.md` § 2 |
+| M4 | Core indicator set | The 27 functions in `INDICATORS.md` § 2.1 |
 | M5 | Public 0.1.0 | Docs site, README, notebooks, release |
-| M6 | v1.0 | Backlog, calendar, crates.io, API freeze |
+| M6 | Full TA-Lib parity | The remaining 174 functions in `INDICATORS_TALIB.md` |
+| M7 | v1.0 | Beyond-TA-Lib list, NSE/BSE calendar, crates.io, API freeze |
 
 ---
 
@@ -123,12 +124,20 @@ Acceptance:
 - [ ] sdist installs from source with only Rust and Python present.
 - [ ] After human approval: `0.1.0a1` on PyPI and `pip install --pre trendlib` works.
 
-## M4 — v0.1 indicator set
+## M4 — Core indicator set
+
+The 27 functions in `INDICATORS.md` § 2.1. They are not an arbitrary 27: between
+them they are the first to exercise every shape the generator and the test
+harness have to handle — multi-input (`atr`), multi-output (`bbands`, `macd`),
+an enum parameter (`bbands`), an int32 output (`cdl_*`), path dependence
+(`supertrend`, `obv`), timestamps and sessions (`vwap`), and an oracle that has
+to be transcribed by a human (`cpr`, the pivots). Anything that breaks on the
+other 174 functions should break here first, on a set small enough to debug.
 
 Tasks:
 
-- [ ] The remaining 24 functions in `INDICATORS.md` § 2, in the order of § 4, one
-      PR-sized commit series each, using the `new-indicator` skill.
+- [ ] The remaining 24 functions, in the order of `INDICATORS.md` § 4 stage 1,
+      one PR-sized commit series each, using the `new-indicator` skill.
 - [ ] `time/` support for `vwap` (`CONVENTIONS.md` § 7), timestamp conversion in
       `_convert.py`.
 - [ ] Benchmarks (`TESTING.md` § 8) and the nightly workflow.
@@ -141,6 +150,9 @@ Acceptance:
 - [ ] TA-Lib parity property tests pass for all T-oracle functions.
 - [ ] No shared indicator slower than 1.5× TA-Lib in the benchmark table, or each
       exception listed with a reason.
+- [ ] Adding one of the 174 remaining functions needs no change outside its own
+      folder and the generated files. Demonstrate on one function from a group
+      M4 did not touch, in a scratch branch.
 
 ## M5 — Public 0.1.0
 
@@ -159,9 +171,42 @@ Acceptance:
 - [ ] Docs site live; every page builds with `--strict`.
 - [ ] Notebooks execute top to bottom in CI.
 
-## M6 — v1.0
+## M6 — Full TA-Lib parity
 
-Scope: the backlog in `INDICATORS.md` § 5 as approved, NSE/BSE trading calendar
-(F13), per-call candle settings, Q2 decision, crates.io publish, public API frozen
-in `api/public_api.txt`. Plan this milestone with a human before starting; split
-it into numbered sub-milestones in this file first.
+Every remaining function in `INDICATORS_TALIB.md`: 201 from the catalogue minus
+the 24 that M4 already shipped, in the order of `INDICATORS.md` § 4 stage 2.
+Released incrementally as 0.2, 0.3 and so on, a group at a time, rather than as
+one long branch.
+
+This milestone is only tractable because M2 generates the registry, bindings,
+wrappers, stubs, docs pages and the parity and edge-case suites. The work per
+function is `spec.yaml`, `mod.rs`, `doc.md` and golden data from the oracle;
+everything else is generated. If that stops being true, stop and fix the
+generator rather than hand-writing the difference.
+
+Tasks:
+
+- [ ] Shared kernels before the functions that use them: the MA dispatch table,
+      the candle-settings kernel for the 58 remaining patterns, and the
+      Hilbert-transform kernel for the cycle group.
+- [ ] Each group from `INDICATORS.md` § 4 stage 2, with its own release.
+- [ ] Benchmarks extended to every shared indicator (`TESTING.md` § 8).
+
+Acceptance:
+
+- [ ] `tl.registry.names()` lists all 204 functions, and every one has
+      `spec.yaml`, `mod.rs`, `doc.md`, golden files and passes the golden,
+      parity and edge-case suites.
+- [ ] For every function with a `talib:` block, the property-based parity suite
+      passes and `tl.lookback(...)` equals TA-Lib's lookback.
+- [ ] `python scripts/catalogue/talib_catalogue.py --check` is clean and every
+      catalogue row has a folder.
+- [ ] No shared indicator slower than 1.5× TA-Lib, or each exception listed.
+
+## M7 — v1.0
+
+Scope: the beyond-TA-Lib list in `INDICATORS.md` § 5 once it is approved, the
+NSE/BSE trading calendar (F13), per-call candle settings, the Q2 decision,
+the crates.io publish, and the public API frozen in `api/public_api.txt`. Plan
+this milestone with a human before starting; split it into numbered
+sub-milestones in this file first.

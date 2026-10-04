@@ -33,7 +33,14 @@ latest = s.update(new_close)                          # equals tl.rsi on the ext
 - **Self-describing.** `tl.registry.describe("bbands")` lists params, ranges and
   outputs; `tl.registry.to_json()` feeds UIs and tool schemas.
 
-## Indicators (0.1)
+## Indicators
+
+TrendLib is working towards every function ta-lib-python exposes, 201 of them,
+plus session VWAP, CPR and the pivot levels that TA-Lib has no equivalent for.
+`docs/INDICATORS_TALIB.md` is the full list with each function's parameters,
+ranges and outputs.
+
+### In the 0.1 release
 
 Overlap: SMA, EMA, WMA, DEMA, TEMA, Bollinger Bands, Supertrend ·
 Momentum: RSI, MACD, Stochastic, ADX, CCI, ROC, Williams %R ·

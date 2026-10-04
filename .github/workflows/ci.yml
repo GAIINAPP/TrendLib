@@ -46,6 +46,12 @@ jobs:
       - name: committed test data is up to date
         run: python scripts/testdata/make_synthetic.py --check
 
+      - name: install the oracle for the catalogue check
+        run: pip install "TA-Lib==0.8.1" numpy PyYAML
+
+      - name: the TA-Lib catalogue is up to date
+        run: python scripts/catalogue/talib_catalogue.py --check
+
       - uses: EmbarkStudios/cargo-deny-action@v2
         with:
           command: check

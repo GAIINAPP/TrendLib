@@ -1,5 +1,5 @@
 MaType:
-  values: [sma, ema, wma, dema, tema]
-  talib_int: { sma: 0, ema: 1, wma: 2, dema: 3, tema: 4 }
+  values: [sma, ema, wma, dema, tema, trima, kama, mama, t3, hma, zlema, rma]
+  talib_int: { sma: 0, ema: 1, wma: 2, dema: 3, tema: 4, trima: 5, kama: 6, mama: 7, t3: 8, hma: 9, zlema: 12, rma: 13 }
 VwapAnchor:
   values: [day, none]
