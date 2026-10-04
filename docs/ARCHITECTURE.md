@@ -30,10 +30,11 @@ trendlib/
 │   │   ├── src/
 │   │   │   ├── lib.rs              #![forbid(unsafe_code)]; re-exports; generated convenience fns
 │   │   │   ├── core/
-│   │   │   │   ├── traits.rs       Indicator, Stream
+│   │   │   │   ├── traits.rs       Indicator, Stream, SeriesStep
 │   │   │   │   ├── error.rs        TlError
 │   │   │   │   ├── input.rs        Ohlcv views, leading-NaN detection, finiteness checks
 │   │   │   │   ├── output.rs       aligned output buffers (NaN / 0 prefill)
+│   │   │   │   ├── single.rs       batch loop + stream shared by single-series indicators
 │   │   │   │   └── math.rs         shared kernels (rolling sums, Wilder smoothing, true range)
 │   │   │   ├── time/               timestamp + timezone-offset handling for session anchors
 │   │   │   ├── registry.rs         GENERATED: static metadata for every indicator
@@ -88,10 +89,11 @@ trendlib/
 
 ### Traits
 
-Starting design; refine in M1 if needed and update this file in the same commit.
+Settled in M1.
 
 ```rust
 pub trait Indicator {
+    const NAME: &'static str;       // equals the folder name and spec.yaml `name`
     type Params: Default + Clone;
     type Input<'a>;                 // &'a [f64] for single-series, Ohlcv<'a> for bar data
     type Output;                    // Vec<f64>, or a struct of Vec<f64>/Vec<i32> for multi-output
@@ -100,20 +102,59 @@ pub trait Indicator {
     fn validate(p: &Self::Params) -> Result<(), TlError>;      // ranges from spec.yaml
     fn lookback(p: &Self::Params) -> usize;                    // warm-up bars, see CONVENTIONS.md
     fn batch(input: Self::Input<'_>, p: &Self::Params) -> Result<Self::Output, TlError>;
+
+    // One pass over the history: the batch output plus a stream positioned at
+    // its last bar. Backs `tl.stream.<name>.open_and_fill`.
+    fn open_and_fill(input: Self::Input<'_>, p: &Self::Params)
+        -> Result<(Self::Stream, Self::Output), TlError>;
 }
 
 pub trait Stream: Clone + Sized {
     type Params;
-    type Bar;                       // f64, or a small Copy struct (HlcBar, OhlcvBar, …)
-    type Value;                     // f64, i32, or a small Copy struct for multi-output
+    type Bar: Copy;                 // f64, or a small Copy struct (HlcBar, OhlcvBar, …)
+    type Value: Copy;               // f64, i32, or a small Copy struct for multi-output
 
     fn open(history: &[Self::Bar], p: &Self::Params) -> Result<Self, TlError>;
     fn update(&mut self, bar: Self::Bar) -> Result<Self::Value, TlError>;  // commit a closed bar
     fn peek(&self, bar: Self::Bar) -> Result<Self::Value, TlError>;        // evaluate, no commit
     fn value(&self) -> Option<Self::Value>;                                // last committed value
-    fn bars_seen(&self) -> u64;
+    fn bars_seen(&self) -> u64;                                            // history included
 }
 ```
+
+### The step function
+
+Batch and stream do not each implement the algorithm. Each indicator writes one
+step function and both paths drive it, so bitwise parity is a property of the
+code shape rather than something a reviewer has to check:
+
+```rust
+pub trait SeriesStep: Clone {
+    fn push(&mut self, value: f64) -> Option<f64>;   // commit a bar; None while warming up
+    fn preview(&self, value: f64) -> Option<f64>;    // what the next push would return
+}
+```
+
+`core::single` turns a `SeriesStep` into the whole public surface of a
+single-series indicator. An indicator supplies its parameters, ranges, lookback
+and a constructor through `SingleSeries`, and gets `batch`, `open`,
+`open_and_fill` and `SingleStream` for free:
+
+```rust
+pub trait SingleSeries: Sized {
+    const NAME: &'static str;
+    const INPUT: &'static str = "source";
+    type Params: Clone;
+    type State: SeriesStep;
+
+    fn validate(params: &Self::Params) -> Result<(), TlError>;
+    fn lookback(params: &Self::Params) -> usize;
+    fn state(params: &Self::Params) -> Self::State;
+}
+```
+
+Multi-input and multi-output indicators get the same treatment as they land
+(`core::bars` in M4); the rule is that no indicator writes its algorithm twice.
 
 Implementation rules:
 
