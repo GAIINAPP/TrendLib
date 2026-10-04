@@ -2,8 +2,8 @@
 
 # Progress
 
-**39 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 165 not started.
+**52 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 152 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -16,19 +16,19 @@ something is done that is not. CI checks it is current.
 
 | Group | Shipped | Total |
 | --- | --- | --- |
-| Overlap studies | 5 | 25 |
-| Momentum | 5 | 47 |
+| Overlap studies | 7 | 25 |
+| Momentum | 9 | 47 |
 | Volatility | 3 | 7 |
 | Volume | 2 | 12 |
-| Price transforms | 4 | 6 |
+| Price transforms | 5 | 6 |
 | Cycle | 0 | 5 |
-| Statistics | 0 | 11 |
+| Statistics | 2 | 11 |
 | Math transforms | 15 | 15 |
-| Math operators | 5 | 12 |
+| Math operators | 9 | 12 |
 | Candlestick patterns | 0 | 61 |
 | Levels | 0 | 3 |
 
-## Overlap studies (5 of 25)
+## Overlap studies (7 of 25)
 
 - [ ] `accbands` (`ACCBANDS`)
 - [ ] `bbands` (`BBANDS`) *
@@ -42,8 +42,8 @@ something is done that is not. CI checks it is current.
 - [ ] `ma` (`MA`)
 - [ ] `mama` (`MAMA`)
 - [ ] `mavp` (`MAVP`)
-- [ ] `midpoint` (`MIDPOINT`)
-- [ ] `midprice` (`MIDPRICE`)
+- [x] `midpoint` (`MIDPOINT`) -- Midpoint over Period
+- [x] `midprice` (`MIDPRICE`) -- Midpoint Price over Period
 - [ ] `rma` (`RMA`)
 - [ ] `sar` (`SAR`)
 - [ ] `sarext` (`SAREXT`)
@@ -56,7 +56,7 @@ something is done that is not. CI checks it is current.
 - [x] `wma` (`WMA`) -- Weighted Moving Average *
 - [ ] `zlema` (`ZLEMA`)
 
-## Momentum (5 of 47)
+## Momentum (9 of 47)
 
 - [ ] `ac` (`AC`)
 - [ ] `adx` (`ADX`) *
@@ -84,15 +84,15 @@ something is done that is not. CI checks it is current.
 - [ ] `mfi` (`MFI`)
 - [ ] `minus_di` (`MINUS_DI`)
 - [ ] `minus_dm` (`MINUS_DM`)
-- [ ] `mom` (`MOM`)
+- [x] `mom` (`MOM`) -- Momentum
 - [ ] `plus_di` (`PLUS_DI`)
 - [ ] `plus_dm` (`PLUS_DM`)
 - [ ] `ppo` (`PPO`)
 - [ ] `qstick` (`QSTICK`)
 - [x] `roc` (`ROC`) -- Rate of Change *
-- [ ] `rocp` (`ROCP`)
-- [ ] `rocr` (`ROCR`)
-- [ ] `rocr100` (`ROCR100`)
+- [x] `rocp` (`ROCP`) -- Rate of Change Percentage
+- [x] `rocr` (`ROCR`) -- Rate of Change Ratio
+- [x] `rocr100` (`ROCR100`) -- Rate of Change Ratio Times 100
 - [x] `rsi` (`RSI`) -- Relative Strength Index *
 - [ ] `smi` (`SMI`)
 - [ ] `stoch` (`STOCH`) *
@@ -131,9 +131,9 @@ something is done that is not. CI checks it is current.
 - [ ] `rvol` (`RVOL`)
 - [ ] `vwap` (`VWAP`) *
 
-## Price transforms (4 of 6)
+## Price transforms (5 of 6)
 
-- [ ] `avgdev` (`AVGDEV`)
+- [x] `avgdev` (`AVGDEV`) -- Average Deviation
 - [x] `avgprice` (`AVGPRICE`) -- Average Price
 - [ ] `ha` (`HA`)
 - [x] `medprice` (`MEDPRICE`) -- Median Price
@@ -148,7 +148,7 @@ something is done that is not. CI checks it is current.
 - [ ] `ht_sine` (`HT_SINE`)
 - [ ] `ht_trendmode` (`HT_TRENDMODE`)
 
-## Statistics (0 of 11)
+## Statistics (2 of 11)
 
 - [ ] `beta` (`BETA`)
 - [ ] `correl` (`CORREL`)
@@ -158,9 +158,9 @@ something is done that is not. CI checks it is current.
 - [ ] `linearreg_slope` (`LINEARREG_SLOPE`)
 - [ ] `percentile` (`PERCENTILE`)
 - [ ] `percentrank` (`PERCENTRANK`)
-- [ ] `stddev` (`STDDEV`)
+- [x] `stddev` (`STDDEV`) -- Standard Deviation
 - [ ] `tsf` (`TSF`)
-- [ ] `var` (`VAR`)
+- [x] `var` (`VAR`) -- Variance
 
 ## Math transforms (15 of 15)
 
@@ -180,20 +180,20 @@ something is done that is not. CI checks it is current.
 - [x] `tan` (`TAN`) -- Vector Tangent
 - [x] `tanh` (`TANH`) -- Vector Hyperbolic Tangent
 
-## Math operators (5 of 12)
+## Math operators (9 of 12)
 
 - [x] `add` (`ADD`) -- Vector Addition
 - [x] `cumsum` (`CUMSUM`) -- Cumulative Sum
 - [x] `div` (`DIV`) -- Vector Division
-- [ ] `max` (`MAX`)
+- [x] `max` (`MAX`) -- Rolling Maximum
 - [ ] `maxindex` (`MAXINDEX`)
-- [ ] `min` (`MIN`)
+- [x] `min` (`MIN`) -- Rolling Minimum
 - [ ] `minindex` (`MININDEX`)
-- [ ] `minmax` (`MINMAX`)
+- [x] `minmax` (`MINMAX`) -- Rolling Minimum and Maximum
 - [ ] `minmaxindex` (`MINMAXINDEX`)
 - [x] `mult` (`MULT`) -- Vector Multiplication
 - [x] `sub` (`SUB`) -- Vector Subtraction
-- [ ] `sum` (`SUM`)
+- [x] `sum` (`SUM`) -- Summation
 
 ## Candlestick patterns (0 of 61)
 

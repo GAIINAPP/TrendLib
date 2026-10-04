@@ -20,6 +20,7 @@ __all__ = [
     "asin",
     "atan",
     "atr",
+    "avgdev",
     "avgprice",
     "cci",
     "ceil",
@@ -34,22 +35,34 @@ __all__ = [
     "ln",
     "log10",
     "macd",
+    "max",
     "medprice",
+    "midpoint",
+    "midprice",
+    "min",
+    "minmax",
+    "mom",
     "mult",
     "natr",
     "obv",
     "roc",
+    "rocp",
+    "rocr",
+    "rocr100",
     "rsi",
     "sin",
     "sinh",
     "sma",
     "sqrt",
+    "stddev",
     "sub",
+    "sum",
     "tan",
     "tanh",
     "tema",
     "trange",
     "typprice",
+    "var",
     "wclprice",
     "willr",
     "wma",
@@ -103,6 +116,7 @@ atr = Factory(
     ),
     ("atr",),
 )
+avgdev = Factory("avgdev", _core.AvgdevStream, ("source",), ("series",), ("avgdev",))
 avgprice = Factory(
     "avgprice",
     _core.AvgpriceStream,
@@ -169,6 +183,7 @@ macd = Factory(
         "macd_hist",
     ),
 )
+max = Factory("max", _core.MaxStream, ("source",), ("series",), ("max",))
 medprice = Factory(
     "medprice",
     _core.MedpriceStream,
@@ -182,6 +197,32 @@ medprice = Factory(
     ),
     ("medprice",),
 )
+midpoint = Factory("midpoint", _core.MidpointStream, ("source",), ("series",), ("midpoint",))
+midprice = Factory(
+    "midprice",
+    _core.MidpriceStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("midprice",),
+)
+min = Factory("min", _core.MinStream, ("source",), ("series",), ("min",))
+minmax = Factory(
+    "minmax",
+    _core.MinmaxStream,
+    ("source",),
+    ("series",),
+    (
+        "minmax_min",
+        "minmax_max",
+    ),
+)
+mom = Factory("mom", _core.MomStream, ("source",), ("series",), ("mom",))
 mult = Factory(
     "mult",
     _core.MultStream,
@@ -224,11 +265,15 @@ obv = Factory(
     ("obv",),
 )
 roc = Factory("roc", _core.RocStream, ("source",), ("series",), ("roc",))
+rocp = Factory("rocp", _core.RocpStream, ("source",), ("series",), ("rocp",))
+rocr = Factory("rocr", _core.RocrStream, ("source",), ("series",), ("rocr",))
+rocr100 = Factory("rocr100", _core.Rocr100Stream, ("source",), ("series",), ("rocr100",))
 rsi = Factory("rsi", _core.RsiStream, ("source",), ("series",), ("rsi",))
 sin = Factory("sin", _core.SinStream, ("source",), ("series",), ("sin",))
 sinh = Factory("sinh", _core.SinhStream, ("source",), ("series",), ("sinh",))
 sma = Factory("sma", _core.SmaStream, ("source",), ("series",), ("sma",))
 sqrt = Factory("sqrt", _core.SqrtStream, ("source",), ("series",), ("sqrt",))
+stddev = Factory("stddev", _core.StddevStream, ("source",), ("series",), ("stddev",))
 sub = Factory(
     "sub",
     _core.SubStream,
@@ -242,6 +287,7 @@ sub = Factory(
     ),
     ("sub",),
 )
+sum = Factory("sum", _core.SumStream, ("source",), ("series",), ("sum",))
 tan = Factory("tan", _core.TanStream, ("source",), ("series",), ("tan",))
 tanh = Factory("tanh", _core.TanhStream, ("source",), ("series",), ("tanh",))
 tema = Factory("tema", _core.TemaStream, ("source",), ("series",), ("tema",))
@@ -275,6 +321,7 @@ typprice = Factory(
     ),
     ("typprice",),
 )
+var = Factory("var", _core.VarStream, ("source",), ("series",), ("var",))
 wclprice = Factory(
     "wclprice",
     _core.WclpriceStream,

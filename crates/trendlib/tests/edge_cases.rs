@@ -179,6 +179,12 @@ fn parameters_at_the_edges_of_their_range_are_accepted() {
     for indicator in registered() {
         let columns = daily_inputs(&indicator);
         for param in indicator.params {
+            // A parameter declared without bounds means "any finite value",
+            // which the registry records as an infinite range. The edges of
+            // that are not values anything can be called with.
+            if !param.min.is_finite() || !param.max.is_finite() {
+                continue;
+            }
             for edge in [param.min, param.max.min(100_000.0)] {
                 let values = indicator.with(param.name, edge);
                 let out = (indicator.batch)(&as_slices(&columns), &values)
@@ -307,6 +313,66 @@ fn natr_normalises_even_at_period_one() {
             normalised[0][row].to_bits(),
             expected.to_bits(),
             "natr(period=1) at row {row} is not 100 * trange / close"
+        );
+    }
+}
+
+/// The golden file for `stddev` at its minimum period carries a looser
+/// tolerance because the oracle is the less accurate of the two there. That
+/// claim is only worth making if it is checked, so this pins how close the
+/// answer is to the exact one: over two bars the population standard deviation
+/// is half the difference between them.
+#[test]
+fn stddev_of_two_bars_is_half_their_difference() {
+    let stddev = support::find("stddev").expect("stddev is registered");
+    let closes = support::daily_column("close");
+    let out = (stddev.batch)(&[&closes], &stddev.with("period", 2.0)).unwrap();
+
+    let mut exact = 0usize;
+    let mut compared = 0usize;
+    for row in 1..closes.len() {
+        let expected = (closes[row] - closes[row - 1]).abs() / 2.0;
+        if expected == 0.0 {
+            continue;
+        }
+        compared += 1;
+        if out[0][row].to_bits() == expected.to_bits() {
+            exact += 1;
+        }
+        let error = (out[0][row] - expected).abs() / expected;
+        assert!(
+            error <= 1.0e-15,
+            "stddev(period=2) at row {row} is {} away from half the bar-to-bar difference",
+            error
+        );
+    }
+    // Measured at 98.7 percent of rows; the bound leaves room for a different
+    // platform's rounding without letting a regression through unnoticed.
+    assert!(
+        exact * 100 >= compared * 95,
+        "only {exact} of {compared} rows were exact, which used to be 98.7 percent"
+    );
+}
+
+/// `var` carries the same looser parity bound as `stddev` and for the same
+/// reason, so the exact property is pinned here too: over two bars the
+/// population variance is the square of half their difference.
+#[test]
+fn var_of_two_bars_is_the_square_of_half_their_difference() {
+    let var = support::find("var").expect("var is registered");
+    let closes = support::daily_column("close");
+    let out = (var.batch)(&[&closes], &var.with("period", 2.0)).unwrap();
+
+    for row in 1..closes.len() {
+        let half = (closes[row] - closes[row - 1]).abs() / 2.0;
+        let expected = half * half;
+        if expected == 0.0 {
+            continue;
+        }
+        let error = (out[0][row] - expected).abs() / expected;
+        assert!(
+            error <= 1.0e-15,
+            "var(period=2) at row {row} is {error} away from the square of half the difference"
         );
     }
 }

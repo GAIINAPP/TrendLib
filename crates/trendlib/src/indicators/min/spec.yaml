@@ -1,0 +1,25 @@
+name: min
+title: Rolling Minimum
+group: statistic
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 30
+    min: 2
+    max: 100000
+    doc: Number of bars the lowest is taken over
+outputs:
+  - name: min
+    dtype: float64
+    plot: line
+    doc: The lowest value of the last period bars
+talib:
+  name: MIN
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Steven B. Achelis, Technical Analysis from A to Z, McGraw-Hill, 2000
+see_also: [minmax, midpoint]

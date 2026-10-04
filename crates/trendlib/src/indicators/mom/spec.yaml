@@ -1,0 +1,25 @@
+name: mom
+title: Momentum
+group: momentum
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 10
+    min: 1
+    max: 100000
+    doc: Number of bars back the comparison is made to
+outputs:
+  - name: mom
+    dtype: float64
+    plot: line
+    doc: Momentum of source over period bars
+talib:
+  name: MOM
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Martin J. Pring, Technical Analysis Explained, McGraw-Hill, 2014, chapter 13
+see_also: [roc, rsi]

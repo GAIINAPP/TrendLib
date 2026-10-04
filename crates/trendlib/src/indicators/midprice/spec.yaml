@@ -1,0 +1,28 @@
+name: midprice
+title: Midpoint Price over Period
+group: overlap
+flags: [overlap]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 2
+    max: 100000
+    doc: Number of bars the range is taken over
+outputs:
+  - name: midprice
+    dtype: float64
+    plot: line
+    doc: Halfway between the highest high and the lowest low of the last period bars
+talib:
+  name: MIDPRICE
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Steven B. Achelis, Technical Analysis from A to Z, McGraw-Hill, 2000
+see_also: [midpoint, minmax]

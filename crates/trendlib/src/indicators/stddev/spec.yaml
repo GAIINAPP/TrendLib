@@ -1,0 +1,30 @@
+name: stddev
+title: Standard Deviation
+group: statistic
+flags: [nan_inf_output]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 5
+    min: 2
+    max: 100000
+    doc: Number of bars the spread is taken over
+  - name: nbdev
+    type: float
+    default: 1.0
+    doc: Multiplier applied to the deviation
+outputs:
+  - name: stddev
+    dtype: float64
+    plot: line
+    doc: Population standard deviation of the last period values, times nbdev
+talib:
+  name: STDDEV
+  params: {period: timeperiod, nbdev: nbdev}
+  outputs: [real]
+references:
+  - Standard population statistics; TA-Lib exposes them as STDDEV and VAR
+see_also: [var, avgdev]

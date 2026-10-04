@@ -19,6 +19,7 @@ __all__ = [
     "ASIN",
     "ATAN",
     "ATR",
+    "AVGDEV",
     "AVGPRICE",
     "CCI",
     "CEIL",
@@ -33,22 +34,34 @@ __all__ = [
     "LN",
     "LOG10",
     "MACD",
+    "MAX",
     "MEDPRICE",
+    "MIDPOINT",
+    "MIDPRICE",
+    "MIN",
+    "MINMAX",
+    "MOM",
     "MULT",
     "NATR",
     "OBV",
     "ROC",
+    "ROCP",
+    "ROCR",
+    "ROCR100",
     "RSI",
     "SIN",
     "SINH",
     "SMA",
     "SQRT",
+    "STDDEV",
     "SUB",
+    "SUM",
     "TAN",
     "TANH",
     "TEMA",
     "TRANGE",
     "TYPPRICE",
+    "VAR",
     "WCLPRICE",
     "WILLR",
     "WMA",
@@ -58,6 +71,7 @@ __all__ = [
     "asin",
     "atan",
     "atr",
+    "avgdev",
     "avgprice",
     "cci",
     "ceil",
@@ -73,22 +87,34 @@ __all__ = [
     "log10",
     "lookback",
     "macd",
+    "max",
     "medprice",
+    "midpoint",
+    "midprice",
+    "min",
+    "minmax",
+    "mom",
     "mult",
     "natr",
     "obv",
     "roc",
+    "rocp",
+    "rocr",
+    "rocr100",
     "rsi",
     "sin",
     "sinh",
     "sma",
     "sqrt",
+    "stddev",
     "sub",
+    "sum",
     "tan",
     "tanh",
     "tema",
     "trange",
     "typprice",
+    "var",
     "wclprice",
     "willr",
     "wma",
@@ -220,6 +246,25 @@ def atr(
     )
     out = _core.atr(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("atr",))
+
+
+def avgdev(source=None, *, period: int = _PARAMS["avgdev"]["period"]["default"]) -> Any:
+    """Average Deviation.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the deviation is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Mean distance of the last period values from their own average.
+    """
+    period = _convert.as_int("avgdev", "period", period)
+    columns, carrier = _convert.bars("avgdev", (source,), ("source",), ("series",))
+    out = _core.avgdev(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("avgdev",))
 
 
 def avgprice(open=None, high=None, low=None, close=None) -> Any:
@@ -493,6 +538,25 @@ def macd(
     )
 
 
+def max(source=None, *, period: int = _PARAMS["max"]["period"]["default"]) -> Any:
+    """Rolling Maximum.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the highest is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        The highest value of the last period bars.
+    """
+    period = _convert.as_int("max", "period", period)
+    columns, carrier = _convert.bars("max", (source,), ("source",), ("series",))
+    out = _core.max(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("max",))
+
+
 def medprice(high=None, low=None) -> Any:
     """Median Price.
 
@@ -515,6 +579,120 @@ def medprice(high=None, low=None) -> Any:
     )
     out = _core.medprice(*columns)
     return _convert.wrap_outputs(out, carrier, ("medprice",))
+
+
+def midpoint(source=None, *, period: int = _PARAMS["midpoint"]["period"]["default"]) -> Any:
+    """Midpoint over Period.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the range is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Halfway between the highest and lowest value of the last period bars.
+    """
+    period = _convert.as_int("midpoint", "period", period)
+    columns, carrier = _convert.bars("midpoint", (source,), ("source",), ("series",))
+    out = _core.midpoint(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("midpoint",))
+
+
+def midprice(high=None, low=None, *, period: int = _PARAMS["midprice"]["period"]["default"]) -> Any:
+    """Midpoint Price over Period.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the range is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Halfway between the highest high and the lowest low of the last period bars.
+    """
+    period = _convert.as_int("midprice", "period", period)
+    columns, carrier = _convert.bars(
+        "midprice",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.midprice(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("midprice",))
+
+
+def min(source=None, *, period: int = _PARAMS["min"]["period"]["default"]) -> Any:
+    """Rolling Minimum.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the lowest is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        The lowest value of the last period bars.
+    """
+    period = _convert.as_int("min", "period", period)
+    columns, carrier = _convert.bars("min", (source,), ("source",), ("series",))
+    out = _core.min(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("min",))
+
+
+def minmax(source=None, *, period: int = _PARAMS["minmax"]["period"]["default"]) -> Any:
+    """Rolling Minimum and Maximum.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the extremes are taken over, from 2 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        minmax_min: The lowest value of the last period bars.
+        minmax_max: The highest value of the last period bars.
+    """
+    period = _convert.as_int("minmax", "period", period)
+    columns, carrier = _convert.bars("minmax", (source,), ("source",), ("series",))
+    out = _core.minmax(*columns, period=period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "minmax_min",
+            "minmax_max",
+        ),
+    )
+
+
+def mom(source=None, *, period: int = _PARAMS["mom"]["period"]["default"]) -> Any:
+    """Momentum.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Number of bars back the comparison is made to, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Momentum of source over period bars.
+    """
+    period = _convert.as_int("mom", "period", period)
+    columns, carrier = _convert.bars("mom", (source,), ("source",), ("series",))
+    out = _core.mom(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("mom",))
 
 
 def mult(source0=None, source1=None) -> Any:
@@ -618,6 +796,63 @@ def roc(source=None, *, period: int = _PARAMS["roc"]["period"]["default"]) -> An
     return _convert.wrap_outputs(out, carrier, ("roc",))
 
 
+def rocp(source=None, *, period: int = _PARAMS["rocp"]["period"]["default"]) -> Any:
+    """Rate of Change Percentage.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Number of bars back the comparison is made to, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Rate of Change Percentage of source over period bars.
+    """
+    period = _convert.as_int("rocp", "period", period)
+    columns, carrier = _convert.bars("rocp", (source,), ("source",), ("series",))
+    out = _core.rocp(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("rocp",))
+
+
+def rocr(source=None, *, period: int = _PARAMS["rocr"]["period"]["default"]) -> Any:
+    """Rate of Change Ratio.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Number of bars back the comparison is made to, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Rate of Change Ratio of source over period bars.
+    """
+    period = _convert.as_int("rocr", "period", period)
+    columns, carrier = _convert.bars("rocr", (source,), ("source",), ("series",))
+    out = _core.rocr(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("rocr",))
+
+
+def rocr100(source=None, *, period: int = _PARAMS["rocr100"]["period"]["default"]) -> Any:
+    """Rate of Change Ratio Times 100.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Number of bars back the comparison is made to, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Rate of Change Ratio Times 100 of source over period bars.
+    """
+    period = _convert.as_int("rocr100", "period", period)
+    columns, carrier = _convert.bars("rocr100", (source,), ("source",), ("series",))
+    out = _core.rocr100(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("rocr100",))
+
+
 def rsi(source=None, *, period: int = _PARAMS["rsi"]["period"]["default"]) -> Any:
     """Relative Strength Index.
 
@@ -695,6 +930,33 @@ def sqrt(source=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("sqrt",))
 
 
+def stddev(
+    source=None,
+    *,
+    period: int = _PARAMS["stddev"]["period"]["default"],
+    nbdev: float = _PARAMS["stddev"]["nbdev"]["default"],
+) -> Any:
+    """Standard Deviation.
+
+    Parameters
+    ----------
+    period : int, default 5
+        Number of bars the spread is taken over, from 2 to 100000.
+    nbdev : float, default 1.0
+        Multiplier applied to the deviation.
+
+    Returns
+    -------
+    ndarray or Series
+        Population standard deviation of the last period values, times nbdev.
+    """
+    period = _convert.as_int("stddev", "period", period)
+    nbdev = _convert.as_float("stddev", "nbdev", nbdev)
+    columns, carrier = _convert.bars("stddev", (source,), ("source",), ("series",))
+    out = _core.stddev(*columns, period=period, nbdev=nbdev)
+    return _convert.wrap_outputs(out, carrier, ("stddev",))
+
+
 def sub(source0=None, source1=None) -> Any:
     """Vector Subtraction.
 
@@ -717,6 +979,25 @@ def sub(source0=None, source1=None) -> Any:
     )
     out = _core.sub(*columns)
     return _convert.wrap_outputs(out, carrier, ("sub",))
+
+
+def sum(source=None, *, period: int = _PARAMS["sum"]["period"]["default"]) -> Any:
+    """Summation.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars added together, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Total of the last period values.
+    """
+    period = _convert.as_int("sum", "period", period)
+    columns, carrier = _convert.bars("sum", (source,), ("source",), ("series",))
+    out = _core.sum(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("sum",))
 
 
 def tan(source=None) -> Any:
@@ -814,6 +1095,33 @@ def typprice(high=None, low=None, close=None) -> Any:
     )
     out = _core.typprice(*columns)
     return _convert.wrap_outputs(out, carrier, ("typprice",))
+
+
+def var(
+    source=None,
+    *,
+    period: int = _PARAMS["var"]["period"]["default"],
+    nbdev: float = _PARAMS["var"]["nbdev"]["default"],
+) -> Any:
+    """Variance.
+
+    Parameters
+    ----------
+    period : int, default 5
+        Number of bars the spread is taken over, from 1 to 100000.
+    nbdev : float, default 1.0
+        Accepted for TA-Lib compatibility and ignored, as TA-Lib ignores it.
+
+    Returns
+    -------
+    ndarray or Series
+        Population variance of the last period values.
+    """
+    period = _convert.as_int("var", "period", period)
+    nbdev = _convert.as_float("var", "nbdev", nbdev)
+    columns, carrier = _convert.bars("var", (source,), ("source",), ("series",))
+    out = _core.var(*columns, period=period, nbdev=nbdev)
+    return _convert.wrap_outputs(out, carrier, ("var",))
 
 
 def wclprice(high=None, low=None, close=None) -> Any:
@@ -936,6 +1244,11 @@ def ATR(high, low, close, timeperiod: int = _PARAMS["atr"]["period"]["default"])
     return atr(high, low, close, period=timeperiod)
 
 
+def AVGDEV(source, timeperiod: int = _PARAMS["avgdev"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`avgdev`."""
+    return avgdev(source, period=timeperiod)
+
+
 def AVGPRICE(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`avgprice`."""
     return avgprice(open, high, low, close)
@@ -1011,9 +1324,39 @@ def MACD(
     return macd(source, fast_period=fastperiod, slow_period=slowperiod, signal_period=signalperiod)
 
 
+def MAX(source, timeperiod: int = _PARAMS["max"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`max`."""
+    return max(source, period=timeperiod)
+
+
 def MEDPRICE(high, low) -> Any:
     """TA-Lib-style alias for :func:`medprice`."""
     return medprice(high, low)
+
+
+def MIDPOINT(source, timeperiod: int = _PARAMS["midpoint"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`midpoint`."""
+    return midpoint(source, period=timeperiod)
+
+
+def MIDPRICE(high, low, timeperiod: int = _PARAMS["midprice"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`midprice`."""
+    return midprice(high, low, period=timeperiod)
+
+
+def MIN(source, timeperiod: int = _PARAMS["min"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`min`."""
+    return min(source, period=timeperiod)
+
+
+def MINMAX(source, timeperiod: int = _PARAMS["minmax"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`minmax`."""
+    return minmax(source, period=timeperiod)
+
+
+def MOM(source, timeperiod: int = _PARAMS["mom"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`mom`."""
+    return mom(source, period=timeperiod)
 
 
 def MULT(source0, source1) -> Any:
@@ -1034,6 +1377,21 @@ def OBV(close, volume) -> Any:
 def ROC(source, timeperiod: int = _PARAMS["roc"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`roc`."""
     return roc(source, period=timeperiod)
+
+
+def ROCP(source, timeperiod: int = _PARAMS["rocp"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`rocp`."""
+    return rocp(source, period=timeperiod)
+
+
+def ROCR(source, timeperiod: int = _PARAMS["rocr"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`rocr`."""
+    return rocr(source, period=timeperiod)
+
+
+def ROCR100(source, timeperiod: int = _PARAMS["rocr100"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`rocr100`."""
+    return rocr100(source, period=timeperiod)
 
 
 def RSI(source, timeperiod: int = _PARAMS["rsi"]["period"]["default"]) -> Any:
@@ -1061,9 +1419,23 @@ def SQRT(source) -> Any:
     return sqrt(source)
 
 
+def STDDEV(
+    source,
+    timeperiod: int = _PARAMS["stddev"]["period"]["default"],
+    nbdev: float = _PARAMS["stddev"]["nbdev"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`stddev`."""
+    return stddev(source, period=timeperiod, nbdev=nbdev)
+
+
 def SUB(source0, source1) -> Any:
     """TA-Lib-style alias for :func:`sub`."""
     return sub(source0, source1)
+
+
+def SUM(source, timeperiod: int = _PARAMS["sum"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`sum`."""
+    return sum(source, period=timeperiod)
 
 
 def TAN(source) -> Any:
@@ -1089,6 +1461,15 @@ def TRANGE(high, low, close) -> Any:
 def TYPPRICE(high, low, close) -> Any:
     """TA-Lib-style alias for :func:`typprice`."""
     return typprice(high, low, close)
+
+
+def VAR(
+    source,
+    timeperiod: int = _PARAMS["var"]["period"]["default"],
+    nbdev: float = _PARAMS["var"]["nbdev"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`var`."""
+    return var(source, period=timeperiod, nbdev=nbdev)
 
 
 def WCLPRICE(high, low, close) -> Any:

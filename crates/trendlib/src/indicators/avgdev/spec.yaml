@@ -1,0 +1,25 @@
+name: avgdev
+title: Average Deviation
+group: statistic
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 2
+    max: 100000
+    doc: Number of bars the deviation is taken over
+outputs:
+  - name: avgdev
+    dtype: float64
+    plot: line
+    doc: Mean distance of the last period values from their own average
+talib:
+  name: AVGDEV
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Steven B. Achelis, Technical Analysis from A to Z, McGraw-Hill, 2000
+see_also: [stddev, cci]

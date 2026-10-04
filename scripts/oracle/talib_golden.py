@@ -28,6 +28,20 @@ TESTDATA = REPO_ROOT / "testdata"
 
 TOLERANCE = "rel=1e-10 abs=1e-12"
 
+# Cases where the oracle, not TrendLib, is the less accurate of the two, so the
+# default tolerance would be measuring TA-Lib's error rather than ours.
+# `docs/SPEC_FORMAT.md` section 4 allows a looser per-file tolerance with a
+# written reason; the reason goes in the header beside it.
+CASE_TOLERANCE = {
+    ("stddev", "min_period"): (
+        "rel=1e-9 abs=1e-12",
+        "at period 2 the population standard deviation is |a - b| / 2; measured against "
+        "that exact value over the dataset TrendLib is exact on 98.7 percent of rows and "
+        "never worse than 1.6e-16, while ta-lib-python reaches 3.2e-10, so the looser "
+        "bound covers the oracle's own error rather than TrendLib's",
+    ),
+}
+
 # Which committed dataset a case reads. Session-anchored indicators need the
 # intraday file; everything else runs on daily bars.
 DAILY = "daily_2000.csv"
@@ -183,9 +197,10 @@ def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
         f"# produced_by: python scripts/oracle/talib_golden.py {name} --case {case}",
         f"# input: testdata/{dataset} (all rows)"
         + (", source scaled into [-1, 1]" if name in SCALED_SOURCE else ""),
-        f"# tolerance: {TOLERANCE}",
+        f"# tolerance: {CASE_TOLERANCE.get((name, case), (TOLERANCE,))[0]}",
         "# excluded_rows: none",
         *([f"# note: {CASE_OVERRIDES[(name, case)][1]}"] if (name, case) in CASE_OVERRIDES else []),
+        *([f"# note: {CASE_TOLERANCE[(name, case)][1]}"] if (name, case) in CASE_TOLERANCE else []),
         f"# date: {dt.date.today().isoformat()}",
     ]
 

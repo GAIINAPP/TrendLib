@@ -1,0 +1,25 @@
+name: rocp
+title: Rate of Change Percentage
+group: momentum
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 10
+    min: 1
+    max: 100000
+    doc: Number of bars back the comparison is made to
+outputs:
+  - name: rocp
+    dtype: float64
+    plot: line
+    doc: Rate of Change Percentage of source over period bars
+talib:
+  name: ROCP
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Martin J. Pring, Technical Analysis Explained, McGraw-Hill, 2014, chapter 13
+see_also: [roc, rsi]

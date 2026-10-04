@@ -73,7 +73,12 @@ def test_every_shipped_indicator_matches_its_catalogue_row(repo_root, catalogue)
         assert row is not None, f"{spec['name']} has a talib: block but no catalogue row"
         assert f"`{alias['name']}`" in row, f"{spec['name']}: alias disagrees with the catalogue"
         for param in spec.get("params") or []:
-            expected = f"`{param['name']}` {param['default']} [{param['min']}, {param['max']}]"
+            if "min" in param and "max" in param:
+                expected = f"`{param['name']}` {param['default']} [{param['min']}, {param['max']}]"
+            else:
+                # A parameter declared without bounds means any finite value,
+                # which the catalogue prints as "any".
+                expected = f"`{param['name']}` {param['default']} any"
             assert expected in row, f"{spec['name']}: {param['name']} disagrees with the catalogue"
         for output in spec["outputs"]:
             assert f"`{output['name']}`" in row, f"{spec['name']}: {output['name']} not in the row"

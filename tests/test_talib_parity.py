@@ -26,6 +26,16 @@ pytestmark = pytest.mark.talib
 RTOL = 1e-10
 ATOL = 1e-12
 
+# Indicators where the oracle is the less accurate of the two at small periods,
+# so comparing at RTOL measures TA-Lib's error rather than TrendLib's.
+#
+# Measured against exact arithmetic over the committed dataset at period 2: for
+# `stddev` TrendLib is exact on 98.7 percent of rows and never worse than
+# 1.6e-16 while ta-lib-python reaches 3.2e-10; for `var`, its square, 2.0e-16
+# against 6.5e-10. The Rust edge-case suite pins the exact property for both,
+# so the looser bound here cannot let a regression through unnoticed.
+ORACLE_IS_LOOSER = {"stddev": 1e-8, "var": 1e-8}
+
 # SMA is pure addition, subtraction and one division, so there is no
 # multiply-add for a compiler to contract and TrendLib reproduces TA-Lib
 # exactly. The recursive ones cannot promise that; see ema/doc.md.
@@ -65,7 +75,7 @@ def talib_kwargs(alias, params):
     return {renames.get(key, key): value for key, value in params.items()}
 
 
-def compare(name, mine, theirs):
+def compare(name, mine, theirs, indicator_name=None):
     mine = np.asarray(mine, dtype=np.float64)
     theirs = np.asarray(theirs, dtype=np.float64)
     assert mine.shape == theirs.shape
@@ -73,7 +83,8 @@ def compare(name, mine, theirs):
         np.isnan(mine), np.isnan(theirs), err_msg=f"{name}: NaN rows differ"
     )
     defined = ~np.isnan(theirs) & np.isfinite(theirs)
-    np.testing.assert_allclose(mine[defined], theirs[defined], rtol=RTOL, atol=ATOL, err_msg=name)
+    rtol = ORACLE_IS_LOOSER.get(indicator_name or name, RTOL)
+    np.testing.assert_allclose(mine[defined], theirs[defined], rtol=rtol, atol=ATOL, err_msg=name)
     # An infinity on one side has to be an infinity on the other.
     np.testing.assert_array_equal(np.isinf(mine), np.isinf(theirs), err_msg=f"{name}: infinities")
     if name in BITWISE:
@@ -95,7 +106,7 @@ def run_both(indicator, alias, bars, rows=None, **params):
 def test_the_committed_dataset_agrees_with_talib(bars, indicator, alias):
     mine, theirs = run_both(indicator, alias, bars)
     for name, ours, oracle in zip(indicator.outputs, mine, theirs, strict=True):
-        compare(indicator.name if len(mine) == 1 else name, ours, oracle)
+        compare(indicator.name if len(mine) == 1 else name, ours, oracle, indicator.name)
 
 
 def test_varied_parameters_agree_with_talib(bars, indicator, alias):
@@ -111,7 +122,7 @@ def test_varied_parameters_agree_with_talib(bars, indicator, alias):
             pytest.skip("no integral parameters")
         mine, theirs = run_both(indicator, alias, bars, **params)
         for name, ours, oracle in zip(indicator.outputs, mine, theirs, strict=True):
-            compare(indicator.name if len(mine) == 1 else name, ours, oracle)
+            compare(indicator.name if len(mine) == 1 else name, ours, oracle, indicator.name)
 
 
 def test_lookback_equals_talibs(indicator, alias):
@@ -138,14 +149,14 @@ def test_a_constant_series_agrees_with_talib(indicator, alias):
     flat["source1"] = flat["open"]
     mine, theirs = run_both(indicator, alias, flat)
     for name, ours, oracle in zip(indicator.outputs, mine, theirs, strict=True):
-        compare(indicator.name if len(mine) == 1 else name, ours, oracle)
+        compare(indicator.name if len(mine) == 1 else name, ours, oracle, indicator.name)
 
 
 def test_leading_nan_rows_agree_with_talib(bars, indicator, alias):
     padded = {name: np.concatenate([[np.nan] * 6, column[:300]]) for name, column in bars.items()}
     mine, theirs = run_both(indicator, alias, padded)
     for name, ours, oracle in zip(indicator.outputs, mine, theirs, strict=True):
-        compare(indicator.name if len(mine) == 1 else name, ours, oracle)
+        compare(indicator.name if len(mine) == 1 else name, ours, oracle, indicator.name)
 
 
 def test_the_uppercase_alias_computes_the_same_thing(bars, indicator, alias):
@@ -211,7 +222,7 @@ def test_random_series_agree_with_talib(name, base, seed, repo_root):
 
     mine, theirs = run_both(indicator, alias, built, **params)
     for output, ours, oracle in zip(indicator.outputs, mine, theirs, strict=True):
-        compare(name if len(mine) == 1 else output, ours, oracle)
+        compare(name if len(mine) == 1 else output, ours, oracle, name)
 
 
 @pytest.mark.parametrize("name", ["sma", "ema", "rsi"])

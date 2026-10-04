@@ -549,15 +549,30 @@ fn lookback_table(specs: &[Spec]) -> String {
         let ty = format!("{path}::{}", spec.type_name());
         let mut body = String::new();
         for param in &spec.params {
-            let _ = write!(
-                body,
-                "            let {0} = match get(\"{0}\")? {{\n                Some(value) => int_param(\"{1}\", \"{0}\", value, {2}, {3}).map_err(|e| to_py_err(py, &e))?,\n                None => {4},\n            }};\n",
-                param.name,
-                spec.name,
-                param.min.clone().unwrap_or_else(|| "0".into()),
-                param.max.clone().unwrap_or_else(|| "i64::MAX".into()),
-                param.default,
-            );
+            // A float parameter cannot go through `int_param`, and it never
+            // changes a lookback; it still has to be read so the Params struct
+            // can be built.
+            match param.ty {
+                ParamType::Int => {
+                    let _ = write!(
+                        body,
+                        "            let {0} = match get(\"{0}\")? {{\n                Some(value) => int_param(\"{1}\", \"{0}\", value, {2}, {3}).map_err(|e| to_py_err(py, &e))?,\n                None => {4},\n            }};\n",
+                        param.name,
+                        spec.name,
+                        param.min.clone().unwrap_or_else(|| "0".into()),
+                        param.max.clone().unwrap_or_else(|| "i64::MAX".into()),
+                        param.default,
+                    );
+                }
+                _ => {
+                    let _ = writeln!(
+                        body,
+                        "            let {0} = {1};",
+                        param.name,
+                        rust_literal(param, &param.default),
+                    );
+                }
+            }
         }
         let fields: String = spec
             .params

@@ -1,0 +1,25 @@
+name: sum
+title: Summation
+group: statistic
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 30
+    min: 2
+    max: 100000
+    doc: Number of bars added together
+outputs:
+  - name: sum
+    dtype: float64
+    plot: line
+    doc: Total of the last period values
+talib:
+  name: SUM
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Steven B. Achelis, Technical Analysis from A to Z, McGraw-Hill, 2000
+see_also: [sma, avgdev]
