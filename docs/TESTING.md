@@ -41,9 +41,19 @@ preference:
 2. A published calculator or worked example run on synthetic inputs, named in the
    header.
 
-Until a human provides H values (open question Q4), the indicator's golden test is
-marked `#[ignore = "awaiting oracle (Q4)"]` and the milestone report lists it. Do
-not substitute self-computed values.
+**A — the approved formula evaluated through an independent implementation's
+arithmetic.** For the three `levels` functions, which no library has an
+equivalent of. The formulas `INDICATORS.md` § 3.2 to 3.4 approve are evaluated
+through TA-Lib's own `TYPPRICE`, `MEDPRICE`, `ADD`, `SUB`, `MULT` and `DIV`, so
+every number in the file comes out of the C library and only the shape of the
+expression is ours. It is weaker than T, because an error in the approved
+formula would go unnoticed, and stronger than values TrendLib computed for
+itself, which the rule above forbids. The header of each such file says which
+functions produced it.
+
+H is still the stronger evidence for those three and open question Q4 still
+asks for it; A is what ships until then. Do not substitute self-computed
+values for either.
 
 **Upgrading an oracle version** regenerates every golden from that oracle in one
 PR whose description summarises any value changes.

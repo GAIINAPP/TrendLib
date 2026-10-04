@@ -1,0 +1,43 @@
+name: pivots_traditional
+title: Traditional Pivot Points
+group: levels
+flags: [overlap]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: pivots_traditional_pp
+    dtype: float64
+    plot: level
+    doc: Average of the previous bar's high, low and close
+  - name: pivots_traditional_r1
+    dtype: float64
+    plot: level
+    doc: First level above the pivot
+  - name: pivots_traditional_r2
+    dtype: float64
+    plot: level
+    doc: Second level above the pivot
+  - name: pivots_traditional_r3
+    dtype: float64
+    plot: level
+    doc: Third level above the pivot
+  - name: pivots_traditional_s1
+    dtype: float64
+    plot: level
+    doc: First level below the pivot
+  - name: pivots_traditional_s2
+    dtype: float64
+    plot: level
+    doc: Second level below the pivot
+  - name: pivots_traditional_s3
+    dtype: float64
+    plot: level
+    doc: Third level below the pivot
+references:
+  - Frank Ochoa, Secrets of a Pivot Boss, Wiley, 2010
+see_also: [pivots_camarilla, cpr, midprice]

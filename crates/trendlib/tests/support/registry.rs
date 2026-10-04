@@ -5305,6 +5305,59 @@ mod cosh_adapter {
     }
 }
 
+mod cpr_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cpr::Cpr;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 3;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cpr::Params {
+        let _ = values;
+        trendlib::indicators::cpr::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "cpr takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cpr::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false, false, false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod cumsum_adapter {
     use super::*;
 
@@ -9044,6 +9097,120 @@ mod percentrank_adapter {
     }
 }
 
+mod pivots_camarilla_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::pivots_camarilla::PivotsCamarilla;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 8;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::pivots_camarilla::Params {
+        let _ = values;
+        trendlib::indicators::pivots_camarilla::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "pivots_camarilla takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::pivots_camarilla::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false, false, false, false, false, false, false, false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod pivots_traditional_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::pivots_traditional::PivotsTraditional;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 7;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::pivots_traditional::Params {
+        let _ = values;
+        trendlib::indicators::pivots_traditional::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "pivots_traditional takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::pivots_traditional::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false, false, false, false, false, false, false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod plus_di_adapter {
     use super::*;
 
@@ -12409,6 +12576,7 @@ pub fn registered() -> Vec<Registered> {
         correl_adapter::registered(),
         cos_adapter::registered(),
         cosh_adapter::registered(),
+        cpr_adapter::registered(),
         cumsum_adapter::registered(),
         cvi_adapter::registered(),
         dema_adapter::registered(),
@@ -12469,6 +12637,8 @@ pub fn registered() -> Vec<Registered> {
         obv_adapter::registered(),
         percentile_adapter::registered(),
         percentrank_adapter::registered(),
+        pivots_camarilla_adapter::registered(),
+        pivots_traditional_adapter::registered(),
         plus_di_adapter::registered(),
         plus_dm_adapter::registered(),
         ppo_adapter::registered(),

@@ -1,0 +1,27 @@
+name: cpr
+title: Central Pivot Range
+group: levels
+flags: [overlap]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cpr_pivot
+    dtype: float64
+    plot: level
+    doc: Average of the previous bar's high, low and close
+  - name: cpr_bc
+    dtype: float64
+    plot: level
+    doc: Midpoint of the previous bar's range
+  - name: cpr_tc
+    dtype: float64
+    plot: level
+    doc: The pivot reflected through the midpoint
+references:
+  - Frank Ochoa, Secrets of a Pivot Boss, Wiley, 2010
+see_also: [pivots_traditional, pivots_camarilla, midprice]

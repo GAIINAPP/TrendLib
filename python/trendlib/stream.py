@@ -105,6 +105,7 @@ __all__ = [
     "correl",
     "cos",
     "cosh",
+    "cpr",
     "cumsum",
     "cvi",
     "dema",
@@ -165,6 +166,8 @@ __all__ = [
     "obv",
     "percentile",
     "percentrank",
+    "pivots_camarilla",
+    "pivots_traditional",
     "plus_di",
     "plus_dm",
     "ppo",
@@ -1547,6 +1550,25 @@ correl = Factory(
 )
 cos = Factory("cos", _core.CosStream, ("source",), ("series",), ("cos",))
 cosh = Factory("cosh", _core.CoshStream, ("source",), ("series",), ("cosh",))
+cpr = Factory(
+    "cpr",
+    _core.CprStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "cpr_pivot",
+        "cpr_bc",
+        "cpr_tc",
+    ),
+)
 cumsum = Factory("cumsum", _core.CumsumStream, ("source",), ("series",), ("cumsum",))
 cvi = Factory(
     "cvi",
@@ -2022,6 +2044,53 @@ percentile = Factory(
 )
 percentrank = Factory(
     "percentrank", _core.PercentrankStream, ("source",), ("series",), ("percentrank",)
+)
+pivots_camarilla = Factory(
+    "pivots_camarilla",
+    _core.PivotsCamarillaStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "camarilla_r1",
+        "camarilla_r2",
+        "camarilla_r3",
+        "camarilla_r4",
+        "camarilla_s1",
+        "camarilla_s2",
+        "camarilla_s3",
+        "camarilla_s4",
+    ),
+)
+pivots_traditional = Factory(
+    "pivots_traditional",
+    _core.PivotsTraditionalStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "pivots_traditional_pp",
+        "pivots_traditional_r1",
+        "pivots_traditional_r2",
+        "pivots_traditional_r3",
+        "pivots_traditional_s1",
+        "pivots_traditional_s2",
+        "pivots_traditional_s3",
+    ),
 )
 plus_di = Factory(
     "plus_di",

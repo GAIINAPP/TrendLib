@@ -33,7 +33,7 @@ proceed on a judgment call.
 | Q1 | GitHub org: under GAIIN's org, or a neutral `trendlib` org? The repository already exists at `GAIINAPP/TrendLib` and M0 used it (A1); confirm or move it before M3. | M3 (Trusted Publishing is bound to owner/repo) |
 | Q2 | Add a `compat="tradingview"` mode where TradingView and TA-Lib conventions differ (Supertrend seed and sign, etc.)? | M6 |
 | Q3 | Ship a WASM/JS build for GAIIN's web frontend? | After 0.1.0 |
-| Q4 | Human transcriber and source for CPR / pivot golden values (see `TESTING.md` § Oracles). | M4 |
+| Q4 | Human transcriber and source for CPR / pivot golden values (see `TESTING.md` § Oracles). Not blocking: oracle A ships in the meantime, see A16. | M5 |
 | Q5 | Docs domain (e.g. `trendlib.dev`) or GitHub Pages default URL? | M5 |
 
 ## Assumptions pending review
@@ -129,3 +129,13 @@ calendar date of the timestamp as given, so a caller wanting another zone passes
 timestamps already expressed in it. Adding `tz` later changes no existing result,
 because UTC is what the current behaviour already means. `INDICATORS.md` § 3.1 and
 `CONVENTIONS.md` § 7 say so in the same commit.
+
+A16 (M4, 2026-10-04): the three `levels` functions have no TA-Lib equivalent and
+Q4's transcribed reference is not in hand, so their golden values are the
+formulas `INDICATORS.md` § 3.2 to 3.4 approve, evaluated through TA-Lib's own
+`TYPPRICE`, `MEDPRICE`, `ADD`, `SUB`, `MULT` and `DIV`. Every number comes out
+of the C library; only the shape of the expression is ours. Call it oracle A:
+weaker than a second end-to-end implementation, because an error in the approved
+formula would go unnoticed, and stronger than values this library computed for
+itself, which `CLAUDE.md` rule 3 forbids. The headers of those files say exactly
+this. A transcribed reference still strengthens it and Q4 stays open.

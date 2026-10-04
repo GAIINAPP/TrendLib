@@ -305,6 +305,7 @@ __all__ = [
     "correl",
     "cos",
     "cosh",
+    "cpr",
     "cumsum",
     "cvi",
     "dema",
@@ -366,6 +367,8 @@ __all__ = [
     "obv",
     "percentile",
     "percentrank",
+    "pivots_camarilla",
+    "pivots_traditional",
     "plus_di",
     "plus_dm",
     "ppo",
@@ -3094,6 +3097,42 @@ def cosh(source=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("cosh",))
 
 
+def cpr(high=None, low=None, close=None) -> Any:
+    """Central Pivot Range.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        cpr_pivot: Average of the previous bar's high, low and close.
+        cpr_bc: Midpoint of the previous bar's range.
+        cpr_tc: The pivot reflected through the midpoint.
+    """
+    columns, carrier = _convert.bars(
+        "cpr",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cpr(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "cpr_pivot",
+            "cpr_bc",
+            "cpr_tc",
+        ),
+    )
+
+
 def cumsum(source=None) -> Any:
     """Cumulative Sum.
 
@@ -4701,6 +4740,96 @@ def percentrank(source=None, *, period: int = _PARAMS["percentrank"]["period"]["
     columns, carrier = _convert.bars("percentrank", (source,), ("source",), ("series",))
     out = _core.percentrank(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("percentrank",))
+
+
+def pivots_camarilla(high=None, low=None, close=None) -> Any:
+    """Camarilla Pivot Points.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        camarilla_r1: First level above the previous close.
+        camarilla_r2: Second level above the previous close.
+        camarilla_r3: Third level above the previous close.
+        camarilla_r4: Fourth level above the previous close.
+        camarilla_s1: First level below the previous close.
+        camarilla_s2: Second level below the previous close.
+        camarilla_s3: Third level below the previous close.
+        camarilla_s4: Fourth level below the previous close.
+    """
+    columns, carrier = _convert.bars(
+        "pivots_camarilla",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.pivots_camarilla(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "camarilla_r1",
+            "camarilla_r2",
+            "camarilla_r3",
+            "camarilla_r4",
+            "camarilla_s1",
+            "camarilla_s2",
+            "camarilla_s3",
+            "camarilla_s4",
+        ),
+    )
+
+
+def pivots_traditional(high=None, low=None, close=None) -> Any:
+    """Traditional Pivot Points.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        pivots_traditional_pp: Average of the previous bar's high, low and close.
+        pivots_traditional_r1: First level above the pivot.
+        pivots_traditional_r2: Second level above the pivot.
+        pivots_traditional_r3: Third level above the pivot.
+        pivots_traditional_s1: First level below the pivot.
+        pivots_traditional_s2: Second level below the pivot.
+        pivots_traditional_s3: Third level below the pivot.
+    """
+    columns, carrier = _convert.bars(
+        "pivots_traditional",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.pivots_traditional(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "pivots_traditional_pp",
+            "pivots_traditional_r1",
+            "pivots_traditional_r2",
+            "pivots_traditional_r3",
+            "pivots_traditional_s1",
+            "pivots_traditional_s2",
+            "pivots_traditional_s3",
+        ),
+    )
 
 
 def plus_di(

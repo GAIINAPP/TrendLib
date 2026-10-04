@@ -2,8 +2,8 @@
 
 # Progress
 
-**201 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 3 not started.
+**204 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 0 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -26,7 +26,7 @@ something is done that is not. CI checks it is current.
 | Math transforms | 15 | 15 |
 | Math operators | 12 | 12 |
 | Candlestick patterns | 61 | 61 |
-| Levels | 0 | 3 |
+| Levels | 3 | 3 |
 
 ## Overlap studies (25 of 25)
 
@@ -259,8 +259,8 @@ something is done that is not. CI checks it is current.
 - [x] `cdl_upsidegap2crows` (`CDLUPSIDEGAP2CROWS`) -- Upside Gap Two Crows
 - [x] `cdl_xsidegap3methods` (`CDLXSIDEGAP3METHODS`) -- Upside/Downside Gap Three Methods
 
-## Levels (0 of 3)
+## Levels (3 of 3)
 
-- [ ] `cpr` -- Central Pivot Range *
-- [ ] `pivots_camarilla` -- Camarilla pivots *
-- [ ] `pivots_traditional` -- Traditional floor pivots *
+- [x] `cpr` -- Central Pivot Range *
+- [x] `pivots_camarilla` -- Camarilla Pivot Points *
+- [x] `pivots_traditional` -- Traditional Pivot Points *

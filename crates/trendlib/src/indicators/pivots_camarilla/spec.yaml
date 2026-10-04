@@ -1,0 +1,47 @@
+name: pivots_camarilla
+title: Camarilla Pivot Points
+group: levels
+flags: [overlap]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: camarilla_r1
+    dtype: float64
+    plot: level
+    doc: First level above the previous close
+  - name: camarilla_r2
+    dtype: float64
+    plot: level
+    doc: Second level above the previous close
+  - name: camarilla_r3
+    dtype: float64
+    plot: level
+    doc: Third level above the previous close
+  - name: camarilla_r4
+    dtype: float64
+    plot: level
+    doc: Fourth level above the previous close
+  - name: camarilla_s1
+    dtype: float64
+    plot: level
+    doc: First level below the previous close
+  - name: camarilla_s2
+    dtype: float64
+    plot: level
+    doc: Second level below the previous close
+  - name: camarilla_s3
+    dtype: float64
+    plot: level
+    doc: Third level below the previous close
+  - name: camarilla_s4
+    dtype: float64
+    plot: level
+    doc: Fourth level below the previous close
+references:
+  - Nick Scott's Camarilla equation, 1989
+see_also: [pivots_traditional, cpr, midprice]

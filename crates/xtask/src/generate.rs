@@ -223,6 +223,10 @@ fn bindings(specs: &[Spec]) -> String {
     let _ = writeln!(
         out,
         "{RUST_BANNER}\n\n\
+         //! An indicator with eight outputs returns a tuple of eight floats,\n\
+         //! which the complexity lint reads as a type that wants a name. The\n\
+         //! name it wants is the Python signature.\n\
+         #![allow(clippy::type_complexity)]\n\n\
          use numpy::{{IntoPyArray, PyArray1, PyReadonlyArray1}};\n\
          use pyo3::prelude::*;\n\
          use pyo3::types::PyDict;\n\

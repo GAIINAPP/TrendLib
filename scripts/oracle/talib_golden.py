@@ -386,10 +386,56 @@ def excluded_rows(spec: dict, bound: dict, params: dict) -> tuple[str, str | Non
     )
 
 
+#: What the levels are: TA-Lib has no function for them, so the published
+#: formulas are evaluated through TA-Lib's own arithmetic functions. Every
+#: value comes out of the C library; only the shape of the expression is ours,
+#: and it is the one `INDICATORS.md` section 3 approves. Oracle A, weaker than
+#: a second end-to-end implementation and stronger than nothing; a transcribed
+#: reference (`DECISIONS.md` Q4) would strengthen it further.
+LEVELS = {"cpr", "pivots_traditional", "pivots_camarilla"}
+
+
+def level_oracle(name: str, bound: dict):
+    """The levels, evaluated with TA-Lib's arithmetic over the previous bar."""
+    import numpy as np
+    import talib
+
+    # Row t describes the period that starts at t, built from bar t - 1.
+    def earlier(values):
+        shifted = np.full(len(values), np.nan)
+        shifted[1:] = values[:-1]
+        return shifted
+
+    high, low, close = (earlier(bound[k]) for k in ("high", "low", "close"))
+    two = np.full(len(close), 2.0)
+    pivot = talib.TYPPRICE(high, low, close)
+    if name == "cpr":
+        bottom = talib.MEDPRICE(high, low)
+        return [pivot, bottom, talib.SUB(talib.MULT(two, pivot), bottom)]
+    span = talib.SUB(high, low)
+    if name == "pivots_traditional":
+        return [
+            pivot,
+            talib.SUB(talib.MULT(two, pivot), low),
+            talib.ADD(pivot, span),
+            talib.ADD(high, talib.MULT(two, talib.SUB(pivot, low))),
+            talib.SUB(talib.MULT(two, pivot), high),
+            talib.SUB(pivot, span),
+            talib.SUB(low, talib.MULT(two, talib.SUB(high, pivot))),
+        ]
+    reach = talib.MULT(np.full(len(close), 1.1), span)
+    steps = [talib.DIV(reach, np.full(len(close), divisor)) for divisor in (12.0, 6.0, 4.0, 2.0)]
+    return [talib.ADD(close, step) for step in steps] + [
+        talib.SUB(close, step) for step in steps
+    ]
+
+
 def run_oracle(spec: dict, bound: dict, params: dict):
     """Call TA-Lib with its own parameter names and return its output arrays."""
     import talib
 
+    if spec["name"] in LEVELS:
+        return level_oracle(spec["name"], bound)
     if spec["name"] == "vwap":
         return [session_vwap(bound, params["anchor"])]
     alias = spec.get("talib")
@@ -429,7 +475,13 @@ def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
         f"# case: {case}",
         f"# params: {rendered}",
         f"# oracle: ta-lib-python {talib.__version__} "
-        f"(TA-Lib C {talib.__ta_version__.decode().split()[0]}), talib.{spec['talib']['name']}",
+        f"(TA-Lib C {talib.__ta_version__.decode().split()[0]}), "
+        + (
+            "the formulas of INDICATORS.md section 3 evaluated through talib.TYPPRICE, "
+            "MEDPRICE, ADD, SUB, MULT and DIV"
+            if name in LEVELS
+            else f"talib.{spec['talib']['name']}"
+        ),
         f"# produced_by: python scripts/oracle/talib_golden.py {name} --case {case}",
         f"# input: testdata/{dataset} (all rows)"
         + (", source scaled into [-1, 1]" if name in SCALED_SOURCE else ""),
