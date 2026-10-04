@@ -1,0 +1,26 @@
+name: hma
+title: Hull Moving Average
+group: overlap
+flags: [overlap]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 20
+    min: 1
+    max: 100000
+    doc: Number of bars the longer weighted average uses
+outputs:
+  - name: hma
+    dtype: float64
+    plot: line
+    doc: Weighted average with most of its lag subtracted back out
+talib:
+  name: HMA
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Alan Hull, How to Reduce Lag in a Moving Average, 2005
+see_also: [wma, ema, t3]

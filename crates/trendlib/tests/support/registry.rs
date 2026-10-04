@@ -7,7 +7,9 @@ use trendlib::core::kernel::Kernel;
 
 /// The averages an `ma_type` parameter accepts, in the order its index
 /// encoding uses.
-pub const MA_TYPES: &[&str] = &["sma", "ema", "wma", "dema", "tema", "trima", "rma"];
+pub const MA_TYPES: &[&str] = &[
+    "sma", "ema", "wma", "dema", "tema", "trima", "kama", "t3", "hma", "zlema", "rma",
+];
 
 mod accbands_adapter {
     use super::*;
@@ -379,7 +381,7 @@ mod apo_adapter {
             name: "ma_type",
             default: 1.0,
             min: 0.0,
-            max: 6.0,
+            max: 10.0,
             integral: false,
             choices: MA_TYPES,
         },
@@ -871,7 +873,7 @@ mod bbands_adapter {
             name: "ma_type",
             default: 0.0,
             min: 0.0,
-            max: 6.0,
+            max: 10.0,
             integral: false,
             choices: MA_TYPES,
         },
@@ -1829,6 +1831,128 @@ mod ha_adapter {
     }
 }
 
+mod hma_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::hma::Hma;
+    const INPUTS: usize = 1;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "period",
+        default: 20.0,
+        min: 1.0,
+        max: 100000.0,
+        integral: true,
+        choices: &[],
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::hma::Params {
+        trendlib::indicators::hma::Params {
+            period: values[0] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "hma takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::hma::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod kama_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::kama::Kama;
+    const INPUTS: usize = 1;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "period",
+        default: 30.0,
+        min: 1.0,
+        max: 100000.0,
+        integral: true,
+        choices: &[],
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::kama::Params {
+        trendlib::indicators::kama::Params {
+            period: values[0] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "kama takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::kama::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod linearreg_adapter {
     use super::*;
 
@@ -2211,7 +2335,7 @@ mod ma_adapter {
             name: "ma_type",
             default: 0.0,
             min: 0.0,
-            max: 6.0,
+            max: 10.0,
             integral: false,
             choices: MA_TYPES,
         },
@@ -3640,7 +3764,7 @@ mod ppo_adapter {
             name: "ma_type",
             default: 1.0,
             min: 0.0,
-            max: 6.0,
+            max: 10.0,
             integral: false,
             choices: MA_TYPES,
         },
@@ -4379,7 +4503,7 @@ mod stoch_adapter {
             name: "slowk_ma_type",
             default: 0.0,
             min: 0.0,
-            max: 6.0,
+            max: 10.0,
             integral: false,
             choices: MA_TYPES,
         },
@@ -4395,7 +4519,7 @@ mod stoch_adapter {
             name: "slowd_ma_type",
             default: 0.0,
             min: 0.0,
-            max: 6.0,
+            max: 10.0,
             integral: false,
             choices: MA_TYPES,
         },
@@ -4478,7 +4602,7 @@ mod stochf_adapter {
             name: "fastd_ma_type",
             default: 0.0,
             min: 0.0,
-            max: 6.0,
+            max: 10.0,
             integral: false,
             choices: MA_TYPES,
         },
@@ -4567,7 +4691,7 @@ mod stochrsi_adapter {
             name: "fastd_ma_type",
             default: 0.0,
             min: 0.0,
-            max: 6.0,
+            max: 10.0,
             integral: false,
             choices: MA_TYPES,
         },
@@ -4726,6 +4850,78 @@ mod sum_adapter {
             params: PARAMS,
             may_be_non_finite: false,
             path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod t3_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::t3::T3;
+    const INPUTS: usize = 1;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "period",
+            default: 5.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "v_factor",
+            default: 0.7,
+            min: 0.0,
+            max: 1.0,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::t3::Params {
+        trendlib::indicators::t3::Params {
+            period: values[0] as usize,
+            v_factor: values[1],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "t3 takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::t3::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
             absolute_index: false,
             integer_outputs: &[false],
             batch,
@@ -5580,6 +5776,67 @@ mod wma_adapter {
     }
 }
 
+mod zlema_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::zlema::Zlema;
+    const INPUTS: usize = 1;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "period",
+        default: 30.0,
+        min: 1.0,
+        max: 100000.0,
+        integral: true,
+        choices: &[],
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::zlema::Params {
+        trendlib::indicators::zlema::Params {
+            period: values[0] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "zlema takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::zlema::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 pub fn registered() -> Vec<Registered> {
     vec![
         accbands_adapter::registered(),
@@ -5613,6 +5870,8 @@ pub fn registered() -> Vec<Registered> {
         exp_adapter::registered(),
         floor_adapter::registered(),
         ha_adapter::registered(),
+        hma_adapter::registered(),
+        kama_adapter::registered(),
         linearreg_adapter::registered(),
         linearreg_angle_adapter::registered(),
         linearreg_intercept_adapter::registered(),
@@ -5659,6 +5918,7 @@ pub fn registered() -> Vec<Registered> {
         stochrsi_adapter::registered(),
         sub_adapter::registered(),
         sum_adapter::registered(),
+        t3_adapter::registered(),
         tan_adapter::registered(),
         tanh_adapter::registered(),
         tema_adapter::registered(),
@@ -5673,5 +5933,6 @@ pub fn registered() -> Vec<Registered> {
         wclprice_adapter::registered(),
         willr_adapter::registered(),
         wma_adapter::registered(),
+        zlema_adapter::registered(),
     ]
 }

@@ -1,0 +1,26 @@
+name: zlema
+title: Zero Lag Exponential Moving Average
+group: overlap
+flags: [overlap, unstable, path_dependent]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 30
+    min: 1
+    max: 100000
+    doc: Number of bars the exponential average uses
+outputs:
+  - name: zlema
+    dtype: float64
+    plot: line
+    doc: Exponential average of the series with its own lag added back in
+talib:
+  name: ZLEMA
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - John Ehlers and Ric Way, Zero Lag (Well, Almost), Technical Analysis of Stocks and Commodities, November 2010
+see_also: [ema, hma, dema]

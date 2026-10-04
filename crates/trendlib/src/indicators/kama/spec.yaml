@@ -1,0 +1,26 @@
+name: kama
+title: Kaufman Adaptive Moving Average
+group: overlap
+flags: [overlap, unstable, path_dependent]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 30
+    min: 1
+    max: 100000
+    doc: Number of bars the efficiency ratio is measured over
+outputs:
+  - name: kama
+    dtype: float64
+    plot: line
+    doc: Average that smooths more when the series is going nowhere
+talib:
+  name: KAMA
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Perry J. Kaufman, Smarter Trading, McGraw-Hill, 1995
+see_also: [ema, ma]

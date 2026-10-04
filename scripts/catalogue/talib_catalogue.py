@@ -286,8 +286,7 @@ def probe_float_range(function, arrays, defaults, param, default):
     is only reported when something is actually refused.
     """
     takes_anything = all(
-        accepts(function, arrays, defaults, param, value)
-        for value in (-FLOAT_LIMIT, FLOAT_LIMIT)
+        accepts(function, arrays, defaults, param, value) for value in (-FLOAT_LIMIT, FLOAT_LIMIT)
     )
     if takes_anything:
         return None

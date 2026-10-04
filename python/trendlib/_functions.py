@@ -44,6 +44,8 @@ __all__ = [
     "EXP",
     "FLOOR",
     "HA",
+    "HMA",
+    "KAMA",
     "LINEARREG",
     "LINEARREG_ANGLE",
     "LINEARREG_INTERCEPT",
@@ -90,6 +92,7 @@ __all__ = [
     "STOCHRSI",
     "SUB",
     "SUM",
+    "T3",
     "TAN",
     "TANH",
     "TEMA",
@@ -104,6 +107,7 @@ __all__ = [
     "WCLPRICE",
     "WILLR",
     "WMA",
+    "ZLEMA",
     "accbands",
     "acos",
     "ad",
@@ -135,6 +139,8 @@ __all__ = [
     "exp",
     "floor",
     "ha",
+    "hma",
+    "kama",
     "linearreg",
     "linearreg_angle",
     "linearreg_intercept",
@@ -182,6 +188,7 @@ __all__ = [
     "stochrsi",
     "sub",
     "sum",
+    "t3",
     "tan",
     "tanh",
     "tema",
@@ -196,6 +203,7 @@ __all__ = [
     "wclprice",
     "willr",
     "wma",
+    "zlema",
 ]
 
 _PARAMS = _core.PARAMS
@@ -981,6 +989,44 @@ def ha(open=None, high=None, low=None, close=None) -> Any:
             "ha_close",
         ),
     )
+
+
+def hma(source=None, *, period: int = _PARAMS["hma"]["period"]["default"]) -> Any:
+    """Hull Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Number of bars the longer weighted average uses, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Weighted average with most of its lag subtracted back out.
+    """
+    period = _convert.as_int("hma", "period", period)
+    columns, carrier = _convert.bars("hma", (source,), ("source",), ("series",))
+    out = _core.hma(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("hma",))
+
+
+def kama(source=None, *, period: int = _PARAMS["kama"]["period"]["default"]) -> Any:
+    """Kaufman Adaptive Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the efficiency ratio is measured over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Average that smooths more when the series is going nowhere.
+    """
+    period = _convert.as_int("kama", "period", period)
+    columns, carrier = _convert.bars("kama", (source,), ("source",), ("series",))
+    out = _core.kama(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("kama",))
 
 
 def linearreg(source=None, *, period: int = _PARAMS["linearreg"]["period"]["default"]) -> Any:
@@ -2158,6 +2204,33 @@ def sum(source=None, *, period: int = _PARAMS["sum"]["period"]["default"]) -> An
     return _convert.wrap_outputs(out, carrier, ("sum",))
 
 
+def t3(
+    source=None,
+    *,
+    period: int = _PARAMS["t3"]["period"]["default"],
+    v_factor: float = _PARAMS["t3"]["v_factor"]["default"],
+) -> Any:
+    """Tillson T3.
+
+    Parameters
+    ----------
+    period : int, default 5
+        Number of bars each of the six exponential stages uses, from 1 to 100000.
+    v_factor : float, default 0.7
+        How much of the lag the combination subtracts back out, from 0.0 to 1.0.
+
+    Returns
+    -------
+    ndarray or Series
+        Six exponential stages combined to cancel most of their lag.
+    """
+    period = _convert.as_int("t3", "period", period)
+    v_factor = _convert.as_float("t3", "v_factor", v_factor)
+    columns, carrier = _convert.bars("t3", (source,), ("source",), ("series",))
+    out = _core.t3(*columns, period=period, v_factor=v_factor)
+    return _convert.wrap_outputs(out, carrier, ("t3",))
+
+
 def tan(source=None) -> Any:
     """Vector Tangent.
 
@@ -2494,6 +2567,25 @@ def wma(source=None, *, period: int = _PARAMS["wma"]["period"]["default"]) -> An
     return _convert.wrap_outputs(out, carrier, ("wma",))
 
 
+def zlema(source=None, *, period: int = _PARAMS["zlema"]["period"]["default"]) -> Any:
+    """Zero Lag Exponential Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the exponential average uses, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Exponential average of the series with its own lag added back in.
+    """
+    period = _convert.as_int("zlema", "period", period)
+    columns, carrier = _convert.bars("zlema", (source,), ("source",), ("series",))
+    out = _core.zlema(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("zlema",))
+
+
 def lookback(name: str, **params: Any) -> int:
     """Warm-up rows before the first defined value."""
     known = _PARAMS.get(name)
@@ -2669,6 +2761,16 @@ def FLOOR(source) -> Any:
 def HA(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`ha`."""
     return ha(open, high, low, close)
+
+
+def HMA(source, timeperiod: int = _PARAMS["hma"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`hma`."""
+    return hma(source, period=timeperiod)
+
+
+def KAMA(source, timeperiod: int = _PARAMS["kama"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`kama`."""
+    return kama(source, period=timeperiod)
 
 
 def LINEARREG(source, timeperiod: int = _PARAMS["linearreg"]["period"]["default"]) -> Any:
@@ -2977,6 +3079,15 @@ def SUM(source, timeperiod: int = _PARAMS["sum"]["period"]["default"]) -> Any:
     return sum(source, period=timeperiod)
 
 
+def T3(
+    source,
+    timeperiod: int = _PARAMS["t3"]["period"]["default"],
+    vfactor: float = _PARAMS["t3"]["v_factor"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`t3`."""
+    return t3(source, period=timeperiod, v_factor=vfactor)
+
+
 def TAN(source) -> Any:
     """TA-Lib-style alias for :func:`tan`."""
     return tan(source)
@@ -3056,3 +3167,8 @@ def WILLR(high, low, close, timeperiod: int = _PARAMS["willr"]["period"]["defaul
 def WMA(source, timeperiod: int = _PARAMS["wma"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`wma`."""
     return wma(source, period=timeperiod)
+
+
+def ZLEMA(source, timeperiod: int = _PARAMS["zlema"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`zlema`."""
+    return zlema(source, period=timeperiod)

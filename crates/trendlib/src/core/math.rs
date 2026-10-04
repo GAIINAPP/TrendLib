@@ -915,6 +915,277 @@ impl LinearRegression {
     }
 }
 
+/// Kaufman's adaptive average: smooths hard when the series travels a long way
+/// to go nowhere and barely at all when it goes straight there.
+#[derive(Clone, Debug)]
+pub enum Adaptive {
+    /// Over one bar the efficiency ratio is always 1, which would smooth at a
+    /// fixed rate rather than adapt. TA-Lib returns the series itself instead.
+    Passthrough,
+    Measured(Measured),
+}
+
+#[derive(Clone, Debug)]
+pub struct Measured {
+    period: usize,
+    seen: usize,
+    /// The bar `period` places back, which the net change is measured against.
+    anchor: Lagged,
+    /// The last `period` absolute bar-to-bar moves; their sum is the distance
+    /// actually travelled.
+    moves: RollingWindow,
+    previous: Option<f64>,
+    average: Option<f64>,
+}
+
+impl Adaptive {
+    /// The two ends of the smoothing range, which TA-Lib fixes at the
+    /// constants for periods 2 and 30 whatever `period` is.
+    pub const FASTEST: f64 = 2.0 / (2.0 + 1.0);
+    pub const SLOWEST: f64 = 2.0 / (30.0 + 1.0);
+
+    pub fn new(period: usize) -> Self {
+        if period == 1 {
+            return Self::Passthrough;
+        }
+        Self::Measured(Measured {
+            period,
+            seen: 0,
+            anchor: Lagged::new(period),
+            moves: RollingWindow::new(period),
+            previous: None,
+            average: None,
+        })
+    }
+
+    pub fn lookback(period: usize) -> usize {
+        if period == 1 { 0 } else { period }
+    }
+
+    pub fn push(&mut self, value: f64) -> Option<f64> {
+        let Self::Measured(state) = self else {
+            return Some(value);
+        };
+        let anchor = state.anchor.push(value);
+        if let Some(previous) = state.previous.replace(value) {
+            state.moves.push((value - previous).abs());
+        }
+        state.seen += 1;
+        if state.seen == state.period {
+            // The average starts from the bar before its first value rather
+            // than from an average of the window.
+            state.average = Some(value);
+            return None;
+        }
+        let next = state.next(value, anchor?, state.average?, state.moves.values().sum());
+        state.average = Some(next);
+        Some(next)
+    }
+
+    pub fn preview(&self, value: f64) -> Option<f64> {
+        let Self::Measured(state) = self else {
+            return Some(value);
+        };
+        let moved = (value - state.previous?).abs();
+        if state.seen + 1 == state.period {
+            return None;
+        }
+        Some(state.next(
+            value,
+            state.anchor.earlier()?,
+            state.average?,
+            state.moves.preview_values(moved).sum(),
+        ))
+    }
+}
+
+impl Measured {
+    fn next(&self, value: f64, anchor: f64, previous: f64, travelled: f64) -> f64 {
+        // The ratio cannot exceed 1, since a window cannot end further from
+        // where it began than the distance it covered. Rounding can put it a
+        // hair over, and a window that did not move at all puts it at 0/0;
+        // both are read as fully efficient, which is the fastest smoothing.
+        let change = (value - anchor).abs();
+        let efficiency = if travelled <= change {
+            1.0
+        } else {
+            change / travelled
+        };
+        let blend = efficiency * (Adaptive::FASTEST - Adaptive::SLOWEST) + Adaptive::SLOWEST;
+        previous + blend * blend * (value - previous)
+    }
+}
+
+/// Tillson's T3: six exponential stages combined so that most of the lag the
+/// chaining introduced comes back out.
+#[derive(Clone, Debug)]
+pub struct Tillson {
+    stages: [Ema; 6],
+    weights: [f64; 4],
+}
+
+impl Tillson {
+    /// The `v_factor` the moving-average dispatch uses, which TA-Lib fixes
+    /// when T3 is reached through `MA` rather than called directly.
+    pub const V_FACTOR_DEFAULT: f64 = 0.7;
+
+    pub fn new(period: usize, v_factor: f64) -> Self {
+        let v2 = v_factor * v_factor;
+        let v3 = v2 * v_factor;
+        Self {
+            stages: std::array::from_fn(|_| Ema::new(period)),
+            // Third, fourth, fifth, sixth. They sum to one at every
+            // `v_factor`, so a series the stages leave unchanged comes through
+            // unchanged.
+            weights: [
+                1.0 + 3.0 * v_factor + v3 + 3.0 * v2,
+                -6.0 * v2 - 3.0 * v_factor - 3.0 * v3,
+                3.0 * v2 + 3.0 * v3,
+                -v3,
+            ],
+        }
+    }
+
+    pub fn lookback(period: usize) -> usize {
+        6 * period.saturating_sub(1)
+    }
+
+    pub fn push(&mut self, value: f64) -> Option<f64> {
+        let mut carried = value;
+        let mut reached = [0.0; 6];
+        for (stage, slot) in self.stages.iter_mut().zip(&mut reached) {
+            carried = stage.push(carried)?;
+            *slot = carried;
+        }
+        Some(self.combine(reached))
+    }
+
+    pub fn preview(&self, value: f64) -> Option<f64> {
+        let mut carried = value;
+        let mut reached = [0.0; 6];
+        for (stage, slot) in self.stages.iter().zip(&mut reached) {
+            carried = stage.preview(carried)?;
+            *slot = carried;
+        }
+        Some(self.combine(reached))
+    }
+
+    fn combine(&self, reached: [f64; 6]) -> f64 {
+        self.weights[3] * reached[5]
+            + self.weights[2] * reached[4]
+            + self.weights[1] * reached[3]
+            + self.weights[0] * reached[2]
+    }
+}
+
+/// Hull's average: a half-length weighted mean doubled and the full-length one
+/// taken off it, smoothed over the square root of the period.
+#[derive(Clone, Debug)]
+pub enum Hull {
+    /// Over one bar the half-length stage would have no bars to average.
+    Passthrough,
+    Stages {
+        half: WeightedMean,
+        full: WeightedMean,
+        smoothed: WeightedMean,
+    },
+}
+
+impl Hull {
+    fn smoothing_period(period: usize) -> usize {
+        (period as f64).sqrt() as usize
+    }
+
+    pub fn new(period: usize) -> Self {
+        if period == 1 {
+            return Self::Passthrough;
+        }
+        Self::Stages {
+            half: WeightedMean::new(period / 2),
+            full: WeightedMean::new(period),
+            smoothed: WeightedMean::new(Self::smoothing_period(period)),
+        }
+    }
+
+    pub fn lookback(period: usize) -> usize {
+        period.saturating_sub(1) + Self::smoothing_period(period).saturating_sub(1)
+    }
+
+    pub fn push(&mut self, value: f64) -> Option<f64> {
+        let Self::Stages {
+            half,
+            full,
+            smoothed,
+        } = self
+        else {
+            return Some(value);
+        };
+        // The half-length stage is ready first and has to keep taking bars
+        // while the longer one warms up.
+        let short = half.push(value);
+        let long = full.push(value)?;
+        smoothed.push(2.0 * short? - long)
+    }
+
+    pub fn preview(&self, value: f64) -> Option<f64> {
+        let Self::Stages {
+            half,
+            full,
+            smoothed,
+        } = self
+        else {
+            return Some(value);
+        };
+        let short = half.preview(value)?;
+        let long = full.preview(value)?;
+        smoothed.preview(2.0 * short - long)
+    }
+}
+
+/// An exponential average fed a series pushed forward by about the lag the
+/// average will add.
+#[derive(Clone, Debug)]
+pub struct ZeroLag {
+    /// Absent at periods 1 and 2, where half the lag rounds down to nothing
+    /// and the correction has no bar to reach back to.
+    earlier: Option<Lagged>,
+    average: Ema,
+}
+
+impl ZeroLag {
+    fn lag(period: usize) -> usize {
+        period.saturating_sub(1) / 2
+    }
+
+    pub fn new(period: usize) -> Self {
+        let lag = Self::lag(period);
+        Self {
+            earlier: (lag > 0).then(|| Lagged::new(lag)),
+            average: Ema::new(period),
+        }
+    }
+
+    pub fn lookback(period: usize) -> usize {
+        Self::lag(period) + period.saturating_sub(1)
+    }
+
+    pub fn push(&mut self, value: f64) -> Option<f64> {
+        let corrected = match &mut self.earlier {
+            Some(earlier) => 2.0 * value - earlier.push(value)?,
+            None => value,
+        };
+        self.average.push(corrected)
+    }
+
+    pub fn preview(&self, value: f64) -> Option<f64> {
+        let corrected = match &self.earlier {
+            Some(earlier) => 2.0 * value - earlier.earlier()?,
+            None => value,
+        };
+        self.average.preview(corrected)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::{
@@ -1126,8 +1397,20 @@ mod tests {
         assert_eq!(MaType::Dema.lookback(30), 58);
         assert_eq!(MaType::Tema.lookback(30), 87);
         assert_eq!(MaType::Trima.lookback(30), 29);
+        assert_eq!(MaType::Kama.lookback(30), 30);
+        assert_eq!(MaType::T3.lookback(30), 174);
+        assert_eq!(MaType::Hma.lookback(30), 33);
+        assert_eq!(MaType::Zlema.lookback(30), 43);
         assert_eq!(MaType::from_name("rma"), Some(MaType::Rma));
-        assert_eq!(MaType::from_name("kama"), None);
+        // Approved but not built, so it is named in the error rather than
+        // quietly standing in for another average.
+        assert_eq!(MaType::from_name("mama"), None);
+        assert!(
+            MaType::parse("ma", "ma_type", "mama")
+                .unwrap_err()
+                .to_string()
+                .contains("not implemented yet")
+        );
     }
 
     #[test]
@@ -1264,10 +1547,16 @@ pub enum MaType {
     Dema,
     Tema,
     Trima,
+    Kama,
+    T3,
+    Hma,
+    Zlema,
     Rma,
 }
 
 impl MaType {
+    /// In `_enums.yaml` order, which is TA-Lib's integer order, so the index
+    /// an indicator's parameter travels as is stable as averages are added.
     pub const ALL: &'static [(&'static str, MaType)] = &[
         ("sma", MaType::Sma),
         ("ema", MaType::Ema),
@@ -1275,6 +1564,10 @@ impl MaType {
         ("dema", MaType::Dema),
         ("tema", MaType::Tema),
         ("trima", MaType::Trima),
+        ("kama", MaType::Kama),
+        ("t3", MaType::T3),
+        ("hma", MaType::Hma),
+        ("zlema", MaType::Zlema),
         ("rma", MaType::Rma),
     ];
 
@@ -1282,7 +1575,7 @@ impl MaType {
     /// named in the error rather than treated as unknown, so a caller asking
     /// for one is told it is coming, not that it was a typo, and the enum never
     /// quietly falls back to a different average.
-    pub const PENDING: &'static [&'static str] = &["kama", "mama", "t3", "hma", "zlema"];
+    pub const PENDING: &'static [&'static str] = &["mama"];
 
     /// The average `name` asks for, or the error the Python layer reports.
     pub fn parse(indicator: &str, param: &str, name: &str) -> Result<Self, TlError> {
@@ -1326,6 +1619,10 @@ impl MaType {
             Self::Sma | Self::Wma | Self::Trima | Self::Rma | Self::Ema => one,
             Self::Dema => 2 * one,
             Self::Tema => 3 * one,
+            Self::Kama => Adaptive::lookback(period),
+            Self::T3 => Tillson::lookback(period),
+            Self::Hma => Hull::lookback(period),
+            Self::Zlema => ZeroLag::lookback(period),
         }
     }
 
@@ -1339,6 +1636,12 @@ impl MaType {
             Self::Tema => {
                 MovingAverage::Triple(Ema::new(period), Ema::new(period), Ema::new(period))
             }
+            Self::Kama => MovingAverage::Kaufman(Adaptive::new(period)),
+            // Reached through the dispatch, T3 takes the `v_factor` TA-Lib
+            // fixes for it rather than one the caller chooses.
+            Self::T3 => MovingAverage::Tillson(Tillson::new(period, Tillson::V_FACTOR_DEFAULT)),
+            Self::Hma => MovingAverage::Hull(Hull::new(period)),
+            Self::Zlema => MovingAverage::ZeroLag(ZeroLag::new(period)),
             Self::Trima => {
                 // Averaging twice over halves of the window is what puts the
                 // triangular weighting in; an even period gives the extra bar
@@ -1366,6 +1669,10 @@ pub enum MovingAverage {
     Double(Ema, Ema),
     Triple(Ema, Ema, Ema),
     Triangular(RollingMean, RollingMean),
+    Kaufman(Adaptive),
+    Tillson(Tillson),
+    Hull(Hull),
+    ZeroLag(ZeroLag),
 }
 
 impl MovingAverage {
@@ -1388,6 +1695,10 @@ impl MovingAverage {
                 let one = first.push(value)?;
                 second.push(one)
             }
+            Self::Kaufman(inner) => inner.push(value),
+            Self::Tillson(inner) => inner.push(value),
+            Self::Hull(inner) => inner.push(value),
+            Self::ZeroLag(inner) => inner.push(value),
         }
     }
 
@@ -1412,6 +1723,10 @@ impl MovingAverage {
                 let one = first.preview(value)?;
                 second.preview(one)
             }
+            Self::Kaufman(inner) => inner.preview(value),
+            Self::Tillson(inner) => inner.preview(value),
+            Self::Hull(inner) => inner.preview(value),
+            Self::ZeroLag(inner) => inner.preview(value),
         }
     }
 }

@@ -45,6 +45,8 @@ __all__ = [
     "exp",
     "floor",
     "ha",
+    "hma",
+    "kama",
     "linearreg",
     "linearreg_angle",
     "linearreg_intercept",
@@ -91,6 +93,7 @@ __all__ = [
     "stochrsi",
     "sub",
     "sum",
+    "t3",
     "tan",
     "tanh",
     "tema",
@@ -105,6 +108,7 @@ __all__ = [
     "wclprice",
     "willr",
     "wma",
+    "zlema",
 ]
 
 accbands = Factory(
@@ -372,6 +376,8 @@ ha = Factory(
         "ha_close",
     ),
 )
+hma = Factory("hma", _core.HmaStream, ("source",), ("series",), ("hma",))
+kama = Factory("kama", _core.KamaStream, ("source",), ("series",), ("kama",))
 linearreg = Factory("linearreg", _core.LinearregStream, ("source",), ("series",), ("linearreg",))
 linearreg_angle = Factory(
     "linearreg_angle", _core.LinearregAngleStream, ("source",), ("series",), ("linearreg_angle",)
@@ -655,6 +661,7 @@ sub = Factory(
     ("sub",),
 )
 sum = Factory("sum", _core.SumStream, ("source",), ("series",), ("sum",))
+t3 = Factory("t3", _core.T3Stream, ("source",), ("series",), ("t3",))
 tan = Factory("tan", _core.TanStream, ("source",), ("series",), ("tan",))
 tanh = Factory("tanh", _core.TanhStream, ("source",), ("series",), ("tanh",))
 tema = Factory("tema", _core.TemaStream, ("source",), ("series",), ("tema",))
@@ -751,5 +758,6 @@ willr = Factory(
     ("willr",),
 )
 wma = Factory("wma", _core.WmaStream, ("source",), ("series",), ("wma",))
+zlema = Factory("zlema", _core.ZlemaStream, ("source",), ("series",), ("zlema",))
 
 _ = (Any, _convert)

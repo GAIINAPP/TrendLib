@@ -130,6 +130,18 @@ def ma_type_ints():
     return yaml.safe_load(ENUMS.read_text())["MaType"]["talib_int"]
 
 
+def swept(spec, wanted):
+    """`wanted`, pulled back inside the parameter's documented range.
+
+    The upper bound matters as much as the lower one: `t3`'s v_factor stops at
+    1, and the oracle refuses anything past it rather than clamping.
+    """
+    value = max(spec["min"], min(wanted, 60))
+    if spec["max"] is not None:
+        value = min(value, spec["max"])
+    return type(spec["default"])(value)
+
+
 def talib_kwargs(alias, params):
     renames = alias.get("params") or {}
     numbers = ma_type_ints()
@@ -201,7 +213,7 @@ def test_varied_parameters_agree_with_talib(bars, indicator, alias):
         for name, spec in indicator.params.items():
             if spec["min"] is None:
                 continue
-            params[name] = min(max(spec["min"], spec["min"] * scale + scale), 60)
+            params[name] = swept(spec, spec["min"] * scale + scale)
         if not params:
             pytest.skip("no integral parameters")
         mine, theirs = run_both(indicator, alias, bars, **params)
@@ -220,7 +232,7 @@ def test_lookback_equals_talibs(indicator, alias):
         for name, spec in indicator.params.items():
             if spec["min"] is None:
                 continue
-            params[name] = min(max(spec["min"], spec["min"] * scale + scale), 60)
+            params[name] = swept(spec, spec["min"] * scale + scale)
         if not params:
             return
         function.parameters = {renames.get(k, k): v for k, v in params.items()}
@@ -311,7 +323,7 @@ def test_random_series_agree_with_talib(name, base, seed, repo_root):
     params = {}
     for param, spec in indicator.params.items():
         if spec["min"] is not None:
-            params[param] = max(spec["min"], 2 + seed % 20)
+            params[param] = swept(spec, 2 + seed % 20)
 
     mine, theirs = run_both(indicator, alias, built, **params)
     for output, ours, oracle in zip(indicator.outputs, mine, theirs, strict=True):
