@@ -31,6 +31,12 @@ where $n$ is `period` and $0.015$ is Lambert's scaling constant.
   which cancels most of the significant digits, so a running total's drift
   would show up in the result. This costs one pass over the window, which is
   what TA-Lib spends too.
+- The index is ill-conditioned when the window's values lie within a unit or
+  two in the last place of each other. The subtraction leaves no significant
+  digits, and the mean must round to one of the values; which one it lands on
+  decides the answer. TA-Lib rounds it differently and reports 0 where
+  TrendLib reports a full-scale reading. Real price data, which moves in ticks,
+  never reaches that state.
 - Not recursive: each row depends only on the last $n$ bars.
 - Leading `NaN` rows are skipped; a `NaN` or infinity after the first valid bar
   raises `InvalidInput` (Deviation 1).

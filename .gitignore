@@ -8,19 +8,19 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
+/build/
+/develop-eggs/
+/dist/
+/downloads/
+/eggs/
+/.eggs/
+/lib/
+/lib64/
+/parts/
+/sdist/
+/var/
+/wheels/
+/share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -37,7 +37,7 @@ pip-log.txt
 pip-delete-this-directory.txt
 
 # Unit test / coverage reports
-htmlcov/
+/htmlcov/
 .tox/
 .nox/
 .coverage
@@ -74,7 +74,7 @@ docs/_build/
 
 # PyBuilder
 .pybuilder/
-target/
+/target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -219,6 +219,10 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
+# Indicator folders under crates/trendlib/src/indicators are source code and
+# several share a name with a build directory above (var is one). The
+# patterns there are anchored to the repository root so they cannot reach
+# into the tree; a test asserts every indicator's files are tracked.
 # ---------------------------------------------------------------- Rust / build
 /target/
 **/*.rs.bk

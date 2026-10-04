@@ -204,6 +204,15 @@ def test_random_series_agree_with_talib(name, base, seed, repo_root):
     path = repo_root / "crates" / "trendlib" / "src" / "indicators" / name / "spec.yaml"
     alias = yaml.safe_load(path.read_text())["talib"]
 
+    # Real prices move in ticks. Rounding here keeps the strategy from pairing
+    # two values a single unit in the last place apart, where an indicator that
+    # subtracts a window mean has no significant digits left to work with: for
+    # a two-bar cci window the mean must round to one of the two values, and
+    # whichever way it falls decides the answer. TrendLib and ta-lib-python
+    # round it differently and neither reaches the true value. The Rust
+    # edge-case suite covers such inputs for defined behaviour; agreement with
+    # the oracle is not meaningful there.
+    base = np.round(base, 4)
     built = {
         "close": base,
         "source": base,

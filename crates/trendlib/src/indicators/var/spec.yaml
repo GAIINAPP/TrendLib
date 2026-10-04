@@ -1,0 +1,30 @@
+name: var
+title: Variance
+group: statistic
+flags: [nan_inf_output]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Number of bars the spread is taken over
+  - name: nbdev
+    type: float
+    default: 1.0
+    doc: Accepted for TA-Lib compatibility and ignored, as TA-Lib ignores it
+outputs:
+  - name: var
+    dtype: float64
+    plot: line
+    doc: Population variance of the last period values
+talib:
+  name: VAR
+  params: {period: timeperiod, nbdev: nbdev}
+  outputs: [real]
+references:
+  - Standard population statistics; TA-Lib exposes them as STDDEV and VAR
+see_also: [stddev, avgdev]

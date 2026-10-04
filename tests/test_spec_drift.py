@@ -6,6 +6,7 @@ drifts will be the one nobody listed.
 
 import inspect
 import re
+import subprocess
 
 import pytest
 
@@ -145,3 +146,32 @@ def test_the_golden_header_params_match_the_case(indicators_dir, indicator):
             continue
         recorded = dict(field.split("=") for field in header["params"].split(", "))
         assert set(recorded) == {p["name"] for p in declared}
+
+
+def test_every_indicator_file_is_tracked_by_git(repo_root, indicators_dir):
+    """A folder git never saw is a folder CI never builds.
+
+    `indicators/var` was written, compiled and tested locally for a whole batch
+    while the Python gitignore template's unanchored `var/` rule kept it out of
+    the repository. Every job failed on the first fresh checkout. Checking the
+    index directly is the only thing that would have caught it here.
+    """
+    tracked = set(
+        subprocess.run(
+            ["git", "ls-files", "crates/trendlib/src/indicators"],
+            cwd=repo_root,
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.split()
+    )
+    missing = []
+    for folder in sorted(indicators_dir.iterdir()):
+        if not (folder / "spec.yaml").is_file():
+            continue
+        for path in sorted(folder.rglob("*")):
+            if path.is_file():
+                relative = path.relative_to(repo_root).as_posix()
+                if relative not in tracked:
+                    missing.append(relative)
+    assert not missing, f"written but not committed: {missing[:8]}"
