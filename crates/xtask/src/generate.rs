@@ -803,7 +803,8 @@ fn stubs(specs: &[Spec]) -> String {
     for spec in specs {
         let _ = writeln!(
             out,
-            "\nclass {}:\n    @staticmethod\n    def open(*args: Any, **params: Any) -> \"{}\": ...\n    @staticmethod\n    def open_and_fill(*args: Any, **params: Any) -> tuple[\"{}\", Any]: ...\n    def update(self, *bar: float) -> Any: ...\n    def peek(self, *bar: float) -> Any: ...\n    def copy(self) -> \"{}\": ...\n    @property\n    def value(self) -> Any: ...\n    @property\n    def bars_seen(self) -> int: ...\n    @property\n    def name(self) -> str: ...",
+            // A stub is never evaluated, so a forward reference needs no quotes.
+            "\nclass {}:\n    @staticmethod\n    def open(*args: Any, **params: Any) -> {}: ...\n    @staticmethod\n    def open_and_fill(*args: Any, **params: Any) -> tuple[{}, Any]: ...\n    def update(self, *bar: float) -> Any: ...\n    def peek(self, *bar: float) -> Any: ...\n    def copy(self) -> {}: ...\n    @property\n    def value(self) -> Any: ...\n    @property\n    def bars_seen(self) -> int: ...\n    @property\n    def name(self) -> str: ...",
             spec.py_stream_class(),
             spec.py_stream_class(),
             spec.py_stream_class(),
