@@ -1,0 +1,25 @@
+name: er
+title: Efficiency Ratio
+group: statistic
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 10
+    min: 2
+    max: 100000
+    doc: Number of bars the ratio is measured over
+outputs:
+  - name: er
+    dtype: float64
+    plot: line
+    doc: Net progress as a share of the distance actually travelled
+talib:
+  name: ER
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Perry J. Kaufman, Smarter Trading, McGraw-Hill, 1995
+see_also: [kama, vhf, adx]

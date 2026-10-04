@@ -100,6 +100,7 @@ __all__ = [
     "cmf",
     "cmo",
     "cmou",
+    "coppock",
     "cos",
     "cosh",
     "cumsum",
@@ -110,8 +111,11 @@ __all__ = [
     "dx",
     "efi",
     "ema",
+    "er",
+    "eri",
     "exp",
     "floor",
+    "fosc",
     "ha",
     "hma",
     "imi",
@@ -181,6 +185,7 @@ __all__ = [
     "typprice",
     "ultosc",
     "var",
+    "vhf",
     "vwma",
     "wad",
     "wclprice",
@@ -1490,6 +1495,7 @@ cmf = Factory(
 )
 cmo = Factory("cmo", _core.CmoStream, ("source",), ("series",), ("cmo",))
 cmou = Factory("cmou", _core.CmouStream, ("source",), ("series",), ("cmou",))
+coppock = Factory("coppock", _core.CoppockStream, ("source",), ("series",), ("coppock",))
 cos = Factory("cos", _core.CosStream, ("source",), ("series",), ("cos",))
 cosh = Factory("cosh", _core.CoshStream, ("source",), ("series",), ("cosh",))
 cumsum = Factory("cumsum", _core.CumsumStream, ("source",), ("series",), ("cumsum",))
@@ -1554,8 +1560,28 @@ efi = Factory(
     ("efi",),
 )
 ema = Factory("ema", _core.EmaStream, ("source",), ("series",), ("ema",))
+er = Factory("er", _core.ErStream, ("source",), ("series",), ("er",))
+eri = Factory(
+    "eri",
+    _core.EriStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "eri_bull_power",
+        "eri_bear_power",
+    ),
+)
 exp = Factory("exp", _core.ExpStream, ("source",), ("series",), ("exp",))
 floor = Factory("floor", _core.FloorStream, ("source",), ("series",), ("floor",))
+fosc = Factory("fosc", _core.FoscStream, ("source",), ("series",), ("fosc",))
 ha = Factory(
     "ha",
     _core.HaStream,
@@ -2027,6 +2053,7 @@ ultosc = Factory(
     ("ultosc",),
 )
 var = Factory("var", _core.VarStream, ("source",), ("series",), ("var",))
+vhf = Factory("vhf", _core.VhfStream, ("source",), ("series",), ("vhf",))
 vwma = Factory(
     "vwma",
     _core.VwmaStream,

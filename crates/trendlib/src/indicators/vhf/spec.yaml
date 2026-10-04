@@ -1,0 +1,25 @@
+name: vhf
+title: Vertical Horizontal Filter
+group: statistic
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 28
+    min: 2
+    max: 100000
+    doc: Number of bars the filter is measured over
+outputs:
+  - name: vhf
+    dtype: float64
+    plot: line
+    doc: Range of the window as a share of the distance travelled in it
+talib:
+  name: VHF
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Adam White, Vertical Horizontal Filter, Futures, August 1991
+see_also: [er, adx, atr]

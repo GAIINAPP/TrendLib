@@ -1,0 +1,34 @@
+name: eri
+title: Elder Ray Index
+group: momentum
+flags: [unstable, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 13
+    min: 1
+    max: 100000
+    doc: Number of bars the average is taken over
+outputs:
+  - name: eri_bull_power
+    dtype: float64
+    plot: histogram
+    doc: How far the high reached above the average close
+  - name: eri_bear_power
+    dtype: float64
+    plot: histogram
+    doc: How far the low reached below the average close
+talib:
+  name: ERI
+  params: {period: timeperiod}
+  outputs: [bullpower, bearpower]
+references:
+  - Alexander Elder, Trading for a Living, Wiley, 1993
+see_also: [ema, ao, macd]

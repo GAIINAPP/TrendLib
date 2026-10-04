@@ -99,6 +99,7 @@ __all__ = [
     "CMF",
     "CMO",
     "CMOU",
+    "COPPOCK",
     "COS",
     "COSH",
     "CUMSUM",
@@ -109,8 +110,11 @@ __all__ = [
     "DX",
     "EFI",
     "EMA",
+    "ER",
+    "ERI",
     "EXP",
     "FLOOR",
+    "FOSC",
     "HA",
     "HMA",
     "IMI",
@@ -180,6 +184,7 @@ __all__ = [
     "TYPPRICE",
     "ULTOSC",
     "VAR",
+    "VHF",
     "VWMA",
     "WAD",
     "WCLPRICE",
@@ -272,6 +277,7 @@ __all__ = [
     "cmf",
     "cmo",
     "cmou",
+    "coppock",
     "cos",
     "cosh",
     "cumsum",
@@ -282,8 +288,11 @@ __all__ = [
     "dx",
     "efi",
     "ema",
+    "er",
+    "eri",
     "exp",
     "floor",
+    "fosc",
     "ha",
     "hma",
     "imi",
@@ -354,6 +363,7 @@ __all__ = [
     "typprice",
     "ultosc",
     "var",
+    "vhf",
     "vwma",
     "wad",
     "wclprice",
@@ -2917,6 +2927,39 @@ def cmou(source=None, *, period: int = _PARAMS["cmou"]["period"]["default"]) -> 
     return _convert.wrap_outputs(out, carrier, ("cmou",))
 
 
+def coppock(
+    source=None,
+    *,
+    wma_period: int = _PARAMS["coppock"]["wma_period"]["default"],
+    roc1_period: int = _PARAMS["coppock"]["roc1_period"]["default"],
+    roc2_period: int = _PARAMS["coppock"]["roc2_period"]["default"],
+) -> Any:
+    """Coppock Curve.
+
+    Parameters
+    ----------
+    wma_period : int, default 10
+        Number of bars the sum is weighted over, from 1 to 100000.
+    roc1_period : int, default 11
+        Bars back for the first rate of change, from 1 to 100000.
+    roc2_period : int, default 14
+        Bars back for the second rate of change, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Weighted average of two rates of change.
+    """
+    wma_period = _convert.as_int("coppock", "wma_period", wma_period)
+    roc1_period = _convert.as_int("coppock", "roc1_period", roc1_period)
+    roc2_period = _convert.as_int("coppock", "roc2_period", roc2_period)
+    columns, carrier = _convert.bars("coppock", (source,), ("source",), ("series",))
+    out = _core.coppock(
+        *columns, wma_period=wma_period, roc1_period=roc1_period, roc2_period=roc2_period
+    )
+    return _convert.wrap_outputs(out, carrier, ("coppock",))
+
+
 def cos(source=None) -> Any:
     """Vector Cosine.
 
@@ -3139,6 +3182,67 @@ def ema(source=None, *, period: int = _PARAMS["ema"]["period"]["default"]) -> An
     return _convert.wrap_outputs(out, carrier, ("ema",))
 
 
+def er(source=None, *, period: int = _PARAMS["er"]["period"]["default"]) -> Any:
+    """Efficiency Ratio.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Number of bars the ratio is measured over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Net progress as a share of the distance actually travelled.
+    """
+    period = _convert.as_int("er", "period", period)
+    columns, carrier = _convert.bars("er", (source,), ("source",), ("series",))
+    out = _core.er(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("er",))
+
+
+def eri(
+    high=None, low=None, close=None, *, period: int = _PARAMS["eri"]["period"]["default"]
+) -> Any:
+    """Elder Ray Index.
+
+    Parameters
+    ----------
+    period : int, default 13
+        Number of bars the average is taken over, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        eri_bull_power: How far the high reached above the average close.
+        eri_bear_power: How far the low reached below the average close.
+    """
+    period = _convert.as_int("eri", "period", period)
+    columns, carrier = _convert.bars(
+        "eri",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.eri(*columns, period=period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "eri_bull_power",
+            "eri_bear_power",
+        ),
+    )
+
+
 def exp(source=None) -> Any:
     """Vector Exponential.
 
@@ -3163,6 +3267,25 @@ def floor(source=None) -> Any:
     columns, carrier = _convert.bars("floor", (source,), ("source",), ("series",))
     out = _core.floor(*columns)
     return _convert.wrap_outputs(out, carrier, ("floor",))
+
+
+def fosc(source=None, *, period: int = _PARAMS["fosc"]["period"]["default"]) -> Any:
+    """Forecast Oscillator.
+
+    Parameters
+    ----------
+    period : int, default 5
+        Number of bars the forecast is fitted over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        How far the value came in above or below the forecast, as a percentage.
+    """
+    period = _convert.as_int("fosc", "period", period)
+    columns, carrier = _convert.bars("fosc", (source,), ("source",), ("series",))
+    out = _core.fosc(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("fosc",))
 
 
 def ha(open=None, high=None, low=None, close=None) -> Any:
@@ -4966,6 +5089,25 @@ def var(
     return _convert.wrap_outputs(out, carrier, ("var",))
 
 
+def vhf(source=None, *, period: int = _PARAMS["vhf"]["period"]["default"]) -> Any:
+    """Vertical Horizontal Filter.
+
+    Parameters
+    ----------
+    period : int, default 28
+        Number of bars the filter is measured over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Range of the window as a share of the distance travelled in it.
+    """
+    period = _convert.as_int("vhf", "period", period)
+    columns, carrier = _convert.bars("vhf", (source,), ("source",), ("series",))
+    out = _core.vhf(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("vhf",))
+
+
 def vwma(close=None, volume=None, *, period: int = _PARAMS["vwma"]["period"]["default"]) -> Any:
     """Volume Weighted Moving Average.
 
@@ -5628,6 +5770,16 @@ def CMOU(source, timeperiod: int = _PARAMS["cmou"]["period"]["default"]) -> Any:
     return cmou(source, period=timeperiod)
 
 
+def COPPOCK(
+    source,
+    wmaperiod: int = _PARAMS["coppock"]["wma_period"]["default"],
+    roc1period: int = _PARAMS["coppock"]["roc1_period"]["default"],
+    roc2period: int = _PARAMS["coppock"]["roc2_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`coppock`."""
+    return coppock(source, wma_period=wmaperiod, roc1_period=roc1period, roc2_period=roc2period)
+
+
 def COS(source) -> Any:
     """TA-Lib-style alias for :func:`cos`."""
     return cos(source)
@@ -5678,6 +5830,16 @@ def EMA(source, timeperiod: int = _PARAMS["ema"]["period"]["default"]) -> Any:
     return ema(source, period=timeperiod)
 
 
+def ER(source, timeperiod: int = _PARAMS["er"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`er`."""
+    return er(source, period=timeperiod)
+
+
+def ERI(high, low, close, timeperiod: int = _PARAMS["eri"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`eri`."""
+    return eri(high, low, close, period=timeperiod)
+
+
 def EXP(source) -> Any:
     """TA-Lib-style alias for :func:`exp`."""
     return exp(source)
@@ -5686,6 +5848,11 @@ def EXP(source) -> Any:
 def FLOOR(source) -> Any:
     """TA-Lib-style alias for :func:`floor`."""
     return floor(source)
+
+
+def FOSC(source, timeperiod: int = _PARAMS["fosc"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`fosc`."""
+    return fosc(source, period=timeperiod)
 
 
 def HA(open, high, low, close) -> Any:
@@ -6145,6 +6312,11 @@ def VAR(
 ) -> Any:
     """TA-Lib-style alias for :func:`var`."""
     return var(source, period=timeperiod, nbdev=nbdev)
+
+
+def VHF(source, timeperiod: int = _PARAMS["vhf"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`vhf`."""
+    return vhf(source, period=timeperiod)
 
 
 def VWMA(close, volume, timeperiod: int = _PARAMS["vwma"]["period"]["default"]) -> Any:

@@ -1,0 +1,38 @@
+name: coppock
+title: Coppock Curve
+group: momentum
+flags: [nan_inf_output]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: wma_period
+    type: int
+    default: 10
+    min: 1
+    max: 100000
+    doc: Number of bars the sum is weighted over
+  - name: roc1_period
+    type: int
+    default: 11
+    min: 1
+    max: 100000
+    doc: Bars back for the first rate of change
+  - name: roc2_period
+    type: int
+    default: 14
+    min: 1
+    max: 100000
+    doc: Bars back for the second rate of change
+outputs:
+  - name: coppock
+    dtype: float64
+    plot: line
+    doc: Weighted average of two rates of change
+talib:
+  name: COPPOCK
+  params: {wma_period: wmaperiod, roc1_period: roc1period, roc2_period: roc2period}
+  outputs: [real]
+references:
+  - Edwin Sedgwick Coppock, Practical Relative Strength Charting, Trendex, 1962
+see_also: [roc, wma, tsi]

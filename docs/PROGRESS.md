@@ -2,8 +2,8 @@
 
 # Progress
 
-**173 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 31 not started.
+**178 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 26 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -17,7 +17,7 @@ something is done that is not. CI checks it is current.
 | Group | Shipped | Total |
 | --- | --- | --- |
 | Overlap studies | 19 | 25 |
-| Momentum | 37 | 47 |
+| Momentum | 42 | 47 |
 | Volatility | 4 | 7 |
 | Volume | 10 | 12 |
 | Price transforms | 6 | 6 |
@@ -56,7 +56,7 @@ something is done that is not. CI checks it is current.
 - [x] `wma` (`WMA`) -- Weighted Moving Average *
 - [x] `zlema` (`ZLEMA`) -- Zero Lag Exponential Moving Average
 
-## Momentum (37 of 47)
+## Momentum (42 of 47)
 
 - [x] `ac` (`AC`) -- Accelerator Oscillator
 - [x] `adx` (`ADX`) -- Average Directional Movement Index *
@@ -69,12 +69,12 @@ something is done that is not. CI checks it is current.
 - [x] `cci` (`CCI`) -- Commodity Channel Index *
 - [x] `cmo` (`CMO`) -- Chande Momentum Oscillator
 - [x] `cmou` (`CMOU`) -- Chande Momentum Oscillator (unsmoothed)
-- [ ] `coppock` (`COPPOCK`)
+- [x] `coppock` (`COPPOCK`) -- Coppock Curve
 - [x] `dpo` (`DPO`) -- Detrended Price Oscillator
 - [x] `dx` (`DX`) -- Directional Movement Index
-- [ ] `er` (`ER`)
-- [ ] `eri` (`ERI`)
-- [ ] `fosc` (`FOSC`)
+- [x] `er` (`ER`) -- Efficiency Ratio
+- [x] `eri` (`ERI`) -- Elder Ray Index
+- [x] `fosc` (`FOSC`) -- Forecast Oscillator
 - [ ] `fractal` (`FRACTAL`)
 - [x] `imi` (`IMI`) -- Intraday Momentum Index
 - [ ] `kdj` (`KDJ`)
@@ -101,7 +101,7 @@ something is done that is not. CI checks it is current.
 - [x] `trix` (`TRIX`) -- Triple Exponential Average
 - [ ] `tsi` (`TSI`)
 - [x] `ultosc` (`ULTOSC`) -- Ultimate Oscillator
-- [ ] `vhf` (`VHF`)
+- [x] `vhf` (`VHF`) -- Vertical Horizontal Filter
 - [ ] `vortex` (`VORTEX`)
 - [x] `wad` (`WAD`) -- Williams Accumulation/Distribution
 - [x] `willr` (`WILLR`) -- Williams Percent Range *

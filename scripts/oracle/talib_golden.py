@@ -49,6 +49,14 @@ SLOPE_CANCELS_AT_TWO = (
     "TrendLib's"
 )
 
+FORECAST_CANCELS = (
+    "the value is the gap between a bar and the line fitted to the bars before it, so a price-"
+    "sized error of 1e-13 arrives as 1e-9 on a gap of 0.004; measured against exact arithmetic "
+    "over this dataset TrendLib's worst relative error is 3.1e-11 and ta-lib-python's is 2.2e-9, "
+    "with TrendLib the closer of the two on 1896 rows to 64, so the looser bound covers the "
+    "oracle's own error rather than TrendLib's"
+)
+
 TRIMA_RESIDUE = (
     "%K swings between 0 and 100 and back, and a triangular average carries that swing in two "
     "running sums whose residue never cancels; measured against exact arithmetic over this "
@@ -98,6 +106,7 @@ INDICATOR_TOLERANCE = {
     "ppo": ("rel=2e-9 abs=1e-12", CANCELLATION),
     "linearreg_slope": ("rel=2e-9 abs=1e-12", SLOPE_CANCELS),
     "linearreg_angle": ("rel=2e-9 abs=1e-12", SLOPE_CANCELS),
+    "fosc": ("rel=5e-9 abs=1e-12", FORECAST_CANCELS),
 }
 
 

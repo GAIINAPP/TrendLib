@@ -91,6 +91,11 @@ ORACLE_IS_LOOSER_NEAR_ZERO = {
 # 1911 rows respectively. The edge-case suite fits a line to a series that
 # already is one and pins that TrendLib reproduces it bit for bit.
 #
+# `fosc` joins them: its value is the gap between a bar and the line fitted to
+# the bars before it, so a price-sized error of 1e-13 arrives as 1e-9 on a gap
+# of 0.004. Against exact arithmetic TrendLib's worst relative error is 3.1e-11
+# and ta-lib-python's is 2.2e-9, with TrendLib the closer on 1896 rows to 64.
+#
 # `macdext` is the same shape once more, one layer deeper: the line is a
 # difference of two averages of the series and the signal and histogram are
 # differences of that again, so an error of 1e-13 on a value near 1000 arrives
@@ -103,6 +108,7 @@ CANCELS = {
     "linearreg_slope": 2e-7,
     "linearreg_angle": 2e-7,
     "macdext": 1e-8,
+    "fosc": 5e-9,
 }
 
 # SMA is pure addition, subtraction and one division, so there is no
