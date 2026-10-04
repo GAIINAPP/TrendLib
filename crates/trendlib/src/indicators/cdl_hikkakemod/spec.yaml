@@ -1,0 +1,25 @@
+name: cdl_hikkakemod
+title: Modified Hikkake Pattern
+group: patterns
+flags: [pattern, path_dependent]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_hikkakemod
+    dtype: int32
+    plot: pattern
+    doc: Two nested inside bars broken the wrong way, after a close at the end of the range
+talib:
+  name: CDLHIKKAKEMOD
+  params: {}
+  outputs: [integer]
+references:
+  - Daniel L. Chesler, Quantifying Support and Resistance, Technical Analysis of Stocks and Commodities, March 2003
+see_also: [cdl_hikkakemodmod, cdl_harami, cdl_3inside]

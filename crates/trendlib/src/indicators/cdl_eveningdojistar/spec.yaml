@@ -1,0 +1,31 @@
+name: cdl_eveningdojistar
+title: Evening Doji Star
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: penetration
+    type: float
+    default: 0.3
+    min: 0.0
+    doc: How far into the previous body the close has to travel, as a fraction of it
+outputs:
+  - name: cdl_eveningdojistar
+    dtype: int32
+    plot: pattern
+    doc: A long white bar, a doji one gapping up from it, then a black one closing well back into it
+talib:
+  name: CDLEVENINGDOJISTAR
+  params: {penetration: penetration}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_morningstar, cdl_dojistar, cdl_abandonedbaby]

@@ -1,0 +1,25 @@
+name: cdl_breakaway
+title: Breakaway
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_breakaway
+    dtype: int32
+    plot: pattern
+    doc: A gap away from a long bar, three bars drifting further, then one closing back into the gap
+talib:
+  name: CDLBREAKAWAY
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_xsidegap3methods, cdl_risefall3methods, cdl_mathold]

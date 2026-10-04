@@ -2706,6 +2706,147 @@ impl PyCdl3insideStream {
 }
 
 #[pyfunction]
+#[pyo3(name = "cdl_3linestrike", signature = (open, high, low, close))]
+pub fn cdl_3linestrike<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_3linestrike::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_3linestrike::Cdl3linestrike as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "Cdl3linestrikeStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdl3linestrikeStream {
+    inner: BarStream<trendlib::indicators::cdl_3linestrike::Cdl3linestrike, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdl3linestrikeStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_3linestrike::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_3linestrike::Cdl3linestrike, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_3linestrike::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_3linestrike::Cdl3linestrike as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_3linestrike"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_3linestrike bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
 #[pyo3(name = "cdl_3outside", signature = (open, high, low, close))]
 pub fn cdl_3outside<'py>(
     py: Python<'py>,
@@ -2857,6 +2998,147 @@ impl PyCdl3outsideStream {
 }
 
 #[pyfunction]
+#[pyo3(name = "cdl_3starsinsouth", signature = (open, high, low, close))]
+pub fn cdl_3starsinsouth<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_3starsinsouth::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_3starsinsouth::Cdl3starsinsouth as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "Cdl3starsinsouthStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdl3starsinsouthStream {
+    inner: BarStream<trendlib::indicators::cdl_3starsinsouth::Cdl3starsinsouth, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdl3starsinsouthStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_3starsinsouth::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_3starsinsouth::Cdl3starsinsouth, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_3starsinsouth::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_3starsinsouth::Cdl3starsinsouth as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_3starsinsouth"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_3starsinsouth bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
 #[pyo3(name = "cdl_3whitesoldiers", signature = (open, high, low, close))]
 pub fn cdl_3whitesoldiers<'py>(
     py: Python<'py>,
@@ -2991,6 +3273,315 @@ impl PyCdl3whitesoldiersStream {
     fn __repr__(&self) -> String {
         format!(
             "<trendlib stream cdl_3whitesoldiers bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_abandonedbaby", signature = (open, high, low, close, *, penetration))]
+pub fn cdl_abandonedbaby<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    penetration: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let penetration = float_param(
+        "cdl_abandonedbaby",
+        "penetration",
+        penetration,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::cdl_abandonedbaby::Params { penetration };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_abandonedbaby::CdlAbandonedbaby as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlAbandonedbabyStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlAbandonedbabyStream {
+    inner: BarStream<trendlib::indicators::cdl_abandonedbaby::CdlAbandonedbaby, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlAbandonedbabyStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, penetration))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        penetration: f64,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let penetration = float_param(
+            "cdl_abandonedbaby",
+            "penetration",
+            penetration,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::cdl_abandonedbaby::Params { penetration };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_abandonedbaby::CdlAbandonedbaby, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, penetration))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        penetration: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let penetration = float_param(
+            "cdl_abandonedbaby",
+            "penetration",
+            penetration,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::cdl_abandonedbaby::Params { penetration };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_abandonedbaby::CdlAbandonedbaby as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_abandonedbaby"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_abandonedbaby bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_advanceblock", signature = (open, high, low, close))]
+pub fn cdl_advanceblock<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_advanceblock::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_advanceblock::CdlAdvanceblock as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlAdvanceblockStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlAdvanceblockStream {
+    inner: BarStream<trendlib::indicators::cdl_advanceblock::CdlAdvanceblock, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlAdvanceblockStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_advanceblock::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_advanceblock::CdlAdvanceblock, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_advanceblock::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_advanceblock::CdlAdvanceblock as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_advanceblock"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_advanceblock bars_seen={} value={:?}>",
             self.inner.bars_seen(),
             self.inner.value()
         )
@@ -3149,6 +3740,152 @@ impl PyCdlBeltholdStream {
 }
 
 #[pyfunction]
+#[pyo3(name = "cdl_breakaway", signature = (open, high, low, close))]
+pub fn cdl_breakaway<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_breakaway::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_breakaway::CdlBreakaway as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlBreakawayStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlBreakawayStream {
+    inner: BarStream<trendlib::indicators::cdl_breakaway::CdlBreakaway, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlBreakawayStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_breakaway::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_breakaway::CdlBreakaway, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_breakaway::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::cdl_breakaway::CdlBreakaway as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_breakaway"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_breakaway bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
 #[pyo3(name = "cdl_closingmarubozu", signature = (open, high, low, close))]
 pub fn cdl_closingmarubozu<'py>(
     py: Python<'py>,
@@ -3283,6 +4020,142 @@ impl PyCdlClosingmarubozuStream {
     fn __repr__(&self) -> String {
         format!(
             "<trendlib stream cdl_closingmarubozu bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_concealbabyswall", signature = (open, high, low, close))]
+pub fn cdl_concealbabyswall<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_concealbabyswall::Params;
+    let out = py
+        .detach(|| <trendlib::indicators::cdl_concealbabyswall::CdlConcealbabyswall as Kernel<4, 1>>::batch([open, high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlConcealbabyswallStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlConcealbabyswallStream {
+    inner: BarStream<trendlib::indicators::cdl_concealbabyswall::CdlConcealbabyswall, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlConcealbabyswallStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_concealbabyswall::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_concealbabyswall::CdlConcealbabyswall, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_concealbabyswall::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_concealbabyswall::CdlConcealbabyswall as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_concealbabyswall"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_concealbabyswall bars_seen={} value={:?}>",
             self.inner.bars_seen(),
             self.inner.value()
         )
@@ -4177,6 +5050,342 @@ impl PyCdlEngulfingStream {
     fn __repr__(&self) -> String {
         format!(
             "<trendlib stream cdl_engulfing bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_eveningdojistar", signature = (open, high, low, close, *, penetration))]
+pub fn cdl_eveningdojistar<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    penetration: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let penetration = float_param(
+        "cdl_eveningdojistar",
+        "penetration",
+        penetration,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::cdl_eveningdojistar::Params { penetration };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_eveningdojistar::CdlEveningdojistar as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlEveningdojistarStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlEveningdojistarStream {
+    inner: BarStream<trendlib::indicators::cdl_eveningdojistar::CdlEveningdojistar, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlEveningdojistarStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, penetration))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        penetration: f64,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let penetration = float_param(
+            "cdl_eveningdojistar",
+            "penetration",
+            penetration,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::cdl_eveningdojistar::Params { penetration };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_eveningdojistar::CdlEveningdojistar, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, penetration))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        penetration: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let penetration = float_param(
+            "cdl_eveningdojistar",
+            "penetration",
+            penetration,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::cdl_eveningdojistar::Params { penetration };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_eveningdojistar::CdlEveningdojistar as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_eveningdojistar"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_eveningdojistar bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_eveningstar", signature = (open, high, low, close, *, penetration))]
+pub fn cdl_eveningstar<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    penetration: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let penetration = float_param(
+        "cdl_eveningstar",
+        "penetration",
+        penetration,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::cdl_eveningstar::Params { penetration };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_eveningstar::CdlEveningstar as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlEveningstarStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlEveningstarStream {
+    inner: BarStream<trendlib::indicators::cdl_eveningstar::CdlEveningstar, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlEveningstarStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, penetration))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        penetration: f64,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let penetration = float_param(
+            "cdl_eveningstar",
+            "penetration",
+            penetration,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::cdl_eveningstar::Params { penetration };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_eveningstar::CdlEveningstar, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, penetration))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        penetration: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let penetration = float_param(
+            "cdl_eveningstar",
+            "penetration",
+            penetration,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::cdl_eveningstar::Params { penetration };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_eveningstar::CdlEveningstar as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_eveningstar"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_eveningstar bars_seen={} value={:?}>",
             self.inner.bars_seen(),
             self.inner.value()
         )
@@ -5196,6 +6405,298 @@ impl PyCdlHighwaveStream {
 }
 
 #[pyfunction]
+#[pyo3(name = "cdl_hikkake", signature = (open, high, low, close))]
+pub fn cdl_hikkake<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_hikkake::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_hikkake::CdlHikkake as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlHikkakeStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlHikkakeStream {
+    inner: BarStream<trendlib::indicators::cdl_hikkake::CdlHikkake, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlHikkakeStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_hikkake::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::cdl_hikkake::CdlHikkake, 4, 1> as Stream>::open(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_hikkake::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::cdl_hikkake::CdlHikkake as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_hikkake"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_hikkake bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_hikkakemod", signature = (open, high, low, close))]
+pub fn cdl_hikkakemod<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_hikkakemod::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_hikkakemod::CdlHikkakemod as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlHikkakemodStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlHikkakemodStream {
+    inner: BarStream<trendlib::indicators::cdl_hikkakemod::CdlHikkakemod, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlHikkakemodStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_hikkakemod::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_hikkakemod::CdlHikkakemod, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_hikkakemod::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_hikkakemod::CdlHikkakemod as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_hikkakemod"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_hikkakemod bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
 #[pyo3(name = "cdl_homingpigeon", signature = (open, high, low, close))]
 pub fn cdl_homingpigeon<'py>(
     py: Python<'py>,
@@ -6062,6 +7563,147 @@ impl PyCdlKickingbylengthStream {
 }
 
 #[pyfunction]
+#[pyo3(name = "cdl_ladderbottom", signature = (open, high, low, close))]
+pub fn cdl_ladderbottom<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_ladderbottom::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_ladderbottom::CdlLadderbottom as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlLadderbottomStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlLadderbottomStream {
+    inner: BarStream<trendlib::indicators::cdl_ladderbottom::CdlLadderbottom, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlLadderbottomStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_ladderbottom::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_ladderbottom::CdlLadderbottom, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_ladderbottom::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_ladderbottom::CdlLadderbottom as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_ladderbottom"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_ladderbottom bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
 #[pyo3(name = "cdl_longleggeddoji", signature = (open, high, low, close))]
 pub fn cdl_longleggeddoji<'py>(
     py: Python<'py>,
@@ -6646,6 +8288,520 @@ impl PyCdlMatchinglowStream {
 }
 
 #[pyfunction]
+#[pyo3(name = "cdl_mathold", signature = (open, high, low, close, *, penetration))]
+pub fn cdl_mathold<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    penetration: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let penetration = float_param(
+        "cdl_mathold",
+        "penetration",
+        penetration,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::cdl_mathold::Params { penetration };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_mathold::CdlMathold as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlMatholdStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlMatholdStream {
+    inner: BarStream<trendlib::indicators::cdl_mathold::CdlMathold, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlMatholdStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, penetration))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        penetration: f64,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let penetration = float_param(
+            "cdl_mathold",
+            "penetration",
+            penetration,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::cdl_mathold::Params { penetration };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::cdl_mathold::CdlMathold, 4, 1> as Stream>::open(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, penetration))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        penetration: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let penetration = float_param(
+            "cdl_mathold",
+            "penetration",
+            penetration,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::cdl_mathold::Params { penetration };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::cdl_mathold::CdlMathold as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_mathold"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_mathold bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_morningdojistar", signature = (open, high, low, close, *, penetration))]
+pub fn cdl_morningdojistar<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    penetration: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let penetration = float_param(
+        "cdl_morningdojistar",
+        "penetration",
+        penetration,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::cdl_morningdojistar::Params { penetration };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_morningdojistar::CdlMorningdojistar as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlMorningdojistarStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlMorningdojistarStream {
+    inner: BarStream<trendlib::indicators::cdl_morningdojistar::CdlMorningdojistar, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlMorningdojistarStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, penetration))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        penetration: f64,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let penetration = float_param(
+            "cdl_morningdojistar",
+            "penetration",
+            penetration,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::cdl_morningdojistar::Params { penetration };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_morningdojistar::CdlMorningdojistar, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, penetration))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        penetration: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let penetration = float_param(
+            "cdl_morningdojistar",
+            "penetration",
+            penetration,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::cdl_morningdojistar::Params { penetration };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_morningdojistar::CdlMorningdojistar as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_morningdojistar"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_morningdojistar bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_morningstar", signature = (open, high, low, close, *, penetration))]
+pub fn cdl_morningstar<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    penetration: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let penetration = float_param(
+        "cdl_morningstar",
+        "penetration",
+        penetration,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::cdl_morningstar::Params { penetration };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_morningstar::CdlMorningstar as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlMorningstarStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlMorningstarStream {
+    inner: BarStream<trendlib::indicators::cdl_morningstar::CdlMorningstar, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlMorningstarStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, penetration))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        penetration: f64,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let penetration = float_param(
+            "cdl_morningstar",
+            "penetration",
+            penetration,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::cdl_morningstar::Params { penetration };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_morningstar::CdlMorningstar, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, penetration))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        penetration: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let penetration = float_param(
+            "cdl_morningstar",
+            "penetration",
+            penetration,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::cdl_morningstar::Params { penetration };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_morningstar::CdlMorningstar as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_morningstar"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_morningstar bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
 #[pyo3(name = "cdl_onneck", signature = (open, high, low, close))]
 pub fn cdl_onneck<'py>(
     py: Python<'py>,
@@ -7082,6 +9238,142 @@ impl PyCdlRickshawmanStream {
     fn __repr__(&self) -> String {
         format!(
             "<trendlib stream cdl_rickshawman bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_risefall3methods", signature = (open, high, low, close))]
+pub fn cdl_risefall3methods<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_risefall3methods::Params;
+    let out = py
+        .detach(|| <trendlib::indicators::cdl_risefall3methods::CdlRisefall3methods as Kernel<4, 1>>::batch([open, high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlRisefall3methodsStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlRisefall3methodsStream {
+    inner: BarStream<trendlib::indicators::cdl_risefall3methods::CdlRisefall3methods, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlRisefall3methodsStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_risefall3methods::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_risefall3methods::CdlRisefall3methods, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_risefall3methods::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_risefall3methods::CdlRisefall3methods as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_risefall3methods"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_risefall3methods bars_seen={} value={:?}>",
             self.inner.bars_seen(),
             self.inner.value()
         )
@@ -7651,6 +9943,147 @@ impl PyCdlSpinningtopStream {
     fn __repr__(&self) -> String {
         format!(
             "<trendlib stream cdl_spinningtop bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_stalledpattern", signature = (open, high, low, close))]
+pub fn cdl_stalledpattern<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_stalledpattern::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_stalledpattern::CdlStalledpattern as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlStalledpatternStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlStalledpatternStream {
+    inner: BarStream<trendlib::indicators::cdl_stalledpattern::CdlStalledpattern, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlStalledpatternStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_stalledpattern::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_stalledpattern::CdlStalledpattern, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_stalledpattern::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_stalledpattern::CdlStalledpattern as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_stalledpattern"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_stalledpattern bars_seen={} value={:?}>",
             self.inner.bars_seen(),
             self.inner.value()
         )
@@ -8235,6 +10668,298 @@ impl PyCdlThrustingStream {
     fn __repr__(&self) -> String {
         format!(
             "<trendlib stream cdl_thrusting bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_tristar", signature = (open, high, low, close))]
+pub fn cdl_tristar<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_tristar::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_tristar::CdlTristar as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlTristarStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlTristarStream {
+    inner: BarStream<trendlib::indicators::cdl_tristar::CdlTristar, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlTristarStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_tristar::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::cdl_tristar::CdlTristar, 4, 1> as Stream>::open(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_tristar::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::cdl_tristar::CdlTristar as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_tristar"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_tristar bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cdl_unique3river", signature = (open, high, low, close))]
+pub fn cdl_unique3river<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::cdl_unique3river::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::cdl_unique3river::CdlUnique3river as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "CdlUnique3riverStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyCdlUnique3riverStream {
+    inner: BarStream<trendlib::indicators::cdl_unique3river::CdlUnique3river, 4, 1>,
+}
+
+#[pymethods]
+impl PyCdlUnique3riverStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_unique3river::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::cdl_unique3river::CdlUnique3river, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::cdl_unique3river::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::cdl_unique3river::CdlUnique3river as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cdl_unique3river"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cdl_unique3river bars_seen={} value={:?}>",
             self.inner.bars_seen(),
             self.inner.value()
         )
@@ -18279,16 +21004,24 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(cdl_2crows, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_3blackcrows, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_3inside, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_3linestrike, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_3outside, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_3starsinsouth, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_3whitesoldiers, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_abandonedbaby, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_advanceblock, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_belthold, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_breakaway, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_closingmarubozu, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_concealbabyswall, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_counterattack, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_darkcloudcover, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_doji, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_dojistar, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_dragonflydoji, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_engulfing, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_eveningdojistar, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_eveningstar, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_gapsidesidewhite, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_gravestonedoji, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_hammer, m)?)?;
@@ -18296,27 +21029,37 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(cdl_harami, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_haramicross, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_highwave, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_hikkake, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_hikkakemod, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_homingpigeon, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_identical3crows, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_inneck, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_invertedhammer, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_kicking, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_kickingbylength, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_ladderbottom, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_longleggeddoji, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_longline, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_marubozu, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_matchinglow, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_mathold, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_morningdojistar, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_morningstar, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_onneck, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_piercing, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_rickshawman, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_risefall3methods, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_separatinglines, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_shootingstar, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_shortline, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_spinningtop, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_stalledpattern, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_sticksandwich, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_takuri, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_tasukigap, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_thrusting, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_tristar, m)?)?;
+    m.add_function(wrap_pyfunction!(cdl_unique3river, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_upsidegap2crows, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_xsidegap3methods, m)?)?;
     m.add_function(wrap_pyfunction!(ceil, m)?)?;
@@ -18419,16 +21162,24 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyCdl2crowsStream>()?;
     m.add_class::<PyCdl3blackcrowsStream>()?;
     m.add_class::<PyCdl3insideStream>()?;
+    m.add_class::<PyCdl3linestrikeStream>()?;
     m.add_class::<PyCdl3outsideStream>()?;
+    m.add_class::<PyCdl3starsinsouthStream>()?;
     m.add_class::<PyCdl3whitesoldiersStream>()?;
+    m.add_class::<PyCdlAbandonedbabyStream>()?;
+    m.add_class::<PyCdlAdvanceblockStream>()?;
     m.add_class::<PyCdlBeltholdStream>()?;
+    m.add_class::<PyCdlBreakawayStream>()?;
     m.add_class::<PyCdlClosingmarubozuStream>()?;
+    m.add_class::<PyCdlConcealbabyswallStream>()?;
     m.add_class::<PyCdlCounterattackStream>()?;
     m.add_class::<PyCdlDarkcloudcoverStream>()?;
     m.add_class::<PyCdlDojiStream>()?;
     m.add_class::<PyCdlDojistarStream>()?;
     m.add_class::<PyCdlDragonflydojiStream>()?;
     m.add_class::<PyCdlEngulfingStream>()?;
+    m.add_class::<PyCdlEveningdojistarStream>()?;
+    m.add_class::<PyCdlEveningstarStream>()?;
     m.add_class::<PyCdlGapsidesidewhiteStream>()?;
     m.add_class::<PyCdlGravestonedojiStream>()?;
     m.add_class::<PyCdlHammerStream>()?;
@@ -18436,27 +21187,37 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyCdlHaramiStream>()?;
     m.add_class::<PyCdlHaramicrossStream>()?;
     m.add_class::<PyCdlHighwaveStream>()?;
+    m.add_class::<PyCdlHikkakeStream>()?;
+    m.add_class::<PyCdlHikkakemodStream>()?;
     m.add_class::<PyCdlHomingpigeonStream>()?;
     m.add_class::<PyCdlIdentical3crowsStream>()?;
     m.add_class::<PyCdlInneckStream>()?;
     m.add_class::<PyCdlInvertedhammerStream>()?;
     m.add_class::<PyCdlKickingStream>()?;
     m.add_class::<PyCdlKickingbylengthStream>()?;
+    m.add_class::<PyCdlLadderbottomStream>()?;
     m.add_class::<PyCdlLongleggeddojiStream>()?;
     m.add_class::<PyCdlLonglineStream>()?;
     m.add_class::<PyCdlMarubozuStream>()?;
     m.add_class::<PyCdlMatchinglowStream>()?;
+    m.add_class::<PyCdlMatholdStream>()?;
+    m.add_class::<PyCdlMorningdojistarStream>()?;
+    m.add_class::<PyCdlMorningstarStream>()?;
     m.add_class::<PyCdlOnneckStream>()?;
     m.add_class::<PyCdlPiercingStream>()?;
     m.add_class::<PyCdlRickshawmanStream>()?;
+    m.add_class::<PyCdlRisefall3methodsStream>()?;
     m.add_class::<PyCdlSeparatinglinesStream>()?;
     m.add_class::<PyCdlShootingstarStream>()?;
     m.add_class::<PyCdlShortlineStream>()?;
     m.add_class::<PyCdlSpinningtopStream>()?;
+    m.add_class::<PyCdlStalledpatternStream>()?;
     m.add_class::<PyCdlSticksandwichStream>()?;
     m.add_class::<PyCdlTakuriStream>()?;
     m.add_class::<PyCdlTasukigapStream>()?;
     m.add_class::<PyCdlThrustingStream>()?;
+    m.add_class::<PyCdlTristarStream>()?;
+    m.add_class::<PyCdlUnique3riverStream>()?;
     m.add_class::<PyCdlUpsidegap2crowsStream>()?;
     m.add_class::<PyCdlXsidegap3methodsStream>()?;
     m.add_class::<PyCeilStream>()?;
@@ -18765,7 +21526,15 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     }
     {
         let params = PyDict::new(py);
+        table.set_item("cdl_3linestrike", params)?;
+    }
+    {
+        let params = PyDict::new(py);
         table.set_item("cdl_3outside", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_3starsinsouth", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -18773,11 +21542,35 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     }
     {
         let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.3)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("penetration", entry)?;
+        }
+        table.set_item("cdl_abandonedbaby", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_advanceblock", params)?;
+    }
+    {
+        let params = PyDict::new(py);
         table.set_item("cdl_belthold", params)?;
     }
     {
         let params = PyDict::new(py);
+        table.set_item("cdl_breakaway", params)?;
+    }
+    {
+        let params = PyDict::new(py);
         table.set_item("cdl_closingmarubozu", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_concealbabyswall", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -18813,6 +21606,30 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     }
     {
         let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.3)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("penetration", entry)?;
+        }
+        table.set_item("cdl_eveningdojistar", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.3)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("penetration", entry)?;
+        }
+        table.set_item("cdl_eveningstar", params)?;
+    }
+    {
+        let params = PyDict::new(py);
         table.set_item("cdl_gapsidesidewhite", params)?;
     }
     {
@@ -18841,6 +21658,14 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     }
     {
         let params = PyDict::new(py);
+        table.set_item("cdl_hikkake", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_hikkakemod", params)?;
+    }
+    {
+        let params = PyDict::new(py);
         table.set_item("cdl_homingpigeon", params)?;
     }
     {
@@ -18865,6 +21690,10 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     }
     {
         let params = PyDict::new(py);
+        table.set_item("cdl_ladderbottom", params)?;
+    }
+    {
+        let params = PyDict::new(py);
         table.set_item("cdl_longleggeddoji", params)?;
     }
     {
@@ -18881,6 +21710,42 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     }
     {
         let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.5)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("penetration", entry)?;
+        }
+        table.set_item("cdl_mathold", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.3)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("penetration", entry)?;
+        }
+        table.set_item("cdl_morningdojistar", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.3)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("penetration", entry)?;
+        }
+        table.set_item("cdl_morningstar", params)?;
+    }
+    {
+        let params = PyDict::new(py);
         table.set_item("cdl_onneck", params)?;
     }
     {
@@ -18890,6 +21755,10 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     {
         let params = PyDict::new(py);
         table.set_item("cdl_rickshawman", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_risefall3methods", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -18909,6 +21778,10 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     }
     {
         let params = PyDict::new(py);
+        table.set_item("cdl_stalledpattern", params)?;
+    }
+    {
+        let params = PyDict::new(py);
         table.set_item("cdl_sticksandwich", params)?;
     }
     {
@@ -18922,6 +21795,14 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     {
         let params = PyDict::new(py);
         table.set_item("cdl_thrusting", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_tristar", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("cdl_unique3river", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -20011,16 +22892,24 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("cdl_2crows", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_3blackcrows", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_3inside", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_3linestrike", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_3outside", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_3starsinsouth", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_3whitesoldiers", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_abandonedbaby", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_advanceblock", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_belthold", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_breakaway", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_closingmarubozu", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_concealbabyswall", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_counterattack", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_darkcloudcover", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_doji", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_dojistar", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_dragonflydoji", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_engulfing", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_eveningdojistar", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_eveningstar", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_gapsidesidewhite", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_gravestonedoji", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_hammer", vec!["open", "high", "low", "close"])?;
@@ -20028,27 +22917,37 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("cdl_harami", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_haramicross", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_highwave", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_hikkake", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_hikkakemod", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_homingpigeon", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_identical3crows", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_inneck", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_invertedhammer", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_kicking", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_kickingbylength", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_ladderbottom", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_longleggeddoji", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_longline", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_marubozu", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_matchinglow", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_mathold", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_morningdojistar", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_morningstar", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_onneck", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_piercing", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_rickshawman", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_risefall3methods", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_separatinglines", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_shootingstar", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_shortline", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_spinningtop", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_stalledpattern", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_sticksandwich", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_takuri", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_tasukigap", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_thrusting", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_tristar", vec!["open", "high", "low", "close"])?;
+    table.set_item("cdl_unique3river", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_upsidegap2crows", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_xsidegap3methods", vec!["open", "high", "low", "close"])?;
     table.set_item("ceil", vec!["source"])?;
@@ -20163,16 +23062,24 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("cdl_2crows", vec!["cdl_2crows"])?;
     table.set_item("cdl_3blackcrows", vec!["cdl_3blackcrows"])?;
     table.set_item("cdl_3inside", vec!["cdl_3inside"])?;
+    table.set_item("cdl_3linestrike", vec!["cdl_3linestrike"])?;
     table.set_item("cdl_3outside", vec!["cdl_3outside"])?;
+    table.set_item("cdl_3starsinsouth", vec!["cdl_3starsinsouth"])?;
     table.set_item("cdl_3whitesoldiers", vec!["cdl_3whitesoldiers"])?;
+    table.set_item("cdl_abandonedbaby", vec!["cdl_abandonedbaby"])?;
+    table.set_item("cdl_advanceblock", vec!["cdl_advanceblock"])?;
     table.set_item("cdl_belthold", vec!["cdl_belthold"])?;
+    table.set_item("cdl_breakaway", vec!["cdl_breakaway"])?;
     table.set_item("cdl_closingmarubozu", vec!["cdl_closingmarubozu"])?;
+    table.set_item("cdl_concealbabyswall", vec!["cdl_concealbabyswall"])?;
     table.set_item("cdl_counterattack", vec!["cdl_counterattack"])?;
     table.set_item("cdl_darkcloudcover", vec!["cdl_darkcloudcover"])?;
     table.set_item("cdl_doji", vec!["cdl_doji"])?;
     table.set_item("cdl_dojistar", vec!["cdl_dojistar"])?;
     table.set_item("cdl_dragonflydoji", vec!["cdl_dragonflydoji"])?;
     table.set_item("cdl_engulfing", vec!["cdl_engulfing"])?;
+    table.set_item("cdl_eveningdojistar", vec!["cdl_eveningdojistar"])?;
+    table.set_item("cdl_eveningstar", vec!["cdl_eveningstar"])?;
     table.set_item("cdl_gapsidesidewhite", vec!["cdl_gapsidesidewhite"])?;
     table.set_item("cdl_gravestonedoji", vec!["cdl_gravestonedoji"])?;
     table.set_item("cdl_hammer", vec!["cdl_hammer"])?;
@@ -20180,27 +23087,37 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("cdl_harami", vec!["cdl_harami"])?;
     table.set_item("cdl_haramicross", vec!["cdl_haramicross"])?;
     table.set_item("cdl_highwave", vec!["cdl_highwave"])?;
+    table.set_item("cdl_hikkake", vec!["cdl_hikkake"])?;
+    table.set_item("cdl_hikkakemod", vec!["cdl_hikkakemod"])?;
     table.set_item("cdl_homingpigeon", vec!["cdl_homingpigeon"])?;
     table.set_item("cdl_identical3crows", vec!["cdl_identical3crows"])?;
     table.set_item("cdl_inneck", vec!["cdl_inneck"])?;
     table.set_item("cdl_invertedhammer", vec!["cdl_invertedhammer"])?;
     table.set_item("cdl_kicking", vec!["cdl_kicking"])?;
     table.set_item("cdl_kickingbylength", vec!["cdl_kickingbylength"])?;
+    table.set_item("cdl_ladderbottom", vec!["cdl_ladderbottom"])?;
     table.set_item("cdl_longleggeddoji", vec!["cdl_longleggeddoji"])?;
     table.set_item("cdl_longline", vec!["cdl_longline"])?;
     table.set_item("cdl_marubozu", vec!["cdl_marubozu"])?;
     table.set_item("cdl_matchinglow", vec!["cdl_matchinglow"])?;
+    table.set_item("cdl_mathold", vec!["cdl_mathold"])?;
+    table.set_item("cdl_morningdojistar", vec!["cdl_morningdojistar"])?;
+    table.set_item("cdl_morningstar", vec!["cdl_morningstar"])?;
     table.set_item("cdl_onneck", vec!["cdl_onneck"])?;
     table.set_item("cdl_piercing", vec!["cdl_piercing"])?;
     table.set_item("cdl_rickshawman", vec!["cdl_rickshawman"])?;
+    table.set_item("cdl_risefall3methods", vec!["cdl_risefall3methods"])?;
     table.set_item("cdl_separatinglines", vec!["cdl_separatinglines"])?;
     table.set_item("cdl_shootingstar", vec!["cdl_shootingstar"])?;
     table.set_item("cdl_shortline", vec!["cdl_shortline"])?;
     table.set_item("cdl_spinningtop", vec!["cdl_spinningtop"])?;
+    table.set_item("cdl_stalledpattern", vec!["cdl_stalledpattern"])?;
     table.set_item("cdl_sticksandwich", vec!["cdl_sticksandwich"])?;
     table.set_item("cdl_takuri", vec!["cdl_takuri"])?;
     table.set_item("cdl_tasukigap", vec!["cdl_tasukigap"])?;
     table.set_item("cdl_thrusting", vec!["cdl_thrusting"])?;
+    table.set_item("cdl_tristar", vec!["cdl_tristar"])?;
+    table.set_item("cdl_unique3river", vec!["cdl_unique3river"])?;
     table.set_item("cdl_upsidegap2crows", vec!["cdl_upsidegap2crows"])?;
     table.set_item("cdl_xsidegap3methods", vec!["cdl_xsidegap3methods"])?;
     table.set_item("ceil", vec!["ceil"])?;
@@ -20321,16 +23238,24 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("cdl_2crows", vec!["int32"])?;
     table.set_item("cdl_3blackcrows", vec!["int32"])?;
     table.set_item("cdl_3inside", vec!["int32"])?;
+    table.set_item("cdl_3linestrike", vec!["int32"])?;
     table.set_item("cdl_3outside", vec!["int32"])?;
+    table.set_item("cdl_3starsinsouth", vec!["int32"])?;
     table.set_item("cdl_3whitesoldiers", vec!["int32"])?;
+    table.set_item("cdl_abandonedbaby", vec!["int32"])?;
+    table.set_item("cdl_advanceblock", vec!["int32"])?;
     table.set_item("cdl_belthold", vec!["int32"])?;
+    table.set_item("cdl_breakaway", vec!["int32"])?;
     table.set_item("cdl_closingmarubozu", vec!["int32"])?;
+    table.set_item("cdl_concealbabyswall", vec!["int32"])?;
     table.set_item("cdl_counterattack", vec!["int32"])?;
     table.set_item("cdl_darkcloudcover", vec!["int32"])?;
     table.set_item("cdl_doji", vec!["int32"])?;
     table.set_item("cdl_dojistar", vec!["int32"])?;
     table.set_item("cdl_dragonflydoji", vec!["int32"])?;
     table.set_item("cdl_engulfing", vec!["int32"])?;
+    table.set_item("cdl_eveningdojistar", vec!["int32"])?;
+    table.set_item("cdl_eveningstar", vec!["int32"])?;
     table.set_item("cdl_gapsidesidewhite", vec!["int32"])?;
     table.set_item("cdl_gravestonedoji", vec!["int32"])?;
     table.set_item("cdl_hammer", vec!["int32"])?;
@@ -20338,27 +23263,37 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("cdl_harami", vec!["int32"])?;
     table.set_item("cdl_haramicross", vec!["int32"])?;
     table.set_item("cdl_highwave", vec!["int32"])?;
+    table.set_item("cdl_hikkake", vec!["int32"])?;
+    table.set_item("cdl_hikkakemod", vec!["int32"])?;
     table.set_item("cdl_homingpigeon", vec!["int32"])?;
     table.set_item("cdl_identical3crows", vec!["int32"])?;
     table.set_item("cdl_inneck", vec!["int32"])?;
     table.set_item("cdl_invertedhammer", vec!["int32"])?;
     table.set_item("cdl_kicking", vec!["int32"])?;
     table.set_item("cdl_kickingbylength", vec!["int32"])?;
+    table.set_item("cdl_ladderbottom", vec!["int32"])?;
     table.set_item("cdl_longleggeddoji", vec!["int32"])?;
     table.set_item("cdl_longline", vec!["int32"])?;
     table.set_item("cdl_marubozu", vec!["int32"])?;
     table.set_item("cdl_matchinglow", vec!["int32"])?;
+    table.set_item("cdl_mathold", vec!["int32"])?;
+    table.set_item("cdl_morningdojistar", vec!["int32"])?;
+    table.set_item("cdl_morningstar", vec!["int32"])?;
     table.set_item("cdl_onneck", vec!["int32"])?;
     table.set_item("cdl_piercing", vec!["int32"])?;
     table.set_item("cdl_rickshawman", vec!["int32"])?;
+    table.set_item("cdl_risefall3methods", vec!["int32"])?;
     table.set_item("cdl_separatinglines", vec!["int32"])?;
     table.set_item("cdl_shootingstar", vec!["int32"])?;
     table.set_item("cdl_shortline", vec!["int32"])?;
     table.set_item("cdl_spinningtop", vec!["int32"])?;
+    table.set_item("cdl_stalledpattern", vec!["int32"])?;
     table.set_item("cdl_sticksandwich", vec!["int32"])?;
     table.set_item("cdl_takuri", vec!["int32"])?;
     table.set_item("cdl_tasukigap", vec!["int32"])?;
     table.set_item("cdl_thrusting", vec!["int32"])?;
+    table.set_item("cdl_tristar", vec!["int32"])?;
+    table.set_item("cdl_unique3river", vec!["int32"])?;
     table.set_item("cdl_upsidegap2crows", vec!["int32"])?;
     table.set_item("cdl_xsidegap3methods", vec!["int32"])?;
     table.set_item("ceil", vec!["float64"])?;
@@ -20467,16 +23402,24 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("cdl_2crows", vec!["pattern"])?;
     table.set_item("cdl_3blackcrows", vec!["pattern"])?;
     table.set_item("cdl_3inside", vec!["pattern"])?;
+    table.set_item("cdl_3linestrike", vec!["pattern"])?;
     table.set_item("cdl_3outside", vec!["pattern"])?;
+    table.set_item("cdl_3starsinsouth", vec!["pattern"])?;
     table.set_item("cdl_3whitesoldiers", vec!["pattern"])?;
+    table.set_item("cdl_abandonedbaby", vec!["pattern"])?;
+    table.set_item("cdl_advanceblock", vec!["pattern"])?;
     table.set_item("cdl_belthold", vec!["pattern"])?;
+    table.set_item("cdl_breakaway", vec!["pattern"])?;
     table.set_item("cdl_closingmarubozu", vec!["pattern"])?;
+    table.set_item("cdl_concealbabyswall", vec!["pattern"])?;
     table.set_item("cdl_counterattack", vec!["pattern"])?;
     table.set_item("cdl_darkcloudcover", vec!["pattern"])?;
     table.set_item("cdl_doji", vec!["pattern"])?;
     table.set_item("cdl_dojistar", vec!["pattern"])?;
     table.set_item("cdl_dragonflydoji", vec!["pattern"])?;
     table.set_item("cdl_engulfing", vec!["pattern"])?;
+    table.set_item("cdl_eveningdojistar", vec!["pattern"])?;
+    table.set_item("cdl_eveningstar", vec!["pattern"])?;
     table.set_item("cdl_gapsidesidewhite", vec!["pattern"])?;
     table.set_item("cdl_gravestonedoji", vec!["pattern"])?;
     table.set_item("cdl_hammer", vec!["pattern"])?;
@@ -20484,27 +23427,37 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("cdl_harami", vec!["pattern"])?;
     table.set_item("cdl_haramicross", vec!["pattern"])?;
     table.set_item("cdl_highwave", vec!["pattern"])?;
+    table.set_item("cdl_hikkake", vec!["pattern", "path_dependent"])?;
+    table.set_item("cdl_hikkakemod", vec!["pattern", "path_dependent"])?;
     table.set_item("cdl_homingpigeon", vec!["pattern"])?;
     table.set_item("cdl_identical3crows", vec!["pattern"])?;
     table.set_item("cdl_inneck", vec!["pattern"])?;
     table.set_item("cdl_invertedhammer", vec!["pattern"])?;
     table.set_item("cdl_kicking", vec!["pattern"])?;
     table.set_item("cdl_kickingbylength", vec!["pattern"])?;
+    table.set_item("cdl_ladderbottom", vec!["pattern"])?;
     table.set_item("cdl_longleggeddoji", vec!["pattern"])?;
     table.set_item("cdl_longline", vec!["pattern"])?;
     table.set_item("cdl_marubozu", vec!["pattern"])?;
     table.set_item("cdl_matchinglow", vec!["pattern"])?;
+    table.set_item("cdl_mathold", vec!["pattern"])?;
+    table.set_item("cdl_morningdojistar", vec!["pattern"])?;
+    table.set_item("cdl_morningstar", vec!["pattern"])?;
     table.set_item("cdl_onneck", vec!["pattern"])?;
     table.set_item("cdl_piercing", vec!["pattern"])?;
     table.set_item("cdl_rickshawman", vec!["pattern"])?;
+    table.set_item("cdl_risefall3methods", vec!["pattern"])?;
     table.set_item("cdl_separatinglines", vec!["pattern"])?;
     table.set_item("cdl_shootingstar", vec!["pattern"])?;
     table.set_item("cdl_shortline", vec!["pattern"])?;
     table.set_item("cdl_spinningtop", vec!["pattern"])?;
+    table.set_item("cdl_stalledpattern", vec!["pattern"])?;
     table.set_item("cdl_sticksandwich", vec!["pattern"])?;
     table.set_item("cdl_takuri", vec!["pattern"])?;
     table.set_item("cdl_tasukigap", vec!["pattern"])?;
     table.set_item("cdl_thrusting", vec!["pattern"])?;
+    table.set_item("cdl_tristar", vec!["pattern"])?;
+    table.set_item("cdl_unique3river", vec!["pattern"])?;
     table.set_item("cdl_upsidegap2crows", vec!["pattern"])?;
     table.set_item("cdl_xsidegap3methods", vec!["pattern"])?;
     table.set_item("ceil", vec!["nan_inf_output"])?;
@@ -20613,16 +23566,24 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("cdl_2crows", "patterns")?;
     table.set_item("cdl_3blackcrows", "patterns")?;
     table.set_item("cdl_3inside", "patterns")?;
+    table.set_item("cdl_3linestrike", "patterns")?;
     table.set_item("cdl_3outside", "patterns")?;
+    table.set_item("cdl_3starsinsouth", "patterns")?;
     table.set_item("cdl_3whitesoldiers", "patterns")?;
+    table.set_item("cdl_abandonedbaby", "patterns")?;
+    table.set_item("cdl_advanceblock", "patterns")?;
     table.set_item("cdl_belthold", "patterns")?;
+    table.set_item("cdl_breakaway", "patterns")?;
     table.set_item("cdl_closingmarubozu", "patterns")?;
+    table.set_item("cdl_concealbabyswall", "patterns")?;
     table.set_item("cdl_counterattack", "patterns")?;
     table.set_item("cdl_darkcloudcover", "patterns")?;
     table.set_item("cdl_doji", "patterns")?;
     table.set_item("cdl_dojistar", "patterns")?;
     table.set_item("cdl_dragonflydoji", "patterns")?;
     table.set_item("cdl_engulfing", "patterns")?;
+    table.set_item("cdl_eveningdojistar", "patterns")?;
+    table.set_item("cdl_eveningstar", "patterns")?;
     table.set_item("cdl_gapsidesidewhite", "patterns")?;
     table.set_item("cdl_gravestonedoji", "patterns")?;
     table.set_item("cdl_hammer", "patterns")?;
@@ -20630,27 +23591,37 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("cdl_harami", "patterns")?;
     table.set_item("cdl_haramicross", "patterns")?;
     table.set_item("cdl_highwave", "patterns")?;
+    table.set_item("cdl_hikkake", "patterns")?;
+    table.set_item("cdl_hikkakemod", "patterns")?;
     table.set_item("cdl_homingpigeon", "patterns")?;
     table.set_item("cdl_identical3crows", "patterns")?;
     table.set_item("cdl_inneck", "patterns")?;
     table.set_item("cdl_invertedhammer", "patterns")?;
     table.set_item("cdl_kicking", "patterns")?;
     table.set_item("cdl_kickingbylength", "patterns")?;
+    table.set_item("cdl_ladderbottom", "patterns")?;
     table.set_item("cdl_longleggeddoji", "patterns")?;
     table.set_item("cdl_longline", "patterns")?;
     table.set_item("cdl_marubozu", "patterns")?;
     table.set_item("cdl_matchinglow", "patterns")?;
+    table.set_item("cdl_mathold", "patterns")?;
+    table.set_item("cdl_morningdojistar", "patterns")?;
+    table.set_item("cdl_morningstar", "patterns")?;
     table.set_item("cdl_onneck", "patterns")?;
     table.set_item("cdl_piercing", "patterns")?;
     table.set_item("cdl_rickshawman", "patterns")?;
+    table.set_item("cdl_risefall3methods", "patterns")?;
     table.set_item("cdl_separatinglines", "patterns")?;
     table.set_item("cdl_shootingstar", "patterns")?;
     table.set_item("cdl_shortline", "patterns")?;
     table.set_item("cdl_spinningtop", "patterns")?;
+    table.set_item("cdl_stalledpattern", "patterns")?;
     table.set_item("cdl_sticksandwich", "patterns")?;
     table.set_item("cdl_takuri", "patterns")?;
     table.set_item("cdl_tasukigap", "patterns")?;
     table.set_item("cdl_thrusting", "patterns")?;
+    table.set_item("cdl_tristar", "patterns")?;
+    table.set_item("cdl_unique3river", "patterns")?;
     table.set_item("cdl_upsidegap2crows", "patterns")?;
     table.set_item("cdl_xsidegap3methods", "patterns")?;
     table.set_item("ceil", "math")?;
@@ -20868,17 +23839,36 @@ pub fn lookback_of(
         "cdl_3inside" => {
             Ok(<trendlib::indicators::cdl_3inside::Cdl3inside as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_3inside::Params { }))
         }
+        "cdl_3linestrike" => {
+            Ok(<trendlib::indicators::cdl_3linestrike::Cdl3linestrike as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_3linestrike::Params { }))
+        }
         "cdl_3outside" => {
             Ok(<trendlib::indicators::cdl_3outside::Cdl3outside as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_3outside::Params { }))
+        }
+        "cdl_3starsinsouth" => {
+            Ok(<trendlib::indicators::cdl_3starsinsouth::Cdl3starsinsouth as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_3starsinsouth::Params { }))
         }
         "cdl_3whitesoldiers" => {
             Ok(<trendlib::indicators::cdl_3whitesoldiers::Cdl3whitesoldiers as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_3whitesoldiers::Params { }))
         }
+        "cdl_abandonedbaby" => {
+            let penetration = 0.3;
+            Ok(<trendlib::indicators::cdl_abandonedbaby::CdlAbandonedbaby as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_abandonedbaby::Params { penetration, }))
+        }
+        "cdl_advanceblock" => {
+            Ok(<trendlib::indicators::cdl_advanceblock::CdlAdvanceblock as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_advanceblock::Params { }))
+        }
         "cdl_belthold" => {
             Ok(<trendlib::indicators::cdl_belthold::CdlBelthold as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_belthold::Params { }))
         }
+        "cdl_breakaway" => {
+            Ok(<trendlib::indicators::cdl_breakaway::CdlBreakaway as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_breakaway::Params { }))
+        }
         "cdl_closingmarubozu" => {
             Ok(<trendlib::indicators::cdl_closingmarubozu::CdlClosingmarubozu as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_closingmarubozu::Params { }))
+        }
+        "cdl_concealbabyswall" => {
+            Ok(<trendlib::indicators::cdl_concealbabyswall::CdlConcealbabyswall as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_concealbabyswall::Params { }))
         }
         "cdl_counterattack" => {
             Ok(<trendlib::indicators::cdl_counterattack::CdlCounterattack as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_counterattack::Params { }))
@@ -20898,6 +23888,14 @@ pub fn lookback_of(
         }
         "cdl_engulfing" => {
             Ok(<trendlib::indicators::cdl_engulfing::CdlEngulfing as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_engulfing::Params { }))
+        }
+        "cdl_eveningdojistar" => {
+            let penetration = 0.3;
+            Ok(<trendlib::indicators::cdl_eveningdojistar::CdlEveningdojistar as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_eveningdojistar::Params { penetration, }))
+        }
+        "cdl_eveningstar" => {
+            let penetration = 0.3;
+            Ok(<trendlib::indicators::cdl_eveningstar::CdlEveningstar as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_eveningstar::Params { penetration, }))
         }
         "cdl_gapsidesidewhite" => {
             Ok(<trendlib::indicators::cdl_gapsidesidewhite::CdlGapsidesidewhite as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_gapsidesidewhite::Params { }))
@@ -20920,6 +23918,12 @@ pub fn lookback_of(
         "cdl_highwave" => {
             Ok(<trendlib::indicators::cdl_highwave::CdlHighwave as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_highwave::Params { }))
         }
+        "cdl_hikkake" => {
+            Ok(<trendlib::indicators::cdl_hikkake::CdlHikkake as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_hikkake::Params { }))
+        }
+        "cdl_hikkakemod" => {
+            Ok(<trendlib::indicators::cdl_hikkakemod::CdlHikkakemod as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_hikkakemod::Params { }))
+        }
         "cdl_homingpigeon" => {
             Ok(<trendlib::indicators::cdl_homingpigeon::CdlHomingpigeon as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_homingpigeon::Params { }))
         }
@@ -20938,6 +23942,9 @@ pub fn lookback_of(
         "cdl_kickingbylength" => {
             Ok(<trendlib::indicators::cdl_kickingbylength::CdlKickingbylength as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_kickingbylength::Params { }))
         }
+        "cdl_ladderbottom" => {
+            Ok(<trendlib::indicators::cdl_ladderbottom::CdlLadderbottom as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_ladderbottom::Params { }))
+        }
         "cdl_longleggeddoji" => {
             Ok(<trendlib::indicators::cdl_longleggeddoji::CdlLongleggeddoji as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_longleggeddoji::Params { }))
         }
@@ -20950,6 +23957,18 @@ pub fn lookback_of(
         "cdl_matchinglow" => {
             Ok(<trendlib::indicators::cdl_matchinglow::CdlMatchinglow as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_matchinglow::Params { }))
         }
+        "cdl_mathold" => {
+            let penetration = 0.5;
+            Ok(<trendlib::indicators::cdl_mathold::CdlMathold as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_mathold::Params { penetration, }))
+        }
+        "cdl_morningdojistar" => {
+            let penetration = 0.3;
+            Ok(<trendlib::indicators::cdl_morningdojistar::CdlMorningdojistar as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_morningdojistar::Params { penetration, }))
+        }
+        "cdl_morningstar" => {
+            let penetration = 0.3;
+            Ok(<trendlib::indicators::cdl_morningstar::CdlMorningstar as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_morningstar::Params { penetration, }))
+        }
         "cdl_onneck" => {
             Ok(<trendlib::indicators::cdl_onneck::CdlOnneck as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_onneck::Params { }))
         }
@@ -20958,6 +23977,9 @@ pub fn lookback_of(
         }
         "cdl_rickshawman" => {
             Ok(<trendlib::indicators::cdl_rickshawman::CdlRickshawman as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_rickshawman::Params { }))
+        }
+        "cdl_risefall3methods" => {
+            Ok(<trendlib::indicators::cdl_risefall3methods::CdlRisefall3methods as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_risefall3methods::Params { }))
         }
         "cdl_separatinglines" => {
             Ok(<trendlib::indicators::cdl_separatinglines::CdlSeparatinglines as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_separatinglines::Params { }))
@@ -20971,6 +23993,9 @@ pub fn lookback_of(
         "cdl_spinningtop" => {
             Ok(<trendlib::indicators::cdl_spinningtop::CdlSpinningtop as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_spinningtop::Params { }))
         }
+        "cdl_stalledpattern" => {
+            Ok(<trendlib::indicators::cdl_stalledpattern::CdlStalledpattern as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_stalledpattern::Params { }))
+        }
         "cdl_sticksandwich" => {
             Ok(<trendlib::indicators::cdl_sticksandwich::CdlSticksandwich as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_sticksandwich::Params { }))
         }
@@ -20982,6 +24007,12 @@ pub fn lookback_of(
         }
         "cdl_thrusting" => {
             Ok(<trendlib::indicators::cdl_thrusting::CdlThrusting as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_thrusting::Params { }))
+        }
+        "cdl_tristar" => {
+            Ok(<trendlib::indicators::cdl_tristar::CdlTristar as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_tristar::Params { }))
+        }
+        "cdl_unique3river" => {
+            Ok(<trendlib::indicators::cdl_unique3river::CdlUnique3river as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_unique3river::Params { }))
         }
         "cdl_upsidegap2crows" => {
             Ok(<trendlib::indicators::cdl_upsidegap2crows::CdlUpsidegap2crows as Kernel<4, 1>>::lookback(&trendlib::indicators::cdl_upsidegap2crows::Params { }))

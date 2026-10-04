@@ -1,0 +1,25 @@
+name: cdl_advanceblock
+title: Advance Block
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_advanceblock
+    dtype: int32
+    plot: pattern
+    doc: Three white bars closing higher, with the advance visibly slowing
+talib:
+  name: CDLADVANCEBLOCK
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_3whitesoldiers, cdl_stalledpattern, cdl_deliberation]

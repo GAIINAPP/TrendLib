@@ -1,0 +1,25 @@
+name: cdl_ladderbottom
+title: Ladder Bottom
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_ladderbottom
+    dtype: int32
+    plot: pattern
+    doc: Three black bars stepping down, a fourth with a wick above, then a white one clearing it
+talib:
+  name: CDLLADDERBOTTOM
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_3starsinsouth, cdl_3blackcrows, cdl_concealbabyswall]

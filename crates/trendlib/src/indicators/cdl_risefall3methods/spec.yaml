@@ -1,0 +1,25 @@
+name: cdl_risefall3methods
+title: Rising/Falling Three Methods
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_risefall3methods
+    dtype: int32
+    plot: pattern
+    doc: A long bar, three short ones drifting back inside its range, then a long one carrying on
+talib:
+  name: CDLRISEFALL3METHODS
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_mathold, cdl_xsidegap3methods, cdl_breakaway]

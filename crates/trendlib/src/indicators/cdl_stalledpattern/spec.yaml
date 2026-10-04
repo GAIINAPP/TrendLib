@@ -1,0 +1,25 @@
+name: cdl_stalledpattern
+title: Stalled Pattern
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_stalledpattern
+    dtype: int32
+    plot: pattern
+    doc: Two long white bars then a short one riding on the second's shoulder
+talib:
+  name: CDLSTALLEDPATTERN
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_advanceblock, cdl_3whitesoldiers, cdl_shortline]

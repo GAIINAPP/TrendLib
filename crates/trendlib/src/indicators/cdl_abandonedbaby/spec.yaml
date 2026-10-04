@@ -1,0 +1,31 @@
+name: cdl_abandonedbaby
+title: Abandoned Baby
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: penetration
+    type: float
+    default: 0.3
+    min: 0.0
+    doc: How far into the previous body the close has to travel, as a fraction of it
+outputs:
+  - name: cdl_abandonedbaby
+    dtype: int32
+    plot: pattern
+    doc: A doji stranded by a gap on both sides, between two long bars of opposite colours
+talib:
+  name: CDLABANDONEDBABY
+  params: {penetration: penetration}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_morningdojistar, cdl_eveningdojistar, cdl_dojistar]

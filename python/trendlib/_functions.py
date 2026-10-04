@@ -33,16 +33,24 @@ __all__ = [
     "CDL2CROWS",
     "CDL3BLACKCROWS",
     "CDL3INSIDE",
+    "CDL3LINESTRIKE",
     "CDL3OUTSIDE",
+    "CDL3STARSINSOUTH",
     "CDL3WHITESOLDIERS",
+    "CDLABANDONEDBABY",
+    "CDLADVANCEBLOCK",
     "CDLBELTHOLD",
+    "CDLBREAKAWAY",
     "CDLCLOSINGMARUBOZU",
+    "CDLCONCEALBABYSWALL",
     "CDLCOUNTERATTACK",
     "CDLDARKCLOUDCOVER",
     "CDLDOJI",
     "CDLDOJISTAR",
     "CDLDRAGONFLYDOJI",
     "CDLENGULFING",
+    "CDLEVENINGDOJISTAR",
+    "CDLEVENINGSTAR",
     "CDLGAPSIDESIDEWHITE",
     "CDLGRAVESTONEDOJI",
     "CDLHAMMER",
@@ -50,27 +58,37 @@ __all__ = [
     "CDLHARAMI",
     "CDLHARAMICROSS",
     "CDLHIGHWAVE",
+    "CDLHIKKAKE",
+    "CDLHIKKAKEMOD",
     "CDLHOMINGPIGEON",
     "CDLIDENTICAL3CROWS",
     "CDLINNECK",
     "CDLINVERTEDHAMMER",
     "CDLKICKING",
     "CDLKICKINGBYLENGTH",
+    "CDLLADDERBOTTOM",
     "CDLLONGLEGGEDDOJI",
     "CDLLONGLINE",
     "CDLMARUBOZU",
     "CDLMATCHINGLOW",
+    "CDLMATHOLD",
+    "CDLMORNINGDOJISTAR",
+    "CDLMORNINGSTAR",
     "CDLONNECK",
     "CDLPIERCING",
     "CDLRICKSHAWMAN",
+    "CDLRISEFALL3METHODS",
     "CDLSEPARATINGLINES",
     "CDLSHOOTINGSTAR",
     "CDLSHORTLINE",
     "CDLSPINNINGTOP",
+    "CDLSTALLEDPATTERN",
     "CDLSTICKSANDWICH",
     "CDLTAKURI",
     "CDLTASUKIGAP",
     "CDLTHRUSTING",
+    "CDLTRISTAR",
+    "CDLUNIQUE3RIVER",
     "CDLUPSIDEGAP2CROWS",
     "CDLXSIDEGAP3METHODS",
     "CEIL",
@@ -173,16 +191,24 @@ __all__ = [
     "cdl_2crows",
     "cdl_3blackcrows",
     "cdl_3inside",
+    "cdl_3linestrike",
     "cdl_3outside",
+    "cdl_3starsinsouth",
     "cdl_3whitesoldiers",
+    "cdl_abandonedbaby",
+    "cdl_advanceblock",
     "cdl_belthold",
+    "cdl_breakaway",
     "cdl_closingmarubozu",
+    "cdl_concealbabyswall",
     "cdl_counterattack",
     "cdl_darkcloudcover",
     "cdl_doji",
     "cdl_dojistar",
     "cdl_dragonflydoji",
     "cdl_engulfing",
+    "cdl_eveningdojistar",
+    "cdl_eveningstar",
     "cdl_gapsidesidewhite",
     "cdl_gravestonedoji",
     "cdl_hammer",
@@ -190,27 +216,37 @@ __all__ = [
     "cdl_harami",
     "cdl_haramicross",
     "cdl_highwave",
+    "cdl_hikkake",
+    "cdl_hikkakemod",
     "cdl_homingpigeon",
     "cdl_identical3crows",
     "cdl_inneck",
     "cdl_invertedhammer",
     "cdl_kicking",
     "cdl_kickingbylength",
+    "cdl_ladderbottom",
     "cdl_longleggeddoji",
     "cdl_longline",
     "cdl_marubozu",
     "cdl_matchinglow",
+    "cdl_mathold",
+    "cdl_morningdojistar",
+    "cdl_morningstar",
     "cdl_onneck",
     "cdl_piercing",
     "cdl_rickshawman",
+    "cdl_risefall3methods",
     "cdl_separatinglines",
     "cdl_shootingstar",
     "cdl_shortline",
     "cdl_spinningtop",
+    "cdl_stalledpattern",
     "cdl_sticksandwich",
     "cdl_takuri",
     "cdl_tasukigap",
     "cdl_thrusting",
+    "cdl_tristar",
+    "cdl_unique3river",
     "cdl_upsidegap2crows",
     "cdl_xsidegap3methods",
     "ceil",
@@ -875,6 +911,34 @@ def cdl_3inside(open=None, high=None, low=None, close=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("cdl_3inside",))
 
 
+def cdl_3linestrike(open=None, high=None, low=None, close=None) -> Any:
+    """Three-Line Strike.
+
+    Returns
+    -------
+    ndarray or Series
+        Three bars running one way, then one that opens past the last and closes past the first.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_3linestrike",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_3linestrike(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_3linestrike",))
+
+
 def cdl_3outside(open=None, high=None, low=None, close=None) -> Any:
     """Three Outside Up/Down.
 
@@ -901,6 +965,34 @@ def cdl_3outside(open=None, high=None, low=None, close=None) -> Any:
     )
     out = _core.cdl_3outside(*columns)
     return _convert.wrap_outputs(out, carrier, ("cdl_3outside",))
+
+
+def cdl_3starsinsouth(open=None, high=None, low=None, close=None) -> Any:
+    """Three Stars In The South.
+
+    Returns
+    -------
+    ndarray or Series
+        Three black bars, each smaller than the last and giving back less ground.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_3starsinsouth",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_3starsinsouth(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_3starsinsouth",))
 
 
 def cdl_3whitesoldiers(open=None, high=None, low=None, close=None) -> Any:
@@ -931,6 +1023,75 @@ def cdl_3whitesoldiers(open=None, high=None, low=None, close=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("cdl_3whitesoldiers",))
 
 
+def cdl_abandonedbaby(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    penetration: float = _PARAMS["cdl_abandonedbaby"]["penetration"]["default"],
+) -> Any:
+    """Abandoned Baby.
+
+    Parameters
+    ----------
+    penetration : float, default 0.3
+        How far into the previous body the close has to travel, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A doji stranded by a gap on both sides, between two long bars of opposite colours.
+    """
+    penetration = _convert.as_float("cdl_abandonedbaby", "penetration", penetration)
+    columns, carrier = _convert.bars(
+        "cdl_abandonedbaby",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_abandonedbaby(*columns, penetration=penetration)
+    return _convert.wrap_outputs(out, carrier, ("cdl_abandonedbaby",))
+
+
+def cdl_advanceblock(open=None, high=None, low=None, close=None) -> Any:
+    """Advance Block.
+
+    Returns
+    -------
+    ndarray or Series
+        Three white bars closing higher, with the advance visibly slowing.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_advanceblock",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_advanceblock(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_advanceblock",))
+
+
 def cdl_belthold(open=None, high=None, low=None, close=None) -> Any:
     """Belt Hold.
 
@@ -959,6 +1120,34 @@ def cdl_belthold(open=None, high=None, low=None, close=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("cdl_belthold",))
 
 
+def cdl_breakaway(open=None, high=None, low=None, close=None) -> Any:
+    """Breakaway.
+
+    Returns
+    -------
+    ndarray or Series
+        A gap away from a long bar, three bars drifting further, then one closing back into the gap.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_breakaway",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_breakaway(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_breakaway",))
+
+
 def cdl_closingmarubozu(open=None, high=None, low=None, close=None) -> Any:
     """Closing Marubozu.
 
@@ -985,6 +1174,34 @@ def cdl_closingmarubozu(open=None, high=None, low=None, close=None) -> Any:
     )
     out = _core.cdl_closingmarubozu(*columns)
     return _convert.wrap_outputs(out, carrier, ("cdl_closingmarubozu",))
+
+
+def cdl_concealbabyswall(open=None, high=None, low=None, close=None) -> Any:
+    """Concealing Baby Swallow.
+
+    Returns
+    -------
+    ndarray or Series
+        Four black bars, two of them marubozu, then one that swallows the bar before it whole.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_concealbabyswall",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_concealbabyswall(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_concealbabyswall",))
 
 
 def cdl_counterattack(open=None, high=None, low=None, close=None) -> Any:
@@ -1167,6 +1384,89 @@ def cdl_engulfing(open=None, high=None, low=None, close=None) -> Any:
     )
     out = _core.cdl_engulfing(*columns)
     return _convert.wrap_outputs(out, carrier, ("cdl_engulfing",))
+
+
+def cdl_eveningdojistar(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    penetration: float = _PARAMS["cdl_eveningdojistar"]["penetration"]["default"],
+) -> Any:
+    """Evening Doji Star.
+
+    Parameters
+    ----------
+    penetration : float, default 0.3
+        How far into the previous body the close has to travel, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A long white bar, a doji one gapping up from it, then a black one closing well back into it.
+    """
+    penetration = _convert.as_float("cdl_eveningdojistar", "penetration", penetration)
+    columns, carrier = _convert.bars(
+        "cdl_eveningdojistar",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_eveningdojistar(*columns, penetration=penetration)
+    return _convert.wrap_outputs(out, carrier, ("cdl_eveningdojistar",))
+
+
+def cdl_eveningstar(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    penetration: float = _PARAMS["cdl_eveningstar"]["penetration"]["default"],
+) -> Any:
+    """Evening Star.
+
+    Parameters
+    ----------
+    penetration : float, default 0.3
+        How far into the previous body the close has to travel, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A long white bar, a short one gapping up from it, then a black one closing well back into
+        it.
+    """
+    penetration = _convert.as_float("cdl_eveningstar", "penetration", penetration)
+    columns, carrier = _convert.bars(
+        "cdl_eveningstar",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_eveningstar(*columns, penetration=penetration)
+    return _convert.wrap_outputs(out, carrier, ("cdl_eveningstar",))
 
 
 def cdl_gapsidesidewhite(open=None, high=None, low=None, close=None) -> Any:
@@ -1365,6 +1665,62 @@ def cdl_highwave(open=None, high=None, low=None, close=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("cdl_highwave",))
 
 
+def cdl_hikkake(open=None, high=None, low=None, close=None) -> Any:
+    """Hikkake Pattern.
+
+    Returns
+    -------
+    ndarray or Series
+        An inside bar broken the wrong way, and the close that confirms it.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_hikkake",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_hikkake(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_hikkake",))
+
+
+def cdl_hikkakemod(open=None, high=None, low=None, close=None) -> Any:
+    """Modified Hikkake Pattern.
+
+    Returns
+    -------
+    ndarray or Series
+        Two nested inside bars broken the wrong way, after a close at the end of the range.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_hikkakemod",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_hikkakemod(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_hikkakemod",))
+
+
 def cdl_homingpigeon(open=None, high=None, low=None, close=None) -> Any:
     """Homing Pigeon.
 
@@ -1533,6 +1889,34 @@ def cdl_kickingbylength(open=None, high=None, low=None, close=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("cdl_kickingbylength",))
 
 
+def cdl_ladderbottom(open=None, high=None, low=None, close=None) -> Any:
+    """Ladder Bottom.
+
+    Returns
+    -------
+    ndarray or Series
+        Three black bars stepping down, a fourth with a wick above, then a white one clearing it.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_ladderbottom",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_ladderbottom(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_ladderbottom",))
+
+
 def cdl_longleggeddoji(open=None, high=None, low=None, close=None) -> Any:
     """Long Legged Doji.
 
@@ -1645,6 +2029,132 @@ def cdl_matchinglow(open=None, high=None, low=None, close=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("cdl_matchinglow",))
 
 
+def cdl_mathold(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    penetration: float = _PARAMS["cdl_mathold"]["penetration"]["default"],
+) -> Any:
+    """Mat Hold.
+
+    Parameters
+    ----------
+    penetration : float, default 0.5
+        How far into the previous body the close has to travel, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A long white bar, three small ones drifting back without undoing it, then another long white
+        one.
+    """
+    penetration = _convert.as_float("cdl_mathold", "penetration", penetration)
+    columns, carrier = _convert.bars(
+        "cdl_mathold",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_mathold(*columns, penetration=penetration)
+    return _convert.wrap_outputs(out, carrier, ("cdl_mathold",))
+
+
+def cdl_morningdojistar(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    penetration: float = _PARAMS["cdl_morningdojistar"]["penetration"]["default"],
+) -> Any:
+    """Morning Doji Star.
+
+    Parameters
+    ----------
+    penetration : float, default 0.3
+        How far into the previous body the close has to travel, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A long black bar, a doji one gapping down from it, then a white one closing well back into
+        it.
+    """
+    penetration = _convert.as_float("cdl_morningdojistar", "penetration", penetration)
+    columns, carrier = _convert.bars(
+        "cdl_morningdojistar",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_morningdojistar(*columns, penetration=penetration)
+    return _convert.wrap_outputs(out, carrier, ("cdl_morningdojistar",))
+
+
+def cdl_morningstar(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    penetration: float = _PARAMS["cdl_morningstar"]["penetration"]["default"],
+) -> Any:
+    """Morning Star.
+
+    Parameters
+    ----------
+    penetration : float, default 0.3
+        How far into the previous body the close has to travel, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A long black bar, a short one gapping down from it, then a white one closing well back into
+        it.
+    """
+    penetration = _convert.as_float("cdl_morningstar", "penetration", penetration)
+    columns, carrier = _convert.bars(
+        "cdl_morningstar",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_morningstar(*columns, penetration=penetration)
+    return _convert.wrap_outputs(out, carrier, ("cdl_morningstar",))
+
+
 def cdl_onneck(open=None, high=None, low=None, close=None) -> Any:
     """On Neck Pattern.
 
@@ -1728,6 +2238,34 @@ def cdl_rickshawman(open=None, high=None, low=None, close=None) -> Any:
     )
     out = _core.cdl_rickshawman(*columns)
     return _convert.wrap_outputs(out, carrier, ("cdl_rickshawman",))
+
+
+def cdl_risefall3methods(open=None, high=None, low=None, close=None) -> Any:
+    """Rising/Falling Three Methods.
+
+    Returns
+    -------
+    ndarray or Series
+        A long bar, three short ones drifting back inside its range, then a long one carrying on.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_risefall3methods",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_risefall3methods(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_risefall3methods",))
 
 
 def cdl_separatinglines(open=None, high=None, low=None, close=None) -> Any:
@@ -1843,6 +2381,34 @@ def cdl_spinningtop(open=None, high=None, low=None, close=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("cdl_spinningtop",))
 
 
+def cdl_stalledpattern(open=None, high=None, low=None, close=None) -> Any:
+    """Stalled Pattern.
+
+    Returns
+    -------
+    ndarray or Series
+        Two long white bars then a short one riding on the second's shoulder.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_stalledpattern",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_stalledpattern(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_stalledpattern",))
+
+
 def cdl_sticksandwich(open=None, high=None, low=None, close=None) -> Any:
     """Stick Sandwich.
 
@@ -1955,6 +2521,62 @@ def cdl_thrusting(open=None, high=None, low=None, close=None) -> Any:
     )
     out = _core.cdl_thrusting(*columns)
     return _convert.wrap_outputs(out, carrier, ("cdl_thrusting",))
+
+
+def cdl_tristar(open=None, high=None, low=None, close=None) -> Any:
+    """Tristar Pattern.
+
+    Returns
+    -------
+    ndarray or Series
+        Three doji in a row, the middle one gapping clear and the third coming back.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_tristar",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_tristar(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_tristar",))
+
+
+def cdl_unique3river(open=None, high=None, low=None, close=None) -> Any:
+    """Unique Three River.
+
+    Returns
+    -------
+    ndarray or Series
+        A long black bar, a smaller black one making a new low, then a short white one above it.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_unique3river",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_unique3river(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_unique3river",))
 
 
 def cdl_upsidegap2crows(open=None, high=None, low=None, close=None) -> Any:
@@ -4138,9 +4760,19 @@ def CDL3INSIDE(open, high, low, close) -> Any:
     return cdl_3inside(open, high, low, close)
 
 
+def CDL3LINESTRIKE(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_3linestrike`."""
+    return cdl_3linestrike(open, high, low, close)
+
+
 def CDL3OUTSIDE(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`cdl_3outside`."""
     return cdl_3outside(open, high, low, close)
+
+
+def CDL3STARSINSOUTH(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_3starsinsouth`."""
+    return cdl_3starsinsouth(open, high, low, close)
 
 
 def CDL3WHITESOLDIERS(open, high, low, close) -> Any:
@@ -4148,14 +4780,40 @@ def CDL3WHITESOLDIERS(open, high, low, close) -> Any:
     return cdl_3whitesoldiers(open, high, low, close)
 
 
+def CDLABANDONEDBABY(
+    open,
+    high,
+    low,
+    close,
+    penetration: float = _PARAMS["cdl_abandonedbaby"]["penetration"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`cdl_abandonedbaby`."""
+    return cdl_abandonedbaby(open, high, low, close, penetration=penetration)
+
+
+def CDLADVANCEBLOCK(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_advanceblock`."""
+    return cdl_advanceblock(open, high, low, close)
+
+
 def CDLBELTHOLD(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`cdl_belthold`."""
     return cdl_belthold(open, high, low, close)
 
 
+def CDLBREAKAWAY(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_breakaway`."""
+    return cdl_breakaway(open, high, low, close)
+
+
 def CDLCLOSINGMARUBOZU(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`cdl_closingmarubozu`."""
     return cdl_closingmarubozu(open, high, low, close)
+
+
+def CDLCONCEALBABYSWALL(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_concealbabyswall`."""
+    return cdl_concealbabyswall(open, high, low, close)
 
 
 def CDLCOUNTERATTACK(open, high, low, close) -> Any:
@@ -4194,6 +4852,28 @@ def CDLENGULFING(open, high, low, close) -> Any:
     return cdl_engulfing(open, high, low, close)
 
 
+def CDLEVENINGDOJISTAR(
+    open,
+    high,
+    low,
+    close,
+    penetration: float = _PARAMS["cdl_eveningdojistar"]["penetration"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`cdl_eveningdojistar`."""
+    return cdl_eveningdojistar(open, high, low, close, penetration=penetration)
+
+
+def CDLEVENINGSTAR(
+    open,
+    high,
+    low,
+    close,
+    penetration: float = _PARAMS["cdl_eveningstar"]["penetration"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`cdl_eveningstar`."""
+    return cdl_eveningstar(open, high, low, close, penetration=penetration)
+
+
 def CDLGAPSIDESIDEWHITE(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`cdl_gapsidesidewhite`."""
     return cdl_gapsidesidewhite(open, high, low, close)
@@ -4229,6 +4909,16 @@ def CDLHIGHWAVE(open, high, low, close) -> Any:
     return cdl_highwave(open, high, low, close)
 
 
+def CDLHIKKAKE(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_hikkake`."""
+    return cdl_hikkake(open, high, low, close)
+
+
+def CDLHIKKAKEMOD(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_hikkakemod`."""
+    return cdl_hikkakemod(open, high, low, close)
+
+
 def CDLHOMINGPIGEON(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`cdl_homingpigeon`."""
     return cdl_homingpigeon(open, high, low, close)
@@ -4259,6 +4949,11 @@ def CDLKICKINGBYLENGTH(open, high, low, close) -> Any:
     return cdl_kickingbylength(open, high, low, close)
 
 
+def CDLLADDERBOTTOM(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_ladderbottom`."""
+    return cdl_ladderbottom(open, high, low, close)
+
+
 def CDLLONGLEGGEDDOJI(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`cdl_longleggeddoji`."""
     return cdl_longleggeddoji(open, high, low, close)
@@ -4279,6 +4974,35 @@ def CDLMATCHINGLOW(open, high, low, close) -> Any:
     return cdl_matchinglow(open, high, low, close)
 
 
+def CDLMATHOLD(
+    open, high, low, close, penetration: float = _PARAMS["cdl_mathold"]["penetration"]["default"]
+) -> Any:
+    """TA-Lib-style alias for :func:`cdl_mathold`."""
+    return cdl_mathold(open, high, low, close, penetration=penetration)
+
+
+def CDLMORNINGDOJISTAR(
+    open,
+    high,
+    low,
+    close,
+    penetration: float = _PARAMS["cdl_morningdojistar"]["penetration"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`cdl_morningdojistar`."""
+    return cdl_morningdojistar(open, high, low, close, penetration=penetration)
+
+
+def CDLMORNINGSTAR(
+    open,
+    high,
+    low,
+    close,
+    penetration: float = _PARAMS["cdl_morningstar"]["penetration"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`cdl_morningstar`."""
+    return cdl_morningstar(open, high, low, close, penetration=penetration)
+
+
 def CDLONNECK(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`cdl_onneck`."""
     return cdl_onneck(open, high, low, close)
@@ -4292,6 +5016,11 @@ def CDLPIERCING(open, high, low, close) -> Any:
 def CDLRICKSHAWMAN(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`cdl_rickshawman`."""
     return cdl_rickshawman(open, high, low, close)
+
+
+def CDLRISEFALL3METHODS(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_risefall3methods`."""
+    return cdl_risefall3methods(open, high, low, close)
 
 
 def CDLSEPARATINGLINES(open, high, low, close) -> Any:
@@ -4314,6 +5043,11 @@ def CDLSPINNINGTOP(open, high, low, close) -> Any:
     return cdl_spinningtop(open, high, low, close)
 
 
+def CDLSTALLEDPATTERN(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_stalledpattern`."""
+    return cdl_stalledpattern(open, high, low, close)
+
+
 def CDLSTICKSANDWICH(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`cdl_sticksandwich`."""
     return cdl_sticksandwich(open, high, low, close)
@@ -4332,6 +5066,16 @@ def CDLTASUKIGAP(open, high, low, close) -> Any:
 def CDLTHRUSTING(open, high, low, close) -> Any:
     """TA-Lib-style alias for :func:`cdl_thrusting`."""
     return cdl_thrusting(open, high, low, close)
+
+
+def CDLTRISTAR(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_tristar`."""
+    return cdl_tristar(open, high, low, close)
+
+
+def CDLUNIQUE3RIVER(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_unique3river`."""
+    return cdl_unique3river(open, high, low, close)
 
 
 def CDLUPSIDEGAP2CROWS(open, high, low, close) -> Any:

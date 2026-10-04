@@ -1204,6 +1204,63 @@ mod cdl_3inside_adapter {
     }
 }
 
+mod cdl_3linestrike_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cdl_3linestrike::Cdl3linestrike;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cdl_3linestrike::Params {
+        let _ = values;
+        trendlib::indicators::cdl_3linestrike::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "cdl_3linestrike takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cdl_3linestrike::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod cdl_3outside_adapter {
     use super::*;
 
@@ -1243,6 +1300,63 @@ mod cdl_3outside_adapter {
     pub fn registered() -> Registered {
         Registered {
             name: trendlib::indicators::cdl_3outside::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod cdl_3starsinsouth_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cdl_3starsinsouth::Cdl3starsinsouth;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cdl_3starsinsouth::Params {
+        let _ = values;
+        trendlib::indicators::cdl_3starsinsouth::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "cdl_3starsinsouth takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cdl_3starsinsouth::NAME,
             inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
             outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
             params: PARAMS,
@@ -1314,6 +1428,128 @@ mod cdl_3whitesoldiers_adapter {
     }
 }
 
+mod cdl_abandonedbaby_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cdl_abandonedbaby::CdlAbandonedbaby;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "penetration",
+        default: 0.3,
+        min: 0.0,
+        max: f64::INFINITY,
+        integral: false,
+        choices: &[],
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cdl_abandonedbaby::Params {
+        trendlib::indicators::cdl_abandonedbaby::Params {
+            penetration: values[0],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "cdl_abandonedbaby takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cdl_abandonedbaby::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod cdl_advanceblock_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cdl_advanceblock::CdlAdvanceblock;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cdl_advanceblock::Params {
+        let _ = values;
+        trendlib::indicators::cdl_advanceblock::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "cdl_advanceblock takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cdl_advanceblock::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod cdl_belthold_adapter {
     use super::*;
 
@@ -1353,6 +1589,59 @@ mod cdl_belthold_adapter {
     pub fn registered() -> Registered {
         Registered {
             name: trendlib::indicators::cdl_belthold::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod cdl_breakaway_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cdl_breakaway::CdlBreakaway;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cdl_breakaway::Params {
+        let _ = values;
+        trendlib::indicators::cdl_breakaway::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "cdl_breakaway takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cdl_breakaway::NAME,
             inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
             outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
             params: PARAMS,
@@ -1410,6 +1699,63 @@ mod cdl_closingmarubozu_adapter {
     pub fn registered() -> Registered {
         Registered {
             name: trendlib::indicators::cdl_closingmarubozu::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod cdl_concealbabyswall_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cdl_concealbabyswall::CdlConcealbabyswall;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cdl_concealbabyswall::Params {
+        let _ = values;
+        trendlib::indicators::cdl_concealbabyswall::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "cdl_concealbabyswall takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cdl_concealbabyswall::NAME,
             inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
             outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
             params: PARAMS,
@@ -1748,6 +2094,136 @@ mod cdl_engulfing_adapter {
     pub fn registered() -> Registered {
         Registered {
             name: trendlib::indicators::cdl_engulfing::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod cdl_eveningdojistar_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cdl_eveningdojistar::CdlEveningdojistar;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "penetration",
+        default: 0.3,
+        min: 0.0,
+        max: f64::INFINITY,
+        integral: false,
+        choices: &[],
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cdl_eveningdojistar::Params {
+        trendlib::indicators::cdl_eveningdojistar::Params {
+            penetration: values[0],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "cdl_eveningdojistar takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cdl_eveningdojistar::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod cdl_eveningstar_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cdl_eveningstar::CdlEveningstar;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "penetration",
+        default: 0.3,
+        min: 0.0,
+        max: f64::INFINITY,
+        integral: false,
+        choices: &[],
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cdl_eveningstar::Params {
+        trendlib::indicators::cdl_eveningstar::Params {
+            penetration: values[0],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "cdl_eveningstar takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cdl_eveningstar::NAME,
             inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
             outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
             params: PARAMS,
@@ -2145,6 +2621,112 @@ mod cdl_highwave_adapter {
     }
 }
 
+mod cdl_hikkake_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cdl_hikkake::CdlHikkake;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cdl_hikkake::Params {
+        let _ = values;
+        trendlib::indicators::cdl_hikkake::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "cdl_hikkake takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cdl_hikkake::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod cdl_hikkakemod_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cdl_hikkakemod::CdlHikkakemod;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cdl_hikkakemod::Params {
+        let _ = values;
+        trendlib::indicators::cdl_hikkakemod::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "cdl_hikkakemod takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cdl_hikkakemod::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod cdl_homingpigeon_adapter {
     use super::*;
 
@@ -2479,6 +3061,63 @@ mod cdl_kickingbylength_adapter {
     }
 }
 
+mod cdl_ladderbottom_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cdl_ladderbottom::CdlLadderbottom;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cdl_ladderbottom::Params {
+        let _ = values;
+        trendlib::indicators::cdl_ladderbottom::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "cdl_ladderbottom takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cdl_ladderbottom::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod cdl_longleggeddoji_adapter {
     use super::*;
 
@@ -2699,6 +3338,197 @@ mod cdl_matchinglow_adapter {
     }
 }
 
+mod cdl_mathold_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cdl_mathold::CdlMathold;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "penetration",
+        default: 0.5,
+        min: 0.0,
+        max: f64::INFINITY,
+        integral: false,
+        choices: &[],
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cdl_mathold::Params {
+        trendlib::indicators::cdl_mathold::Params {
+            penetration: values[0],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "cdl_mathold takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cdl_mathold::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod cdl_morningdojistar_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cdl_morningdojistar::CdlMorningdojistar;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "penetration",
+        default: 0.3,
+        min: 0.0,
+        max: f64::INFINITY,
+        integral: false,
+        choices: &[],
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cdl_morningdojistar::Params {
+        trendlib::indicators::cdl_morningdojistar::Params {
+            penetration: values[0],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "cdl_morningdojistar takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cdl_morningdojistar::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod cdl_morningstar_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cdl_morningstar::CdlMorningstar;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "penetration",
+        default: 0.3,
+        min: 0.0,
+        max: f64::INFINITY,
+        integral: false,
+        choices: &[],
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cdl_morningstar::Params {
+        trendlib::indicators::cdl_morningstar::Params {
+            penetration: values[0],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "cdl_morningstar takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cdl_morningstar::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod cdl_onneck_adapter {
     use super::*;
 
@@ -2848,6 +3678,63 @@ mod cdl_rickshawman_adapter {
     pub fn registered() -> Registered {
         Registered {
             name: trendlib::indicators::cdl_rickshawman::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod cdl_risefall3methods_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cdl_risefall3methods::CdlRisefall3methods;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cdl_risefall3methods::Params {
+        let _ = values;
+        trendlib::indicators::cdl_risefall3methods::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "cdl_risefall3methods takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cdl_risefall3methods::NAME,
             inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
             outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
             params: PARAMS,
@@ -3086,6 +3973,63 @@ mod cdl_spinningtop_adapter {
     }
 }
 
+mod cdl_stalledpattern_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cdl_stalledpattern::CdlStalledpattern;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cdl_stalledpattern::Params {
+        let _ = values;
+        trendlib::indicators::cdl_stalledpattern::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "cdl_stalledpattern takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cdl_stalledpattern::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod cdl_sticksandwich_adapter {
     use super::*;
 
@@ -3288,6 +4232,116 @@ mod cdl_thrusting_adapter {
     pub fn registered() -> Registered {
         Registered {
             name: trendlib::indicators::cdl_thrusting::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod cdl_tristar_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cdl_tristar::CdlTristar;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cdl_tristar::Params {
+        let _ = values;
+        trendlib::indicators::cdl_tristar::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "cdl_tristar takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cdl_tristar::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod cdl_unique3river_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::cdl_unique3river::CdlUnique3river;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[];
+
+    fn params(values: &[f64]) -> trendlib::indicators::cdl_unique3river::Params {
+        let _ = values;
+        trendlib::indicators::cdl_unique3river::Params
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "cdl_unique3river takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::cdl_unique3river::NAME,
             inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
             outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
             params: PARAMS,
@@ -8423,16 +9477,24 @@ pub fn registered() -> Vec<Registered> {
         cdl_2crows_adapter::registered(),
         cdl_3blackcrows_adapter::registered(),
         cdl_3inside_adapter::registered(),
+        cdl_3linestrike_adapter::registered(),
         cdl_3outside_adapter::registered(),
+        cdl_3starsinsouth_adapter::registered(),
         cdl_3whitesoldiers_adapter::registered(),
+        cdl_abandonedbaby_adapter::registered(),
+        cdl_advanceblock_adapter::registered(),
         cdl_belthold_adapter::registered(),
+        cdl_breakaway_adapter::registered(),
         cdl_closingmarubozu_adapter::registered(),
+        cdl_concealbabyswall_adapter::registered(),
         cdl_counterattack_adapter::registered(),
         cdl_darkcloudcover_adapter::registered(),
         cdl_doji_adapter::registered(),
         cdl_dojistar_adapter::registered(),
         cdl_dragonflydoji_adapter::registered(),
         cdl_engulfing_adapter::registered(),
+        cdl_eveningdojistar_adapter::registered(),
+        cdl_eveningstar_adapter::registered(),
         cdl_gapsidesidewhite_adapter::registered(),
         cdl_gravestonedoji_adapter::registered(),
         cdl_hammer_adapter::registered(),
@@ -8440,27 +9502,37 @@ pub fn registered() -> Vec<Registered> {
         cdl_harami_adapter::registered(),
         cdl_haramicross_adapter::registered(),
         cdl_highwave_adapter::registered(),
+        cdl_hikkake_adapter::registered(),
+        cdl_hikkakemod_adapter::registered(),
         cdl_homingpigeon_adapter::registered(),
         cdl_identical3crows_adapter::registered(),
         cdl_inneck_adapter::registered(),
         cdl_invertedhammer_adapter::registered(),
         cdl_kicking_adapter::registered(),
         cdl_kickingbylength_adapter::registered(),
+        cdl_ladderbottom_adapter::registered(),
         cdl_longleggeddoji_adapter::registered(),
         cdl_longline_adapter::registered(),
         cdl_marubozu_adapter::registered(),
         cdl_matchinglow_adapter::registered(),
+        cdl_mathold_adapter::registered(),
+        cdl_morningdojistar_adapter::registered(),
+        cdl_morningstar_adapter::registered(),
         cdl_onneck_adapter::registered(),
         cdl_piercing_adapter::registered(),
         cdl_rickshawman_adapter::registered(),
+        cdl_risefall3methods_adapter::registered(),
         cdl_separatinglines_adapter::registered(),
         cdl_shootingstar_adapter::registered(),
         cdl_shortline_adapter::registered(),
         cdl_spinningtop_adapter::registered(),
+        cdl_stalledpattern_adapter::registered(),
         cdl_sticksandwich_adapter::registered(),
         cdl_takuri_adapter::registered(),
         cdl_tasukigap_adapter::registered(),
         cdl_thrusting_adapter::registered(),
+        cdl_tristar_adapter::registered(),
+        cdl_unique3river_adapter::registered(),
         cdl_upsidegap2crows_adapter::registered(),
         cdl_xsidegap3methods_adapter::registered(),
         ceil_adapter::registered(),

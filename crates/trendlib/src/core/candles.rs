@@ -211,6 +211,36 @@ impl CandleHistory {
     }
 }
 
+/// What the two hikkake patterns carry between bars.
+///
+/// Both are the only patterns that remember anything: a setup fires once, and
+/// then has three bars in which a close beyond the bar before it confirms the
+/// setup and scores again. Everything else here answers from a fixed window.
+#[derive(Clone, Copy, Debug)]
+pub struct Pending {
+    /// The reading the setup gave, which the confirmation doubles.
+    pub result: f64,
+    /// Bars since the setup, counting the setup itself as zero.
+    pub age: usize,
+    /// The high and low of the bar before the setup, which a close has to
+    /// clear for the setup to be confirmed.
+    pub high: f64,
+    pub low: f64,
+}
+
+impl Pending {
+    /// A close beyond the bar before the setup, while the window is open.
+    pub fn confirmed_by(&self, close: f64) -> bool {
+        self.age <= 3
+            && ((self.result > 0.0 && close > self.high) || (self.result < 0.0 && close < self.low))
+    }
+
+    /// What a confirmation reads: the setup's own figure, again.
+    pub fn doubled(&self) -> f64 {
+        self.result * 2.0
+    }
+}
+
 /// The scaffolding every pattern shares.
 ///
 /// A pattern differs from its neighbours only in how far back it reads and

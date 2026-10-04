@@ -1,0 +1,25 @@
+name: cdl_tristar
+title: Tristar Pattern
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_tristar
+    dtype: int32
+    plot: pattern
+    doc: Three doji in a row, the middle one gapping clear and the third coming back
+talib:
+  name: CDLTRISTAR
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_dojistar, cdl_abandonedbaby, cdl_doji]

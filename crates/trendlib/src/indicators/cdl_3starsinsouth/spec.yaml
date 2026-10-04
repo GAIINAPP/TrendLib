@@ -1,0 +1,25 @@
+name: cdl_3starsinsouth
+title: Three Stars In The South
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_3starsinsouth
+    dtype: int32
+    plot: pattern
+    doc: Three black bars, each smaller than the last and giving back less ground
+talib:
+  name: CDL3STARSINSOUTH
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_3blackcrows, cdl_identical3crows, cdl_ladderbottom]

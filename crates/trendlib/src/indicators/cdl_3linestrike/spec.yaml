@@ -1,0 +1,25 @@
+name: cdl_3linestrike
+title: Three-Line Strike
+group: patterns
+flags: [pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: cdl_3linestrike
+    dtype: int32
+    plot: pattern
+    doc: Three bars running one way, then one that opens past the last and closes past the first
+talib:
+  name: CDL3LINESTRIKE
+  params: {}
+  outputs: [integer]
+references:
+  - Steve Nison, Japanese Candlestick Charting Techniques, New York Institute of Finance, 1991
+see_also: [cdl_risefall3methods, cdl_3whitesoldiers, cdl_3blackcrows]
