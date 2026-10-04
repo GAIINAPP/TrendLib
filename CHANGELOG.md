@@ -35,6 +35,10 @@ Before 1.0, minor versions may break the API; every break is listed under
   every `spec.yaml`; `cargo xtask regen-check` fails when any of them is stale.
   Adding an indicator is now its own folder plus generated files.
 - `wma`, `trange`, `atr` and `natr` are callable from Python.
+- Indicators `dema`, `tema`, `roc` and `macd`. `macd` is the first with
+  several outputs, returned as a tuple or, from a DataFrame, as a frame.
+- The Rust test registry is generated too, so every indicator is covered by
+  the golden, parity and edge-case suites the moment its spec exists.
 - `docs/PROGRESS.md` tracks all 204 approved indicators, ticked from the
   repository rather than by hand.
 - `natr` normalises at every period, including `period = 1` where TA-Lib

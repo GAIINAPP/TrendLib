@@ -13,7 +13,6 @@ use std::path::{Path, PathBuf};
 use trendlib::TlError;
 use trendlib::core::kernel::{BarStream, Kernel};
 use trendlib::core::traits::Stream;
-use trendlib::indicators::{atr, ema, natr, rsi, sma, trange, wma};
 
 pub fn repo_root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -66,157 +65,74 @@ where
     }
 }
 
-pub type BatchFn = fn(&[&[f64]], Option<usize>) -> Result<Vec<Vec<f64>>, TlError>;
-pub type LookbackFn = fn(Option<usize>) -> usize;
-pub type OpenAndFillFn =
-    fn(&[&[f64]], Option<usize>) -> Result<(Box<dyn AnyStream>, Vec<Vec<f64>>), TlError>;
+/// One parameter, as the spec declares it.
+#[derive(Clone, Copy, Debug)]
+pub struct ParamSpec {
+    pub name: &'static str,
+    pub default: f64,
+    pub min: f64,
+    pub max: f64,
+    pub integral: bool,
+}
 
+pub type Columns = Vec<Vec<f64>>;
+pub type OpenAndFillResult = Result<(Box<dyn AnyStream>, Columns), TlError>;
+
+pub type BatchFn = fn(&[&[f64]], &[f64]) -> Result<Columns, TlError>;
+pub type LookbackFn = fn(&[f64]) -> usize;
+pub type OpenAndFillFn = fn(&[&[f64]], &[f64]) -> OpenAndFillResult;
+
+/// An indicator with its types erased. Parameters travel as `f64` in spec
+/// order, so one shape covers an indicator with none and one with three.
 pub struct Registered {
     pub name: &'static str,
     pub inputs: &'static [&'static str],
     pub outputs: &'static [&'static str],
-    /// `None` for an indicator that takes no period, such as `trange`.
-    pub period: Option<(usize, usize, usize)>,
+    pub params: &'static [ParamSpec],
     pub batch: BatchFn,
     pub lookback: LookbackFn,
     pub open_and_fill: OpenAndFillFn,
 }
 
 impl Registered {
-    pub fn default_period(&self) -> Option<usize> {
-        self.period.map(|(default, _, _)| default)
+    pub fn defaults(&self) -> Vec<f64> {
+        self.params.iter().map(|p| p.default).collect()
     }
 
-    pub fn min_period(&self) -> Option<usize> {
-        self.period.map(|(_, min, _)| min)
+    /// Defaults with one parameter replaced, for the boundary tests.
+    pub fn with(&self, name: &str, value: f64) -> Vec<f64> {
+        self.params
+            .iter()
+            .map(|p| if p.name == name { value } else { p.default })
+            .collect()
     }
 
-    pub fn max_period(&self) -> Option<usize> {
-        self.period.map(|(_, _, max)| max)
-    }
-
-    pub fn open(
-        &self,
-        inputs: &[&[f64]],
-        period: Option<usize>,
-    ) -> Result<Box<dyn AnyStream>, TlError> {
-        (self.open_and_fill)(inputs, period).map(|(stream, _)| stream)
-    }
-}
-
-macro_rules! adapter {
-    (
-        $adapter:ident, $module:ident, $type:ident, $inputs:literal, $outputs:literal,
-        $period:expr, $make:expr
-    ) => {
-        mod $adapter {
-            use super::*;
-
-            type Indicated = $module::$type;
-            const INPUTS: usize = $inputs;
-            const OUTPUTS: usize = $outputs;
-
-            fn params(period: Option<usize>) -> $module::Params {
-                let make: fn(Option<usize>) -> $module::Params = $make;
-                make(period)
-            }
-
-            fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
-                assert_eq!(
-                    inputs.len(),
-                    INPUTS,
-                    "{} takes {INPUTS} inputs",
-                    $module::NAME
-                );
-                std::array::from_fn(|i| inputs[i])
-            }
-
-            fn batch(inputs: &[&[f64]], period: Option<usize>) -> Result<Vec<Vec<f64>>, TlError> {
-                <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(period))
-                    .map(|out| out.to_vec())
-            }
-
-            fn lookback(period: Option<usize>) -> usize {
-                <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(period))
-            }
-
-            fn open_and_fill(
-                inputs: &[&[f64]],
-                period: Option<usize>,
-            ) -> Result<(Box<dyn AnyStream>, Vec<Vec<f64>>), TlError> {
-                let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
-                    columns(inputs),
-                    &params(period),
-                )?;
-                Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
-            }
-
-            pub fn registered() -> Registered {
-                Registered {
-                    name: $module::NAME,
-                    inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
-                    outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
-                    period: $period,
-                    batch,
-                    lookback,
-                    open_and_fill,
+    /// A period-like parameter capped, so a property case stays quick.
+    pub fn capped(&self, seed: usize, cap: f64) -> Vec<f64> {
+        self.params
+            .iter()
+            .map(|p| {
+                if !p.integral {
+                    return p.default;
                 }
-            }
-        }
-    };
+                let high = p.max.min(cap);
+                if high <= p.min {
+                    return p.min;
+                }
+                let span = (high - p.min) as usize + 1;
+                p.min + (seed % span) as f64
+            })
+            .collect()
+    }
+
+    pub fn open(&self, inputs: &[&[f64]], values: &[f64]) -> Result<Box<dyn AnyStream>, TlError> {
+        (self.open_and_fill)(inputs, values).map(|(stream, _)| stream)
+    }
 }
 
-adapter!(sma_adapter, sma, Sma, 1, 1, Some((30, 1, 100_000)), |p| {
-    sma::Params {
-        period: p.unwrap_or(sma::PERIOD_DEFAULT),
-    }
-});
-adapter!(ema_adapter, ema, Ema, 1, 1, Some((30, 1, 100_000)), |p| {
-    ema::Params {
-        period: p.unwrap_or(ema::PERIOD_DEFAULT),
-    }
-});
-adapter!(wma_adapter, wma, Wma, 1, 1, Some((30, 1, 100_000)), |p| {
-    wma::Params {
-        period: p.unwrap_or(wma::PERIOD_DEFAULT),
-    }
-});
-adapter!(rsi_adapter, rsi, Rsi, 1, 1, Some((14, 2, 100_000)), |p| {
-    rsi::Params {
-        period: p.unwrap_or(rsi::PERIOD_DEFAULT),
-    }
-});
-adapter!(trange_adapter, trange, Trange, 3, 1, None, |_p| {
-    trange::Params
-});
-adapter!(atr_adapter, atr, Atr, 3, 1, Some((14, 1, 100_000)), |p| {
-    atr::Params {
-        period: p.unwrap_or(atr::PERIOD_DEFAULT),
-    }
-});
-adapter!(
-    natr_adapter,
-    natr,
-    Natr,
-    3,
-    1,
-    Some((14, 1, 100_000)),
-    |p| natr::Params {
-        period: p.unwrap_or(natr::PERIOD_DEFAULT)
-    }
-);
+mod registry;
 
-pub fn registered() -> Vec<Registered> {
-    vec![
-        sma_adapter::registered(),
-        ema_adapter::registered(),
-        wma_adapter::registered(),
-        rsi_adapter::registered(),
-        trange_adapter::registered(),
-        atr_adapter::registered(),
-        natr_adapter::registered(),
-    ]
-}
+pub use registry::registered;
 
 pub fn find(name: &str) -> Option<Registered> {
     registered().into_iter().find(|i| i.name == name)
@@ -247,15 +163,26 @@ impl Golden {
         self.rows.iter().map(|row| row[index]).collect()
     }
 
+    /// Parameter values for this case, in the order the spec declares them.
+    pub fn values(&self, params: &[ParamSpec]) -> Vec<f64> {
+        params
+            .iter()
+            .map(|param| {
+                self.params
+                    .get(param.name)
+                    .map(|value| {
+                        value.parse().unwrap_or_else(|_| {
+                            panic!("{}: {} is not a number", self.path.display(), param.name)
+                        })
+                    })
+                    .unwrap_or(param.default)
+            })
+            .collect()
+    }
+
     /// Set when the case could not use the documented boundary, with the reason.
     pub fn note(&self) -> Option<&str> {
         self.note.as_deref()
-    }
-
-    pub fn period(&self) -> Option<usize> {
-        self.params
-            .get("period")
-            .map(|value| value.parse().expect("period is an integer"))
     }
 
     pub fn is_excluded(&self, row: usize) -> bool {

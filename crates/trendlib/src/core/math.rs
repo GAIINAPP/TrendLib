@@ -200,6 +200,39 @@ impl Ema {
     }
 }
 
+/// The value `lag` bars ago, for indicators that compare now with then.
+#[derive(Clone, Debug)]
+pub struct Lagged {
+    window: Box<[f64]>,
+    head: usize,
+    seen: usize,
+}
+
+impl Lagged {
+    pub fn new(lag: usize) -> Self {
+        assert!(lag > 0, "lag must be at least 1");
+        Self {
+            window: vec![0.0; lag].into_boxed_slice(),
+            head: 0,
+            seen: 0,
+        }
+    }
+
+    pub fn push(&mut self, value: f64) -> Option<f64> {
+        let past = self.earlier();
+        self.window[self.head] = value;
+        self.head = (self.head + 1) % self.window.len();
+        self.seen += 1;
+        past
+    }
+
+    /// The value that a `push` now would compare against. Unaffected by the
+    /// bar being offered, so `preview` can use it directly.
+    pub fn earlier(&self) -> Option<f64> {
+        (self.seen >= self.window.len()).then(|| self.window[self.head])
+    }
+}
+
 /// Wilder's smoothing: the simple average of the first `period` values, then
 /// `prev * (n - 1) / n + x / n` (`docs/CONVENTIONS.md` § 4).
 #[derive(Clone, Debug)]
@@ -253,7 +286,7 @@ impl Wilder {
 
 #[cfg(test)]
 mod tests {
-    use super::{Ema, RollingMean, TrueRange, WeightedMean, Wilder};
+    use super::{Ema, Lagged, RollingMean, TrueRange, WeightedMean, Wilder};
 
     fn drive<F>(len: usize, mut step: F) -> Vec<Option<f64>>
     where
@@ -277,6 +310,25 @@ mod tests {
             let mut forked = mean.clone();
             assert_eq!(previewed, forked.push(9.5));
             mean.push(x);
+        }
+    }
+
+    #[test]
+    fn lagged_returns_the_value_that_many_bars_ago() {
+        let mut lagged = Lagged::new(3);
+        assert_eq!(drive(3, |x| lagged.push(x)), vec![None, None, None]);
+        assert_eq!(lagged.push(4.0), Some(1.0));
+        assert_eq!(lagged.push(5.0), Some(2.0));
+    }
+
+    #[test]
+    fn lagged_earlier_matches_the_next_push() {
+        let mut lagged = Lagged::new(4);
+        for x in [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0] {
+            let seen = lagged.earlier();
+            let mut forked = lagged.clone();
+            assert_eq!(seen, forked.push(99.0));
+            lagged.push(x);
         }
     }
 

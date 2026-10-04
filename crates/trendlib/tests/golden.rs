@@ -26,9 +26,9 @@ fn every_golden_file_matches_the_implementation() {
             .map(|name| golden.column(name))
             .collect();
         let inputs = as_slices(&columns);
-        let period = golden.period();
+        let values = golden.values(indicator.params);
 
-        let actual = (indicator.batch)(&inputs, period)
+        let actual = (indicator.batch)(&inputs, &values)
             .unwrap_or_else(|e| panic!("{shown}: batch failed: {e}"));
         assert_eq!(
             actual.len(),
@@ -71,13 +71,13 @@ fn every_golden_file_matches_the_implementation() {
 
         // The same file also pins the stream: open on the shortest history that
         // can produce a value, feed the rest, and demand the batch output back.
-        let lookback = (indicator.lookback)(period);
+        let lookback = (indicator.lookback)(&values);
         let split = lookback + 1;
         let rows = columns[0].len();
         assert!(split < rows, "{shown}: dataset is too short to stream");
 
         let history = support::head(&columns, split);
-        let (mut stream, filled) = (indicator.open_and_fill)(&as_slices(&history), period)
+        let (mut stream, filled) = (indicator.open_and_fill)(&as_slices(&history), &values)
             .unwrap_or_else(|e| panic!("{shown}: open_and_fill failed: {e}"));
         let mut streamed = filled;
         for row in split..rows {
@@ -113,7 +113,7 @@ fn every_indicator_has_the_golden_cases_its_parameters_call_for() {
         );
         // A boundary case is only meaningful for an indicator that has a
         // boundary; `trange` takes no parameters at all.
-        if indicator.period.is_some() {
+        if indicator.params.iter().any(|p| p.integral) {
             assert!(
                 folder.join("min_period.csv").exists(),
                 "{} has a period but no golden/min_period.csv",
@@ -128,33 +128,31 @@ fn golden_params_are_inside_the_documented_range() {
     for path in golden_files() {
         let golden = read_golden(&path);
         let indicator = find(&golden.indicator).expect("known indicator");
-        let Some(period) = golden.period() else {
+        let values = golden.values(indicator.params);
+        for (param, value) in indicator.params.iter().zip(&values) {
             assert!(
-                indicator.period.is_none(),
-                "{}: {} takes a period but the header has none",
+                (param.min..=param.max).contains(value),
+                "{}: {}={value} is outside [{}, {}]",
                 path.display(),
-                indicator.name
+                param.name,
+                param.min,
+                param.max
             );
-            continue;
-        };
-        let (default, min, max) = indicator.period.expect("a period in the header");
-        assert!(
-            (min..=max).contains(&period),
-            "{}: period={period} is outside [{min}, {max}]",
-            path.display()
-        );
-        if golden.case == "default" {
-            assert_eq!(period, default, "{}", path.display());
-        }
-        if golden.case == "min_period" && period != min {
-            assert!(
-                golden
-                    .note()
-                    .is_some_and(|note| note.contains("CONVENTIONS.md")),
-                "{}: the boundary case uses period={period} instead of {min} without a \
-                 `# note:` header pointing at the deviation that explains it",
-                path.display()
-            );
+            if golden.case == "default" {
+                assert_eq!(*value, param.default, "{}: {}", path.display(), param.name);
+            }
+            if golden.case == "min_period" && param.integral && *value != param.min {
+                assert!(
+                    golden
+                        .note()
+                        .is_some_and(|note| note.contains("CONVENTIONS.md")),
+                    "{}: the boundary case uses {}={value} instead of {} without a \
+                     `# note:` header pointing at the deviation that explains it",
+                    path.display(),
+                    param.name,
+                    param.min
+                );
+            }
         }
     }
 }

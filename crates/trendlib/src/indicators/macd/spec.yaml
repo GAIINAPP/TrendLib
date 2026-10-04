@@ -1,0 +1,46 @@
+name: macd
+title: Moving Average Convergence Divergence
+group: momentum
+flags: [unstable]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: fast_period
+    type: int
+    default: 12
+    min: 2
+    max: 100000
+    doc: Bars in the faster exponential average
+  - name: slow_period
+    type: int
+    default: 26
+    min: 2
+    max: 100000
+    doc: Bars in the slower exponential average
+  - name: signal_period
+    type: int
+    default: 9
+    min: 1
+    max: 100000
+    doc: Bars in the exponential average taken of the difference
+outputs:
+  - name: macd
+    dtype: float64
+    plot: line
+    doc: Faster average minus the slower one
+  - name: macd_signal
+    dtype: float64
+    plot: line
+    doc: Exponential average of macd
+  - name: macd_hist
+    dtype: float64
+    plot: histogram
+    doc: macd minus its signal line
+talib:
+  name: MACD
+  params: {fast_period: fastperiod, slow_period: slowperiod, signal_period: signalperiod}
+  outputs: [macd, macdsignal, macdhist]
+references:
+  - Gerald Appel, Technical Analysis - Power Tools for Active Investors, FT Press, 2005
+see_also: [ema, roc]

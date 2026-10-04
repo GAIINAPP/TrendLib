@@ -2,8 +2,8 @@
 
 # Progress
 
-**7 of 204 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 197 not started.
+**11 of 204 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 193 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -16,8 +16,8 @@ something is done that is not. CI checks it is current.
 
 | Group | Shipped | Total |
 | --- | --- | --- |
-| Overlap studies | 3 | 25 |
-| Momentum | 1 | 47 |
+| Overlap studies | 5 | 25 |
+| Momentum | 3 | 47 |
 | Volatility | 3 | 7 |
 | Volume | 0 | 12 |
 | Price transforms | 0 | 6 |
@@ -28,11 +28,11 @@ something is done that is not. CI checks it is current.
 | Candlestick patterns | 0 | 61 |
 | Levels | 0 | 3 |
 
-## Overlap studies (3 of 25)
+## Overlap studies (5 of 25)
 
 - [ ] `accbands` (`ACCBANDS`)
 - [ ] `bbands` (`BBANDS`) *
-- [ ] `dema` (`DEMA`) *
+- [x] `dema` (`DEMA`) -- Double Exponential Moving Average *
 - [ ] `donchian` (`DONCHIAN`)
 - [x] `ema` (`EMA`) -- Exponential Moving Average *
 - [ ] `hma` (`HMA`)
@@ -50,13 +50,13 @@ something is done that is not. CI checks it is current.
 - [x] `sma` (`SMA`) -- Simple Moving Average *
 - [ ] `supertrend` (`SUPERTREND`) *
 - [ ] `t3` (`T3`)
-- [ ] `tema` (`TEMA`) *
+- [x] `tema` (`TEMA`) -- Triple Exponential Moving Average *
 - [ ] `trima` (`TRIMA`)
 - [ ] `vwma` (`VWMA`)
 - [x] `wma` (`WMA`) -- Weighted Moving Average *
 - [ ] `zlema` (`ZLEMA`)
 
-## Momentum (1 of 47)
+## Momentum (3 of 47)
 
 - [ ] `ac` (`AC`)
 - [ ] `adx` (`ADX`) *
@@ -78,7 +78,7 @@ something is done that is not. CI checks it is current.
 - [ ] `fractal` (`FRACTAL`)
 - [ ] `imi` (`IMI`)
 - [ ] `kdj` (`KDJ`)
-- [ ] `macd` (`MACD`) *
+- [x] `macd` (`MACD`) -- Moving Average Convergence Divergence *
 - [ ] `macdext` (`MACDEXT`)
 - [ ] `macdfix` (`MACDFIX`)
 - [ ] `mfi` (`MFI`)
@@ -89,7 +89,7 @@ something is done that is not. CI checks it is current.
 - [ ] `plus_dm` (`PLUS_DM`)
 - [ ] `ppo` (`PPO`)
 - [ ] `qstick` (`QSTICK`)
-- [ ] `roc` (`ROC`) *
+- [x] `roc` (`ROC`) -- Rate of Change *
 - [ ] `rocp` (`ROCP`)
 - [ ] `rocr` (`ROCR`)
 - [ ] `rocr100` (`ROCR100`)

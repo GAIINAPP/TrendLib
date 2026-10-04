@@ -204,6 +204,18 @@ fn bindings(specs: &[Spec]) -> String {
             return_type
         };
 
+        // A tuple of several arrays is too wide to repeat at four call sites,
+        // so a multi-output indicator gets a named alias for it.
+        let mut alias = String::new();
+        let return_type = if outputs == 1 {
+            return_type
+        } else {
+            let named = format!("{ty}Outputs");
+            let _ = write!(alias, "\ntype {named}<'py> = {return_type};\n");
+            format!("{named}<'py>")
+        };
+        out.push_str(&alias);
+
         let _ = write!(
             out,
             "\n\
@@ -705,7 +717,7 @@ fn functions(specs: &[Spec]) -> String {
         };
         let _ = write!(
             out,
-            "def {}({signature}) -> Any:  # noqa: N802\n    \"\"\"TA-Lib-style alias for :func:`{}`.\"\"\"\n    return {}({call})\n\n\n",
+            "def {}({signature}) -> Any:\n    \"\"\"TA-Lib-style alias for :func:`{}`.\"\"\"\n    return {}({call})\n\n\n",
             alias.name, spec.name, spec.name
         );
     }
@@ -877,6 +889,110 @@ fn formatted(path: &Path, text: &str) -> Result<String, SpecError> {
     }
 }
 
+/// The table the Rust test suites iterate.
+///
+/// Generated rather than hand-written because every indicator has to appear in
+/// it or it is simply untested, and a list people maintain by hand is a list
+/// that silently falls behind. Parameters travel as `f64` in spec order so one
+/// signature covers an indicator with no parameters and one with three.
+fn test_registry(specs: &[Spec]) -> String {
+    let mut out = format!(
+        "{RUST_BANNER}\n\n\
+         #![allow(dead_code)]\n\n\
+         use super::{{AnyStream, Columns, OpenAndFillResult, ParamSpec, Registered, TlError}};\n\
+         use trendlib::core::kernel::Kernel;\n\n"
+    );
+
+    for spec in specs {
+        let name = &spec.name;
+        let path = format!("trendlib::indicators::{name}");
+        let inputs = spec.inputs.len();
+        let outputs = spec.outputs.len();
+
+        let fields: String = spec
+            .params
+            .iter()
+            .enumerate()
+            .map(|(index, param)| match param.ty {
+                ParamType::Int => format!("{}: values[{index}] as usize, ", param.name),
+                _ => format!("{}: values[{index}], ", param.name),
+            })
+            .collect();
+        let build = if spec.params.is_empty() {
+            format!("        let _ = values;\n        {path}::Params\n")
+        } else {
+            format!("        {path}::Params {{ {fields}}}\n")
+        };
+
+        let param_specs: String = spec
+            .params
+            .iter()
+            .map(|param| {
+                format!(
+                    "        ParamSpec {{ name: {:?}, default: {}, min: {}, max: {}, integral: {} }},\n",
+                    param.name,
+                    as_float(&param.default),
+                    param
+                        .min
+                        .as_deref()
+                        .map(as_float)
+                        .unwrap_or_else(|| "f64::NEG_INFINITY".into()),
+                    param
+                        .max
+                        .as_deref()
+                        .map(as_float)
+                        .unwrap_or_else(|| "f64::INFINITY".into()),
+                    param.ty == ParamType::Int,
+                )
+            })
+            .collect();
+
+        let _ = write!(
+            out,
+            "mod {name}_adapter {{\n\
+             \x20   use super::*;\n\n\
+             \x20   type Indicated = {path}::{ty};\n\
+             \x20   const INPUTS: usize = {inputs};\n\
+             \x20   const OUTPUTS: usize = {outputs};\n\n\
+             \x20   const PARAMS: &[ParamSpec] = &[\n{param_specs}    ];\n\n\
+             \x20   fn params(values: &[f64]) -> {path}::Params {{\n{build}    }}\n\n\
+             \x20   fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {{\n\
+             \x20       assert_eq!(inputs.len(), INPUTS, \"{name} takes {{INPUTS}} inputs\");\n\
+             \x20       std::array::from_fn(|i| inputs[i])\n    }}\n\n\
+             \x20   fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {{\n\
+             \x20       <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))\n            .map(|out| out.to_vec())\n    }}\n\n\
+             \x20   fn lookback(values: &[f64]) -> usize {{\n\
+             \x20       <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))\n    }}\n\n\
+             \x20   fn open_and_fill(\n        inputs: &[&[f64]],\n        values: &[f64],\n    ) -> OpenAndFillResult {{\n\
+             \x20       let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(\n            columns(inputs),\n            &params(values),\n        )?;\n\
+             \x20       Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))\n    }}\n\n\
+             \x20   pub fn registered() -> Registered {{\n\
+             \x20       Registered {{\n\
+             \x20           name: {path}::NAME,\n\
+             \x20           inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,\n\
+             \x20           outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,\n\
+             \x20           params: PARAMS,\n\
+             \x20           batch,\n            lookback,\n            open_and_fill,\n        }}\n    }}\n}}\n\n",
+            ty = spec.type_name(),
+        );
+    }
+
+    out.push_str("pub fn registered() -> Vec<Registered> {\n    vec![\n");
+    for spec in specs {
+        let _ = writeln!(out, "        {}_adapter::registered(),", spec.name);
+    }
+    out.push_str("    ]\n}\n");
+    out
+}
+
+fn as_float(value: &str) -> String {
+    if value.contains('.') || value.contains('e') {
+        value.to_string()
+    } else {
+        format!("{value}.0")
+    }
+}
+
 pub fn generate(root: &Path) -> Result<Vec<Generated>, Vec<SpecError>> {
     let indicators = root.join("crates/trendlib/src/indicators");
     let specs = crate::spec::read_all(&indicators)?;
@@ -894,6 +1010,10 @@ pub fn generate(root: &Path) -> Result<Vec<Generated>, Vec<SpecError>> {
         ),
         (root.join("python/trendlib/stream.py"), streams(&specs)),
         (root.join("python/trendlib/_core.pyi"), stubs(&specs)),
+        (
+            root.join("crates/trendlib/tests/support/registry.rs"),
+            test_registry(&specs),
+        ),
     ];
 
     let mut generated = Vec::new();

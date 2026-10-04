@@ -14,18 +14,26 @@ from trendlib import _convert, _core
 
 __all__ = [
     "ATR",
+    "DEMA",
     "EMA",
+    "MACD",
     "NATR",
+    "ROC",
     "RSI",
     "SMA",
+    "TEMA",
     "TRANGE",
     "WMA",
     "atr",
+    "dema",
     "ema",
     "lookback",
+    "macd",
     "natr",
+    "roc",
     "rsi",
     "sma",
+    "tema",
     "trange",
     "wma",
 ]
@@ -67,6 +75,25 @@ def atr(
     return _convert.wrap_outputs(out, carrier, ("atr",))
 
 
+def dema(source=None, *, period: int = _PARAMS["dema"]["period"]["default"]) -> Any:
+    """Double Exponential Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars each exponential stage is derived from, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Exponential average with most of its own lag subtracted back out.
+    """
+    period = _convert.as_int("dema", "period", period)
+    columns, carrier = _convert.bars("dema", (source,), ("source",), ("series",))
+    out = _core.dema(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("dema",))
+
+
 def ema(source=None, *, period: int = _PARAMS["ema"]["period"]["default"]) -> Any:
     """Exponential Moving Average.
 
@@ -84,6 +111,49 @@ def ema(source=None, *, period: int = _PARAMS["ema"]["period"]["default"]) -> An
     columns, carrier = _convert.bars("ema", (source,), ("source",), ("series",))
     out = _core.ema(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("ema",))
+
+
+def macd(
+    source=None,
+    *,
+    fast_period: int = _PARAMS["macd"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["macd"]["slow_period"]["default"],
+    signal_period: int = _PARAMS["macd"]["signal_period"]["default"],
+) -> Any:
+    """Moving Average Convergence Divergence.
+
+    Parameters
+    ----------
+    fast_period : int, default 12
+        Bars in the faster exponential average, from 2 to 100000.
+    slow_period : int, default 26
+        Bars in the slower exponential average, from 2 to 100000.
+    signal_period : int, default 9
+        Bars in the exponential average taken of the difference, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        macd: Faster average minus the slower one.
+        macd_signal: Exponential average of macd.
+        macd_hist: macd minus its signal line.
+    """
+    fast_period = _convert.as_int("macd", "fast_period", fast_period)
+    slow_period = _convert.as_int("macd", "slow_period", slow_period)
+    signal_period = _convert.as_int("macd", "signal_period", signal_period)
+    columns, carrier = _convert.bars("macd", (source,), ("source",), ("series",))
+    out = _core.macd(
+        *columns, fast_period=fast_period, slow_period=slow_period, signal_period=signal_period
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "macd",
+            "macd_signal",
+            "macd_hist",
+        ),
+    )
 
 
 def natr(
@@ -118,6 +188,25 @@ def natr(
     )
     out = _core.natr(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("natr",))
+
+
+def roc(source=None, *, period: int = _PARAMS["roc"]["period"]["default"]) -> Any:
+    """Rate of Change.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Number of bars back the comparison is made to, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Percentage change from the value period bars ago.
+    """
+    period = _convert.as_int("roc", "period", period)
+    columns, carrier = _convert.bars("roc", (source,), ("source",), ("series",))
+    out = _core.roc(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("roc",))
 
 
 def rsi(source=None, *, period: int = _PARAMS["rsi"]["period"]["default"]) -> Any:
@@ -156,6 +245,25 @@ def sma(source=None, *, period: int = _PARAMS["sma"]["period"]["default"]) -> An
     columns, carrier = _convert.bars("sma", (source,), ("source",), ("series",))
     out = _core.sma(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("sma",))
+
+
+def tema(source=None, *, period: int = _PARAMS["tema"]["period"]["default"]) -> Any:
+    """Triple Exponential Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars each exponential stage is derived from, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Exponential average with lag removed through three stages.
+    """
+    period = _convert.as_int("tema", "period", period)
+    columns, carrier = _convert.bars("tema", (source,), ("source",), ("series",))
+    out = _core.tema(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("tema",))
 
 
 def trange(high=None, low=None, close=None) -> Any:
@@ -214,36 +322,61 @@ def lookback(name: str, **params: Any) -> int:
     return _core.lookback(name, **params)
 
 
-def ATR(high, low, close, timeperiod: int = _PARAMS["atr"]["period"]["default"]) -> Any:  # noqa: N802
+def ATR(high, low, close, timeperiod: int = _PARAMS["atr"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`atr`."""
     return atr(high, low, close, period=timeperiod)
 
 
-def EMA(source, timeperiod: int = _PARAMS["ema"]["period"]["default"]) -> Any:  # noqa: N802
+def DEMA(source, timeperiod: int = _PARAMS["dema"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`dema`."""
+    return dema(source, period=timeperiod)
+
+
+def EMA(source, timeperiod: int = _PARAMS["ema"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`ema`."""
     return ema(source, period=timeperiod)
 
 
-def NATR(high, low, close, timeperiod: int = _PARAMS["natr"]["period"]["default"]) -> Any:  # noqa: N802
+def MACD(
+    source,
+    fastperiod: int = _PARAMS["macd"]["fast_period"]["default"],
+    slowperiod: int = _PARAMS["macd"]["slow_period"]["default"],
+    signalperiod: int = _PARAMS["macd"]["signal_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`macd`."""
+    return macd(source, fast_period=fastperiod, slow_period=slowperiod, signal_period=signalperiod)
+
+
+def NATR(high, low, close, timeperiod: int = _PARAMS["natr"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`natr`."""
     return natr(high, low, close, period=timeperiod)
 
 
-def RSI(source, timeperiod: int = _PARAMS["rsi"]["period"]["default"]) -> Any:  # noqa: N802
+def ROC(source, timeperiod: int = _PARAMS["roc"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`roc`."""
+    return roc(source, period=timeperiod)
+
+
+def RSI(source, timeperiod: int = _PARAMS["rsi"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`rsi`."""
     return rsi(source, period=timeperiod)
 
 
-def SMA(source, timeperiod: int = _PARAMS["sma"]["period"]["default"]) -> Any:  # noqa: N802
+def SMA(source, timeperiod: int = _PARAMS["sma"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`sma`."""
     return sma(source, period=timeperiod)
 
 
-def TRANGE(high, low, close) -> Any:  # noqa: N802
+def TEMA(source, timeperiod: int = _PARAMS["tema"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`tema`."""
+    return tema(source, period=timeperiod)
+
+
+def TRANGE(high, low, close) -> Any:
     """TA-Lib-style alias for :func:`trange`."""
     return trange(high, low, close)
 
 
-def WMA(source, timeperiod: int = _PARAMS["wma"]["period"]["default"]) -> Any:  # noqa: N802
+def WMA(source, timeperiod: int = _PARAMS["wma"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`wma`."""
     return wma(source, period=timeperiod)

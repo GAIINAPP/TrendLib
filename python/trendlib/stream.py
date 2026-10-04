@@ -15,10 +15,14 @@ from trendlib._stream_base import Factory
 
 __all__ = [
     "atr",
+    "dema",
     "ema",
+    "macd",
     "natr",
+    "roc",
     "rsi",
     "sma",
+    "tema",
     "trange",
     "wma",
 ]
@@ -38,7 +42,19 @@ atr = Factory(
     ),
     ("atr",),
 )
+dema = Factory("dema", _core.DemaStream, ("source",), ("series",), ("dema",))
 ema = Factory("ema", _core.EmaStream, ("source",), ("series",), ("ema",))
+macd = Factory(
+    "macd",
+    _core.MacdStream,
+    ("source",),
+    ("series",),
+    (
+        "macd",
+        "macd_signal",
+        "macd_hist",
+    ),
+)
 natr = Factory(
     "natr",
     _core.NatrStream,
@@ -54,8 +70,10 @@ natr = Factory(
     ),
     ("natr",),
 )
+roc = Factory("roc", _core.RocStream, ("source",), ("series",), ("roc",))
 rsi = Factory("rsi", _core.RsiStream, ("source",), ("series",), ("rsi",))
 sma = Factory("sma", _core.SmaStream, ("source",), ("series",), ("sma",))
+tema = Factory("tema", _core.TemaStream, ("source",), ("series",), ("tema",))
 trange = Factory(
     "trange",
     _core.TrangeStream,

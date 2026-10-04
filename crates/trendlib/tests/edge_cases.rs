@@ -15,7 +15,7 @@ fn empty_like(indicator: &Registered) -> Vec<Vec<f64>> {
 fn empty_input_returns_empty_output() {
     for indicator in registered() {
         let columns = empty_like(&indicator);
-        let out = (indicator.batch)(&as_slices(&columns), None).unwrap();
+        let out = (indicator.batch)(&as_slices(&columns), &indicator.defaults()).unwrap();
         assert_eq!(out.len(), indicator.outputs.len(), "{}", indicator.name);
         assert!(out.iter().all(Vec::is_empty), "{}", indicator.name);
     }
@@ -25,11 +25,11 @@ fn empty_input_returns_empty_output() {
 fn short_input_is_all_warm_up_until_one_bar_past_the_lookback() {
     for indicator in registered() {
         let columns = daily_inputs(&indicator);
-        let lookback = (indicator.lookback)(None);
+        let lookback = (indicator.lookback)(&indicator.defaults());
 
         for len in [lookback.saturating_sub(1), lookback] {
             let short = head(&columns, len);
-            let out = (indicator.batch)(&as_slices(&short), None).unwrap();
+            let out = (indicator.batch)(&as_slices(&short), &indicator.defaults()).unwrap();
             for column in &out {
                 assert_eq!(column.len(), len, "{}", indicator.name);
                 assert!(
@@ -41,7 +41,7 @@ fn short_input_is_all_warm_up_until_one_bar_past_the_lookback() {
         }
 
         let exact = head(&columns, lookback + 1);
-        let out = (indicator.batch)(&as_slices(&exact), None).unwrap();
+        let out = (indicator.batch)(&as_slices(&exact), &indicator.defaults()).unwrap();
         for (index, column) in out.iter().enumerate() {
             assert!(
                 column[..lookback].iter().all(|v| v.is_nan()),
@@ -63,8 +63,8 @@ fn a_constant_series_gives_a_constant_result() {
     for indicator in registered() {
         let base = vec![5.0; 200];
         let columns = bars_from(&base, indicator.inputs);
-        let lookback = (indicator.lookback)(None);
-        let out = (indicator.batch)(&as_slices(&columns), None).unwrap();
+        let lookback = (indicator.lookback)(&indicator.defaults());
+        let out = (indicator.batch)(&as_slices(&columns), &indicator.defaults()).unwrap();
         for (index, column) in out.iter().enumerate() {
             let settled = column[lookback];
             assert!(
@@ -92,7 +92,7 @@ fn a_constant_series_gives_a_constant_result() {
 fn leading_warm_up_rows_are_skipped() {
     for indicator in registered() {
         let columns = daily_inputs(&indicator);
-        let trimmed = (indicator.batch)(&as_slices(&columns), None).unwrap();
+        let trimmed = (indicator.batch)(&as_slices(&columns), &indicator.defaults()).unwrap();
         for leading in [1usize, 5, 37] {
             let padded: Vec<Vec<f64>> = columns
                 .iter()
@@ -102,7 +102,7 @@ fn leading_warm_up_rows_are_skipped() {
                     padded
                 })
                 .collect();
-            let shifted = (indicator.batch)(&as_slices(&padded), None).unwrap();
+            let shifted = (indicator.batch)(&as_slices(&padded), &indicator.defaults()).unwrap();
             for (index, column) in shifted.iter().enumerate() {
                 assert!(column[..leading].iter().all(|v| v.is_nan()));
                 assert!(
@@ -123,7 +123,8 @@ fn a_non_finite_bar_after_the_first_valid_bar_is_rejected() {
             for bad in [f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
                 let mut poisoned = columns.clone();
                 poisoned[which][42] = bad;
-                let error = (indicator.batch)(&as_slices(&poisoned), None).unwrap_err();
+                let error =
+                    (indicator.batch)(&as_slices(&poisoned), &indicator.defaults()).unwrap_err();
                 let message = error.to_string();
                 assert!(
                     matches!(error, TlError::InvalidInput(_)),
@@ -148,8 +149,8 @@ fn extreme_magnitudes_do_not_panic() {
                 .map(|i| scale * (1.0 + (i % 7) as f64 / 10.0))
                 .collect();
             let columns = bars_from(&base, indicator.inputs);
-            let out = (indicator.batch)(&as_slices(&columns), None).unwrap();
-            let lookback = (indicator.lookback)(None);
+            let out = (indicator.batch)(&as_slices(&columns), &indicator.defaults()).unwrap();
+            let lookback = (indicator.lookback)(&indicator.defaults());
             for (index, column) in out.iter().enumerate() {
                 assert_eq!(column.len(), base.len(), "{}", indicator.name);
                 assert!(
@@ -166,14 +167,14 @@ fn extreme_magnitudes_do_not_panic() {
 #[test]
 fn parameters_at_the_edges_of_their_range_are_accepted() {
     for indicator in registered() {
-        let Some((_, min, max)) = indicator.period else {
-            continue;
-        };
         let columns = daily_inputs(&indicator);
-        for period in [min, max] {
-            let out = (indicator.batch)(&as_slices(&columns), Some(period))
-                .unwrap_or_else(|e| panic!("{} period={period}: {e}", indicator.name));
-            assert_eq!(out[0].len(), columns[0].len());
+        for param in indicator.params {
+            for edge in [param.min, param.max.min(100_000.0)] {
+                let values = indicator.with(param.name, edge);
+                let out = (indicator.batch)(&as_slices(&columns), &values)
+                    .unwrap_or_else(|e| panic!("{} {}={edge}: {e}", indicator.name, param.name));
+                assert_eq!(out[0].len(), columns[0].len());
+            }
         }
     }
 }
@@ -181,21 +182,25 @@ fn parameters_at_the_edges_of_their_range_are_accepted() {
 #[test]
 fn parameters_outside_their_range_name_the_range() {
     for indicator in registered() {
-        let Some((_, min, max)) = indicator.period else {
-            continue;
-        };
         let columns = daily_inputs(&indicator);
-        for period in [min - 1, max + 1] {
-            let error = (indicator.batch)(&as_slices(&columns), Some(period)).unwrap_err();
-            assert_eq!(
-                error.to_string(),
-                format!(
-                    "{}: period={period} is out of range [{min}, {max}]",
-                    indicator.name
-                ),
-                "{}",
-                indicator.name
-            );
+        for param in indicator.params {
+            if !param.integral {
+                continue;
+            }
+            for bad in [param.min - 1.0, param.max + 1.0] {
+                let values = indicator.with(param.name, bad);
+                let error = (indicator.batch)(&as_slices(&columns), &values).unwrap_err();
+                assert_eq!(
+                    error.to_string(),
+                    format!(
+                        "{}: {}={} is out of range [{}, {}]",
+                        indicator.name, param.name, bad as i64, param.min as i64, param.max as i64
+                    ),
+                    "{} {}",
+                    indicator.name,
+                    param.name
+                );
+            }
         }
     }
 }
@@ -204,10 +209,12 @@ fn parameters_outside_their_range_name_the_range() {
 fn a_stream_opened_with_exactly_the_lookback_is_refused() {
     for indicator in registered() {
         let columns = daily_inputs(&indicator);
-        let lookback = (indicator.lookback)(None);
+        let lookback = (indicator.lookback)(&indicator.defaults());
 
         let too_short = head(&columns, lookback);
-        let error = indicator.open(&as_slices(&too_short), None).unwrap_err();
+        let error = indicator
+            .open(&as_slices(&too_short), &indicator.defaults())
+            .unwrap_err();
         let message = error.to_string();
         assert!(
             matches!(error, TlError::InsufficientHistory(_)),
@@ -222,7 +229,7 @@ fn a_stream_opened_with_exactly_the_lookback_is_refused() {
 
         let enough = head(&columns, lookback + 1);
         indicator
-            .open(&as_slices(&enough), None)
+            .open(&as_slices(&enough), &indicator.defaults())
             .unwrap_or_else(|e| panic!("{} should open on lookback + 1 bars: {e}", indicator.name));
     }
 }
@@ -231,11 +238,15 @@ fn a_stream_opened_with_exactly_the_lookback_is_refused() {
 fn a_rejected_bar_leaves_the_stream_untouched() {
     for indicator in registered() {
         let columns = daily_inputs(&indicator);
-        let split = (indicator.lookback)(None) + 1;
+        let split = (indicator.lookback)(&indicator.defaults()) + 1;
         let history = head(&columns, split);
 
-        let mut clean = indicator.open(&as_slices(&history), None).unwrap();
-        let mut poisoned = indicator.open(&as_slices(&history), None).unwrap();
+        let mut clean = indicator
+            .open(&as_slices(&history), &indicator.defaults())
+            .unwrap();
+        let mut poisoned = indicator
+            .open(&as_slices(&history), &indicator.defaults())
+            .unwrap();
 
         for bad in [f64::NAN, f64::INFINITY] {
             let bar: Vec<f64> = indicator.inputs.iter().map(|_| bad).collect();
@@ -276,8 +287,8 @@ fn natr_normalises_even_at_period_one() {
     let columns = head(&daily_inputs(&natr), 50);
     let inputs = as_slices(&columns);
 
-    let normalised = (natr.batch)(&inputs, Some(1)).unwrap();
-    let spans = (trange.batch)(&inputs, None).unwrap();
+    let normalised = (natr.batch)(&inputs, &natr.with("period", 1.0)).unwrap();
+    let spans = (trange.batch)(&inputs, &trange.defaults()).unwrap();
     let close = &columns[2];
 
     for row in 1..columns[0].len() {

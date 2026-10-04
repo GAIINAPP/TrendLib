@@ -4,19 +4,12 @@
 mod support;
 
 use proptest::prelude::*;
-use support::{
-    Registered, as_slices, bars_from, bitwise_equal, first_difference, head, registered,
-};
+use support::{as_slices, bars_from, bitwise_equal, first_difference, head, registered};
 use trendlib::TlError;
 
-/// Periods are capped so a case stays fast; the golden suite covers the
-/// documented default and minimum, and `edge_cases` covers the maximum.
-const MAX_PERIOD: usize = 60;
-
-fn period_for(indicator: &Registered, seed: usize) -> Option<usize> {
-    let (_, min, _) = indicator.period?;
-    Some(min + seed % (MAX_PERIOD - min + 1))
-}
+/// Period-like parameters are capped so a case stays fast; the golden suite
+/// covers the documented default and minimum, and `edge_cases` the maximum.
+const MAX_PERIOD: f64 = 40.0;
 
 fn finite_series() -> impl Strategy<Value = Vec<f64>> {
     prop::collection::vec(-1.0e6..1.0e6f64, 0..400)
@@ -37,12 +30,12 @@ proptest! {
         fork_pick in 0.0f64..=1.0,
     ) {
         for indicator in registered() {
-            let period = period_for(&indicator, seed);
+            let values = indicator.capped(seed, MAX_PERIOD);
             let columns = bars_from(&base, indicator.inputs);
             let rows = base.len();
-            let lookback = (indicator.lookback)(period);
+            let lookback = (indicator.lookback)(&values);
 
-            let batch = (indicator.batch)(&as_slices(&columns), period)
+            let batch = (indicator.batch)(&as_slices(&columns), &values)
                 .expect("a finite series is valid");
             prop_assert_eq!(batch.len(), indicator.outputs.len());
             for column in &batch {
@@ -51,7 +44,7 @@ proptest! {
 
             let needed = lookback + 1;
             if rows < needed {
-                let error = indicator.open(&as_slices(&columns), period).unwrap_err();
+                let error = indicator.open(&as_slices(&columns), &values).unwrap_err();
                 prop_assert!(matches!(error, TlError::InsufficientHistory(_)));
                 continue;
             }
@@ -61,8 +54,8 @@ proptest! {
             let history = head(&columns, split);
 
             let (mut stream, filled) =
-                (indicator.open_and_fill)(&as_slices(&history), period).unwrap();
-            let history_batch = (indicator.batch)(&as_slices(&history), period).unwrap();
+                (indicator.open_and_fill)(&as_slices(&history), &values).unwrap();
+            let history_batch = (indicator.batch)(&as_slices(&history), &values).unwrap();
             for (index, column) in filled.iter().enumerate() {
                 prop_assert!(
                     bitwise_equal(column, &history_batch[index]),
@@ -127,9 +120,9 @@ proptest! {
         seed in 0usize..1000,
     ) {
         for indicator in registered() {
-            let period = period_for(&indicator, seed);
+            let values = indicator.capped(seed, MAX_PERIOD);
             let columns = bars_from(&base, indicator.inputs);
-            let trimmed = (indicator.batch)(&as_slices(&columns), period).unwrap();
+            let trimmed = (indicator.batch)(&as_slices(&columns), &values).unwrap();
 
             let padded: Vec<Vec<f64>> = columns
                 .iter()
@@ -139,7 +132,7 @@ proptest! {
                     padded
                 })
                 .collect();
-            let shifted = (indicator.batch)(&as_slices(&padded), period).unwrap();
+            let shifted = (indicator.batch)(&as_slices(&padded), &values).unwrap();
 
             for (index, column) in shifted.iter().enumerate() {
                 prop_assert_eq!(column.len(), base.len() + leading);

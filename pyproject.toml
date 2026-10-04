@@ -51,6 +51,9 @@ select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "RUF"]
 # docs/PYTHON_API.md section 1 fixes these exception names; they are public
 # API and cannot gain an Error suffix.
 "python/trendlib/errors.py" = ["N818"]
+# The uppercase TA-Lib aliases (D12) are deliberately not snake_case, and this
+# file is generated, so annotating each one is noise rather than information.
+"python/trendlib/_functions.py" = ["N802"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["trendlib"]
