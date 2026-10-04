@@ -95,16 +95,23 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
+      # Two steps rather than one with a branch: under bash on Windows $PWD is
+      # an MSYS path (/d/a/...), and the later steps run under PowerShell, which
+      # cannot resolve it. Each shell writes a path its own OS understands.
       - name: create virtualenv
-        shell: bash
+        if: runner.os != 'Windows'
         run: |
           python -m venv .venv
           echo "VIRTUAL_ENV=$PWD/.venv" >> "$GITHUB_ENV"
-          if [ "$RUNNER_OS" = "Windows" ]; then
-            echo "$PWD/.venv/Scripts" >> "$GITHUB_PATH"
-          else
-            echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
-          fi
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+
+      - name: create virtualenv (windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          python -m venv .venv
+          Add-Content -Path $env:GITHUB_ENV -Value "VIRTUAL_ENV=$PWD\.venv"
+          Add-Content -Path $env:GITHUB_PATH -Value "$PWD\.venv\Scripts"
 
       - name: install build and test dependencies
         run: pip install maturin pytest hypothesis pytest-benchmark "pandas>=2.0"
