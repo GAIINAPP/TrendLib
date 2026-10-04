@@ -1,0 +1,30 @@
+name: natr
+title: Normalized Average True Range
+group: volatility
+flags: [unstable]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 1
+    max: 100000
+    doc: Number of bars the true ranges are averaged over
+outputs:
+  - name: natr
+    dtype: float64
+    plot: line
+    doc: Wilder average of the true range as a percentage of the close
+talib:
+  name: NATR
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - J. Welles Wilder Jr., New Concepts in Technical Trading Systems, Trend Research, 1978, chapter 2
+see_also: [atr, trange]

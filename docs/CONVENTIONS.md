@@ -123,9 +123,14 @@ where the computation starts. Their `spec.yaml` carries the `path_dependent` fla
 | 3 | VWAP reset | Never resets; caller slices sessions | `anchor="day"` by default; alias `tl.VWAP` uses `anchor="none"` | Session VWAP is what Indian intraday users mean |
 | 4 | Unstable-period setting | Global `TA_SetUnstablePeriod` | Not supported; equals TA-Lib default 0 | D9 |
 | 5 | Candle settings | Globally configurable | Fixed at defaults (v0.1) | D9; configurable per call in M6 |
+| 6 | `natr` with `period = 1` | Returns the raw true range, not normalised | Normalises at every period: `100 * atr / close` | A price span is not a percentage. TA-Lib's value is in price units under a name that means percent, which is the kind of plausible wrong number this project exists to avoid. Every other period agrees exactly. |
 
 Golden tests against TA-Lib exclude only the rows a listed deviation affects, and
-the golden header names the deviation number.
+the golden header names the deviation number. Where a deviation makes the oracle
+unusable at a parameter boundary rather than on particular rows, the boundary
+case is generated at the nearest parameter the oracle can be trusted at and the
+header carries a `# note:` saying which deviation forced it; a test refuses a
+substitution that has no such note.
 
 ## 10. Known differences from TradingView
 

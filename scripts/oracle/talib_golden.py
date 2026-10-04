@@ -47,6 +47,18 @@ def defaults(spec: dict) -> dict:
     return {param["name"]: param["default"] for param in spec.get("params") or []}
 
 
+# A boundary case whose documented minimum the oracle cannot be trusted at.
+# The value is the period to use instead and the reason, which goes in the file
+# header so the substitution is visible where the numbers are.
+CASE_OVERRIDES = {
+    ("natr", "min_period"): (
+        2,
+        "TA-Lib returns the raw true range at period=1 rather than normalising it "
+        "(CONVENTIONS.md deviation 6), so the oracle is only usable from period=2",
+    ),
+}
+
+
 def cases(spec: dict) -> dict[str, dict]:
     """Every parameter case a golden file is written for.
 
@@ -62,6 +74,9 @@ def cases(spec: dict) -> dict[str, dict]:
     }
     if floors:
         found["min_period"] = {**defaults(spec), **floors}
+    for (name, case), (period, _) in CASE_OVERRIDES.items():
+        if name == spec["name"] and case in found:
+            found[case] = {**found[case], "period": period}
     return found
 
 
@@ -146,6 +161,7 @@ def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
         f"# input: testdata/{dataset} (all rows)",
         f"# tolerance: {TOLERANCE}",
         "# excluded_rows: none",
+        *([f"# note: {CASE_OVERRIDES[(name, case)][1]}"] if (name, case) in CASE_OVERRIDES else []),
         f"# date: {dt.date.today().isoformat()}",
     ]
 

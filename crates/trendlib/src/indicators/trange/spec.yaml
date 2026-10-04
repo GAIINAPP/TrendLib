@@ -1,0 +1,22 @@
+name: trange
+title: True Range
+group: volatility
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: trange
+    dtype: float64
+    plot: line
+    doc: Greater of the bar's own range and its distance from the previous close
+talib:
+  name: TRANGE
+  params: {}
+  outputs: [real]
+references:
+  - J. Welles Wilder Jr., New Concepts in Technical Trading Systems, Trend Research, 1978, chapter 2
+see_also: [atr, natr]

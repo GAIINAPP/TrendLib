@@ -1,107 +1,141 @@
-//! The shared edge-case suite from `docs/TESTING.md` section 5. Hand-written
-//! for M1; generated for every indicator in M2.
+//! The shared edge-case suite from `docs/TESTING.md` section 5, run against
+//! every registered indicator whatever its shape. Generated for every indicator
+//! in M2.
 
 mod support;
 
-use support::{bitwise_equal, daily_closes, registered};
+use support::{Registered, as_slices, bars_from, bitwise_equal, daily_inputs, head, registered};
 use trendlib::TlError;
+
+fn empty_like(indicator: &Registered) -> Vec<Vec<f64>> {
+    indicator.inputs.iter().map(|_| Vec::new()).collect()
+}
 
 #[test]
 fn empty_input_returns_empty_output() {
     for indicator in registered() {
-        let out = (indicator.batch)(&[], indicator.default_period).unwrap();
-        assert!(out.is_empty(), "{}", indicator.name);
+        let columns = empty_like(&indicator);
+        let out = (indicator.batch)(&as_slices(&columns), None).unwrap();
+        assert_eq!(out.len(), indicator.outputs.len(), "{}", indicator.name);
+        assert!(out.iter().all(Vec::is_empty), "{}", indicator.name);
     }
 }
 
 #[test]
 fn short_input_is_all_warm_up_until_one_bar_past_the_lookback() {
-    let closes = daily_closes();
     for indicator in registered() {
-        let period = indicator.default_period;
-        let lookback = (indicator.lookback)(period);
+        let columns = daily_inputs(&indicator);
+        let lookback = (indicator.lookback)(None);
 
         for len in [lookback.saturating_sub(1), lookback] {
-            let out = (indicator.batch)(&closes[..len], period).unwrap();
-            assert_eq!(out.len(), len, "{}", indicator.name);
-            assert!(
-                out.iter().all(|v| v.is_nan()),
-                "{} produced a value with only {len} bars",
-                indicator.name
-            );
+            let short = head(&columns, len);
+            let out = (indicator.batch)(&as_slices(&short), None).unwrap();
+            for column in &out {
+                assert_eq!(column.len(), len, "{}", indicator.name);
+                assert!(
+                    column.iter().all(|v| v.is_nan()),
+                    "{} produced a value with only {len} bars",
+                    indicator.name
+                );
+            }
         }
 
-        let out = (indicator.batch)(&closes[..lookback + 1], period).unwrap();
-        assert_eq!(out.len(), lookback + 1);
-        assert!(
-            out[..lookback].iter().all(|v| v.is_nan()),
-            "{}",
-            indicator.name
-        );
-        assert!(
-            out[lookback].is_finite(),
-            "{} has no value at row {lookback}",
-            indicator.name
-        );
+        let exact = head(&columns, lookback + 1);
+        let out = (indicator.batch)(&as_slices(&exact), None).unwrap();
+        for (index, column) in out.iter().enumerate() {
+            assert!(
+                column[..lookback].iter().all(|v| v.is_nan()),
+                "{}",
+                indicator.name
+            );
+            assert!(
+                column[lookback].is_finite(),
+                "{} has no {} at row {lookback}",
+                indicator.name,
+                indicator.outputs[index]
+            );
+        }
     }
 }
 
 #[test]
-fn a_constant_series_is_defined_everywhere() {
-    let flat = vec![5.0; 200];
+fn a_constant_series_gives_a_constant_result() {
     for indicator in registered() {
-        let period = indicator.default_period;
-        let lookback = (indicator.lookback)(period);
-        let out = (indicator.batch)(&flat, period).unwrap();
-        // A flat series has no movement at all, so the moving averages return
-        // the level and RSI reports 0, which is what TA-Lib returns too (the
-        // Python parity suite checks that against the oracle directly).
-        let expected = if indicator.name == "rsi" { 0.0 } else { 5.0 };
-        for (row, value) in out.iter().enumerate().skip(lookback) {
-            assert_eq!(*value, expected, "{} at row {row}", indicator.name);
+        let base = vec![5.0; 200];
+        let columns = bars_from(&base, indicator.inputs);
+        let lookback = (indicator.lookback)(None);
+        let out = (indicator.batch)(&as_slices(&columns), None).unwrap();
+        for (index, column) in out.iter().enumerate() {
+            let settled = column[lookback];
+            assert!(
+                settled.is_finite(),
+                "{} {}",
+                indicator.name,
+                indicator.outputs[index]
+            );
+            for (row, value) in column.iter().enumerate().skip(lookback) {
+                assert_eq!(
+                    *value, settled,
+                    "{} {} drifted at row {row} on constant input",
+                    indicator.name, indicator.outputs[index]
+                );
+            }
+        }
+        // RSI's documented answer on a flat series, which TA-Lib also returns.
+        if indicator.name == "rsi" {
+            assert_eq!(out[0][lookback], 0.0);
         }
     }
 }
 
 #[test]
 fn leading_warm_up_rows_are_skipped() {
-    let closes = daily_closes();
     for indicator in registered() {
-        let period = indicator.default_period;
-        let trimmed = (indicator.batch)(&closes, period).unwrap();
+        let columns = daily_inputs(&indicator);
+        let trimmed = (indicator.batch)(&as_slices(&columns), None).unwrap();
         for leading in [1usize, 5, 37] {
-            let mut padded = vec![f64::NAN; leading];
-            padded.extend_from_slice(&closes);
-            let shifted = (indicator.batch)(&padded, period).unwrap();
-            assert!(shifted[..leading].iter().all(|v| v.is_nan()));
-            assert!(
-                bitwise_equal(&shifted[leading..], &trimmed),
-                "{} with {leading} leading NaN rows",
-                indicator.name
-            );
+            let padded: Vec<Vec<f64>> = columns
+                .iter()
+                .map(|column| {
+                    let mut padded = vec![f64::NAN; leading];
+                    padded.extend_from_slice(column);
+                    padded
+                })
+                .collect();
+            let shifted = (indicator.batch)(&as_slices(&padded), None).unwrap();
+            for (index, column) in shifted.iter().enumerate() {
+                assert!(column[..leading].iter().all(|v| v.is_nan()));
+                assert!(
+                    bitwise_equal(&column[leading..], &trimmed[index]),
+                    "{} with {leading} leading NaN rows",
+                    indicator.name
+                );
+            }
         }
     }
 }
 
 #[test]
 fn a_non_finite_bar_after_the_first_valid_bar_is_rejected() {
-    let closes = daily_closes();
     for indicator in registered() {
-        for bad in [f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
-            let mut series = closes[..100].to_vec();
-            series[42] = bad;
-            let error = (indicator.batch)(&series, indicator.default_period).unwrap_err();
-            let message = error.to_string();
-            assert!(
-                matches!(error, TlError::InvalidInput(_)),
-                "{}",
-                indicator.name
-            );
-            assert!(
-                message.contains("source") && message.contains("row 42"),
-                "{}: message does not name the input and row: {message}",
-                indicator.name
-            );
+        let columns = head(&daily_inputs(&indicator), 100);
+        for (which, name) in indicator.inputs.iter().enumerate() {
+            for bad in [f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
+                let mut poisoned = columns.clone();
+                poisoned[which][42] = bad;
+                let error = (indicator.batch)(&as_slices(&poisoned), None).unwrap_err();
+                let message = error.to_string();
+                assert!(
+                    matches!(error, TlError::InvalidInput(_)),
+                    "{}",
+                    indicator.name
+                );
+                assert!(
+                    message.contains(name) && message.contains("row 42"),
+                    "{}: message does not name the input and row: {message}",
+                    indicator.name
+                );
+            }
         }
     }
 }
@@ -109,63 +143,71 @@ fn a_non_finite_bar_after_the_first_valid_bar_is_rejected() {
 #[test]
 fn extreme_magnitudes_do_not_panic() {
     for scale in [1.0e-300f64, 1.0e300] {
-        let series: Vec<f64> = (0..120)
-            .map(|i| scale * (1.0 + (i % 7) as f64 / 10.0))
-            .collect();
         for indicator in registered() {
-            let out = (indicator.batch)(&series, indicator.default_period).unwrap();
-            assert_eq!(out.len(), series.len(), "{}", indicator.name);
-            let lookback = (indicator.lookback)(indicator.default_period);
-            assert!(
-                out[lookback..].iter().all(|v| v.is_finite()),
-                "{} produced a non-finite value at scale {scale}",
-                indicator.name
-            );
+            let base: Vec<f64> = (0..120)
+                .map(|i| scale * (1.0 + (i % 7) as f64 / 10.0))
+                .collect();
+            let columns = bars_from(&base, indicator.inputs);
+            let out = (indicator.batch)(&as_slices(&columns), None).unwrap();
+            let lookback = (indicator.lookback)(None);
+            for (index, column) in out.iter().enumerate() {
+                assert_eq!(column.len(), base.len(), "{}", indicator.name);
+                assert!(
+                    column[lookback..].iter().all(|v| v.is_finite()),
+                    "{} {} produced a non-finite value at scale {scale}",
+                    indicator.name,
+                    indicator.outputs[index]
+                );
+            }
         }
     }
 }
 
 #[test]
 fn parameters_at_the_edges_of_their_range_are_accepted() {
-    let closes = daily_closes();
     for indicator in registered() {
-        for period in [indicator.min_period, indicator.max_period] {
-            let out = (indicator.batch)(&closes, period)
+        let Some((_, min, max)) = indicator.period else {
+            continue;
+        };
+        let columns = daily_inputs(&indicator);
+        for period in [min, max] {
+            let out = (indicator.batch)(&as_slices(&columns), Some(period))
                 .unwrap_or_else(|e| panic!("{} period={period}: {e}", indicator.name));
-            assert_eq!(out.len(), closes.len());
+            assert_eq!(out[0].len(), columns[0].len());
         }
     }
 }
 
 #[test]
 fn parameters_outside_their_range_name_the_range() {
-    let closes = daily_closes();
     for indicator in registered() {
-        for period in [indicator.min_period - 1, indicator.max_period + 1] {
-            let error = (indicator.batch)(&closes, period).unwrap_err();
-            let message = error.to_string();
-            assert!(
-                matches!(error, TlError::InvalidInput(_)),
+        let Some((_, min, max)) = indicator.period else {
+            continue;
+        };
+        let columns = daily_inputs(&indicator);
+        for period in [min - 1, max + 1] {
+            let error = (indicator.batch)(&as_slices(&columns), Some(period)).unwrap_err();
+            assert_eq!(
+                error.to_string(),
+                format!(
+                    "{}: period={period} is out of range [{min}, {max}]",
+                    indicator.name
+                ),
                 "{}",
                 indicator.name
             );
-            let expected = format!(
-                "{}: period={period} is out of range [{}, {}]",
-                indicator.name, indicator.min_period, indicator.max_period
-            );
-            assert_eq!(message, expected, "{}", indicator.name);
         }
     }
 }
 
 #[test]
 fn a_stream_opened_with_exactly_the_lookback_is_refused() {
-    let closes = daily_closes();
     for indicator in registered() {
-        let period = indicator.default_period;
-        let lookback = (indicator.lookback)(period);
+        let columns = daily_inputs(&indicator);
+        let lookback = (indicator.lookback)(None);
 
-        let error = (indicator.open)(&closes[..lookback], period).unwrap_err();
+        let too_short = head(&columns, lookback);
+        let error = indicator.open(&as_slices(&too_short), None).unwrap_err();
         let message = error.to_string();
         assert!(
             matches!(error, TlError::InsufficientHistory(_)),
@@ -178,29 +220,32 @@ fn a_stream_opened_with_exactly_the_lookback_is_refused() {
             indicator.name
         );
 
-        (indicator.open)(&closes[..lookback + 1], period)
+        let enough = head(&columns, lookback + 1);
+        indicator
+            .open(&as_slices(&enough), None)
             .unwrap_or_else(|e| panic!("{} should open on lookback + 1 bars: {e}", indicator.name));
     }
 }
 
 #[test]
 fn a_rejected_bar_leaves_the_stream_untouched() {
-    let closes = daily_closes();
     for indicator in registered() {
-        let period = indicator.default_period;
-        let split = (indicator.lookback)(period) + 1;
+        let columns = daily_inputs(&indicator);
+        let split = (indicator.lookback)(None) + 1;
+        let history = head(&columns, split);
 
-        let mut clean = (indicator.open)(&closes[..split], period).unwrap();
-        let mut poisoned = (indicator.open)(&closes[..split], period).unwrap();
+        let mut clean = indicator.open(&as_slices(&history), None).unwrap();
+        let mut poisoned = indicator.open(&as_slices(&history), None).unwrap();
 
         for bad in [f64::NAN, f64::INFINITY] {
-            let error = poisoned.update(bad).unwrap_err();
+            let bar: Vec<f64> = indicator.inputs.iter().map(|_| bad).collect();
+            let error = poisoned.update(&bar).unwrap_err();
             assert!(
                 matches!(error, TlError::InvalidInput(_)),
                 "{}",
                 indicator.name
             );
-            assert!(poisoned.peek(bad).is_err(), "{}", indicator.name);
+            assert!(poisoned.peek(&bar).is_err(), "{}", indicator.name);
         }
         assert_eq!(
             poisoned.bars_seen(),
@@ -209,15 +254,38 @@ fn a_rejected_bar_leaves_the_stream_untouched() {
             indicator.name
         );
 
-        for &bar in &closes[split..split + 20] {
-            let expected = clean.update(bar).unwrap();
-            let got = poisoned.update(bar).unwrap();
-            assert_eq!(
-                expected.to_bits(),
-                got.to_bits(),
+        for row in split..split + 20 {
+            let bar: Vec<f64> = columns.iter().map(|c| c[row]).collect();
+            let expected = clean.update(&bar).unwrap();
+            let got = poisoned.update(&bar).unwrap();
+            assert!(
+                bitwise_equal(&expected, &got),
                 "{}: a rejected bar changed later values",
                 indicator.name
             );
         }
+    }
+}
+
+/// Deviation 6: `natr` normalises at every period, including the one where
+/// TA-Lib does not, so the oracle cannot pin this row and a test must.
+#[test]
+fn natr_normalises_even_at_period_one() {
+    let natr = support::find("natr").expect("natr is registered");
+    let trange = support::find("trange").expect("trange is registered");
+    let columns = head(&daily_inputs(&natr), 50);
+    let inputs = as_slices(&columns);
+
+    let normalised = (natr.batch)(&inputs, Some(1)).unwrap();
+    let spans = (trange.batch)(&inputs, None).unwrap();
+    let close = &columns[2];
+
+    for row in 1..columns[0].len() {
+        let expected = 100.0 * spans[0][row] / close[row];
+        assert_eq!(
+            normalised[0][row].to_bits(),
+            expected.to_bits(),
+            "natr(period=1) at row {row} is not 100 * trange / close"
+        );
     }
 }

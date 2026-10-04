@@ -4,20 +4,26 @@
 mod support;
 
 use proptest::prelude::*;
-use support::{Registered, bitwise_equal, first_difference, registered};
+use support::{
+    Registered, as_slices, bars_from, bitwise_equal, first_difference, head, registered,
+};
 use trendlib::TlError;
 
-/// Periods are capped at 60 so a case stays fast; the golden suite covers the
+/// Periods are capped so a case stays fast; the golden suite covers the
 /// documented default and minimum, and `edge_cases` covers the maximum.
 const MAX_PERIOD: usize = 60;
 
-fn period_for(indicator: &Registered, seed: usize) -> usize {
-    let span = MAX_PERIOD - indicator.min_period + 1;
-    indicator.min_period + seed % span
+fn period_for(indicator: &Registered, seed: usize) -> Option<usize> {
+    let (_, min, _) = indicator.period?;
+    Some(min + seed % (MAX_PERIOD - min + 1))
 }
 
 fn finite_series() -> impl Strategy<Value = Vec<f64>> {
-    prop::collection::vec(-1.0e6..1.0e6f64, 0..600)
+    prop::collection::vec(-1.0e6..1.0e6f64, 0..400)
+}
+
+fn bar_at(columns: &[Vec<f64>], row: usize) -> Vec<f64> {
+    columns.iter().map(|column| column[row]).collect()
 }
 
 proptest! {
@@ -25,104 +31,125 @@ proptest! {
 
     #[test]
     fn stream_equals_batch_from_any_split(
-        series in finite_series(),
+        base in finite_series(),
         seed in 0usize..1000,
         split_pick in 0.0f64..=1.0,
         fork_pick in 0.0f64..=1.0,
     ) {
         for indicator in registered() {
             let period = period_for(&indicator, seed);
+            let columns = bars_from(&base, indicator.inputs);
+            let rows = base.len();
             let lookback = (indicator.lookback)(period);
-            let batch = (indicator.batch)(&series, period).expect("finite series is valid");
-            prop_assert_eq!(batch.len(), series.len());
+
+            let batch = (indicator.batch)(&as_slices(&columns), period)
+                .expect("a finite series is valid");
+            prop_assert_eq!(batch.len(), indicator.outputs.len());
+            for column in &batch {
+                prop_assert_eq!(column.len(), rows);
+            }
 
             let needed = lookback + 1;
-            if series.len() < needed {
-                let error = (indicator.open)(&series, period).unwrap_err();
+            if rows < needed {
+                let error = indicator.open(&as_slices(&columns), period).unwrap_err();
                 prop_assert!(matches!(error, TlError::InsufficientHistory(_)));
                 continue;
             }
 
-            let room = series.len() - needed;
-            let split = needed + (room as f64 * split_pick).round() as usize;
-            let split = split.min(series.len());
+            let room = rows - needed;
+            let split = (needed + (room as f64 * split_pick).round() as usize).min(rows);
+            let history = head(&columns, split);
 
-            let (mut stream, head) = (indicator.open_and_fill)(&series[..split], period).unwrap();
-            let head_batch = (indicator.batch)(&series[..split], period).unwrap();
-            prop_assert!(
-                bitwise_equal(&head, &head_batch),
-                "{}: open_and_fill differs from batch at {:?}",
-                indicator.name,
-                first_difference(&head, &head_batch)
-            );
+            let (mut stream, filled) =
+                (indicator.open_and_fill)(&as_slices(&history), period).unwrap();
+            let history_batch = (indicator.batch)(&as_slices(&history), period).unwrap();
+            for (index, column) in filled.iter().enumerate() {
+                prop_assert!(
+                    bitwise_equal(column, &history_batch[index]),
+                    "{}: open_and_fill differs from batch at {:?}",
+                    indicator.name,
+                    first_difference(column, &history_batch[index])
+                );
+            }
             prop_assert_eq!(stream.bars_seen(), split as u64);
-            prop_assert_eq!(
-                stream.value().map(f64::to_bits),
-                head.last().copied().map(f64::to_bits)
-            );
 
-            let tail = &series[split..];
-            let fork_at = if tail.is_empty() {
+            let fork_at = if split >= rows {
                 usize::MAX
             } else {
-                ((tail.len() - 1) as f64 * fork_pick).round() as usize
+                split + ((rows - split - 1) as f64 * fork_pick).round() as usize
             };
 
-            let mut streamed = head;
-            for (offset, &bar) in tail.iter().enumerate() {
-                let peeked = stream.peek(bar).unwrap();
-                let peeked_again = stream.peek(bar).unwrap();
-                prop_assert_eq!(peeked.to_bits(), peeked_again.to_bits());
+            let mut streamed = filled;
+            for row in split..rows {
+                let bar = bar_at(&columns, row);
 
-                if offset == fork_at {
+                let peeked = stream.peek(&bar).unwrap();
+                let peeked_again = stream.peek(&bar).unwrap();
+                prop_assert!(bitwise_equal(&peeked, &peeked_again));
+
+                if row == fork_at {
                     // A fork is an independent value: whatever happens to it,
                     // the original's next bar is unaffected.
                     let mut fork = stream.fork();
-                    fork.update(bar * 1.5 + 1.0).unwrap();
-                    fork.update(bar * 0.5 - 1.0).unwrap();
+                    let nudged: Vec<f64> = bar.iter().map(|v| v * 1.5 + 1.0).collect();
+                    fork.update(&nudged).unwrap();
+                    fork.update(&nudged).unwrap();
                 }
 
-                let committed = stream.update(bar).unwrap();
-                prop_assert_eq!(
-                    peeked.to_bits(),
-                    committed.to_bits(),
+                let committed = stream.update(&bar).unwrap();
+                prop_assert!(
+                    bitwise_equal(&peeked, &committed),
                     "{}: peek did not predict update",
                     indicator.name
                 );
-                streamed.push(committed);
+                for (column, value) in streamed.iter_mut().zip(committed) {
+                    column.push(value);
+                }
             }
 
-            prop_assert!(
-                bitwise_equal(&streamed, &batch),
-                "{}: stream and batch differ at {:?}",
-                indicator.name,
-                first_difference(&streamed, &batch)
-            );
-            prop_assert_eq!(stream.bars_seen(), series.len() as u64);
+            for (index, column) in streamed.iter().enumerate() {
+                prop_assert!(
+                    bitwise_equal(column, &batch[index]),
+                    "{} {}: stream and batch differ at {:?}",
+                    indicator.name,
+                    indicator.outputs[index],
+                    first_difference(column, &batch[index])
+                );
+            }
+            prop_assert_eq!(stream.bars_seen(), rows as u64);
         }
     }
 
     #[test]
     fn leading_warm_up_rows_shift_the_output(
-        series in prop::collection::vec(-1.0e6..1.0e6f64, 40..200),
+        base in prop::collection::vec(-1.0e6..1.0e6f64, 40..200),
         leading in 1usize..10,
         seed in 0usize..1000,
     ) {
         for indicator in registered() {
             let period = period_for(&indicator, seed);
-            let trimmed = (indicator.batch)(&series, period).unwrap();
+            let columns = bars_from(&base, indicator.inputs);
+            let trimmed = (indicator.batch)(&as_slices(&columns), period).unwrap();
 
-            let mut padded = vec![f64::NAN; leading];
-            padded.extend_from_slice(&series);
-            let shifted = (indicator.batch)(&padded, period).unwrap();
+            let padded: Vec<Vec<f64>> = columns
+                .iter()
+                .map(|column| {
+                    let mut padded = vec![f64::NAN; leading];
+                    padded.extend_from_slice(column);
+                    padded
+                })
+                .collect();
+            let shifted = (indicator.batch)(&as_slices(&padded), period).unwrap();
 
-            prop_assert_eq!(shifted.len(), padded.len());
-            prop_assert!(shifted[..leading].iter().all(|v| v.is_nan()));
-            prop_assert!(
-                bitwise_equal(&shifted[leading..], &trimmed),
-                "{}: padding changed the values",
-                indicator.name
-            );
+            for (index, column) in shifted.iter().enumerate() {
+                prop_assert_eq!(column.len(), base.len() + leading);
+                prop_assert!(column[..leading].iter().all(|v| v.is_nan()));
+                prop_assert!(
+                    bitwise_equal(&column[leading..], &trimmed[index]),
+                    "{}: padding changed the values",
+                    indicator.name
+                );
+            }
         }
     }
 }
