@@ -5,7 +5,8 @@ use numpy::{IntoPyArray, PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use trendlib::TlError;
-use trendlib::core::traits::{Indicator, Stream};
+use trendlib::core::kernel::Kernel;
+use trendlib::core::traits::Stream;
 use trendlib::indicators::{ema, rsi, sma};
 
 /// Map a core error onto the Python class that `docs/PYTHON_API.md` promises.
@@ -57,7 +58,7 @@ macro_rules! bind_single_series {
             use super::*;
 
             type Indicated = $module::$indicator;
-            type Inner = <Indicated as Indicator>::Stream;
+            type Inner = trendlib::core::kernel::BarStream<Indicated, 1, 1>;
 
             pub const NAME: &str = $name;
             pub const DEFAULT: usize = $module::PERIOD_DEFAULT;
@@ -71,7 +72,7 @@ macro_rules! bind_single_series {
             }
 
             pub fn lookback(period: i64) -> Result<usize, TlError> {
-                Ok(<Indicated as Indicator>::lookback(&params(period)?))
+                Ok(<Indicated as Kernel<1, 1>>::lookback(&params(period)?))
             }
 
             #[pyfunction]
@@ -83,8 +84,8 @@ macro_rules! bind_single_series {
             ) -> PyResult<Bound<'py, PyArray1<f64>>> {
                 let values = as_slice(&source)?;
                 let params = params(period).map_err(|e| to_py_err(py, &e))?;
-                let out = py
-                    .detach(|| <Indicated as Indicator>::batch(values, &params))
+                let [out] = py
+                    .detach(|| <Indicated as Kernel<1, 1>>::batch([values], &params))
                     .map_err(|e| to_py_err(py, &e))?;
                 Ok(out.into_pyarray(py))
             }
@@ -107,7 +108,7 @@ macro_rules! bind_single_series {
                     let values = as_slice(&history)?;
                     let params = params(period).map_err(|e| to_py_err(py, &e))?;
                     let inner = py
-                        .detach(|| <Inner as Stream>::open(values, &params))
+                        .detach(|| <Inner as Stream>::open([values], &params))
                         .map_err(|e| to_py_err(py, &e))?;
                     Ok(Self { inner })
                 }
@@ -121,18 +122,24 @@ macro_rules! bind_single_series {
                 ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
                     let values = as_slice(&history)?;
                     let params = params(period).map_err(|e| to_py_err(py, &e))?;
-                    let (inner, out) = py
-                        .detach(|| <Indicated as Indicator>::open_and_fill(values, &params))
+                    let (inner, [out]) = py
+                        .detach(|| <Indicated as Kernel<1, 1>>::open_and_fill([values], &params))
                         .map_err(|e| to_py_err(py, &e))?;
                     Ok((Self { inner }, out.into_pyarray(py)))
                 }
 
                 fn update(&mut self, py: Python<'_>, bar: f64) -> PyResult<f64> {
-                    self.inner.update(bar).map_err(|e| to_py_err(py, &e))
+                    self.inner
+                        .update([bar])
+                        .map(|[value]| value)
+                        .map_err(|e| to_py_err(py, &e))
                 }
 
                 fn peek(&self, py: Python<'_>, bar: f64) -> PyResult<f64> {
-                    self.inner.peek(bar).map_err(|e| to_py_err(py, &e))
+                    self.inner
+                        .peek([bar])
+                        .map(|[value]| value)
+                        .map_err(|e| to_py_err(py, &e))
                 }
 
                 fn copy(&self) -> Self {
@@ -141,7 +148,7 @@ macro_rules! bind_single_series {
 
                 #[getter]
                 fn value(&self) -> Option<f64> {
-                    self.inner.value()
+                    self.inner.value().map(|[value]| value)
                 }
 
                 #[getter]
@@ -155,7 +162,7 @@ macro_rules! bind_single_series {
                 }
 
                 fn __repr__(&self) -> String {
-                    match self.inner.value() {
+                    match self.inner.value().map(|[value]| value) {
                         Some(value) => format!(
                             "<trendlib stream {NAME} bars_seen={} value={value}>",
                             self.inner.bars_seen()

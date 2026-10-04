@@ -1,7 +1,6 @@
 use crate::core::error::TlError;
+use crate::core::kernel::{BarStream, Kernel, Step};
 use crate::core::math::Wilder;
-use crate::core::single::{self, SingleSeries, SingleStream};
-use crate::core::traits::{Indicator, SeriesStep};
 
 pub const NAME: &str = "rsi";
 
@@ -52,21 +51,21 @@ impl State {
     }
 }
 
-impl SeriesStep for State {
-    fn push(&mut self, value: f64) -> Option<f64> {
-        let previous = self.previous.replace(value)?;
-        let (gain, loss) = Self::split(value - previous);
+impl Step<1, 1> for State {
+    fn push(&mut self, bar: [f64; 1]) -> Option<[f64; 1]> {
+        let previous = self.previous.replace(bar[0])?;
+        let (gain, loss) = Self::split(bar[0] - previous);
         match (self.gain.push(gain), self.loss.push(loss)) {
-            (Some(gain), Some(loss)) => Some(Self::index(gain, loss)),
+            (Some(gain), Some(loss)) => Some([Self::index(gain, loss)]),
             _ => None,
         }
     }
 
-    fn preview(&self, value: f64) -> Option<f64> {
+    fn preview(&self, bar: [f64; 1]) -> Option<[f64; 1]> {
         let previous = self.previous?;
-        let (gain, loss) = Self::split(value - previous);
+        let (gain, loss) = Self::split(bar[0] - previous);
         match (self.gain.preview(gain), self.loss.preview(loss)) {
-            (Some(gain), Some(loss)) => Some(Self::index(gain, loss)),
+            (Some(gain), Some(loss)) => Some([Self::index(gain, loss)]),
             _ => None,
         }
     }
@@ -75,10 +74,12 @@ impl SeriesStep for State {
 #[derive(Clone, Copy, Debug)]
 pub struct Rsi;
 
-pub type RsiStream = SingleStream<Rsi>;
+pub type RsiStream = BarStream<Rsi, 1, 1>;
 
-impl SingleSeries for Rsi {
+impl Kernel<1, 1> for Rsi {
     const NAME: &'static str = NAME;
+    const INPUTS: [&'static str; 1] = ["source"];
+    const OUTPUTS: [&'static str; 1] = ["rsi"];
 
     type Params = Params;
     type State = State;
@@ -106,30 +107,5 @@ impl SingleSeries for Rsi {
             gain: Wilder::new(params.period),
             loss: Wilder::new(params.period),
         }
-    }
-}
-
-impl Indicator for Rsi {
-    const NAME: &'static str = NAME;
-
-    type Params = Params;
-    type Input<'a> = &'a [f64];
-    type Output = Vec<f64>;
-    type Stream = RsiStream;
-
-    fn validate(params: &Params) -> Result<(), TlError> {
-        <Self as SingleSeries>::validate(params)
-    }
-
-    fn lookback(params: &Params) -> usize {
-        <Self as SingleSeries>::lookback(params)
-    }
-
-    fn batch(source: &[f64], params: &Params) -> Result<Vec<f64>, TlError> {
-        single::batch::<Self>(source, params)
-    }
-
-    fn open_and_fill(source: &[f64], params: &Params) -> Result<(RsiStream, Vec<f64>), TlError> {
-        single::open_and_fill::<Self>(source, params)
     }
 }

@@ -30,11 +30,11 @@ trendlib/
 │   │   ├── src/
 │   │   │   ├── lib.rs              #![forbid(unsafe_code)]; re-exports; generated convenience fns
 │   │   │   ├── core/
-│   │   │   │   ├── traits.rs       Indicator, Stream, SeriesStep
+│   │   │   │   ├── traits.rs       Stream
 │   │   │   │   ├── error.rs        TlError
 │   │   │   │   ├── input.rs        Ohlcv views, leading-NaN detection, finiteness checks
 │   │   │   │   ├── output.rs       aligned output buffers (NaN / 0 prefill)
-│   │   │   │   ├── single.rs       batch loop + stream shared by single-series indicators
+│   │   │   │   ├── kernel.rs       Kernel, Step, BarStream: the batch loop and stream
 │   │   │   │   └── math.rs         shared kernels (rolling sums, Wilder smoothing, true range)
 │   │   │   ├── time/               timestamp + timezone-offset handling for session anchors
 │   │   │   ├── registry.rs         GENERATED: static metadata for every indicator
@@ -89,32 +89,43 @@ trendlib/
 
 ### Traits
 
-Settled in M1.
+Settled in M1, generalised in M2. One trait describes an indicator; everything
+else is derived from it.
 
 ```rust
-pub trait Indicator {
-    const NAME: &'static str;       // equals the folder name and spec.yaml `name`
-    type Params: Default + Clone;
-    type Input<'a>;                 // &'a [f64] for single-series, Ohlcv<'a> for bar data
-    type Output;                    // Vec<f64>, or a struct of Vec<f64>/Vec<i32> for multi-output
-    type Stream: Stream<Params = Self::Params>;
+pub trait Step<const I: usize, const O: usize>: Clone {
+    fn push(&mut self, bar: [f64; I]) -> Option<[f64; O]>;   // commit; None while warming up
+    fn preview(&self, bar: [f64; I]) -> Option<[f64; O]>;    // what the next push would return
+}
 
-    fn validate(p: &Self::Params) -> Result<(), TlError>;      // ranges from spec.yaml
-    fn lookback(p: &Self::Params) -> usize;                    // warm-up bars, see CONVENTIONS.md
-    fn batch(input: Self::Input<'_>, p: &Self::Params) -> Result<Self::Output, TlError>;
+pub trait Kernel<const I: usize, const O: usize>: Sized {
+    const NAME: &'static str;                       // equals the folder name and spec.yaml `name`
+    const INPUTS: [&'static str; I];                // spec.yaml order = Python positional order
+    const OUTPUTS: [&'static str; O];               // spec.yaml order = returned tuple order
 
-    // One pass over the history: the batch output plus a stream positioned at
-    // its last bar. Backs `tl.stream.<name>.open_and_fill`.
-    fn open_and_fill(input: Self::Input<'_>, p: &Self::Params)
-        -> Result<(Self::Stream, Self::Output), TlError>;
+    type Params: Clone;
+    type State: Step<I, O>;
+
+    fn validate(p: &Self::Params) -> Result<(), TlError>;   // ranges from spec.yaml
+    fn lookback(p: &Self::Params) -> usize;                 // warm-up bars, see CONVENTIONS.md
+    fn state(p: &Self::Params) -> Self::State;
+
+    // Checks beyond "every input is finite", e.g. rejecting a negative volume.
+    fn check_inputs(inputs: &[&[f64]; I], from: usize) -> Result<(), TlError> { Ok(()) }
+
+    // Provided: both drive Self::State, so they cannot disagree.
+    fn batch(inputs: [&[f64]; I], p: &Self::Params) -> Result<[Vec<f64>; O], TlError>;
+    fn open_and_fill(inputs: [&[f64]; I], p: &Self::Params)
+        -> Result<(BarStream<Self, I, O>, [Vec<f64>; O]), TlError>;
 }
 
 pub trait Stream: Clone + Sized {
     type Params;
-    type Bar: Copy;                 // f64, or a small Copy struct (HlcBar, OhlcvBar, …)
-    type Value: Copy;               // f64, i32, or a small Copy struct for multi-output
+    type History<'a>;               // [&'a [f64]; I]: one column per input, as NumPy hands it over
+    type Bar: Copy;                 // [f64; I] in spec input order
+    type Value: Copy;               // [f64; O] in spec output order
 
-    fn open(history: &[Self::Bar], p: &Self::Params) -> Result<Self, TlError>;
+    fn open(history: Self::History<'_>, p: &Self::Params) -> Result<Self, TlError>;
     fn update(&mut self, bar: Self::Bar) -> Result<Self::Value, TlError>;  // commit a closed bar
     fn peek(&self, bar: Self::Bar) -> Result<Self::Value, TlError>;        // evaluate, no commit
     fn value(&self) -> Option<Self::Value>;                                // last committed value
@@ -122,39 +133,20 @@ pub trait Stream: Clone + Sized {
 }
 ```
 
-### The step function
+An indicator writes its parameters, its ranges, its lookback and one `Step`.
+`core::kernel` supplies the batch loop, `BarStream`, validation, warm-up
+alignment and `open_and_fill`, all of which call that one `Step`. Bitwise parity
+between batch and stream is therefore a property of the code shape rather than
+something a reviewer has to check.
 
-Batch and stream do not each implement the algorithm. Each indicator writes one
-step function and both paths drive it, so bitwise parity is a property of the
-code shape rather than something a reviewer has to check:
+Two consequences worth stating:
 
-```rust
-pub trait SeriesStep: Clone {
-    fn push(&mut self, value: f64) -> Option<f64>;   // commit a bar; None while warming up
-    fn preview(&self, value: f64) -> Option<f64>;    // what the next push would return
-}
-```
-
-`core::single` turns a `SeriesStep` into the whole public surface of a
-single-series indicator. An indicator supplies its parameters, ranges, lookback
-and a constructor through `SingleSeries`, and gets `batch`, `open`,
-`open_and_fill` and `SingleStream` for free:
-
-```rust
-pub trait SingleSeries: Sized {
-    const NAME: &'static str;
-    const INPUT: &'static str = "source";
-    type Params: Clone;
-    type State: SeriesStep;
-
-    fn validate(params: &Self::Params) -> Result<(), TlError>;
-    fn lookback(params: &Self::Params) -> usize;
-    fn state(params: &Self::Params) -> Self::State;
-}
-```
-
-Multi-input and multi-output indicators get the same treatment as they land
-(`core::bars` in M4); the rule is that no indicator writes its algorithm twice.
+- History arrives **columnar**, one slice per input, because that is what NumPy
+  hands over. Opening a stream transposes nothing and allocates nothing per bar.
+- Integer outputs travel as `f64` through `Step` and are narrowed at the
+  boundary where `spec.yaml` says `dtype: int32`. Every integer an indicator
+  produces - pattern flags, trend direction, bar indices - is far inside the
+  2^53 a float64 represents exactly, so one step signature covers both.
 
 Implementation rules:
 

@@ -1,7 +1,6 @@
 use crate::core::error::TlError;
+use crate::core::kernel::{BarStream, Kernel, Step};
 use crate::core::math::RollingMean;
-use crate::core::single::{self, SingleSeries, SingleStream};
-use crate::core::traits::{Indicator, SeriesStep};
 
 pub const NAME: &str = "sma";
 
@@ -27,23 +26,25 @@ impl Default for Params {
 #[derive(Clone, Debug)]
 pub struct State(RollingMean);
 
-impl SeriesStep for State {
-    fn push(&mut self, value: f64) -> Option<f64> {
-        self.0.push(value)
+impl Step<1, 1> for State {
+    fn push(&mut self, bar: [f64; 1]) -> Option<[f64; 1]> {
+        self.0.push(bar[0]).map(|value| [value])
     }
 
-    fn preview(&self, value: f64) -> Option<f64> {
-        self.0.preview(value)
+    fn preview(&self, bar: [f64; 1]) -> Option<[f64; 1]> {
+        self.0.preview(bar[0]).map(|value| [value])
     }
 }
 
 #[derive(Clone, Copy, Debug)]
 pub struct Sma;
 
-pub type SmaStream = SingleStream<Sma>;
+pub type SmaStream = BarStream<Sma, 1, 1>;
 
-impl SingleSeries for Sma {
+impl Kernel<1, 1> for Sma {
     const NAME: &'static str = NAME;
+    const INPUTS: [&'static str; 1] = ["source"];
+    const OUTPUTS: [&'static str; 1] = ["sma"];
 
     type Params = Params;
     type State = State;
@@ -67,30 +68,5 @@ impl SingleSeries for Sma {
 
     fn state(params: &Params) -> State {
         State(RollingMean::new(params.period))
-    }
-}
-
-impl Indicator for Sma {
-    const NAME: &'static str = NAME;
-
-    type Params = Params;
-    type Input<'a> = &'a [f64];
-    type Output = Vec<f64>;
-    type Stream = SmaStream;
-
-    fn validate(params: &Params) -> Result<(), TlError> {
-        <Self as SingleSeries>::validate(params)
-    }
-
-    fn lookback(params: &Params) -> usize {
-        <Self as SingleSeries>::lookback(params)
-    }
-
-    fn batch(source: &[f64], params: &Params) -> Result<Vec<f64>, TlError> {
-        single::batch::<Self>(source, params)
-    }
-
-    fn open_and_fill(source: &[f64], params: &Params) -> Result<(SmaStream, Vec<f64>), TlError> {
-        single::open_and_fill::<Self>(source, params)
     }
 }

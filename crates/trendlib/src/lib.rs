@@ -5,7 +5,8 @@ pub mod core;
 pub mod indicators;
 
 pub use crate::core::error::TlError;
-pub use crate::core::traits::{Indicator, SeriesStep, Stream};
+pub use crate::core::kernel::{BarStream, Kernel, Step};
+pub use crate::core::traits::Stream;
 
 /// The version of this crate, shared across the whole workspace.
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -15,17 +16,20 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// Simple moving average of `source`.
 pub fn sma(source: &[f64], params: &indicators::sma::Params) -> Result<Vec<f64>, TlError> {
-    indicators::sma::Sma::batch(source, params)
+    let [out] = indicators::sma::Sma::batch([source], params)?;
+    Ok(out)
 }
 
 /// Exponential moving average of `source`.
 pub fn ema(source: &[f64], params: &indicators::ema::Params) -> Result<Vec<f64>, TlError> {
-    indicators::ema::Ema::batch(source, params)
+    let [out] = indicators::ema::Ema::batch([source], params)?;
+    Ok(out)
 }
 
 /// Relative strength index of `source`.
 pub fn rsi(source: &[f64], params: &indicators::rsi::Params) -> Result<Vec<f64>, TlError> {
-    indicators::rsi::Rsi::batch(source, params)
+    let [out] = indicators::rsi::Rsi::batch([source], params)?;
+    Ok(out)
 }
 
 #[cfg(test)]

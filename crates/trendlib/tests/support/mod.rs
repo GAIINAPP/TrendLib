@@ -11,7 +11,8 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use trendlib::TlError;
-use trendlib::core::traits::{Indicator, Stream};
+use trendlib::core::kernel::Kernel;
+use trendlib::core::traits::Stream;
 use trendlib::indicators::{ema, rsi, sma};
 
 pub fn repo_root() -> PathBuf {
@@ -38,18 +39,18 @@ pub trait AnyStream: std::fmt::Debug {
 
 impl<S> AnyStream for S
 where
-    S: Stream<Bar = f64, Value = f64> + std::fmt::Debug + 'static,
+    S: Stream<Bar = [f64; 1], Value = [f64; 1]> + std::fmt::Debug + 'static,
 {
     fn update(&mut self, bar: f64) -> Result<f64, TlError> {
-        Stream::update(self, bar)
+        Stream::update(self, [bar]).map(|[value]| value)
     }
 
     fn peek(&self, bar: f64) -> Result<f64, TlError> {
-        Stream::peek(self, bar)
+        Stream::peek(self, [bar]).map(|[value]| value)
     }
 
     fn value(&self) -> Option<f64> {
-        Stream::value(self)
+        Stream::value(self).map(|[value]| value)
     }
 
     fn bars_seen(&self) -> u64 {
@@ -89,24 +90,27 @@ macro_rules! adapter {
             }
 
             fn batch(source: &[f64], period: usize) -> Result<Vec<f64>, TlError> {
-                <Indicated as Indicator>::batch(source, &params(period))
+                let [out] = <Indicated as Kernel<1, 1>>::batch([source], &params(period))?;
+                Ok(out)
             }
 
             fn lookback(period: usize) -> usize {
-                <Indicated as Indicator>::lookback(&params(period))
+                <Indicated as Kernel<1, 1>>::lookback(&params(period))
             }
 
             fn open(source: &[f64], period: usize) -> Result<Box<dyn AnyStream>, TlError> {
-                <<Indicated as Indicator>::Stream as Stream>::open(source, &params(period))
-                    .map(|stream| Box::new(stream) as Box<dyn AnyStream>)
+                let (stream, _) =
+                    <Indicated as Kernel<1, 1>>::open_and_fill([source], &params(period))?;
+                Ok(Box::new(stream) as Box<dyn AnyStream>)
             }
 
             fn open_and_fill(
                 source: &[f64],
                 period: usize,
             ) -> Result<(Box<dyn AnyStream>, Vec<f64>), TlError> {
-                <Indicated as Indicator>::open_and_fill(source, &params(period))
-                    .map(|(stream, out)| (Box::new(stream) as Box<dyn AnyStream>, out))
+                let (stream, [out]) =
+                    <Indicated as Kernel<1, 1>>::open_and_fill([source], &params(period))?;
+                Ok((Box::new(stream) as Box<dyn AnyStream>, out))
             }
 
             pub fn registered() -> Registered {
