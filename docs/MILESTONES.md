@@ -26,7 +26,7 @@ Tasks:
       `xtask = "run -p xtask --"`. Shared `[workspace.package]` version `0.0.0`.
 - [ ] `rust-toolchain.toml` (stable, pinned minor), `deny.toml`, `.editorconfig`,
       `.gitignore` (target, dist, `.venv`, `__pycache__`, `*.so`, `*.pyd`).
-- [ ] `pyproject.toml` exactly as `RELEASE.md` § 2 (with `<org>` placeholders).
+- [ ] `pyproject.toml` exactly as `RELEASE.md` § 2.
 - [ ] `python/trendlib/__init__.py` exposing `__version__` and `__version_info__`
       from `_core`; `errors.py`; `py.typed`.
 - [ ] `trendlib._core` module with a `__version__` attribute and nothing else yet.

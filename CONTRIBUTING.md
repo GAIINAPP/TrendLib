@@ -8,7 +8,7 @@ backed by an independent reference, so contributions follow a spec-first process
 Requirements: Rust (via rustup; the repo pins the toolchain), Python ≥ 3.11.
 
 ```bash
-git clone https://github.com/<org>/trendlib && cd trendlib
+git clone https://github.com/GAIINAPP/TrendLib && cd TrendLib
 python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install maturin
 pip install -e ".[dev]"            # builds the extension in debug mode

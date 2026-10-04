@@ -47,9 +47,9 @@ dev = ["pytest", "hypothesis", "pytest-benchmark", "ruff", "pandas>=2.0", "TA-Li
 docs = ["mkdocs-material"]
 
 [project.urls]
-Homepage = "https://github.com/<org>/trendlib"
-Documentation = "<docs url>"
-Changelog = "https://github.com/<org>/trendlib/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/GAIINAPP/TrendLib"
+Documentation = "https://gaiinapp.github.io/TrendLib/"
+Changelog = "https://github.com/GAIINAPP/TrendLib/blob/main/CHANGELOG.md"
 
 [tool.maturin]
 manifest-path = "crates/trendlib-py/Cargo.toml"
@@ -89,7 +89,8 @@ No API tokens. GitHub Actions proves its identity to PyPI with OIDC.
 
 1. Accounts on pypi.org and test.pypi.org, 2FA on.
 2. On each, add a *pending trusted publisher* for project `trendlib`: GitHub
-   owner = the org from Q1, repository `trendlib`, workflow `release.yml`,
+   owner = the org from Q1 (`GAIINAPP` unless it moves), repository `TrendLib`,
+   workflow `release.yml`,
    environment `pypi` (on TestPyPI: `testpypi`).
 3. In the GitHub repo, create environments `pypi` and `testpypi`. Require a reviewer
    (the maintainer) on `pypi`.

@@ -28,7 +28,7 @@ proceed on a judgment call.
 
 | ID | Question | Needed by |
 | --- | --- | --- |
-| Q1 | GitHub org: under GAIIN's org, or a neutral `trendlib` org? | M3 (Trusted Publishing is bound to owner/repo) |
+| Q1 | GitHub org: under GAIIN's org, or a neutral `trendlib` org? The repository already exists at `GAIINAPP/TrendLib` and M0 used it (A1); confirm or move it before M3. | M3 (Trusted Publishing is bound to owner/repo) |
 | Q2 | Add a `compat="tradingview"` mode where TradingView and TA-Lib conventions differ (Supertrend seed and sign, etc.)? | M6 |
 | Q3 | Ship a WASM/JS build for GAIIN's web frontend? | After 0.1.0 |
 | Q4 | Human transcriber and source for CPR / pivot golden values (see `TESTING.md` § Oracles). | M4 |
@@ -37,3 +37,47 @@ proceed on a judgment call.
 ## Assumptions pending review
 
 <!-- Claude Code: append here as "A<n> (M<k>, YYYY-MM-DD): <assumption> — <why>" -->
+
+A1 (M0, 2026-10-04): `<org>` placeholders were filled with the live remote,
+`github.com/GAIINAPP/TrendLib`, in `pyproject.toml`, `CONTRIBUTING.md`, the issue
+templates and `RELEASE.md` section 2 — a placeholder would ship a broken URL in the
+package metadata, and the remote is observable. Cheap to change; Q1 still needs a
+human answer before M3 because Trusted Publishing binds owner and repository.
+
+A2 (M0, 2026-10-04): `project.urls.Documentation` points at the GitHub Pages default
+`https://gaiinapp.github.io/TrendLib/` while Q5 is open. Change it in M5 if a custom
+domain is chosen.
+
+A3 (M0, 2026-10-04): `.github/pull_request_template.md`, the two issue templates and
+`.claude/skills/new-indicator/SKILL.md` are described as "provided" by
+`MILESTONES.md` and `CLAUDE.md` but were not in the repository, so M0 wrote them.
+
+A4 (M0, 2026-10-04): the synthetic datasets are built from the standard library's
+`random.Random`, not NumPy. CPython documents its Mersenne Twister stream; NumPy
+promises no cross-version stream, which `TESTING.md` section 3 itself warns about.
+
+A5 (M0, 2026-10-04): `testdata/daily_2000.csv` carries a `date` column (naive ISO
+date, the way a SQL `DATE` reads back) and `testdata/intraday_5m_20d.csv` a
+`timestamp` column (int64 epoch nanoseconds UTC). `TESTING.md` section 3 specifies
+only the intraday one.
+
+A6 (M0, 2026-10-04): the intraday dataset is 20 consecutive weekdays from Monday
+2026-01-05, so it contains four weekend gaps rather than the single gap
+`TESTING.md` section 3 mentions. Any 20 consecutive trading sessions span four
+weekends; the requirement is read as "the series contains a weekend gap".
+
+A7 (M0, 2026-10-04): `*.md` is excluded from ruff. Current ruff reformats Python
+blocks inside Markdown, which would flatten the aligned explanatory comments the
+docs rely on. Ruff still lints and formats every `.py` file.
+
+A8 (M0, 2026-10-04): the CI step that installs TA-Lib is `continue-on-error`
+everywhere except ubuntu + Python 3.11, so a platform with no wheel skips the parity
+suite instead of failing the build, while one job always has the oracle.
+
+A9 (M0, 2026-10-04): `crates/trendlib` has its own short `README.md`, included as the
+crate docs, because `cargo publish` ships only files under the crate folder (D4) and
+the repository README is two levels up.
+
+A10 (M0, 2026-10-04): pinned pyo3 0.29 with numpy 0.29 (the matching pair), Rust
+edition 2024 and toolchain 1.95. `extension-module` is a default feature of
+`trendlib-py` so `cargo test --workspace` never has to link libpython.
