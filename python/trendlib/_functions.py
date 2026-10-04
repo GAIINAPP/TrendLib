@@ -21,8 +21,10 @@ __all__ = [
     "ATR",
     "AVGDEV",
     "AVGPRICE",
+    "BOP",
     "CCI",
     "CEIL",
+    "CMO",
     "COS",
     "COSH",
     "CUMSUM",
@@ -40,10 +42,13 @@ __all__ = [
     "MIDPRICE",
     "MIN",
     "MINMAX",
+    "MINUS_DM",
     "MOM",
     "MULT",
     "NATR",
     "OBV",
+    "PLUS_DM",
+    "RMA",
     "ROC",
     "ROCP",
     "ROCR",
@@ -60,6 +65,7 @@ __all__ = [
     "TANH",
     "TEMA",
     "TRANGE",
+    "TRIMA",
     "TYPPRICE",
     "VAR",
     "WCLPRICE",
@@ -73,8 +79,10 @@ __all__ = [
     "atr",
     "avgdev",
     "avgprice",
+    "bop",
     "cci",
     "ceil",
+    "cmo",
     "cos",
     "cosh",
     "cumsum",
@@ -93,10 +101,13 @@ __all__ = [
     "midprice",
     "min",
     "minmax",
+    "minus_dm",
     "mom",
     "mult",
     "natr",
     "obv",
+    "plus_dm",
+    "rma",
     "roc",
     "rocp",
     "rocr",
@@ -113,6 +124,7 @@ __all__ = [
     "tanh",
     "tema",
     "trange",
+    "trima",
     "typprice",
     "var",
     "wclprice",
@@ -295,6 +307,34 @@ def avgprice(open=None, high=None, low=None, close=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("avgprice",))
 
 
+def bop(open=None, high=None, low=None, close=None) -> Any:
+    """Balance of Power.
+
+    Returns
+    -------
+    ndarray or Series
+        Where the close finished relative to the open, scaled by the bar's range.
+    """
+    columns, carrier = _convert.bars(
+        "bop",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bop(*columns)
+    return _convert.wrap_outputs(out, carrier, ("bop",))
+
+
 def cci(
     high=None, low=None, close=None, *, period: int = _PARAMS["cci"]["period"]["default"]
 ) -> Any:
@@ -340,6 +380,25 @@ def ceil(source=None) -> Any:
     columns, carrier = _convert.bars("ceil", (source,), ("source",), ("series",))
     out = _core.ceil(*columns)
     return _convert.wrap_outputs(out, carrier, ("ceil",))
+
+
+def cmo(source=None, *, period: int = _PARAMS["cmo"]["period"]["default"]) -> Any:
+    """Chande Momentum Oscillator.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bar-to-bar changes the gains and losses are accumulated over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Gains minus losses as a share of the two combined, from -100 to 100.
+    """
+    period = _convert.as_int("cmo", "period", period)
+    columns, carrier = _convert.bars("cmo", (source,), ("source",), ("series",))
+    out = _core.cmo(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("cmo",))
 
 
 def cos(source=None) -> Any:
@@ -676,6 +735,36 @@ def minmax(source=None, *, period: int = _PARAMS["minmax"]["period"]["default"])
     )
 
 
+def minus_dm(high=None, low=None, *, period: int = _PARAMS["minus_dm"]["period"]["default"]) -> Any:
+    """Minus Directional Movement.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the movement is accumulated over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Wilder's running total of downward directional movement.
+    """
+    period = _convert.as_int("minus_dm", "period", period)
+    columns, carrier = _convert.bars(
+        "minus_dm",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.minus_dm(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("minus_dm",))
+
+
 def mom(source=None, *, period: int = _PARAMS["mom"]["period"]["default"]) -> Any:
     """Momentum.
 
@@ -775,6 +864,55 @@ def obv(close=None, volume=None) -> Any:
     )
     out = _core.obv(*columns)
     return _convert.wrap_outputs(out, carrier, ("obv",))
+
+
+def plus_dm(high=None, low=None, *, period: int = _PARAMS["plus_dm"]["period"]["default"]) -> Any:
+    """Plus Directional Movement.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the movement is accumulated over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Wilder's running total of upward directional movement.
+    """
+    period = _convert.as_int("plus_dm", "period", period)
+    columns, carrier = _convert.bars(
+        "plus_dm",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.plus_dm(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("plus_dm",))
+
+
+def rma(source=None, *, period: int = _PARAMS["rma"]["period"]["default"]) -> Any:
+    """Wilder Smoothed Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the smoothing is derived from, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Wilder's smoothing of source.
+    """
+    period = _convert.as_int("rma", "period", period)
+    columns, carrier = _convert.bars("rma", (source,), ("source",), ("series",))
+    out = _core.rma(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("rma",))
 
 
 def roc(source=None, *, period: int = _PARAMS["roc"]["period"]["default"]) -> Any:
@@ -1071,6 +1209,25 @@ def trange(high=None, low=None, close=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("trange",))
 
 
+def trima(source=None, *, period: int = _PARAMS["trima"]["period"]["default"]) -> Any:
+    """Triangular Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars in the average, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Mean of source weighted most heavily in the middle of the window.
+    """
+    period = _convert.as_int("trima", "period", period)
+    columns, carrier = _convert.bars("trima", (source,), ("source",), ("series",))
+    out = _core.trima(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("trima",))
+
+
 def typprice(high=None, low=None, close=None) -> Any:
     """Typical Price.
 
@@ -1254,6 +1411,11 @@ def AVGPRICE(open, high, low, close) -> Any:
     return avgprice(open, high, low, close)
 
 
+def BOP(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`bop`."""
+    return bop(open, high, low, close)
+
+
 def CCI(high, low, close, timeperiod: int = _PARAMS["cci"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`cci`."""
     return cci(high, low, close, period=timeperiod)
@@ -1262,6 +1424,11 @@ def CCI(high, low, close, timeperiod: int = _PARAMS["cci"]["period"]["default"])
 def CEIL(source) -> Any:
     """TA-Lib-style alias for :func:`ceil`."""
     return ceil(source)
+
+
+def CMO(source, timeperiod: int = _PARAMS["cmo"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`cmo`."""
+    return cmo(source, period=timeperiod)
 
 
 def COS(source) -> Any:
@@ -1354,6 +1521,11 @@ def MINMAX(source, timeperiod: int = _PARAMS["minmax"]["period"]["default"]) -> 
     return minmax(source, period=timeperiod)
 
 
+def MINUS_DM(high, low, timeperiod: int = _PARAMS["minus_dm"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`minus_dm`."""
+    return minus_dm(high, low, period=timeperiod)
+
+
 def MOM(source, timeperiod: int = _PARAMS["mom"]["period"]["default"]) -> Any:
     """TA-Lib-style alias for :func:`mom`."""
     return mom(source, period=timeperiod)
@@ -1372,6 +1544,16 @@ def NATR(high, low, close, timeperiod: int = _PARAMS["natr"]["period"]["default"
 def OBV(close, volume) -> Any:
     """TA-Lib-style alias for :func:`obv`."""
     return obv(close, volume)
+
+
+def PLUS_DM(high, low, timeperiod: int = _PARAMS["plus_dm"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`plus_dm`."""
+    return plus_dm(high, low, period=timeperiod)
+
+
+def RMA(source, timeperiod: int = _PARAMS["rma"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`rma`."""
+    return rma(source, period=timeperiod)
 
 
 def ROC(source, timeperiod: int = _PARAMS["roc"]["period"]["default"]) -> Any:
@@ -1456,6 +1638,11 @@ def TEMA(source, timeperiod: int = _PARAMS["tema"]["period"]["default"]) -> Any:
 def TRANGE(high, low, close) -> Any:
     """TA-Lib-style alias for :func:`trange`."""
     return trange(high, low, close)
+
+
+def TRIMA(source, timeperiod: int = _PARAMS["trima"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`trima`."""
+    return trima(source, period=timeperiod)
 
 
 def TYPPRICE(high, low, close) -> Any:

@@ -430,6 +430,67 @@ impl RollingWindow {
     }
 }
 
+/// Wilder's running total: the plain sum of the first `period` values, then
+/// `prev - prev / n + x`.
+///
+/// This is the form the directional movement family and the Chande momentum
+/// oscillator accumulate with. It is `period` times [`Wilder`], which keeps the
+/// same quantity as an average; both exist because TA-Lib reports some
+/// indicators from one and some from the other, and scaling between them after
+/// the fact would not round identically.
+#[derive(Clone, Debug)]
+pub struct WilderSum {
+    period: usize,
+    n: f64,
+    seen: usize,
+    total: f64,
+}
+
+impl WilderSum {
+    pub fn new(period: usize) -> Self {
+        Self::with_seed(period, period)
+    }
+
+    /// A total whose seed is a different length from its divisor.
+    ///
+    /// The directional movement family needs this: TA-Lib seeds `+DM` and
+    /// `-DM` with `period - 1` movements and then decays by `period`, which is
+    /// why their lookback is one bar shorter than the accumulation suggests.
+    pub fn with_seed(seed: usize, divisor: usize) -> Self {
+        assert!(seed > 0, "seed must be at least 1");
+        assert!(divisor > 0, "divisor must be at least 1");
+        Self {
+            period: seed,
+            n: divisor as f64,
+            seen: 0,
+            total: 0.0,
+        }
+    }
+
+    fn advance(total: f64, n: f64, value: f64) -> f64 {
+        total - total / n + value
+    }
+
+    pub fn push(&mut self, value: f64) -> Option<f64> {
+        if self.seen < self.period {
+            self.total += value;
+            self.seen += 1;
+            return (self.seen == self.period).then_some(self.total);
+        }
+        self.total = Self::advance(self.total, self.n, value);
+        self.seen += 1;
+        Some(self.total)
+    }
+
+    pub fn preview(&self, value: f64) -> Option<f64> {
+        match (self.seen + 1).cmp(&self.period) {
+            std::cmp::Ordering::Less => None,
+            std::cmp::Ordering::Equal => Some(self.total + value),
+            std::cmp::Ordering::Greater => Some(Self::advance(self.total, self.n, value)),
+        }
+    }
+}
+
 /// The value `lag` bars ago, for indicators that compare now with then.
 #[derive(Clone, Debug)]
 pub struct Lagged {
@@ -518,6 +579,7 @@ impl Wilder {
 mod tests {
     use super::{
         Ema, Lagged, RollingExtreme, RollingMean, RollingWindow, TrueRange, WeightedMean, Wilder,
+        WilderSum,
     };
 
     fn drive<F>(len: usize, mut step: F) -> Vec<Option<f64>>
@@ -599,6 +661,35 @@ mod tests {
         assert_eq!(previewed.iter().copied().fold(0.0, f64::max), 4.0);
         window.push(4.0);
         assert_eq!(window.mean(), 3.0);
+    }
+
+    #[test]
+    fn wilder_sum_seeds_with_the_plain_total_then_decays_it() {
+        let mut sum = WilderSum::new(3);
+        assert_eq!(drive(3, |x| sum.push(x)), vec![None, None, Some(6.0)]);
+        // 6 - 6/3 + 4 = 8
+        assert_eq!(sum.push(4.0), Some(8.0));
+    }
+
+    #[test]
+    fn wilder_sum_can_seed_over_fewer_bars_than_it_decays_by() {
+        // The shape the directional movement family needs: seed over two
+        // movements, then decay by three.
+        let mut sum = WilderSum::with_seed(2, 3);
+        assert_eq!(sum.push(1.0), None);
+        assert_eq!(sum.push(1.0), Some(2.0));
+        assert_eq!(sum.push(0.0), Some(2.0 - 2.0 / 3.0));
+    }
+
+    #[test]
+    fn wilder_sum_preview_equals_the_next_push() {
+        let mut sum = WilderSum::new(4);
+        for x in [1.0, 2.0, 3.0, 4.0, 5.0, 6.0] {
+            let previewed = sum.preview(1.25);
+            let mut forked = sum.clone();
+            assert_eq!(previewed, forked.push(1.25));
+            sum.push(x);
+        }
     }
 
     #[test]

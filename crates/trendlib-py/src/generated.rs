@@ -957,6 +957,147 @@ impl PyAvgpriceStream {
 }
 
 #[pyfunction]
+#[pyo3(name = "bop", signature = (open, high, low, close))]
+pub fn bop<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<f64>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::bop::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::bop::Bop as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok(std::mem::take(&mut out[0]).into_pyarray(py))
+}
+
+#[pyclass(module = "trendlib._core", name = "BopStream", skip_from_py_object)]
+#[derive(Clone, Debug)]
+pub struct PyBopStream {
+    inner: BarStream<trendlib::indicators::bop::Bop, 4, 1>,
+}
+
+#[pymethods]
+impl PyBopStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::bop::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::bop::Bop, 4, 1> as Stream>::open(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::bop::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::bop::Bop as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            std::mem::take(&mut out[0]).into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<f64> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<f64> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value().map(|row| row[0])
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bop"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bop bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
 #[pyo3(name = "cci", signature = (high, low, close, *, period))]
 pub fn cci<'py>(
     py: Python<'py>,
@@ -1182,6 +1323,113 @@ impl PyCeilStream {
     fn __repr__(&self) -> String {
         format!(
             "<trendlib stream ceil bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "cmo", signature = (source, *, period))]
+pub fn cmo<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+    period: i64,
+) -> PyResult<Bound<'py, PyArray1<f64>>> {
+    let source = as_slice(&source, "source")?;
+    let period = int_param("cmo", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::cmo::Params { period };
+    let out = py
+        .detach(|| <trendlib::indicators::cmo::Cmo as Kernel<1, 1>>::batch([source], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok(std::mem::take(&mut out[0]).into_pyarray(py))
+}
+
+#[pyclass(module = "trendlib._core", name = "CmoStream", skip_from_py_object)]
+#[derive(Clone, Debug)]
+pub struct PyCmoStream {
+    inner: BarStream<trendlib::indicators::cmo::Cmo, 1, 1>,
+}
+
+#[pymethods]
+impl PyCmoStream {
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("cmo", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::cmo::Params { period };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::cmo::Cmo, 1, 1> as Stream>::open([source], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("cmo", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::cmo::Params { period };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::cmo::Cmo as Kernel<1, 1>>::open_and_fill([source], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            std::mem::take(&mut out[0]).into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(&mut self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(&self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value().map(|row| row[0])
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "cmo"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream cmo bars_seen={} value={:?}>",
             self.inner.bars_seen(),
             self.inner.value()
         )
@@ -3083,6 +3331,134 @@ impl PyMinmaxStream {
 }
 
 #[pyfunction]
+#[pyo3(name = "minus_dm", signature = (high, low, *, period))]
+pub fn minus_dm<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    period: i64,
+) -> PyResult<Bound<'py, PyArray1<f64>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let period =
+        int_param("minus_dm", "period", period, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::minus_dm::Params { period };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::minus_dm::MinusDm as Kernel<2, 1>>::batch([high, low], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok(std::mem::take(&mut out[0]).into_pyarray(py))
+}
+
+#[pyclass(module = "trendlib._core", name = "MinusDmStream", skip_from_py_object)]
+#[derive(Clone, Debug)]
+pub struct PyMinusDmStream {
+    inner: BarStream<trendlib::indicators::minus_dm::MinusDm, 2, 1>,
+}
+
+#[pymethods]
+impl PyMinusDmStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, period))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let period =
+            int_param("minus_dm", "period", period, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::minus_dm::Params { period };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::minus_dm::MinusDm, 2, 1> as Stream>::open(
+                    [high, low],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, period))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let period =
+            int_param("minus_dm", "period", period, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::minus_dm::Params { period };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::minus_dm::MinusDm as Kernel<2, 1>>::open_and_fill(
+                    [high, low],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            std::mem::take(&mut out[0]).into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64) -> PyResult<f64> {
+        let row = self
+            .inner
+            .update([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64) -> PyResult<f64> {
+        let row = self
+            .inner
+            .peek([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value().map(|row| row[0])
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "minus_dm"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream minus_dm bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
 #[pyo3(name = "mom", signature = (source, *, period))]
 pub fn mom<'py>(
     py: Python<'py>,
@@ -3554,6 +3930,241 @@ impl PyObvStream {
     fn __repr__(&self) -> String {
         format!(
             "<trendlib stream obv bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "plus_dm", signature = (high, low, *, period))]
+pub fn plus_dm<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    period: i64,
+) -> PyResult<Bound<'py, PyArray1<f64>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let period =
+        int_param("plus_dm", "period", period, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::plus_dm::Params { period };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::plus_dm::PlusDm as Kernel<2, 1>>::batch([high, low], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok(std::mem::take(&mut out[0]).into_pyarray(py))
+}
+
+#[pyclass(module = "trendlib._core", name = "PlusDmStream", skip_from_py_object)]
+#[derive(Clone, Debug)]
+pub struct PyPlusDmStream {
+    inner: BarStream<trendlib::indicators::plus_dm::PlusDm, 2, 1>,
+}
+
+#[pymethods]
+impl PyPlusDmStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, period))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let period =
+            int_param("plus_dm", "period", period, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::plus_dm::Params { period };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::plus_dm::PlusDm, 2, 1> as Stream>::open(
+                    [high, low],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, period))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let period =
+            int_param("plus_dm", "period", period, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::plus_dm::Params { period };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::plus_dm::PlusDm as Kernel<2, 1>>::open_and_fill(
+                    [high, low],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            std::mem::take(&mut out[0]).into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64) -> PyResult<f64> {
+        let row = self
+            .inner
+            .update([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64) -> PyResult<f64> {
+        let row = self
+            .inner
+            .peek([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value().map(|row| row[0])
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "plus_dm"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream plus_dm bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "rma", signature = (source, *, period))]
+pub fn rma<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+    period: i64,
+) -> PyResult<Bound<'py, PyArray1<f64>>> {
+    let source = as_slice(&source, "source")?;
+    let period = int_param("rma", "period", period, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::rma::Params { period };
+    let out = py
+        .detach(|| <trendlib::indicators::rma::Rma as Kernel<1, 1>>::batch([source], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok(std::mem::take(&mut out[0]).into_pyarray(py))
+}
+
+#[pyclass(module = "trendlib._core", name = "RmaStream", skip_from_py_object)]
+#[derive(Clone, Debug)]
+pub struct PyRmaStream {
+    inner: BarStream<trendlib::indicators::rma::Rma, 1, 1>,
+}
+
+#[pymethods]
+impl PyRmaStream {
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("rma", "period", period, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::rma::Params { period };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::rma::Rma, 1, 1> as Stream>::open([source], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("rma", "period", period, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::rma::Params { period };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::rma::Rma as Kernel<1, 1>>::open_and_fill([source], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            std::mem::take(&mut out[0]).into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(&mut self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(&self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value().map(|row| row[0])
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "rma"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream rma bars_seen={} value={:?}>",
             self.inner.bars_seen(),
             self.inner.value()
         )
@@ -5293,6 +5904,119 @@ impl PyTrangeStream {
 }
 
 #[pyfunction]
+#[pyo3(name = "trima", signature = (source, *, period))]
+pub fn trima<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+    period: i64,
+) -> PyResult<Bound<'py, PyArray1<f64>>> {
+    let source = as_slice(&source, "source")?;
+    let period = int_param("trima", "period", period, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::trima::Params { period };
+    let out = py
+        .detach(|| <trendlib::indicators::trima::Trima as Kernel<1, 1>>::batch([source], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok(std::mem::take(&mut out[0]).into_pyarray(py))
+}
+
+#[pyclass(module = "trendlib._core", name = "TrimaStream", skip_from_py_object)]
+#[derive(Clone, Debug)]
+pub struct PyTrimaStream {
+    inner: BarStream<trendlib::indicators::trima::Trima, 1, 1>,
+}
+
+#[pymethods]
+impl PyTrimaStream {
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("trima", "period", period, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::trima::Params { period };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::trima::Trima, 1, 1> as Stream>::open(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<f64>>)> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("trima", "period", period, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::trima::Params { period };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::trima::Trima as Kernel<1, 1>>::open_and_fill(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            std::mem::take(&mut out[0]).into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(&mut self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(&self, py: Python<'_>, source: f64) -> PyResult<f64> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0])
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<f64> {
+        self.inner.value().map(|row| row[0])
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "trima"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream trima bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
 #[pyo3(name = "typprice", signature = (high, low, close))]
 pub fn typprice<'py>(
     py: Python<'py>,
@@ -5921,8 +6645,10 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(atr, m)?)?;
     m.add_function(wrap_pyfunction!(avgdev, m)?)?;
     m.add_function(wrap_pyfunction!(avgprice, m)?)?;
+    m.add_function(wrap_pyfunction!(bop, m)?)?;
     m.add_function(wrap_pyfunction!(cci, m)?)?;
     m.add_function(wrap_pyfunction!(ceil, m)?)?;
+    m.add_function(wrap_pyfunction!(cmo, m)?)?;
     m.add_function(wrap_pyfunction!(cos, m)?)?;
     m.add_function(wrap_pyfunction!(cosh, m)?)?;
     m.add_function(wrap_pyfunction!(cumsum, m)?)?;
@@ -5940,10 +6666,13 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(midprice, m)?)?;
     m.add_function(wrap_pyfunction!(min, m)?)?;
     m.add_function(wrap_pyfunction!(minmax, m)?)?;
+    m.add_function(wrap_pyfunction!(minus_dm, m)?)?;
     m.add_function(wrap_pyfunction!(mom, m)?)?;
     m.add_function(wrap_pyfunction!(mult, m)?)?;
     m.add_function(wrap_pyfunction!(natr, m)?)?;
     m.add_function(wrap_pyfunction!(obv, m)?)?;
+    m.add_function(wrap_pyfunction!(plus_dm, m)?)?;
+    m.add_function(wrap_pyfunction!(rma, m)?)?;
     m.add_function(wrap_pyfunction!(roc, m)?)?;
     m.add_function(wrap_pyfunction!(rocp, m)?)?;
     m.add_function(wrap_pyfunction!(rocr, m)?)?;
@@ -5960,6 +6689,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(tanh, m)?)?;
     m.add_function(wrap_pyfunction!(tema, m)?)?;
     m.add_function(wrap_pyfunction!(trange, m)?)?;
+    m.add_function(wrap_pyfunction!(trima, m)?)?;
     m.add_function(wrap_pyfunction!(typprice, m)?)?;
     m.add_function(wrap_pyfunction!(var, m)?)?;
     m.add_function(wrap_pyfunction!(wclprice, m)?)?;
@@ -5973,8 +6703,10 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyAtrStream>()?;
     m.add_class::<PyAvgdevStream>()?;
     m.add_class::<PyAvgpriceStream>()?;
+    m.add_class::<PyBopStream>()?;
     m.add_class::<PyCciStream>()?;
     m.add_class::<PyCeilStream>()?;
+    m.add_class::<PyCmoStream>()?;
     m.add_class::<PyCosStream>()?;
     m.add_class::<PyCoshStream>()?;
     m.add_class::<PyCumsumStream>()?;
@@ -5992,10 +6724,13 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyMidpriceStream>()?;
     m.add_class::<PyMinStream>()?;
     m.add_class::<PyMinmaxStream>()?;
+    m.add_class::<PyMinusDmStream>()?;
     m.add_class::<PyMomStream>()?;
     m.add_class::<PyMultStream>()?;
     m.add_class::<PyNatrStream>()?;
     m.add_class::<PyObvStream>()?;
+    m.add_class::<PyPlusDmStream>()?;
+    m.add_class::<PyRmaStream>()?;
     m.add_class::<PyRocStream>()?;
     m.add_class::<PyRocpStream>()?;
     m.add_class::<PyRocrStream>()?;
@@ -6012,6 +6747,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyTanhStream>()?;
     m.add_class::<PyTemaStream>()?;
     m.add_class::<PyTrangeStream>()?;
+    m.add_class::<PyTrimaStream>()?;
     m.add_class::<PyTyppriceStream>()?;
     m.add_class::<PyVarStream>()?;
     m.add_class::<PyWclpriceStream>()?;
@@ -6075,6 +6811,10 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     }
     {
         let params = PyDict::new(py);
+        table.set_item("bop", params)?;
+    }
+    {
+        let params = PyDict::new(py);
         {
             let entry = PyDict::new(py);
             entry.set_item("default", 14)?;
@@ -6087,6 +6827,17 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     {
         let params = PyDict::new(py);
         table.set_item("ceil", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 14)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            params.set_item("period", entry)?;
+        }
+        table.set_item("cmo", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -6230,6 +6981,17 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
         let params = PyDict::new(py);
         {
             let entry = PyDict::new(py);
+            entry.set_item("default", 14)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            params.set_item("period", entry)?;
+        }
+        table.set_item("minus_dm", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
             entry.set_item("default", 10)?;
             entry.set_item("min", 1)?;
             entry.set_item("max", 100000)?;
@@ -6255,6 +7017,28 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     {
         let params = PyDict::new(py);
         table.set_item("obv", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 14)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            params.set_item("period", entry)?;
+        }
+        table.set_item("plus_dm", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 30)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            params.set_item("period", entry)?;
+        }
+        table.set_item("rma", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -6392,6 +7176,17 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     }
     {
         let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 30)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            params.set_item("period", entry)?;
+        }
+        table.set_item("trima", params)?;
+    }
+    {
+        let params = PyDict::new(py);
         table.set_item("typprice", params)?;
     }
     {
@@ -6452,8 +7247,10 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("atr", vec!["high", "low", "close"])?;
     table.set_item("avgdev", vec!["source"])?;
     table.set_item("avgprice", vec!["open", "high", "low", "close"])?;
+    table.set_item("bop", vec!["open", "high", "low", "close"])?;
     table.set_item("cci", vec!["high", "low", "close"])?;
     table.set_item("ceil", vec!["source"])?;
+    table.set_item("cmo", vec!["source"])?;
     table.set_item("cos", vec!["source"])?;
     table.set_item("cosh", vec!["source"])?;
     table.set_item("cumsum", vec!["source"])?;
@@ -6471,10 +7268,13 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("midprice", vec!["high", "low"])?;
     table.set_item("min", vec!["source"])?;
     table.set_item("minmax", vec!["source"])?;
+    table.set_item("minus_dm", vec!["high", "low"])?;
     table.set_item("mom", vec!["source"])?;
     table.set_item("mult", vec!["source0", "source1"])?;
     table.set_item("natr", vec!["high", "low", "close"])?;
     table.set_item("obv", vec!["close", "volume"])?;
+    table.set_item("plus_dm", vec!["high", "low"])?;
+    table.set_item("rma", vec!["source"])?;
     table.set_item("roc", vec!["source"])?;
     table.set_item("rocp", vec!["source"])?;
     table.set_item("rocr", vec!["source"])?;
@@ -6491,6 +7291,7 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("tanh", vec!["source"])?;
     table.set_item("tema", vec!["source"])?;
     table.set_item("trange", vec!["high", "low", "close"])?;
+    table.set_item("trima", vec!["source"])?;
     table.set_item("typprice", vec!["high", "low", "close"])?;
     table.set_item("var", vec!["source"])?;
     table.set_item("wclprice", vec!["high", "low", "close"])?;
@@ -6510,8 +7311,10 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("atr", vec!["atr"])?;
     table.set_item("avgdev", vec!["avgdev"])?;
     table.set_item("avgprice", vec!["avgprice"])?;
+    table.set_item("bop", vec!["bop"])?;
     table.set_item("cci", vec!["cci"])?;
     table.set_item("ceil", vec!["ceil"])?;
+    table.set_item("cmo", vec!["cmo"])?;
     table.set_item("cos", vec!["cos"])?;
     table.set_item("cosh", vec!["cosh"])?;
     table.set_item("cumsum", vec!["cumsum"])?;
@@ -6529,10 +7332,13 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("midprice", vec!["midprice"])?;
     table.set_item("min", vec!["min"])?;
     table.set_item("minmax", vec!["minmax_min", "minmax_max"])?;
+    table.set_item("minus_dm", vec!["minus_dm"])?;
     table.set_item("mom", vec!["mom"])?;
     table.set_item("mult", vec!["mult"])?;
     table.set_item("natr", vec!["natr"])?;
     table.set_item("obv", vec!["obv"])?;
+    table.set_item("plus_dm", vec!["plus_dm"])?;
+    table.set_item("rma", vec!["rma"])?;
     table.set_item("roc", vec!["roc"])?;
     table.set_item("rocp", vec!["rocp"])?;
     table.set_item("rocr", vec!["rocr"])?;
@@ -6549,6 +7355,7 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("tanh", vec!["tanh"])?;
     table.set_item("tema", vec!["tema"])?;
     table.set_item("trange", vec!["trange"])?;
+    table.set_item("trima", vec!["trima"])?;
     table.set_item("typprice", vec!["typprice"])?;
     table.set_item("var", vec!["var"])?;
     table.set_item("wclprice", vec!["wclprice"])?;
@@ -6568,8 +7375,10 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("atr", "volatility")?;
     table.set_item("avgdev", "statistic")?;
     table.set_item("avgprice", "price")?;
+    table.set_item("bop", "momentum")?;
     table.set_item("cci", "momentum")?;
     table.set_item("ceil", "math")?;
+    table.set_item("cmo", "momentum")?;
     table.set_item("cos", "math")?;
     table.set_item("cosh", "math")?;
     table.set_item("cumsum", "operator")?;
@@ -6587,10 +7396,13 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("midprice", "overlap")?;
     table.set_item("min", "statistic")?;
     table.set_item("minmax", "statistic")?;
+    table.set_item("minus_dm", "momentum")?;
     table.set_item("mom", "momentum")?;
     table.set_item("mult", "operator")?;
     table.set_item("natr", "volatility")?;
     table.set_item("obv", "volume")?;
+    table.set_item("plus_dm", "momentum")?;
+    table.set_item("rma", "overlap")?;
     table.set_item("roc", "momentum")?;
     table.set_item("rocp", "momentum")?;
     table.set_item("rocr", "momentum")?;
@@ -6607,6 +7419,7 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("tanh", "math")?;
     table.set_item("tema", "overlap")?;
     table.set_item("trange", "volatility")?;
+    table.set_item("trima", "overlap")?;
     table.set_item("typprice", "price")?;
     table.set_item("var", "statistic")?;
     table.set_item("wclprice", "price")?;
@@ -6676,6 +7489,9 @@ pub fn lookback_of(
                 &trendlib::indicators::avgprice::Params {},
             ),
         ),
+        "bop" => Ok(<trendlib::indicators::bop::Bop as Kernel<4, 1>>::lookback(
+            &trendlib::indicators::bop::Params {},
+        )),
         "cci" => {
             let period = match get("period")? {
                 Some(value) => {
@@ -6692,6 +7508,17 @@ pub fn lookback_of(
                 &trendlib::indicators::ceil::Params {},
             ),
         ),
+        "cmo" => {
+            let period = match get("period")? {
+                Some(value) => {
+                    int_param("cmo", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?
+                }
+                None => 14,
+            };
+            Ok(<trendlib::indicators::cmo::Cmo as Kernel<1, 1>>::lookback(
+                &trendlib::indicators::cmo::Params { period },
+            ))
+        }
         "cos" => Ok(<trendlib::indicators::cos::Cos as Kernel<1, 1>>::lookback(
             &trendlib::indicators::cos::Params {},
         )),
@@ -6837,6 +7664,18 @@ pub fn lookback_of(
                 ),
             )
         }
+        "minus_dm" => {
+            let period = match get("period")? {
+                Some(value) => int_param("minus_dm", "period", value, 1, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 14,
+            };
+            Ok(
+                <trendlib::indicators::minus_dm::MinusDm as Kernel<2, 1>>::lookback(
+                    &trendlib::indicators::minus_dm::Params { period },
+                ),
+            )
+        }
         "mom" => {
             let period = match get("period")? {
                 Some(value) => {
@@ -6869,6 +7708,29 @@ pub fn lookback_of(
         "obv" => Ok(<trendlib::indicators::obv::Obv as Kernel<2, 1>>::lookback(
             &trendlib::indicators::obv::Params {},
         )),
+        "plus_dm" => {
+            let period = match get("period")? {
+                Some(value) => int_param("plus_dm", "period", value, 1, 100000)
+                    .map_err(|e| to_py_err(py, &e))?,
+                None => 14,
+            };
+            Ok(
+                <trendlib::indicators::plus_dm::PlusDm as Kernel<2, 1>>::lookback(
+                    &trendlib::indicators::plus_dm::Params { period },
+                ),
+            )
+        }
+        "rma" => {
+            let period = match get("period")? {
+                Some(value) => {
+                    int_param("rma", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
+                }
+                None => 30,
+            };
+            Ok(<trendlib::indicators::rma::Rma as Kernel<1, 1>>::lookback(
+                &trendlib::indicators::rma::Params { period },
+            ))
+        }
         "roc" => {
             let period = match get("period")? {
                 Some(value) => {
@@ -7006,6 +7868,19 @@ pub fn lookback_of(
                 &trendlib::indicators::trange::Params {},
             ),
         ),
+        "trima" => {
+            let period = match get("period")? {
+                Some(value) => {
+                    int_param("trima", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?
+                }
+                None => 30,
+            };
+            Ok(
+                <trendlib::indicators::trima::Trima as Kernel<1, 1>>::lookback(
+                    &trendlib::indicators::trima::Params { period },
+                ),
+            )
+        }
         "typprice" => Ok(
             <trendlib::indicators::typprice::Typprice as Kernel<3, 1>>::lookback(
                 &trendlib::indicators::typprice::Params {},

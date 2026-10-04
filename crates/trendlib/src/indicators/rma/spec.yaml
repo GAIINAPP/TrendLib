@@ -1,0 +1,26 @@
+name: rma
+title: Wilder Smoothed Moving Average
+group: overlap
+flags: [overlap, unstable]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 30
+    min: 1
+    max: 100000
+    doc: Number of bars the smoothing is derived from
+outputs:
+  - name: rma
+    dtype: float64
+    plot: line
+    doc: Wilder's smoothing of source
+talib:
+  name: RMA
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - J. Welles Wilder Jr., New Concepts in Technical Trading Systems, Trend Research, 1978
+see_also: [ema, sma]

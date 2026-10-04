@@ -37,6 +37,7 @@ Before 1.0, minor versions may break the API; every break is listed under
 - `wma`, `trange`, `atr` and `natr` are callable from Python.
 - Indicators `dema`, `tema`, `roc` and `macd`. `macd` is the first with
   several outputs, returned as a tuple or, from a DataFrame, as a frame.
+- 6 more indicators: `bop`, `rma`, `trima`, `plus_dm`, `minus_dm` and `cmo`.
 - 13 more indicators: `mom`, `rocp`, `rocr`, `rocr100`, `midpoint`, `midprice`,
   `sum`, `avgdev`, `stddev`, `var`, `max`, `min` and `minmax`. `stddev` and
   `var` are the first with a float parameter.

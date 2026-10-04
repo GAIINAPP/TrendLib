@@ -1,0 +1,26 @@
+name: cmo
+title: Chande Momentum Oscillator
+group: momentum
+flags: [unstable]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 2
+    max: 100000
+    doc: Number of bar-to-bar changes the gains and losses are accumulated over
+outputs:
+  - name: cmo
+    dtype: float64
+    plot: line
+    doc: Gains minus losses as a share of the two combined, from -100 to 100
+talib:
+  name: CMO
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Tushar S. Chande and Stanley Kroll, The New Technical Trader, Wiley, 1994
+see_also: [rsi, roc]

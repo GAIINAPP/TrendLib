@@ -22,8 +22,10 @@ __all__ = [
     "atr",
     "avgdev",
     "avgprice",
+    "bop",
     "cci",
     "ceil",
+    "cmo",
     "cos",
     "cosh",
     "cumsum",
@@ -41,10 +43,13 @@ __all__ = [
     "midprice",
     "min",
     "minmax",
+    "minus_dm",
     "mom",
     "mult",
     "natr",
     "obv",
+    "plus_dm",
+    "rma",
     "roc",
     "rocp",
     "rocr",
@@ -61,6 +66,7 @@ __all__ = [
     "tanh",
     "tema",
     "trange",
+    "trima",
     "typprice",
     "var",
     "wclprice",
@@ -134,6 +140,23 @@ avgprice = Factory(
     ),
     ("avgprice",),
 )
+bop = Factory(
+    "bop",
+    _core.BopStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bop",),
+)
 cci = Factory(
     "cci",
     _core.CciStream,
@@ -150,6 +173,7 @@ cci = Factory(
     ("cci",),
 )
 ceil = Factory("ceil", _core.CeilStream, ("source",), ("series",), ("ceil",))
+cmo = Factory("cmo", _core.CmoStream, ("source",), ("series",), ("cmo",))
 cos = Factory("cos", _core.CosStream, ("source",), ("series",), ("cos",))
 cosh = Factory("cosh", _core.CoshStream, ("source",), ("series",), ("cosh",))
 cumsum = Factory("cumsum", _core.CumsumStream, ("source",), ("series",), ("cumsum",))
@@ -222,6 +246,19 @@ minmax = Factory(
         "minmax_max",
     ),
 )
+minus_dm = Factory(
+    "minus_dm",
+    _core.MinusDmStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("minus_dm",),
+)
 mom = Factory("mom", _core.MomStream, ("source",), ("series",), ("mom",))
 mult = Factory(
     "mult",
@@ -264,6 +301,20 @@ obv = Factory(
     ),
     ("obv",),
 )
+plus_dm = Factory(
+    "plus_dm",
+    _core.PlusDmStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("plus_dm",),
+)
+rma = Factory("rma", _core.RmaStream, ("source",), ("series",), ("rma",))
 roc = Factory("roc", _core.RocStream, ("source",), ("series",), ("roc",))
 rocp = Factory("rocp", _core.RocpStream, ("source",), ("series",), ("rocp",))
 rocr = Factory("rocr", _core.RocrStream, ("source",), ("series",), ("rocr",))
@@ -306,6 +357,7 @@ trange = Factory(
     ),
     ("trange",),
 )
+trima = Factory("trima", _core.TrimaStream, ("source",), ("series",), ("trima",))
 typprice = Factory(
     "typprice",
     _core.TyppriceStream,

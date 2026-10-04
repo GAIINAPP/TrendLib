@@ -1,0 +1,24 @@
+name: bop
+title: Balance of Power
+group: momentum
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: bop
+    dtype: float64
+    plot: line
+    doc: Where the close finished relative to the open, scaled by the bar's range
+talib:
+  name: BOP
+  params: {}
+  outputs: [real]
+references:
+  - Igor Livshin, Balance of Power, Technical Analysis of Stocks and Commodities, 2001
+see_also: [cci, willr]

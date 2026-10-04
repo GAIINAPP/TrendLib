@@ -1,0 +1,26 @@
+name: trima
+title: Triangular Moving Average
+group: overlap
+flags: [overlap]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 30
+    min: 1
+    max: 100000
+    doc: Number of bars in the average
+outputs:
+  - name: trima
+    dtype: float64
+    plot: line
+    doc: Mean of source weighted most heavily in the middle of the window
+talib:
+  name: TRIMA
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - Steven B. Achelis, Technical Analysis from A to Z, McGraw-Hill, 2000
+see_also: [sma, wma]
