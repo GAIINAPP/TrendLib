@@ -43,7 +43,7 @@ dynamic = ["version"]
 [project.optional-dependencies]
 pandas = ["pandas>=2.0"]
 polars = ["polars>=1.0"]
-dev = ["pytest", "hypothesis", "pytest-benchmark", "ruff", "pandas>=2.0", "TA-Lib==0.8.1", "PyYAML>=6.0"]
+dev = ["pytest", "hypothesis", "pytest-benchmark", "ruff==0.16.10", "pandas>=2.0", "TA-Lib==0.8.1", "PyYAML>=6.0"]
 docs = ["mkdocs-material"]
 
 [project.urls]
