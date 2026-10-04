@@ -1,0 +1,6 @@
+- { key: overlap,    title: Overlap studies }
+- { key: momentum,   title: Momentum }
+- { key: volatility, title: Volatility }
+- { key: volume,     title: Volume }
+- { key: levels,     title: Levels }
+- { key: patterns,   title: Candlestick patterns }

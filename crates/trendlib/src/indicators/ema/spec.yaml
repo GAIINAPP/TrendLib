@@ -1,0 +1,26 @@
+name: ema
+title: Exponential Moving Average
+group: overlap
+flags: [overlap, unstable]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 30
+    min: 1
+    max: 100000
+    doc: Number of bars the smoothing factor is derived from
+outputs:
+  - name: ema
+    dtype: float64
+    plot: line
+    doc: Exponentially weighted mean of source
+talib:
+  name: EMA
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - John J. Murphy, Technical Analysis of the Financial Markets, New York Institute of Finance, 1999, chapter 9
+see_also: [sma, rsi]

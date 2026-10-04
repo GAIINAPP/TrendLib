@@ -1,0 +1,5 @@
+MaType:
+  values: [sma, ema, wma, dema, tema]
+  talib_int: { sma: 0, ema: 1, wma: 2, dema: 3, tema: 4 }
+VwapAnchor:
+  values: [day, none]

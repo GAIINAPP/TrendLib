@@ -1,0 +1,25 @@
+name: rsi
+title: Relative Strength Index
+group: momentum
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 2
+    max: 100000
+    doc: Number of bar-to-bar changes the average gain and loss are taken over
+outputs:
+  - name: rsi
+    dtype: float64
+    plot: line
+    doc: Share of recent movement that was upward, from 0 to 100
+talib:
+  name: RSI
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - J. Welles Wilder Jr., New Concepts in Technical Trading Systems, Trend Research, 1978, chapter 6
+see_also: [ema, sma]

@@ -1,0 +1,26 @@
+name: sma
+title: Simple Moving Average
+group: overlap
+flags: [overlap]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: period
+    type: int
+    default: 30
+    min: 1
+    max: 100000
+    doc: Number of bars in the average
+outputs:
+  - name: sma
+    dtype: float64
+    plot: line
+    doc: Mean of the last period values of source
+talib:
+  name: SMA
+  params: {period: timeperiod}
+  outputs: [real]
+references:
+  - John J. Murphy, Technical Analysis of the Financial Markets, New York Institute of Finance, 1999, chapter 9
+see_also: [ema, rsi]
