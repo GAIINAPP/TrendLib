@@ -5,6 +5,7 @@ documented as one thing and computes another. The generator is cheap to re-run;
 this makes sure nobody has to remember to.
 """
 
+import importlib.util
 import re
 import subprocess
 import sys
@@ -12,6 +13,14 @@ import sys
 import pytest
 
 talib = pytest.importorskip("talib", reason="the TA-Lib oracle is not installed here")
+
+#: Both generators read the spec files, which are YAML. Where no parser is
+#: installed they cannot run, and the checks that drive them skip rather than
+#: report the missing import as a stale catalogue.
+needs_yaml = pytest.mark.skipif(
+    importlib.util.find_spec("yaml") is None,
+    reason="the generators read YAML and no parser is installed here",
+)
 
 ROW = re.compile(r"^\| `([a-z0-9_]+)`")
 
@@ -26,6 +35,7 @@ def catalogue_names(catalogue):
     return [m.group(1) for line in catalogue.splitlines() if (m := ROW.match(line))]
 
 
+@needs_yaml
 def test_the_catalogue_is_up_to_date(repo_root):
     result = subprocess.run(
         [sys.executable, "scripts/catalogue/talib_catalogue.py", "--check"],
@@ -96,6 +106,7 @@ def test_every_shipped_indicator_matches_its_catalogue_row(repo_root, catalogue)
             assert f"`{output['name']}`" in row, f"{spec['name']}: {output['name']} not in the row"
 
 
+@needs_yaml
 def test_the_progress_list_is_up_to_date(repo_root):
     """The marks are read off the repository, so staleness is the only failure."""
     result = subprocess.run(
