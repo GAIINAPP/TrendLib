@@ -1,0 +1,124 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      - name: cargo fmt
+        run: cargo fmt --all --check
+
+      - name: cargo clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: install ruff
+        run: pip install ruff
+
+      - name: ruff check
+        run: ruff check
+
+      - name: ruff format
+        run: ruff format --check
+
+      - name: committed test data is up to date
+        run: python scripts/testdata/make_synthetic.py --check
+
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check
+
+  rust:
+    name: rust (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: cargo test
+        run: cargo test --workspace
+
+      - name: core crate has no runtime dependencies
+        shell: bash
+        run: |
+          tree=$(cargo tree -p trendlib -e normal)
+          echo "$tree"
+          test "$(echo "$tree" | wc -l)" -eq 1
+
+  python:
+    name: python (${{ matrix.os }}, ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.11", "3.14"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: create virtualenv
+        shell: bash
+        run: |
+          python -m venv .venv
+          echo "VIRTUAL_ENV=$PWD/.venv" >> "$GITHUB_ENV"
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            echo "$PWD/.venv/Scripts" >> "$GITHUB_PATH"
+          else
+            echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+          fi
+
+      - name: install build and test dependencies
+        run: pip install maturin pytest hypothesis pytest-benchmark "pandas>=2.0"
+
+      # The oracle for TA-Lib parity tests. Those tests skip when it is absent,
+      # so a platform without a wheel does not fail the build, but one job has
+      # to have it or the parity suite would silently never run.
+      - name: install TA-Lib (oracle)
+        continue-on-error: ${{ !(matrix.os == 'ubuntu-latest' && matrix.python == '3.11') }}
+        run: pip install "TA-Lib==0.8.1"
+
+      - name: install polars
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.14'
+        run: pip install "polars>=1.0"
+
+      - name: maturin develop
+        run: maturin develop --release
+
+      - name: version is importable
+        run: python -c "import trendlib; print(trendlib.__version__, trendlib.__version_info__)"
+
+      - name: pytest
+        run: pytest
