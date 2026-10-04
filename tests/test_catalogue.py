@@ -77,3 +77,36 @@ def test_every_shipped_indicator_matches_its_catalogue_row(repo_root, catalogue)
             assert expected in row, f"{spec['name']}: {param['name']} disagrees with the catalogue"
         for output in spec["outputs"]:
             assert f"`{output['name']}`" in row, f"{spec['name']}: {output['name']} not in the row"
+
+
+def test_the_progress_list_is_up_to_date(repo_root):
+    """The marks are read off the repository, so staleness is the only failure."""
+    result = subprocess.run(
+        [sys.executable, "scripts/catalogue/progress.py", "--check"],
+        cwd=repo_root,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, result.stderr or result.stdout
+
+
+def test_the_progress_list_covers_every_approved_indicator(repo_root, catalogue_names):
+    progress = (repo_root / "docs" / "PROGRESS.md").read_text()
+    listed = set(re.findall(r"^- \[[x~ ]\] `([a-z0-9_]+)`", progress, re.M))
+    missing = set(catalogue_names) - listed
+    assert not missing, f"not listed in PROGRESS.md: {sorted(missing)[:10]}"
+    # The three TrendLib defines itself are approved too (INDICATORS.md § 3).
+    assert {"cpr", "pivots_traditional", "pivots_camarilla"} <= listed
+    assert len(listed) == len(catalogue_names) + 3
+
+
+def test_nothing_is_ticked_that_is_not_actually_there(repo_root):
+    """A tick has to mean four files on disk and a Python entry point."""
+    progress = (repo_root / "docs" / "PROGRESS.md").read_text()
+    folder = repo_root / "crates" / "trendlib" / "src" / "indicators"
+    functions = (repo_root / "python" / "trendlib" / "_functions.py").read_text()
+    for name in re.findall(r"^- \[x\] `([a-z0-9_]+)`", progress, re.M):
+        for required in ("spec.yaml", "mod.rs", "doc.md"):
+            assert (folder / name / required).is_file(), f"{name} is ticked but has no {required}"
+        assert list((folder / name / "golden").glob("*.csv")), f"{name} is ticked with no golden"
+        assert f"def {name}(" in functions, f"{name} is ticked but is not callable from Python"

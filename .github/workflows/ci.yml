@@ -52,6 +52,9 @@ jobs:
       - name: the TA-Lib catalogue is up to date
         run: python scripts/catalogue/talib_catalogue.py --check
 
+      - name: the progress list is up to date
+        run: python scripts/catalogue/progress.py --check
+
       - uses: EmbarkStudios/cargo-deny-action@v2
         with:
           command: check
