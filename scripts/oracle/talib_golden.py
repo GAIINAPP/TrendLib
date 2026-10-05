@@ -281,11 +281,12 @@ def read_dataset(filename: str) -> dict[str, list]:
     return columns
 
 
-# Functions whose domain the raw close prices fall outside of. An arc cosine of
-# 1000 is NaN on every row and an exponential of 1000 is infinity on every row;
-# either way the file would prove nothing, so the source is scaled into [-1, 1]
-# first. The header records that it was.
-SCALED_SOURCE = {"acos", "asin", "exp", "cosh", "sinh"}
+# Functions the raw close prices tell nothing about. An arc cosine of 1000 is
+# NaN on every row, an exponential of 1000 is infinity on every row, and a
+# hyperbolic tangent of 1000 is 1.0 on every row: a file of one repeated value
+# proves nothing, so the source is scaled into [-1, 1] first. The header records
+# that it was.
+SCALED_SOURCE = {"acos", "asin", "exp", "cosh", "sinh", "tanh"}
 
 # The two operands of an arithmetic operator want to be different series, or
 # `div` is 1.0 on every row and `sub` is 0.0 on every row.
