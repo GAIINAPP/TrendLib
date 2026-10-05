@@ -191,4 +191,4 @@ A22 (M7, 2026-10-05): two shared tests grow with the approved set rather than
 loosening: `tests/test_spec_drift.py` accepts `ta-patterns` as a golden file's
 oracle beside `ta-lib-python` and `manual`, and
 `tests/test_catalogue.py` counts the section 5.1 list in the approved total that
-`docs/PROGRESS.md` must cover.
+`docs/PROGRESS.md` must cover. Confirmed by the owner on 2026-10-06.
