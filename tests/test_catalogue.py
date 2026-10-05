@@ -127,9 +127,7 @@ def test_the_progress_list_covers_every_approved_indicator(repo_root, catalogue_
     # and so are the chart patterns of section 5.1, which a second oracle checks.
     assert {"cpr", "pivots_traditional", "pivots_camarilla"} <= listed
     indicators = (repo_root / "docs" / "INDICATORS.md").read_text()
-    charts = set(
-        re.findall(r"^\| `(chart_[a-z0-9_]+)` \|", indicators.split("### 5.1")[1], re.M)
-    )
+    charts = set(re.findall(r"^\| `(chart_[a-z0-9_]+)` \|", indicators.split("### 5.1")[1], re.M))
     assert charts, "INDICATORS.md section 5.1 approves no chart pattern"
     assert charts <= listed, f"not listed in PROGRESS.md: {sorted(charts - listed)}"
     assert len(listed) == len(catalogue_names) + 3 + len(charts)
