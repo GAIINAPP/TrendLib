@@ -10,6 +10,7 @@ and that agreement with the oracle holds on random bars too.
 """
 
 import csv
+import functools
 
 import numpy as np
 import pytest
@@ -41,17 +42,26 @@ RANDOM_SERIES = 24
 RANDOM_BARS = 750
 
 
-def alias_of(repo_root, name):
-    import yaml
-
-    path = repo_root / "crates" / "trendlib" / "src" / "indicators" / name / "spec.yaml"
-    return yaml.safe_load(path.read_text(encoding="utf-8"))["talib"]["name"]
+def golden_path(repo_root, name):
+    return (
+        repo_root / "crates" / "trendlib" / "src" / "indicators" / name / "golden" / "patterns.csv"
+    )
 
 
 def read_golden(path):
+    """The bars and expected values, and the oracle function named in the header.
+
+    The alias is read from the file rather than from `spec.yaml` so this module
+    needs no YAML parser: one CI job installs the runtime dependencies only.
+    """
+    header, body = [], []
     with path.open(newline="", encoding="utf-8") as handle:
-        rows = list(csv.DictReader(line for line in handle if not line.startswith("#")))
-    return {key: np.array([float(row[key]) for row in rows]) for key in rows[0]}
+        for line in handle:
+            (header if line.startswith("#") else body).append(line)
+    oracle = next(line for line in header if line.startswith("# oracle:"))
+    rows = list(csv.DictReader(body))
+    columns = {key: np.array([float(row[key]) for row in rows]) for key in rows[0]}
+    return columns, oracle.rsplit("talib.", 1)[1].strip()
 
 
 def random_bars(rng, count):
@@ -71,6 +81,11 @@ def random_bars(rng, count):
     return [bars[:, index].copy() for index in range(4)]
 
 
+@functools.cache
+def aliases(repo_root):
+    return {name: read_golden(golden_path(repo_root, name))[1] for name in PATTERNS}
+
+
 @pytest.mark.parametrize("name", PATTERNS)
 def test_the_pattern_golden_holds_bars_the_pattern_fires_on(name, repo_root):
     """A golden of nothing but zeros tests only that the pattern stayed quiet.
@@ -78,8 +93,7 @@ def test_the_pattern_golden_holds_bars_the_pattern_fires_on(name, repo_root):
     Three of the nine rules this suite caught were wrong in exactly that blind
     spot, so an empty golden is treated as a missing test rather than a pass.
     """
-    folder = repo_root / "crates" / "trendlib" / "src" / "indicators" / name
-    columns = read_golden(folder / "golden" / "patterns.csv")
+    columns, _ = read_golden(golden_path(repo_root, name))
     fired = np.flatnonzero(columns[name])
     assert fired.size, f"{name}: the patterns golden never fires, so it proves nothing"
 
@@ -93,7 +107,7 @@ def test_every_pattern_agrees_with_talib_on_random_bars(seed, repo_root):
     bars = random_bars(np.random.default_rng(20261008 + seed), RANDOM_BARS)
     for name in PATTERNS:
         mine = np.asarray(getattr(tl, name)(*bars))
-        theirs = getattr(talib, alias_of(repo_root, name))(*bars)
+        theirs = getattr(talib, aliases(repo_root)[name])(*bars)
         differing = np.flatnonzero(mine != theirs)
         assert not differing.size, (
             f"{name}: row {differing[0]} reads {mine[differing[0]]}, "
