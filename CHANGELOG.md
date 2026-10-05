@@ -61,3 +61,17 @@ Before 1.0, minor versions may break the API; every break is listed under
   repository rather than by hand.
 - `natr` normalises at every period, including `period = 1` where TA-Lib
   returns the raw true range instead (`CONVENTIONS.md` deviation 6).
+- Nineteen chart patterns, the first beyond-TA-Lib group
+  (`docs/INDICATORS.md` section 5.1): `chart_double_top`,
+  `chart_double_bottom`, `chart_triple_top`, `chart_triple_bottom`,
+  `chart_head_shoulders`, `chart_inverse_head_shoulders`, `chart_rising_wedge`,
+  `chart_falling_wedge`, `chart_ascending_triangle`,
+  `chart_descending_triangle`, `chart_symmetrical_triangle`,
+  `chart_broadening`, `chart_bull_flag`, `chart_bear_flag`,
+  `chart_bull_pennant`, `chart_bear_pennant`, `chart_rectangle`,
+  `chart_ascending_channel` and `chart_descending_channel`. Each takes `high`,
+  `low` and `close` and reads `+100`, `-100` or `0`, with a stream that agrees
+  with batch bar for bar. Golden data comes from running `ta-patterns` 1.2.1
+  (oracle P); `testdata/charts_2579.csv` holds shapes that make every one fire
+  in each direction it reads. Where TrendLib and that oracle differ is
+  `CONVENTIONS.md` deviations 8 and 9.
