@@ -84,6 +84,7 @@ Rules:
 | `unstable` | Recursive, converges over time (EMA family) | Docs note on discarding early rows |
 | `requires_timestamps` | Needs timestamps for some params | Python layer converts timestamps and offsets |
 | `pattern` | Candlestick pattern, int32 ±100 output | Registry grouping, docs |
+| `chart_pattern` | Chart pattern (`INDICATORS.md` § 5.1), int32 ±100 output, oracle P | Registry grouping, docs, `tests/test_chart_patterns.py` |
 | `nan_inf_output` | A finite input may produce `NaN` or infinity | The edge-case suite checks the indicator answered, not that it answered finitely |
 
 ### 1.2 Ranges
@@ -117,6 +118,7 @@ they never change computation.
 - { key: operator,   title: Math operators }
 - { key: levels,     title: Levels }
 - { key: patterns,   title: Candlestick patterns }
+- { key: chart,      title: Chart patterns }
 ```
 
 `indicators/_enums.yaml`:

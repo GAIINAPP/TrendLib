@@ -33,10 +33,26 @@ HEADING = re.compile(r"^## (.+)$")
 # The indicators TrendLib defines itself, which have no catalogue row because
 # TA-Lib has no equivalent (`docs/INDICATORS.md` section 3).
 OWN = [
-    ("levels", "cpr", "Central Pivot Range"),
-    ("levels", "pivots_traditional", "Traditional floor pivots"),
-    ("levels", "pivots_camarilla", "Camarilla pivots"),
+    ("Levels", "cpr", "Central Pivot Range"),
+    ("Levels", "pivots_traditional", "Traditional floor pivots"),
+    ("Levels", "pivots_camarilla", "Camarilla pivots"),
 ]
+
+# The chart patterns, approved on top of the catalogue and checked against a
+# second oracle (`docs/INDICATORS.md` section 5.1). Read from that table rather
+# than listed here, so approving one more is one edit, in the document.
+CHART_ROW = re.compile(r"^\| `(chart_[a-z0-9_]+)` \| ([^|]+?) \|")
+
+
+def chart_entries() -> list[tuple[str, str, str]]:
+    """`(group title, trendlib name, title)` for every approved chart pattern."""
+    text = (REPO_ROOT / "docs" / "INDICATORS.md").read_text(encoding="utf-8")
+    section = text.split("### 5.1 Chart patterns", 1)[1]
+    return [
+        ("Chart patterns", row.group(1), row.group(2).strip())
+        for line in section.splitlines()
+        if (row := CHART_ROW.match(line))
+    ]
 
 # The slice the first public release ships (`docs/INDICATORS.md` section 2.1).
 RELEASE_SET = {
@@ -122,8 +138,8 @@ def render() -> str:
     grouped: dict[str, list[tuple[str, str, str]]] = {}
     for group, name, alias in catalogue_entries():
         grouped.setdefault(group, []).append((name, alias, known.get(name, "")))
-    for _group, name, title in OWN:
-        grouped.setdefault("Levels", []).append((name, "", known.get(name, title)))
+    for group, name, title in OWN + chart_entries():
+        grouped.setdefault(group, []).append((name, "", known.get(name, title)))
 
     states = {name: state_of(name, in_python) for group in grouped.values() for name, _, _ in group}
     done = sum(1 for s in states.values() if s == "done")

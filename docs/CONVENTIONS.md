@@ -130,10 +130,14 @@ where the computation starts. Their `spec.yaml` carries the `path_dependent` fla
 - Candlestick pattern outputs: `+100` bullish, `−100` bearish, `0` none or
   warm-up, matching TA-Lib. Candle settings (body/shadow thresholds) are fixed at
   TA-Lib's defaults in v0.1.
+- Chart pattern outputs (`INDICATORS.md` section 5.1) use the same codes:
+  `+100` on a bar whose close leaves the shape upward, `−100` downward, `0`
+  otherwise. They describe what price did, the way a candle reading does; no
+  output names a level to act at.
 
-## 9. Deviations from TA-Lib
+## 9. Deviations from the oracle
 
-| # | Case | TA-Lib | TrendLib | Why |
+| # | Case | Oracle | TrendLib | Why |
 | --- | --- | --- | --- | --- |
 | 1 | NaN / inf after the first valid bar | Undefined, or skipped by some functions | Raises `InvalidInput` | D8 |
 | 2 | VWAP rows before any volume has traded in the session | Carries previous value, `0` at the start | `NaN` | `0` is not a price |
@@ -142,9 +146,12 @@ where the computation starts. Their `spec.yaml` carries the `path_dependent` fla
 | 5 | Candle settings | Globally configurable | Fixed at defaults (v0.1) | D9; configurable per call in M6 |
 | 7 | `plus_di` and `minus_di` with `period = 1` | Return the raw fraction, not scaled to a percentage | Scale at every period: `100 * movement / range` | Both are measured by factor exactly 100 at period 1 and exactly 1 everywhere else. A fraction reported under a name that means percent is the same hazard as deviation 6. |
 | 6 | `natr` with `period = 1` | Returns the raw true range, not normalised | Normalises at every period: `100 * atr / close` | A price span is not a percentage. TA-Lib's value is in price units under a name that means percent, which is the kind of plausible wrong number this project exists to avoid. Every other period agrees exactly. |
+| 8 | Flags and pennants (oracle P) on row `pole_bars + period`, the first bar one can fire on | `ta-patterns` reads the bar before the input there (`c[-1]`), which NumPy takes to be the *last* bar of the whole input | That row is warm-up; the first value is one bar later | A reading that changes when later bars are appended is look-ahead, and a stream cannot reproduce it. |
+| 9 | Chart pattern trendline (oracle P) through swing points of exactly equal price | Sums are differences of running totals over the whole input, so a flat line's slope comes out as a residue of either sign and its r² as noise | The line is refitted from the window's own swing points, and a window whose prices are all equal is recognised as flat: slope 0, r² 1 | Section 1: rebuild where two similar sums are subtracted, and ask the window rather than the result. Whether a residue is positive must not decide whether a line is rising. |
 
-Golden tests against TA-Lib exclude only the rows a listed deviation affects, and
-the golden header names the deviation number. Where a deviation makes the oracle
+Deviations 1 to 7 are against TA-Lib (oracle T) and 8 and 9 against
+`ta-patterns` (oracle P). Golden tests against either exclude only the rows a
+listed deviation affects, and the golden header names the deviation number. Where a deviation makes the oracle
 unusable at a parameter boundary rather than on particular rows, the boundary
 case is generated at the nearest parameter the oracle can be trusted at and the
 header carries a `# note:` saying which deviation forced it; a test refuses a

@@ -64,7 +64,9 @@ four, and the catalogue marks the fourth with a dagger:
 
 **The full target is 204 functions.** Everything with a `talib:` block in its
 spec is verified by running ta-lib-python (oracle T); the three in `levels`
-need human-transcribed reference values (oracle H, open question Q4).
+need human-transcribed reference values (oracle H, open question Q4). The
+chart patterns of section 5.1 come on top of the 204 and are verified by
+running `ta-patterns` (oracle P).
 
 TA-Lib's C library at HEAD carries 22 functions beyond the 201 the 0.8.1 Python
 wheel exposes. They are out of scope until a Python release exposes them,
@@ -217,3 +219,64 @@ Candidates recorded so far:
 | Overlap | `ichimoku`, `supertrend` variants |
 | India data | `oi_change`, `pcr` (put-call ratio), `delivery_ratio` (delivered quantity over traded quantity) - these need an input-data contract first, because none of them is computed from OHLCV |
 | Patterns | configurable candle settings (M6; fixed at TA-Lib's defaults in 0.1) |
+
+### 5.1 Chart patterns (approved 2026-10-05)
+
+The owner asked for the classic chart patterns on 2026-10-05: the double, triple
+and head-and-shoulders reversals, the wedges, triangles, broadening formation,
+flags, pennants, rectangles and channels. They are approved here as the first
+beyond-TA-Lib group (assumption A18). The reference charts they came with also
+marked entry, stop-loss and target levels; those are trade instructions (D11)
+and are not part of any function.
+
+**Oracle P** is `ta-patterns` 1.2.1 (MIT), a NumPy implementation that can be
+run, pinned in the `dev` extra (`docs/TESTING.md` section 2, assumption A19).
+As with TA-Lib (D6), TrendLib uses the oracle's definitions and defaults so the
+oracle can check them. Each row names the oracle function. Where two oracle
+functions are the two directions of one shape, TrendLib ships them as one
+function that reads `+100` for an upward close through the shape and `-100` for
+a downward one, the way TA-Lib's two-sided candles do.
+
+Every function takes `high`, `low` and `close`, returns one `int32` column named
+after the function (`+100`, `-100` or `0`), and is in group `chart`.
+Parameter names are the oracle's, except that `window` is `period` (D12). The
+ranges are TrendLib's own: the oracle checks none.
+
+Common parameters: `period` int [2, 100000] is how many bars back a swing point
+may have been confirmed and still count; `pivot_n` int [1, 100000] is how many
+bars on each side a swing high (low) must be at least as high (low) as.
+
+| Function | Title | Oracle | Reads | Parameters (default [min, max]) |
+| --- | --- | --- | --- | --- |
+| `chart_double_top` | Double Top | `double_top` | -100 | `period` 60, `pivot_n` 5, `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
+| `chart_double_bottom` | Double Bottom | `double_bottom` | +100 | as `chart_double_top` |
+| `chart_triple_top` | Triple Top | `triple_top` | -100 | `period` 100, `pivot_n` 5, `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
+| `chart_triple_bottom` | Triple Bottom | `triple_bottom` | +100 | as `chart_triple_top` |
+| `chart_head_shoulders` | Head and Shoulders | `hs_top` | -100 | `period` 150, `pivot_n` 5, `shoulder_tol` 0.05 [0.0, any], `min_separation` 8 [1, 100000] |
+| `chart_inverse_head_shoulders` | Inverse Head and Shoulders | `hs_bottom` | +100 | as `chart_head_shoulders` |
+| `chart_rising_wedge` | Rising Wedge | `rising_wedge` | -100 | `period` 80, `pivot_n` 5 |
+| `chart_falling_wedge` | Falling Wedge | `falling_wedge` | +100 | `period` 80, `pivot_n` 5 |
+| `chart_ascending_triangle` | Ascending Triangle | `ascending_triangle` | +100 | `period` 100, `pivot_n` 5, `flat_tol` 0.02 [0.0, any] |
+| `chart_descending_triangle` | Descending Triangle | `descending_triangle` | -100 | as `chart_ascending_triangle` |
+| `chart_symmetrical_triangle` | Symmetrical Triangle | `symmetrical_triangle` | ±100 | `period` 100, `pivot_n` 5 |
+| `chart_broadening` | Broadening Formation | `broadening_bottom` (+), `broadening_top` (-) | ±100 | `period` 80, `pivot_n` 5 |
+| `chart_bull_flag` | Bull Flag | `flag_bull` | +100 | `period` 30, `pivot_n` 3, `pole_bars` 10 [1, 100000], `min_pole` 0.05 [0.0, any], `max_retrace` 0.5 [0.0, any] |
+| `chart_bear_flag` | Bear Flag | `flag_bear` | -100 | as `chart_bull_flag` |
+| `chart_bull_pennant` | Bull Pennant | `pennant_bull` | +100 | `period` 15, `pivot_n` 3, `pole_bars` 10 [1, 100000], `min_pole` 0.05 [0.0, any] |
+| `chart_bear_pennant` | Bear Pennant | `pennant_bear` | -100 | as `chart_bull_pennant` |
+| `chart_rectangle` | Rectangle | `rectangle_bottom` (+), `rectangle_top` (-) | ±100 | `period` 80, `pivot_n` 4, `flat_tol` 0.025 [0.0, any] |
+| `chart_ascending_channel` | Ascending Channel | `channel_asc` | -100 | `period` 80, `pivot_n` 4, `parallel_tol` 0.25 [0.0, any] |
+| `chart_descending_channel` | Descending Channel | `channel_desc` | +100 | as `chart_ascending_channel` |
+
+The names of the reference charts map on as follows: "symmetrical expanding
+triangle" is `chart_broadening`; "bullish" and "bearish rectangle" are the two
+directions of `chart_rectangle`; "bullish channel" (a falling channel left
+upward) is `chart_descending_channel` and "bearish channel" is
+`chart_ascending_channel`; "bullish wedge" is `chart_falling_wedge` and "bearish
+wedge" `chart_rising_wedge`.
+
+The oracle's `mode="forming"` (report the shape before price leaves it) and its
+`pivot_pct` ZigZag filter are not offered: every function reports the
+`mode="confirmed"` reading with no ZigZag filter, and either can be added later
+as a new parameter without changing a value. Where TrendLib and the oracle part
+company, `docs/CONVENTIONS.md` section 9 lists it (deviations 8 and 9).

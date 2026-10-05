@@ -9,3 +9,4 @@
 - { key: operator,   title: Math operators }
 - { key: levels,     title: Levels }
 - { key: patterns,   title: Candlestick patterns }
+- { key: chart,      title: Chart patterns }

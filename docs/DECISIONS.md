@@ -150,3 +150,44 @@ each laid after 12 quiet bars, followed by a 600-bar walk through ten regimes.
 Choosing which bars a golden covers is not the same as choosing what it expects:
 the expected values still come from running TA-Lib, so `CLAUDE.md` rule 3 holds.
 `tests/test_patterns.py` fails if any pattern's golden goes quiet again.
+
+A18 (M7, 2026-10-05): the owner asked for the classic chart patterns (four
+reference charts of reversal and continuation shapes) "implemented like the other
+indicators and patterns, with proper testing". That request is read as approving
+them as the first beyond-TA-Lib group, `INDICATORS.md` section 5.1: 19 functions
+covering every shape the charts name, in a new group `chart` with a new flag
+`chart_pattern` (the `pattern` flag stays the TA-Lib candles, which the candle
+suite compares against TA-Lib). The entry, stop-loss and target levels drawn on
+the charts are trade instructions (D11) and were left out.
+
+A19 (M7, 2026-10-05): oracle P is `ta-patterns` 1.2.1, pinned in the `dev` extra.
+It was the only library on PyPI found to implement every one of the shapes, under
+a licence (MIT) that allows it, as code that can be run, and point in time (bar
+`i` reads bars `0..i`, with the one exception deviation 8 records). TrendLib
+takes its definitions and defaults the way D6 takes TA-Lib's, so it can serve as
+the oracle; its parameter names are kept except `window`, which is `period` (D12).
+It checks no ranges, so the ranges in section 5.1 are TrendLib's: whole numbers
+from 1 (2 for `period`) to 100000 like the catalogue's, and tolerances from 0 with
+no ceiling. Its `mode="forming"` and `pivot_pct` are not offered (section 5.1).
+`NOTICE` credits it. Needs a human to confirm the oracle choice: it is a young
+library (first release 2026), so it is evidence that TrendLib does what it
+documents, not that the documented definitions are the best ones.
+
+A20 (M7, 2026-10-05): the chart-pattern trendlines are refitted each bar from the
+swing points inside the window, in coordinates relative to the current bar, not
+taken as differences of running totals over the whole series the way the oracle
+takes them (`CONVENTIONS.md` section 1, and the candle kernel's precedent). The
+two agree to rounding everywhere a line has any slope; where the swing prices are
+exactly equal the oracle's sums leave a residue of arbitrary sign and TrendLib
+reads the line as flat, which is deviation 9.
+
+A21 (M7, 2026-10-05): every chart pattern carries `path_dependent`. A swing
+point near the start of the input is judged on the bars it has, the way the
+oracle judges it, so a batch over a slice can find swing points the full series
+does not have until a window has passed.
+
+A22 (M7, 2026-10-05): two shared tests grow with the approved set rather than
+loosening: `tests/test_spec_drift.py` accepts `ta-patterns` as a golden file's
+oracle beside `ta-lib-python` and `manual`, and
+`tests/test_catalogue.py` counts the section 5.1 list in the approved total that
+`docs/PROGRESS.md` must cover.
