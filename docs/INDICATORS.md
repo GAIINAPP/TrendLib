@@ -230,7 +230,7 @@ marked entry, stop-loss and target levels; those are trade instructions (D11)
 and are not part of any function.
 
 **Oracle P** is `ta-patterns` 1.2.1 (MIT), a NumPy implementation that can be
-run, pinned in the `dev` extra (`docs/TESTING.md` section 2, assumption A19).
+run, pinned in the `dev` extra (`docs/TESTING.md` section 2, decision D18).
 As with TA-Lib (D6), TrendLib uses the oracle's definitions and defaults so the
 oracle can check them. Each row names the oracle function. Where two oracle
 functions are the two directions of one shape, TrendLib ships them as one

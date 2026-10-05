@@ -25,6 +25,7 @@ proceed on a judgment call.
 | D16 | **The target set is every function ta-lib-python exposes** (201 at 0.8.1), plus the four TrendLib defines itself, for 204 in total. A second list of non-TA-Lib indicators follows after it. | Owner decision, 2026-10-04. TA-Lib is the oracle, so its surface is the largest set whose every value can be proved rather than asserted. |
 | D17 | The catalogue is **derived by interrogating the oracle**, not transcribed from TA-Lib's source: names, groups, defaults and output names from `talib.abstract`, integer ranges by bisecting the library until it answers `TA_BAD_PARAM`. `scripts/catalogue/talib_catalogue.py` regenerates it and CI checks it. | A transcription would be a copy that silently rots; a probe is reproducible from the pinned dev dependency and cannot disagree with the tests. Algorithms are still written from published formulas, never ported (`CONVENTIONS.md` § 4). |
 | D15 | **No data source lives in the library.** TrendLib accepts arrays and frames only, never a connection, driver, DSN or table name. The input frame contract and the loader patterns that satisfy it are documented in `DATA_INTEGRATION.md`. | Keeps the core crate dependency-free and the non-goal in `SPEC.md` § 3 honest. Callers own credentials, pooling and caching, so a schema change never becomes a library upgrade. |
+| D18 | **Oracle P for the chart patterns is `ta-patterns` 1.2.1** (MIT), pinned in the `dev` extra and installed by every CI python job. TrendLib takes its definitions and defaults for the chart patterns of `INDICATORS.md` § 5.1 the way D6 takes TA-Lib's, and departs from it only where `CONVENTIONS.md` § 9 lists a deviation (8 and 9). | Owner decision, 2026-10-06, confirming A19. It is the only runnable library found that implements every shape, under a licence that allows it, point in time. |
 
 ## Open questions (ask; do not guess)
 
@@ -169,9 +170,9 @@ the oracle; its parameter names are kept except `window`, which is `period` (D12
 It checks no ranges, so the ranges in section 5.1 are TrendLib's: whole numbers
 from 1 (2 for `period`) to 100000 like the catalogue's, and tolerances from 0 with
 no ceiling. Its `mode="forming"` and `pivot_pct` are not offered (section 5.1).
-`NOTICE` credits it. Needs a human to confirm the oracle choice: it is a young
-library (first release 2026), so it is evidence that TrendLib does what it
-documents, not that the documented definitions are the best ones.
+`NOTICE` credits it. Confirmed by the owner on 2026-10-06 and settled as D18. It is
+a young library (first release 2026), so it is evidence that TrendLib does what
+it documents, not that the documented definitions are the best ones.
 
 A20 (M7, 2026-10-05): the chart-pattern trendlines are refitted each bar from the
 swing points inside the window, in coordinates relative to the current bar, not
