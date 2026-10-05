@@ -54,6 +54,7 @@ def chart_entries() -> list[tuple[str, str, str]]:
         if (row := CHART_ROW.match(line))
     ]
 
+
 # The slice the first public release ships (`docs/INDICATORS.md` section 2.1).
 RELEASE_SET = {
     "sma",

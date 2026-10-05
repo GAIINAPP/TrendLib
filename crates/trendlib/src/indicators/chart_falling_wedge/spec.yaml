@@ -1,0 +1,34 @@
+name: chart_falling_wedge
+title: Falling Wedge
+group: chart
+flags: [chart_pattern, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 80
+    min: 2
+    max: 100000
+    doc: Bars back a swing point may have been placed and still be on a line
+  - name: pivot_n
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Bars on each side a swing high must be at least as high as, and a swing low at least as low as
+outputs:
+  - name: chart_falling_wedge
+    dtype: int32
+    plot: pattern
+    doc: A close above a falling line over the swing highs that drops faster than the falling line under the swing lows
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - Robert D. Edwards and John Magee, Technical Analysis of Stock Trends, 9th edition, CRC Press, 2007
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.falling_wedge (oracle P)
+see_also: [chart_rising_wedge, chart_descending_channel, chart_bull_flag]

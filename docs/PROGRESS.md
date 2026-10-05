@@ -2,8 +2,8 @@
 
 # Progress
 
-**204 of 223 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 19 not started.
+**223 of 223 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 0 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -27,7 +27,7 @@ something is done that is not. CI checks it is current.
 | Math operators | 12 | 12 |
 | Candlestick patterns | 61 | 61 |
 | Levels | 3 | 3 |
-| Chart patterns | 0 | 19 |
+| Chart patterns | 19 | 19 |
 
 ## Overlap studies (25 of 25)
 
@@ -266,24 +266,24 @@ something is done that is not. CI checks it is current.
 - [x] `pivots_camarilla` -- Camarilla Pivot Points *
 - [x] `pivots_traditional` -- Traditional Pivot Points *
 
-## Chart patterns (0 of 19)
+## Chart patterns (19 of 19)
 
-- [ ] `chart_ascending_channel` -- Ascending Channel
-- [ ] `chart_ascending_triangle` -- Ascending Triangle
-- [ ] `chart_bear_flag` -- Bear Flag
-- [ ] `chart_bear_pennant` -- Bear Pennant
-- [ ] `chart_broadening` -- Broadening Formation
-- [ ] `chart_bull_flag` -- Bull Flag
-- [ ] `chart_bull_pennant` -- Bull Pennant
-- [ ] `chart_descending_channel` -- Descending Channel
-- [ ] `chart_descending_triangle` -- Descending Triangle
-- [ ] `chart_double_bottom` -- Double Bottom
-- [ ] `chart_double_top` -- Double Top
-- [ ] `chart_falling_wedge` -- Falling Wedge
-- [ ] `chart_head_shoulders` -- Head and Shoulders
-- [ ] `chart_inverse_head_shoulders` -- Inverse Head and Shoulders
-- [ ] `chart_rectangle` -- Rectangle
-- [ ] `chart_rising_wedge` -- Rising Wedge
-- [ ] `chart_symmetrical_triangle` -- Symmetrical Triangle
-- [ ] `chart_triple_bottom` -- Triple Bottom
-- [ ] `chart_triple_top` -- Triple Top
+- [x] `chart_ascending_channel` -- Ascending Channel
+- [x] `chart_ascending_triangle` -- Ascending Triangle
+- [x] `chart_bear_flag` -- Bear Flag
+- [x] `chart_bear_pennant` -- Bear Pennant
+- [x] `chart_broadening` -- Broadening Formation
+- [x] `chart_bull_flag` -- Bull Flag
+- [x] `chart_bull_pennant` -- Bull Pennant
+- [x] `chart_descending_channel` -- Descending Channel
+- [x] `chart_descending_triangle` -- Descending Triangle
+- [x] `chart_double_bottom` -- Double Bottom
+- [x] `chart_double_top` -- Double Top
+- [x] `chart_falling_wedge` -- Falling Wedge
+- [x] `chart_head_shoulders` -- Head and Shoulders
+- [x] `chart_inverse_head_shoulders` -- Inverse Head and Shoulders
+- [x] `chart_rectangle` -- Rectangle
+- [x] `chart_rising_wedge` -- Rising Wedge
+- [x] `chart_symmetrical_triangle` -- Symmetrical Triangle
+- [x] `chart_triple_bottom` -- Triple Bottom
+- [x] `chart_triple_top` -- Triple Top

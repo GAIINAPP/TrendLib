@@ -81,7 +81,7 @@ PR whose description summarises any value changes.
 | `testdata/daily_2000.csv` | 2,000 daily OHLCV bars | Geometric random walk from 1000; `low ≤ min(open, close)`, `high ≥ max(open, close)`; integer volumes |
 | `testdata/intraday_5m_20d.csv` | 20 sessions × 75 bars, 09:15–15:25 IST starts, `timestamp` = epoch ns UTC | Session 3 opens with a zero-volume bar; one mid-session zero-volume bar; one session spans a weekend gap |
 | `testdata/patterns_1080.csv` | 1,080 daily OHLCV bars | 31 hand-built shapes, one per pattern a walk does not reach, each after 12 quiet bars; then a 600-bar walk through ten regimes |
-| `testdata/charts_2400.csv` | 2,400 daily OHLCV bars | Hand-built chart shapes, each direction of each section 5.1 pattern at least once, separated by drifting filler; then a walk through trending and ranging regimes |
+| `testdata/charts_2579.csv` | 2,579 daily OHLCV bars | 22 hand-built chart shapes, each direction of each `INDICATORS.md` § 5.1 pattern at least once, each after a 40-bar straight ramp; a head and shoulders whose right shoulder is an outside bar; then a top seen twice `pivot_n` bars apart, set bar by bar |
 
 A pattern fires on a handful of bars or on none at all. Over `daily_2000.csv` 31 of
 the 61 patterns fire fewer than five times and 12 never fire, so their golden files
@@ -93,7 +93,7 @@ fails if one of them goes quiet again.
 The chart patterns have the same blind spot, wider: over `daily_2000.csv` the
 triangles, rectangles and broadening formation never fire at all, because a
 flat line is judged by its slope in price per bar and a random walk near 1,000
-almost never draws one. `charts_2400.csv` is built the way `patterns_1080.csv`
+almost never draws one. `charts_2579.csv` is built the way `patterns_1080.csv`
 was, for them, and each chart pattern's `charts` golden reads it;
 `tests/test_chart_patterns.py` fails if one of them goes quiet in either
 direction it can read.

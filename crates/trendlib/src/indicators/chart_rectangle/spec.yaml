@@ -1,0 +1,39 @@
+name: chart_rectangle
+title: Rectangle
+group: chart
+flags: [chart_pattern, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 80
+    min: 2
+    max: 100000
+    doc: Bars back a swing point may have been placed and still be on a line
+  - name: pivot_n
+    type: int
+    default: 4
+    min: 1
+    max: 100000
+    doc: Bars on each side a swing high must be at least as high as, and a swing low at least as low as
+  - name: flat_tol
+    type: float
+    default: 0.025
+    min: 0.0
+    doc: Steepest either line may be and still count as flat, in price per bar
+outputs:
+  - name: chart_rectangle
+    dtype: int32
+    plot: pattern
+    doc: A close through either of two flat lines, one over the swing highs and one under the swing lows
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - Robert D. Edwards and John Magee, Technical Analysis of Stock Trends, 9th edition, CRC Press, 2007
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.rectangle_bottom and ta_patterns.chart_patterns.rectangle_top (oracle P)
+see_also: [chart_ascending_triangle, chart_descending_triangle, chart_broadening]
