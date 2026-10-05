@@ -149,6 +149,12 @@ jobs:
         continue-on-error: ${{ !(matrix.os == 'ubuntu-latest' && matrix.python == '3.11') }}
         run: pip install "TA-Lib==0.8.1"
 
+      # The oracle for the chart patterns (docs/TESTING.md section 2, oracle P).
+      # Pure Python on NumPy, so unlike TA-Lib it installs everywhere and no
+      # job is allowed to go without it.
+      - name: install ta-patterns (oracle)
+        run: pip install "ta-patterns==1.2.1"
+
       - name: install polars
         if: matrix.os == 'ubuntu-latest' && matrix.python == '3.14'
         run: pip install "polars>=1.0"
