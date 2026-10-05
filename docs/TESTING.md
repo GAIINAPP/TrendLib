@@ -13,6 +13,7 @@ plus suites that prove batch, stream and Python surfaces agree.
 | Edge cases (generated) | `crates/trendlib/tests/edge_cases.rs` | Defined behaviour on hostile input (§ 5) | Every PR |
 | Python contract | `tests/test_api_*.py` | `PYTHON_API.md`: types in/out, index, names, errors | Every PR |
 | TA-Lib parity (property) | `tests/test_talib_parity.py` | Random data and params agree with TA-Lib; lookbacks equal | Every PR (bounded examples), nightly (more) |
+| Pattern coverage | `tests/test_patterns.py` | Every pattern has a golden it fires in, and agrees with TA-Lib on random bars | Every PR |
 | Wheel smoke | `release.yml` | Installed wheel imports and computes on each platform | Every release, TestPyPI and PyPI |
 | Benchmarks | `benches/`, `tests/bench/` | Speed vs TA-Lib | Nightly; enforced by release checklist |
 
@@ -66,6 +67,18 @@ PR whose description summarises any value changes.
 | --- | --- | --- |
 | `testdata/daily_2000.csv` | 2,000 daily OHLCV bars | Geometric random walk from 1000; `low ≤ min(open, close)`, `high ≥ max(open, close)`; integer volumes |
 | `testdata/intraday_5m_20d.csv` | 20 sessions × 75 bars, 09:15–15:25 IST starts, `timestamp` = epoch ns UTC | Session 3 opens with a zero-volume bar; one mid-session zero-volume bar; one session spans a weekend gap |
+| `testdata/patterns_1080.csv` | 1,080 daily OHLCV bars | 31 hand-built shapes, one per pattern a walk does not reach, each after 12 quiet bars; then a 600-bar walk through ten regimes |
+
+A pattern fires on a handful of bars or on none at all. Over `daily_2000.csv` 31 of
+the 61 patterns fire fewer than five times and 12 never fire, so their golden files
+hold nothing but zeros and assert only that the pattern stayed silent — a rule can be
+wrong in ways such a file cannot see, and nine were. `patterns_1080.csv` exists so
+every pattern has a golden with at least one firing bar in it; `tests/test_patterns.py`
+fails if one of them goes quiet again.
+
+The shapes are chosen so the oracle reports the pattern. They decide *which bars* a
+golden file covers, never what the expected values are: those still come from running
+TA-Lib (section 2), the same as every other golden.
 
 The committed CSVs are the source of truth. NumPy does not promise identical random
 streams across versions, so regenerate only on purpose and regenerate goldens in the
@@ -119,8 +132,13 @@ lookback + 1`:
 
 - Contract tests for every rule in `PYTHON_API.md` (types, index, column names,
   DataFrame mapping, errors, aliases, accessor, registry, `to_json` schema).
-- TA-Lib parity with `hypothesis`: random OHLCV and params, all shared indicators,
-  tolerance from § 4; `tl.lookback(...)` equals `talib.abstract.Function(...).lookback`.
+- TA-Lib parity over the committed datasets: every shared indicator, every enum
+  value, swept parameters, a constant series and a leading run of NaN, tolerance
+  from § 4; `tl.lookback(...)` equals `talib.abstract.Function(...).lookback`.
+- TA-Lib parity with `hypothesis`: random series against the eight indicators whose
+  arithmetic is worth fuzzing (`sma`, `ema`, `wma`, `rsi`, `atr`, `macd`, `cci`,
+  `willr`). It does not cover the patterns; `tests/test_patterns.py` does, over 24
+  random series of 750 bars built to contain gaps, doji bars and marubozu runs.
 - Alias equivalence: `tl.RSI(x, timeperiod=n)` equals `tl.rsi(x, period=n)`.
 - polars tests skip when polars is missing; one CI job installs it so they always run
   somewhere.

@@ -29,8 +29,7 @@ fn detect(pattern: &PatternState) -> f64 {
         && bar.body() < pattern.average(CandleSetting::BODY_SHORT, 0)
         && second.open > first.open
         && second.open <= first.close + pattern.average(CandleSetting::NEAR, 2)
-        && bar.open > second.close - bar.body()
-        && bar.open <= second.close + pattern.average(CandleSetting::NEAR, 1)
+        && bar.open >= second.close - bar.body() - pattern.average(CandleSetting::NEAR, 1)
     {
         -100.0
     } else {

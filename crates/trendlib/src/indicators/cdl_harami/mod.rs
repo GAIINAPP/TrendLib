@@ -17,12 +17,20 @@ pub type State = PatternState;
 fn detect(pattern: &PatternState) -> f64 {
     let bar = pattern.back(0);
     let prior = pattern.back(1);
-    let inside = bar.body_top() < prior.body_top() && bar.body_bottom() > prior.body_bottom();
-    if prior.body() > pattern.average(CandleSetting::BODY_LONG, 1)
-        && bar.body() <= pattern.average(CandleSetting::BODY_SHORT, 0)
-        && inside
+    if prior.body() <= pattern.average(CandleSetting::BODY_LONG, 1)
+        || bar.body() > pattern.average(CandleSetting::BODY_SHORT, 0)
     {
+        return 0.0;
+    }
+    let inside = bar.body_top() < prior.body_top() && bar.body_bottom() > prior.body_bottom();
+    // One end of the body may sit exactly where the earlier one's did. A long
+    // bar around a short one still holds it, so it is reported, but at four
+    // fifths: the oracle grades the two cases apart.
+    let touching = bar.body_top() <= prior.body_top() && bar.body_bottom() >= prior.body_bottom();
+    if inside {
         -prior.colour() * 100.0
+    } else if touching {
+        -prior.colour() * 80.0
     } else {
         0.0
     }

@@ -33,24 +33,24 @@ fn detect(pattern: &PatternState) -> f64 {
     let third = pattern.back(2);
     let second = pattern.back(3);
     let first = pattern.back(4);
-    let highest_top = second
-        .body_top()
-        .max(third.body_top())
-        .max(fourth.body_top());
-    let highest_high = second.high.max(third.high).max(fourth.high);
-    if first.body() > pattern.average(CandleSetting::BODY_LONG, 4)
+    // How far down the first body the three resting bars may reach.
+    let floor = first.close - first.body() * pattern.penetration;
+    if first.is_white()
+        && second.is_black()
+        && bar.is_white()
+        && first.body() > pattern.average(CandleSetting::BODY_LONG, 4)
         && second.body() < pattern.average(CandleSetting::BODY_SHORT, 3)
         && third.body() < pattern.average(CandleSetting::BODY_SHORT, 2)
         && fourth.body() < pattern.average(CandleSetting::BODY_SHORT, 1)
-        && bar.body() > pattern.average(CandleSetting::BODY_LONG, 0)
-        && first.is_white()
-        && second.is_black()
-        && bar.is_white()
         && second.body_gaps_above(first)
-        && third.close.max(fourth.close) < second.open
-        && third.close.min(fourth.close) > first.body_bottom()
-        && bar.open > highest_top
-        && bar.close > highest_high
+        && third.body_bottom() < first.close
+        && fourth.body_bottom() < first.close
+        && third.body_bottom() > floor
+        && fourth.body_bottom() > floor
+        && third.body_top() < second.open
+        && fourth.body_top() < third.body_top()
+        && bar.open > fourth.close
+        && bar.close > second.high.max(third.high).max(fourth.high)
     {
         100.0
     } else {

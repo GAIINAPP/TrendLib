@@ -98,6 +98,7 @@ CASE_TOLERANCE = {
 # intraday file; everything else runs on daily bars.
 DAILY = "daily_2000.csv"
 INTRADAY = "intraday_5m_20d.csv"
+PATTERNS = "patterns_1080.csv"
 
 
 # Indicators where cancellation, not an error on either side, puts the two
@@ -250,13 +251,21 @@ def cases(spec: dict) -> dict[str, dict]:
             if value == param["default"]:
                 continue
             found[f"{param['name']}_{value}"] = {**defaults(spec), param["name"]: value}
+    # A pattern fires on a handful of bars or on none at all, and on the daily
+    # dataset thirty-one of the sixty-one fire fewer than five times. The
+    # second case reads bars built to make each one fire, so the file says what
+    # the pattern recognises rather than only when it stays quiet.
+    if "pattern" in (spec.get("flags") or []):
+        found["patterns"] = defaults(spec)
     for (name, case), (period, _) in CASE_OVERRIDES.items():
         if name == spec["name"] and case in found:
             found[case] = {**found[case], "period": period}
     return found
 
 
-def dataset_for(spec: dict) -> str:
+def dataset_for(spec: dict, case: str = "default") -> str:
+    if case == "patterns":
+        return PATTERNS
     kinds = {i["kind"] for i in spec["inputs"]}
     return INTRADAY if "timestamps" in kinds else DAILY
 
@@ -455,7 +464,7 @@ def run_oracle(spec: dict, bound: dict, params: dict):
 def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
     import talib
 
-    dataset = dataset_for(spec)
+    dataset = dataset_for(spec, case)
     columns = read_dataset(dataset)
     bound = bind_inputs(spec, columns)
     outputs = run_oracle(spec, bound, params)

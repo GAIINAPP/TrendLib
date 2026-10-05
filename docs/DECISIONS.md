@@ -139,3 +139,14 @@ weaker than a second end-to-end implementation, because an error in the approved
 formula would go unnoticed, and stronger than values this library computed for
 itself, which `CLAUDE.md` rule 3 forbids. The headers of those files say exactly
 this. A transcribed reference still strengthens it and Q4 stays open.
+
+A17 (M4, 2026-10-05): the candlestick patterns get a second committed dataset,
+`testdata/patterns_1080.csv`, and a second golden case named `patterns`. Over
+`daily_2000.csv` 31 of the 61 patterns fire fewer than five times and 12 never
+fire at all, so their golden files were zeros end to end and asserted only that
+the pattern stayed silent. Nine rules were wrong inside that blind spot. The new
+dataset is 31 hand-built shapes, one per pattern a random walk does not reach,
+each laid after 12 quiet bars, followed by a 600-bar walk through ten regimes.
+Choosing which bars a golden covers is not the same as choosing what it expects:
+the expected values still come from running TA-Lib, so `CLAUDE.md` rule 3 holds.
+`tests/test_patterns.py` fails if any pattern's golden goes quiet again.

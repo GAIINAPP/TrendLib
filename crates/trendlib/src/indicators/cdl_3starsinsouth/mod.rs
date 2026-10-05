@@ -29,7 +29,7 @@ fn detect(pattern: &PatternState) -> f64 {
         && middle.low < first.close
         && middle.low >= first.low
         && middle.lower_shadow() > pattern.average(CandleSetting::SHADOW_VERY_SHORT, 1)
-        && bar.body() < middle.body()
+        && bar.body() < pattern.average(CandleSetting::BODY_SHORT, 0)
         && bar.lower_shadow() < pattern.average(CandleSetting::SHADOW_VERY_SHORT, 0)
         && bar.upper_shadow() < pattern.average(CandleSetting::SHADOW_VERY_SHORT, 0)
         && bar.low > middle.low

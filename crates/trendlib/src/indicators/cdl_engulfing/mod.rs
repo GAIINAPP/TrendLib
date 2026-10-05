@@ -19,14 +19,19 @@ fn detect(pattern: &PatternState) -> f64 {
     let previous = pattern.back(1);
     let swallows_black = bar.is_white()
         && previous.is_black()
-        && bar.close > previous.open
-        && bar.open < previous.close;
+        && ((bar.close >= previous.open && bar.open < previous.close)
+            || (bar.close > previous.open && bar.open <= previous.close));
     let swallows_white = bar.is_black()
         && previous.is_white()
-        && bar.open > previous.close
-        && bar.close < previous.open;
+        && ((bar.open >= previous.close && bar.close < previous.open)
+            || (bar.open > previous.close && bar.close <= previous.open));
     if swallows_black || swallows_white {
-        bar.colour() * 100.0
+        // One end of the body may sit exactly where the earlier one's did. The
+        // bar still swallows the other, so it is reported, but at four fifths:
+        // the oracle grades the two cases apart and a reader comparing against
+        // it would see the difference.
+        let touching = bar.open == previous.close || bar.close == previous.open;
+        bar.colour() * if touching { 80.0 } else { 100.0 }
     } else {
         0.0
     }

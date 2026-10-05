@@ -30,7 +30,7 @@ fn detect(pattern: &PatternState) -> f64 {
         && marubozu(first, 3)
         && marubozu(second, 2)
         && third.body_gaps_below(second)
-        && third.upper_shadow() > 0.0
+        && third.upper_shadow() > pattern.average(CandleSetting::SHADOW_VERY_SHORT, 1)
         && third.high > second.close
         && bar.high > third.high
         && bar.low < third.low

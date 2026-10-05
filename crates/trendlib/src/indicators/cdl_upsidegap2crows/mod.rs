@@ -21,11 +21,12 @@ fn detect(pattern: &PatternState) -> f64 {
     if first.is_white()
         && first.body() > pattern.average(CandleSetting::BODY_LONG, 2)
         && middle.is_black()
+        && middle.body() <= pattern.average(CandleSetting::BODY_SHORT, 1)
         && middle.body_gaps_above(first)
         && bar.is_black()
         && bar.open > middle.open
         && bar.close < middle.close
-        && bar.body_gaps_above(first)
+        && bar.close > first.close
     {
         -100.0
     } else {

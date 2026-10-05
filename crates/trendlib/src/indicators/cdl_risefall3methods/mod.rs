@@ -20,12 +20,10 @@ fn detect(pattern: &PatternState) -> f64 {
     let third = pattern.back(2);
     let second = pattern.back(3);
     let first = pattern.back(4);
-    let within = |candle: Candle| {
-        candle.open < first.high
-            && candle.open > first.low
-            && candle.close < first.high
-            && candle.close > first.low
-    };
+    // Part of the body has to fall inside the first bar's range, not all of
+    // it: a middle bar may run past either end so long as it still overlaps.
+    let within =
+        |candle: Candle| candle.body_bottom() < first.high && candle.body_top() > first.low;
     // The middle bars move against the first, and the last one takes it all
     // back; multiplying by the first bar's colour reads both directions at
     // once, which is how TA-Lib writes it.

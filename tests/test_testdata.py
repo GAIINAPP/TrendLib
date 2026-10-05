@@ -31,6 +31,11 @@ def intraday(testdata):
     return read_rows(testdata / "intraday_5m_20d.csv")
 
 
+@pytest.fixture(scope="module")
+def patterns(testdata):
+    return read_rows(testdata / "patterns_1080.csv")
+
+
 def test_daily_shape(daily):
     assert len(daily) == 2000
     assert list(daily[0]) == ["date", "open", "high", "low", "close", "volume"]
@@ -98,6 +103,23 @@ def test_intraday_bars_are_well_formed(intraday):
         assert h >= max(o, c)
         assert low <= min(o, c)
         assert low > 0.0
+
+
+def test_patterns_shape(patterns):
+    assert len(patterns) == 1080
+    assert list(patterns[0]) == ["date", "open", "high", "low", "close", "volume"]
+
+
+def test_pattern_bars_are_well_formed(patterns):
+    previous = ""
+    for row in patterns:
+        o, h, low, c = (float(row[k]) for k in ("open", "high", "low", "close"))
+        assert h >= max(o, c)
+        assert low <= min(o, c)
+        assert low > 0.0
+        assert int(row["volume"]) > 0
+        assert row["date"] > previous
+        previous = row["date"]
 
 
 def test_generator_reproduces_the_committed_files(repo_root):
