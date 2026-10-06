@@ -424,6 +424,7 @@ __all__ = [
     "ht_trendline",
     "ht_trendmode",
     "ichimoku",
+    "ift_rsi",
     "imi",
     "kama",
     "kc",
@@ -463,6 +464,7 @@ __all__ = [
     "percentile",
     "percentrank",
     "pivots_camarilla",
+    "pivots_fibonacci",
     "pivots_traditional",
     "plus_di",
     "plus_dm",
@@ -509,7 +511,9 @@ __all__ = [
     "vortex",
     "vwap",
     "vwma",
+    "vzo",
     "wad",
+    "wavetrend",
     "wclprice",
     "willr",
     "wma",
@@ -8219,6 +8223,33 @@ def ichimoku(
     )
 
 
+def ift_rsi(
+    source=None,
+    *,
+    rsi_period: int = _PARAMS["ift_rsi"]["rsi_period"]["default"],
+    wma_period: int = _PARAMS["ift_rsi"]["wma_period"]["default"],
+) -> Any:
+    """Inverse Fisher Transform of RSI.
+
+    Parameters
+    ----------
+    rsi_period : int, default 5
+        Bars of the RSI, from 2 to 100000.
+    wma_period : int, default 9
+        Bars of the weighted average of the rescaled RSI, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        The transformed RSI, between -1 and 1.
+    """
+    rsi_period = _convert.as_int("ift_rsi", "rsi_period", rsi_period)
+    wma_period = _convert.as_int("ift_rsi", "wma_period", wma_period)
+    columns, carrier = _convert.bars("ift_rsi", (source,), ("source",), ("series",))
+    out = _core.ift_rsi(*columns, rsi_period=rsi_period, wma_period=wma_period)
+    return _convert.wrap_outputs(out, carrier, ("ift_rsi",))
+
+
 def imi(open=None, close=None, *, period: int = _PARAMS["imi"]["period"]["default"]) -> Any:
     """Intraday Momentum Index.
 
@@ -9329,6 +9360,54 @@ def pivots_camarilla(high=None, low=None, close=None) -> Any:
             "camarilla_s2",
             "camarilla_s3",
             "camarilla_s4",
+        ),
+    )
+
+
+def pivots_fibonacci(high=None, low=None, close=None) -> Any:
+    """Fibonacci Pivot Points.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        fibonacci_pp: The previous bar's typical price.
+        fibonacci_s1: Pivot less 0.382 of the previous range.
+        fibonacci_s2: Pivot less 0.618 of the previous range.
+        fibonacci_s3: Pivot less the previous range.
+        fibonacci_s4: Pivot less 1.382 of the previous range.
+        fibonacci_r1: Pivot plus 0.382 of the previous range.
+        fibonacci_r2: Pivot plus 0.618 of the previous range.
+        fibonacci_r3: Pivot plus the previous range.
+        fibonacci_r4: Pivot plus 1.382 of the previous range.
+    """
+    columns, carrier = _convert.bars(
+        "pivots_fibonacci",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.pivots_fibonacci(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "fibonacci_pp",
+            "fibonacci_s1",
+            "fibonacci_s2",
+            "fibonacci_s3",
+            "fibonacci_s4",
+            "fibonacci_r1",
+            "fibonacci_r2",
+            "fibonacci_r3",
+            "fibonacci_r4",
         ),
     )
 
@@ -10694,6 +10773,36 @@ def vwma(close=None, volume=None, *, period: int = _PARAMS["vwma"]["period"]["de
     return _convert.wrap_outputs(out, carrier, ("vwma",))
 
 
+def vzo(close=None, volume=None, *, period: int = _PARAMS["vzo"]["period"]["default"]) -> Any:
+    """Volume Zone Oscillator.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Bars of the averages, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Percent of the average volume that came on rising closes, net of falling ones.
+    """
+    period = _convert.as_int("vzo", "period", period)
+    columns, carrier = _convert.bars(
+        "vzo",
+        (close, volume),
+        (
+            "close",
+            "volume",
+        ),
+        (
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.vzo(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("vzo",))
+
+
 def wad(high=None, low=None, close=None) -> Any:
     """Williams Accumulation/Distribution.
 
@@ -10718,6 +10827,56 @@ def wad(high=None, low=None, close=None) -> Any:
     )
     out = _core.wad(*columns)
     return _convert.wrap_outputs(out, carrier, ("wad",))
+
+
+def wavetrend(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    channel_length: int = _PARAMS["wavetrend"]["channel_length"]["default"],
+    average_length: int = _PARAMS["wavetrend"]["average_length"]["default"],
+) -> Any:
+    """WaveTrend Oscillator.
+
+    Parameters
+    ----------
+    channel_length : int, default 10
+        Bars of the channel's averages, from 2 to 100000.
+    average_length : int, default 21
+        Bars of the oscillator's average, from 2 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        wavetrend_1: The averaged channel index.
+        wavetrend_2: Four-bar mean of the first line.
+    """
+    channel_length = _convert.as_int("wavetrend", "channel_length", channel_length)
+    average_length = _convert.as_int("wavetrend", "average_length", average_length)
+    columns, carrier = _convert.bars(
+        "wavetrend",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.wavetrend(*columns, channel_length=channel_length, average_length=average_length)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "wavetrend_1",
+            "wavetrend_2",
+        ),
+    )
 
 
 def wclprice(high=None, low=None, close=None) -> Any:

@@ -1,0 +1,37 @@
+name: wavetrend
+title: WaveTrend Oscillator
+group: momentum
+flags: [path_dependent, unstable, nan_inf_output]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: channel_length
+    type: int
+    default: 10
+    min: 2
+    max: 100000
+    doc: Bars of the channel's averages
+  - name: average_length
+    type: int
+    default: 21
+    min: 2
+    max: 100000
+    doc: Bars of the oscillator's average
+outputs:
+  - name: wavetrend_1
+    dtype: float64
+    plot: line
+    doc: The averaged channel index
+  - name: wavetrend_2
+    dtype: float64
+    plot: line
+    doc: Four-bar mean of the first line
+references:
+  - LazyBear, WaveTrend Oscillator, TradingView, 2014
+  - finta 1.3, finta.TA (oracle F)
+see_also: [cci, stochrsi, tsi]

@@ -87,7 +87,7 @@ Before 1.0, minor versions may break the API; every break is listed under
   V-top and V-bottom, the complex head and shoulders both ways, the high and
   tight flag, measured moves up and down, the two broadening wedges, the two
   right-angled broadening formations and the two scallops the oracle can
-  fire. `testdata/shapes_190.csv` holds the flags no walk draws.
+  fire. `testdata/shapes_1640.csv` holds the shapes no walk draws.
 - Twelve more on oracle P: the Adam and Eve double tops and bottoms (eight,
   graded the way Bulkowski names them), Big M and Big W, and three falling
   peaks and three rising valleys.
@@ -96,3 +96,6 @@ Before 1.0, minor versions may break the API; every break is listed under
   rectangle, each read when price reverses soon after its base pattern does.
 - Twelve harmonic patterns on oracle P: AB=CD, Gartley, Bat, Butterfly, Crab
   and the Wolfe wave, each bullish and bearish.
+- Four indicators on oracle F (`finta` 1.3, test-only, `docs/DECISIONS.md`
+  D19): `wavetrend`, `ift_rsi`, `vzo` and `pivots_fibonacci`. Their averages
+  follow pandas' `ewm(adjust=True)` recursion, as the oracle's do.

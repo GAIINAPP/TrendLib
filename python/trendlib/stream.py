@@ -224,6 +224,7 @@ __all__ = [
     "ht_trendline",
     "ht_trendmode",
     "ichimoku",
+    "ift_rsi",
     "imi",
     "kama",
     "kc",
@@ -262,6 +263,7 @@ __all__ = [
     "percentile",
     "percentrank",
     "pivots_camarilla",
+    "pivots_fibonacci",
     "pivots_traditional",
     "plus_di",
     "plus_dm",
@@ -308,7 +310,9 @@ __all__ = [
     "vortex",
     "vwap",
     "vwma",
+    "vzo",
     "wad",
+    "wavetrend",
     "wclprice",
     "willr",
     "wma",
@@ -3296,6 +3300,7 @@ ichimoku = Factory(
         "ichimoku_senkou_b",
     ),
 )
+ift_rsi = Factory("ift_rsi", _core.IftRsiStream, ("source",), ("series",), ("ift_rsi",))
 imi = Factory(
     "imi",
     _core.ImiStream,
@@ -3630,6 +3635,31 @@ pivots_camarilla = Factory(
         "camarilla_s4",
     ),
 )
+pivots_fibonacci = Factory(
+    "pivots_fibonacci",
+    _core.PivotsFibonacciStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "fibonacci_pp",
+        "fibonacci_s1",
+        "fibonacci_s2",
+        "fibonacci_s3",
+        "fibonacci_s4",
+        "fibonacci_r1",
+        "fibonacci_r2",
+        "fibonacci_r3",
+        "fibonacci_r4",
+    ),
+)
 pivots_traditional = Factory(
     "pivots_traditional",
     _core.PivotsTraditionalStream,
@@ -3962,6 +3992,19 @@ vwma = Factory(
     ),
     ("vwma",),
 )
+vzo = Factory(
+    "vzo",
+    _core.VzoStream,
+    (
+        "close",
+        "volume",
+    ),
+    (
+        "close",
+        "volume",
+    ),
+    ("vzo",),
+)
 wad = Factory(
     "wad",
     _core.WadStream,
@@ -3976,6 +4019,24 @@ wad = Factory(
         "close",
     ),
     ("wad",),
+)
+wavetrend = Factory(
+    "wavetrend",
+    _core.WavetrendStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "wavetrend_1",
+        "wavetrend_2",
+    ),
 )
 wclprice = Factory(
     "wclprice",

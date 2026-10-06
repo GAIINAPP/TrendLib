@@ -1981,3 +1981,64 @@ impl MovingAverage {
         }
     }
 }
+
+/// pandas' `ewm(adjust=True).mean()` with `ignore_na=False`, as finta averages
+/// (oracle F, `docs/TESTING.md` section 2).
+///
+/// Each value is the weighted mean of every observation so far, the newest
+/// weighted 1 and each older one `1 - alpha` times the one after it, so the
+/// first value is the first observation rather than a seed. A NaN is not an
+/// observation: it leaves the mean where it was, though the older weights still
+/// decay across it. Until the first observation the mean is NaN.
+#[derive(Clone, Copy, Debug)]
+pub struct PandasEwm {
+    alpha: f64,
+    weighted: f64,
+    old_weight: f64,
+    started: bool,
+}
+
+impl PandasEwm {
+    pub fn with_alpha(alpha: f64) -> Self {
+        Self {
+            alpha,
+            weighted: f64::NAN,
+            old_weight: 1.0,
+            started: false,
+        }
+    }
+
+    /// `ewm(span=span)`: `alpha = 2 / (span + 1)`.
+    pub fn with_span(span: usize) -> Self {
+        Self::with_alpha(2.0 / (span as f64 + 1.0))
+    }
+
+    pub fn push(&mut self, value: f64) -> f64 {
+        if !self.started {
+            self.started = true;
+            self.weighted = value;
+            return self.weighted;
+        }
+        let observed = !value.is_nan();
+        if !self.weighted.is_nan() {
+            self.old_weight *= 1.0 - self.alpha;
+            if observed {
+                // pandas leaves a mean that already equals the value alone, to
+                // keep a constant series exactly constant.
+                if self.weighted != value {
+                    self.weighted =
+                        (self.old_weight * self.weighted + value) / (self.old_weight + 1.0);
+                }
+                self.old_weight += 1.0;
+            }
+        } else if observed {
+            self.weighted = value;
+        }
+        self.weighted
+    }
+
+    pub fn preview(&self, value: f64) -> f64 {
+        let mut forked = *self;
+        forked.push(value)
+    }
+}

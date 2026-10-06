@@ -1,0 +1,25 @@
+name: vzo
+title: Volume Zone Oscillator
+group: volume
+flags: [path_dependent, unstable, nan_inf_output]
+inputs:
+  - name: close
+    kind: close
+  - name: volume
+    kind: volume
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 2
+    max: 100000
+    doc: Bars of the averages
+outputs:
+  - name: vzo
+    dtype: float64
+    plot: line
+    doc: Percent of the average volume that came on rising closes, net of falling ones
+references:
+  - Walid Khalil and David Steckler, In the Volume Zone, Technical Analysis of Stocks & Commodities, May 2011
+  - finta 1.3, finta.TA (oracle F)
+see_also: [obv, pvo, mfi]

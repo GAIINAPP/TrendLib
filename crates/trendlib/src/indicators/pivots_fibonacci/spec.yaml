@@ -1,0 +1,52 @@
+name: pivots_fibonacci
+title: Fibonacci Pivot Points
+group: levels
+flags: [overlap]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: fibonacci_pp
+    dtype: float64
+    plot: level
+    doc: The previous bar's typical price
+  - name: fibonacci_s1
+    dtype: float64
+    plot: level
+    doc: Pivot less 0.382 of the previous range
+  - name: fibonacci_s2
+    dtype: float64
+    plot: level
+    doc: Pivot less 0.618 of the previous range
+  - name: fibonacci_s3
+    dtype: float64
+    plot: level
+    doc: Pivot less the previous range
+  - name: fibonacci_s4
+    dtype: float64
+    plot: level
+    doc: Pivot less 1.382 of the previous range
+  - name: fibonacci_r1
+    dtype: float64
+    plot: level
+    doc: Pivot plus 0.382 of the previous range
+  - name: fibonacci_r2
+    dtype: float64
+    plot: level
+    doc: Pivot plus 0.618 of the previous range
+  - name: fibonacci_r3
+    dtype: float64
+    plot: level
+    doc: Pivot plus the previous range
+  - name: fibonacci_r4
+    dtype: float64
+    plot: level
+    doc: Pivot plus 1.382 of the previous range
+references:
+  - TradingView, Pivot Points Standard, type Fibonacci
+  - finta 1.3, finta.TA (oracle F)
+see_also: [pivots_traditional, pivots_camarilla, cpr]

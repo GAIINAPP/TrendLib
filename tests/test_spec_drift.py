@@ -140,11 +140,13 @@ def test_the_golden_header_params_match_the_case(indicators_dir, indicator):
         )
         assert header["indicator"] == indicator.name
         assert header["case"] == path.stem
-        # The chart patterns' oracle is ta-patterns (docs/TESTING.md section 2,
-        # oracle P); everything else is TA-Lib or transcribed by hand.
+        # The chart patterns' oracle is ta-patterns (oracle P), the four
+        # indicators of INDICATORS.md section 5.4 finta's (oracle F,
+        # docs/TESTING.md section 2); everything else is TA-Lib or transcribed.
         assert (
             "ta-lib-python" in header["oracle"]
             or header["oracle"].startswith("ta-patterns ")
+            or header["oracle"].startswith("finta ")
             or header["produced_by"] == "manual"
         )
         if not declared:

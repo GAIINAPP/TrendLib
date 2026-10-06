@@ -2,8 +2,8 @@
 
 # Progress
 
-**299 of 325 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 26 not started.
+**303 of 325 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 22 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -31,7 +31,7 @@ something is done that is not. CI checks it is current.
 | Bar patterns | 19 | 19 |
 | Harmonic patterns | 12 | 12 |
 | Indicators on oracle A | 1 | 23 |
-| Indicators on oracle F | 0 | 4 |
+| Indicators on oracle F | 4 | 4 |
 
 ## Overlap studies (25 of 25)
 
@@ -399,9 +399,9 @@ something is done that is not. CI checks it is current.
 - [ ] `wilder_volatility` -- Wilder Volatility System
 - [ ] `woodies_cci` -- Woodies CCI
 
-## Indicators on oracle F (0 of 4)
+## Indicators on oracle F (4 of 4)
 
-- [ ] `ift_rsi` -- Inverse Fisher Transform of RSI
-- [ ] `pivots_fibonacci` -- Fibonacci Pivot Points
-- [ ] `vzo` -- Volume Zone Oscillator
-- [ ] `wavetrend` -- WaveTrend Oscillator
+- [x] `ift_rsi` -- Inverse Fisher Transform of RSI
+- [x] `pivots_fibonacci` -- Fibonacci Pivot Points
+- [x] `vzo` -- Volume Zone Oscillator
+- [x] `wavetrend` -- WaveTrend Oscillator
