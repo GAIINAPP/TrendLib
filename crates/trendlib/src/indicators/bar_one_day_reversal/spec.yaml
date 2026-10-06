@@ -1,0 +1,29 @@
+name: bar_one_day_reversal
+title: One-Day Reversal
+group: bars
+flags: [chart_pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: lookback
+    type: int
+    default: 10
+    min: 1
+    max: 100000
+    doc: Bars whose extreme the bar must exceed
+outputs:
+  - name: bar_one_day_reversal
+    dtype: int32
+    plot: pattern
+    doc: A new extreme for the window closing in the other half of the bar
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.one_day_reversal (oracle P)
+see_also: [bar_key_reversal, cdl_hammer, cdl_shootingstar]

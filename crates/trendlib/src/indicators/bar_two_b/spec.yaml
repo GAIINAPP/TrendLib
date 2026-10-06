@@ -1,0 +1,34 @@
+name: bar_two_b
+title: 2B Reversal
+group: bars
+flags: [chart_pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: lookback
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Bars before the breakout bar its high or low is compared with
+  - name: tol
+    type: float
+    default: 0.01
+    min: 0.0
+    doc: How far beyond the earlier extreme the breakout bar must reach, as a fraction
+outputs:
+  - name: bar_two_b
+    dtype: int32
+    plot: pattern
+    doc: A bar beyond the extreme of the bars before it, then a close back inside it
+references:
+  - Victor Sperandeo, Trader Vic - Methods of a Wall Street Master, Wiley, 1991
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.two_b (oracle P)
+see_also: [bar_key_reversal, bar_fakey, bar_one_day_reversal]

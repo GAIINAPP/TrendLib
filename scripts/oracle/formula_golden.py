@@ -84,7 +84,9 @@ def midpoint(high, low, period: int):
     """TA-Lib's MIDPRICE, or its MEDPRICE for the one-bar window MIDPRICE refuses."""
     import talib
 
-    return talib.MIDPRICE(high, low, timeperiod=period) if period >= 2 else talib.MEDPRICE(high, low)
+    return (
+        talib.MIDPRICE(high, low, timeperiod=period) if period >= 2 else talib.MEDPRICE(high, low)
+    )
 
 
 # Each formula returns its outputs in spec order, with the TA-Lib functions it
@@ -128,7 +130,9 @@ def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
     outputs, lookback, functions = FORMULAS[name](columns, params)
     outputs = warm_up(outputs, lookback)
     if len(outputs) != len(spec["outputs"]):
-        raise SystemExit(f"{name}: formula returned {len(outputs)} outputs, spec has {len(spec['outputs'])}")
+        raise SystemExit(
+            f"{name}: formula returned {len(outputs)} outputs, spec has {len(spec['outputs'])}"
+        )
 
     rendered = ", ".join(f"{key}={value}" for key, value in params.items()) or "none"
     header = [
@@ -156,7 +160,9 @@ def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
     path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
     size = path.stat().st_size
     if size > 2_000_000:
-        raise SystemExit(f"{path.name} is {size} bytes; docs/SPEC_FORMAT.md section 4 caps it at 2 MB")
+        raise SystemExit(
+            f"{path.name} is {size} bytes; docs/SPEC_FORMAT.md section 4 caps it at 2 MB"
+        )
     return path
 
 
@@ -170,10 +176,14 @@ def main() -> int:
         import talib  # noqa: F401
         import yaml  # noqa: F401
     except ImportError as exc:
-        raise SystemExit(f"{exc.name} is missing; install the dev extra: pip install -e '.[dev]'") from exc
+        raise SystemExit(
+            f"{exc.name} is missing; install the dev extra: pip install -e '.[dev]'"
+        ) from exc
 
     if args.indicator not in FORMULAS:
-        raise SystemExit(f"{args.indicator} has no formula here; see docs/INDICATORS.md section 5.3")
+        raise SystemExit(
+            f"{args.indicator} has no formula here; see docs/INDICATORS.md section 5.3"
+        )
     spec = load_spec(args.indicator)
     available = cases(spec)
     if args.case and args.case not in available:

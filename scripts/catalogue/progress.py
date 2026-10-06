@@ -59,7 +59,9 @@ def beyond_entries() -> list[tuple[str, str, str]]:
     entries = []
     group = None
     for line in section.splitlines():
-        heading = next((title for start, title in BEYOND_GROUPS.items() if line.startswith(start)), None)
+        heading = next(
+            (title for start, title in BEYOND_GROUPS.items() if line.startswith(start)), None
+        )
         if heading:
             group = heading
             continue

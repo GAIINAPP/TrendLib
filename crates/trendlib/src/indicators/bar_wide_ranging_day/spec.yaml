@@ -1,0 +1,34 @@
+name: bar_wide_ranging_day
+title: Wide-Ranging Day
+group: bars
+flags: [chart_pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: factor
+    type: float
+    default: 2.0
+    min: 0.0
+    doc: How many times the average range the bar's range must exceed
+  - name: lookback
+    type: int
+    default: 10
+    min: 1
+    max: 100000
+    doc: Bars the average range is taken over
+outputs:
+  - name: bar_wide_ranging_day
+    dtype: int32
+    plot: pattern
+    doc: A range well above the recent average, closing in its upper or lower half
+references:
+  - Laurence A. Connors and Linda Bradford Raschke, Street Smarts, M. Gordon Publishing, 1995
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.wide_ranging_day (oracle P)
+see_also: [bar_narrow_range_7, trange, atr]

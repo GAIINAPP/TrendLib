@@ -2,8 +2,8 @@
 
 # Progress
 
-**226 of 328 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 102 not started.
+**245 of 328 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 83 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -28,7 +28,7 @@ something is done that is not. CI checks it is current.
 | Candlestick patterns | 61 | 61 |
 | Levels | 3 | 3 |
 | Chart patterns | 21 | 66 |
-| Bar patterns | 0 | 19 |
+| Bar patterns | 19 | 19 |
 | Harmonic patterns | 0 | 12 |
 | Indicators on oracle A | 1 | 23 |
 | Indicators on oracle F | 0 | 4 |
@@ -339,27 +339,27 @@ something is done that is not. CI checks it is current.
 - [ ] `chart_v_bottom` -- V-Bottom
 - [ ] `chart_v_top` -- V-Top
 
-## Bar patterns (0 of 19)
+## Bar patterns (19 of 19)
 
-- [ ] `bar_dead_cat_bounce` -- Dead-Cat Bounce
-- [ ] `bar_fakey` -- Fakey
-- [ ] `bar_gap2h` -- Gap Beyond Two Bars
-- [ ] `bar_hook_reversal` -- Hook Reversal
-- [ ] `bar_horn_bottom` -- Horn Bottom
-- [ ] `bar_horn_top` -- Horn Top
-- [ ] `bar_inside_day` -- Inside Day
-- [ ] `bar_inverted_dead_cat_bounce` -- Inverted Dead-Cat Bounce
-- [ ] `bar_key_reversal` -- Key Reversal
-- [ ] `bar_narrow_range_4` -- Narrow Range 4
-- [ ] `bar_narrow_range_7` -- Narrow Range 7
-- [ ] `bar_one_day_reversal` -- One-Day Reversal
-- [ ] `bar_one_two_three` -- 1-2-3 Reversal
-- [ ] `bar_outside_day` -- Outside Day
-- [ ] `bar_pipe_bottom` -- Pipe Bottom
-- [ ] `bar_pipe_top` -- Pipe Top
-- [ ] `bar_pivot_point_reversal` -- Pivot Point Reversal
-- [ ] `bar_two_b` -- 2B Reversal
-- [ ] `bar_wide_ranging_day` -- Wide-Ranging Day
+- [x] `bar_dead_cat_bounce` -- Dead-Cat Bounce
+- [x] `bar_fakey` -- Fakey
+- [x] `bar_gap2h` -- Gap Beyond Two Bars
+- [x] `bar_hook_reversal` -- Hook Reversal
+- [x] `bar_horn_bottom` -- Horn Bottom
+- [x] `bar_horn_top` -- Horn Top
+- [x] `bar_inside_day` -- Inside Day
+- [x] `bar_inverted_dead_cat_bounce` -- Inverted Dead-Cat Bounce
+- [x] `bar_key_reversal` -- Key Reversal
+- [x] `bar_narrow_range_4` -- Narrow Range 4
+- [x] `bar_narrow_range_7` -- Narrow Range 7
+- [x] `bar_one_day_reversal` -- One-Day Reversal
+- [x] `bar_one_two_three` -- 1-2-3 Reversal
+- [x] `bar_outside_day` -- Outside Day
+- [x] `bar_pipe_bottom` -- Pipe Bottom
+- [x] `bar_pipe_top` -- Pipe Top
+- [x] `bar_pivot_point_reversal` -- Pivot Point Reversal
+- [x] `bar_two_b` -- 2B Reversal
+- [x] `bar_wide_ranging_day` -- Wide-Ranging Day
 
 ## Harmonic patterns (0 of 12)
 

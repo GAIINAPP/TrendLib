@@ -1,0 +1,22 @@
+name: bar_gap2h
+title: Gap Beyond Two Bars
+group: bars
+flags: [chart_pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: bar_gap2h
+    dtype: int32
+    plot: pattern
+    doc: An open beyond the highs or the lows of both bars before it
+references:
+  - Laurence A. Connors and Linda Bradford Raschke, Street Smarts, M. Gordon Publishing, 1995
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.gap2h_combined (oracle P)
+see_also: [bar_outside_day, cdl_gapsidesidewhite]

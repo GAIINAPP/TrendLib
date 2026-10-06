@@ -1,0 +1,22 @@
+name: bar_outside_day
+title: Outside Day
+group: bars
+flags: [chart_pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: bar_outside_day
+    dtype: int32
+    plot: pattern
+    doc: A bar covering the previous one and closing beyond it
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.outside_day (oracle P)
+see_also: [bar_inside_day, cdl_engulfing, bar_key_reversal]

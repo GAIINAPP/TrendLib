@@ -1,0 +1,22 @@
+name: bar_narrow_range_4
+title: Narrow Range 4
+group: bars
+flags: [chart_pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: bar_narrow_range_4
+    dtype: int32
+    plot: pattern
+    doc: The narrowest range of the last 4 bars
+references:
+  - Toby Crabel, Day Trading with Short Term Price Patterns and Opening Range Breakout, Traders Press, 1990
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.narrow_range_4 (oracle P)
+see_also: [bar_narrow_range_7, bar_inside_day, bar_wide_ranging_day]

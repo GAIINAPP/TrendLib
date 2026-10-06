@@ -32,6 +32,25 @@ __all__ = [
     "atr",
     "avgdev",
     "avgprice",
+    "bar_dead_cat_bounce",
+    "bar_fakey",
+    "bar_gap2h",
+    "bar_hook_reversal",
+    "bar_horn_bottom",
+    "bar_horn_top",
+    "bar_inside_day",
+    "bar_inverted_dead_cat_bounce",
+    "bar_key_reversal",
+    "bar_narrow_range_4",
+    "bar_narrow_range_7",
+    "bar_one_day_reversal",
+    "bar_one_two_three",
+    "bar_outside_day",
+    "bar_pipe_bottom",
+    "bar_pipe_top",
+    "bar_pivot_point_reversal",
+    "bar_two_b",
+    "bar_wide_ranging_day",
     "bbands",
     "beta",
     "bop",
@@ -442,6 +461,329 @@ avgprice = Factory(
         "close",
     ),
     ("avgprice",),
+)
+bar_dead_cat_bounce = Factory(
+    "bar_dead_cat_bounce",
+    _core.BarDeadCatBounceStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_dead_cat_bounce",),
+)
+bar_fakey = Factory(
+    "bar_fakey",
+    _core.BarFakeyStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_fakey",),
+)
+bar_gap2h = Factory(
+    "bar_gap2h",
+    _core.BarGap2hStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_gap2h",),
+)
+bar_hook_reversal = Factory(
+    "bar_hook_reversal",
+    _core.BarHookReversalStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_hook_reversal",),
+)
+bar_horn_bottom = Factory(
+    "bar_horn_bottom",
+    _core.BarHornBottomStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_horn_bottom",),
+)
+bar_horn_top = Factory(
+    "bar_horn_top",
+    _core.BarHornTopStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_horn_top",),
+)
+bar_inside_day = Factory(
+    "bar_inside_day",
+    _core.BarInsideDayStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_inside_day",),
+)
+bar_inverted_dead_cat_bounce = Factory(
+    "bar_inverted_dead_cat_bounce",
+    _core.BarInvertedDeadCatBounceStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_inverted_dead_cat_bounce",),
+)
+bar_key_reversal = Factory(
+    "bar_key_reversal",
+    _core.BarKeyReversalStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_key_reversal",),
+)
+bar_narrow_range_4 = Factory(
+    "bar_narrow_range_4",
+    _core.BarNarrowRange4Stream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_narrow_range_4",),
+)
+bar_narrow_range_7 = Factory(
+    "bar_narrow_range_7",
+    _core.BarNarrowRange7Stream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_narrow_range_7",),
+)
+bar_one_day_reversal = Factory(
+    "bar_one_day_reversal",
+    _core.BarOneDayReversalStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_one_day_reversal",),
+)
+bar_one_two_three = Factory(
+    "bar_one_two_three",
+    _core.BarOneTwoThreeStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_one_two_three",),
+)
+bar_outside_day = Factory(
+    "bar_outside_day",
+    _core.BarOutsideDayStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_outside_day",),
+)
+bar_pipe_bottom = Factory(
+    "bar_pipe_bottom",
+    _core.BarPipeBottomStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_pipe_bottom",),
+)
+bar_pipe_top = Factory(
+    "bar_pipe_top",
+    _core.BarPipeTopStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_pipe_top",),
+)
+bar_pivot_point_reversal = Factory(
+    "bar_pivot_point_reversal",
+    _core.BarPivotPointReversalStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_pivot_point_reversal",),
+)
+bar_two_b = Factory(
+    "bar_two_b",
+    _core.BarTwoBStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_two_b",),
+)
+bar_wide_ranging_day = Factory(
+    "bar_wide_ranging_day",
+    _core.BarWideRangingDayStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_wide_ranging_day",),
 )
 bbands = Factory(
     "bbands",

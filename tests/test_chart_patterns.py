@@ -132,9 +132,7 @@ def ta_patterns():
 
 @functools.cache
 def oracle_functions(repo_root):
-    return {
-        name: read_golden(golden_dir(repo_root, name) / "default.csv")[1] for name in PATTERNS
-    }
+    return {name: read_golden(golden_dir(repo_root, name) / "default.csv")[1] for name in PATTERNS}
 
 
 def oracle(ta_patterns, functions, bars, params):

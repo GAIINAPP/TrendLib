@@ -35,6 +35,7 @@ TESTDATA = REPO_ROOT / "testdata"
 TOLERANCE = "rel=1e-10 abs=1e-12"
 DAILY = "daily_2000.csv"
 CHARTS = "charts_2579.csv"
+PATTERNS = "patterns_1080.csv"
 
 # TrendLib's names for the oracle's parameters (D12): only `window` differs.
 RENAMED = {"period": "window"}
@@ -42,12 +43,25 @@ RENAMED = {"period": "window"}
 # The oracle functions that draw their lines with the sliding least-squares fit,
 # which is where deviation 9 can apply. Every other function draws none.
 TRENDLINE = {
-    "ascending_triangle", "descending_triangle", "symmetrical_triangle",
-    "broadening_top", "broadening_bottom", "rising_wedge", "falling_wedge",
-    "rectangle_top", "rectangle_bottom", "channel_asc", "channel_desc",
-    "flag_bull", "flag_bear", "pennant_bull", "pennant_bear",
-    "broadening_wedge_asc", "broadening_wedge_desc",
-    "right_angle_broadening_asc", "right_angle_broadening_desc",
+    "ascending_triangle",
+    "descending_triangle",
+    "symmetrical_triangle",
+    "broadening_top",
+    "broadening_bottom",
+    "rising_wedge",
+    "falling_wedge",
+    "rectangle_top",
+    "rectangle_bottom",
+    "channel_asc",
+    "channel_desc",
+    "flag_bull",
+    "flag_bear",
+    "pennant_bull",
+    "pennant_bear",
+    "broadening_wedge_asc",
+    "broadening_wedge_desc",
+    "right_angle_broadening_asc",
+    "right_angle_broadening_desc",
 }
 POLE = {"flag_bull", "flag_bear", "pennant_bull", "pennant_bear"}
 
@@ -123,13 +137,17 @@ def cases(spec: dict) -> dict[str, dict]:
         "min_period": {**defaults(spec), **floors},
         "charts": defaults(spec),
     }
+    # A bar pattern reads a few bars at a time, like a candle, so it also gets
+    # the bars built for the candlestick patterns, where the rarer shapes occur.
+    if spec["group"] == "bars":
+        found["patterns"] = defaults(spec)
     for case, overrides in EXTRA_CASES.get(spec["name"], {}).items():
         found[case] = {**defaults(spec), **overrides}
     return found
 
 
 def dataset_for(case: str) -> str:
-    return CHARTS if case == "charts" else DAILY
+    return {"charts": CHARTS, "patterns": PATTERNS}.get(case, DAILY)
 
 
 def read_columns(filename: str):
@@ -138,8 +156,7 @@ def read_columns(filename: str):
     with (TESTDATA / filename).open(newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle))
     return {
-        key: np.array([float(row[key]) for row in rows])
-        for key in ("open", "high", "low", "close")
+        key: np.array([float(row[key]) for row in rows]) for key in ("open", "high", "low", "close")
     }
 
 

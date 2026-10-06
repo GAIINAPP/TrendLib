@@ -1,0 +1,22 @@
+name: bar_inside_day
+title: Inside Day
+group: bars
+flags: [chart_pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: bar_inside_day
+    dtype: int32
+    plot: pattern
+    doc: A range inside the previous bar's
+references:
+  - Laurence A. Connors and Linda Bradford Raschke, Street Smarts, M. Gordon Publishing, 1995
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.inside_day (oracle P)
+see_also: [bar_outside_day, bar_narrow_range_4, cdl_harami]

@@ -1,0 +1,22 @@
+name: bar_pivot_point_reversal
+title: Pivot Point Reversal
+group: bars
+flags: [chart_pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: bar_pivot_point_reversal
+    dtype: int32
+    plot: pattern
+    doc: A gap past the previous bar's extreme and a close past the open
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.pivot_point_reversal (oracle P)
+see_also: [bar_hook_reversal, bar_gap2h, cdl_kicking]

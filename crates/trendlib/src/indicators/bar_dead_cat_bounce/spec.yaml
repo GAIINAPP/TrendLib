@@ -1,0 +1,39 @@
+name: bar_dead_cat_bounce
+title: Dead-Cat Bounce
+group: bars
+flags: [chart_pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: drop_pct
+    type: float
+    default: 0.1
+    min: 0.0
+    doc: Smallest fall that starts the pattern, as a fraction
+  - name: bounce_pct
+    type: float
+    default: 0.5
+    min: 0.0
+    doc: Largest share of the fall the bounce may recover
+  - name: period
+    type: int
+    default: 15
+    min: 2
+    max: 100000
+    doc: Bars the fall and bounce must fit in
+outputs:
+  - name: bar_dead_cat_bounce
+    dtype: int32
+    plot: pattern
+    doc: A weak bounce after a sharp fall
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.dead_cat_bounce (oracle P)
+see_also: [bar_inverted_dead_cat_bounce, chart_bear_flag]

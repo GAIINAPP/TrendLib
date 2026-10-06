@@ -1,0 +1,22 @@
+name: bar_hook_reversal
+title: Hook Reversal
+group: bars
+flags: [chart_pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: bar_hook_reversal
+    dtype: int32
+    plot: pattern
+    doc: An open inside the previous bar and a close past the previous open
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.hook_reversal (oracle P)
+see_also: [bar_pivot_point_reversal, cdl_harami]

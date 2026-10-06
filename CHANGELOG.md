@@ -78,3 +78,7 @@ Before 1.0, minor versions may break the API; every break is listed under
 - `chart_cup_with_handle`, `chart_inverted_cup_with_handle` (oracle P) and
   `ichimoku` (oracle A, through TA-Lib's `MIDPRICE`): the first of the 105
   functions `docs/INDICATORS.md` §§ 5.2 to 5.4 approve.
+- Nineteen bar patterns on oracle P (`docs/INDICATORS.md` § 5.2): 2B, 1-2-3,
+  the two-bar gap, key, hook, one-day and pivot-point reversals, outside and
+  inside day, fakey, wide-ranging day, NR4, NR7, pipe and horn tops and
+  bottoms, and the dead-cat bounce and its inverse.

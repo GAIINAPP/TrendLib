@@ -1,0 +1,28 @@
+name: bar_pipe_top
+title: Pipe Top
+group: bars
+flags: [chart_pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: height_tol
+    type: float
+    default: 0.02
+    min: 0.0
+    doc: How far apart the two spikes' highs may be, as a fraction
+outputs:
+  - name: bar_pipe_top
+    dtype: int32
+    plot: pattern
+    doc: Two tall adjacent bars with matching highs
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.pipe_top (oracle P)
+see_also: [bar_pipe_bottom, bar_horn_top, atr]

@@ -232,6 +232,25 @@ __all__ = [
     "atr",
     "avgdev",
     "avgprice",
+    "bar_dead_cat_bounce",
+    "bar_fakey",
+    "bar_gap2h",
+    "bar_hook_reversal",
+    "bar_horn_bottom",
+    "bar_horn_top",
+    "bar_inside_day",
+    "bar_inverted_dead_cat_bounce",
+    "bar_key_reversal",
+    "bar_narrow_range_4",
+    "bar_narrow_range_7",
+    "bar_one_day_reversal",
+    "bar_one_two_three",
+    "bar_outside_day",
+    "bar_pipe_bottom",
+    "bar_pipe_top",
+    "bar_pivot_point_reversal",
+    "bar_two_b",
+    "bar_wide_ranging_day",
     "bbands",
     "beta",
     "bop",
@@ -986,6 +1005,714 @@ def avgprice(open=None, high=None, low=None, close=None) -> Any:
     )
     out = _core.avgprice(*columns)
     return _convert.wrap_outputs(out, carrier, ("avgprice",))
+
+
+def bar_dead_cat_bounce(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    drop_pct: float = _PARAMS["bar_dead_cat_bounce"]["drop_pct"]["default"],
+    bounce_pct: float = _PARAMS["bar_dead_cat_bounce"]["bounce_pct"]["default"],
+    period: int = _PARAMS["bar_dead_cat_bounce"]["period"]["default"],
+) -> Any:
+    """Dead-Cat Bounce.
+
+    Parameters
+    ----------
+    drop_pct : float, default 0.1
+        Smallest fall that starts the pattern, as a fraction.
+    bounce_pct : float, default 0.5
+        Largest share of the fall the bounce may recover.
+    period : int, default 15
+        Bars the fall and bounce must fit in, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A weak bounce after a sharp fall.
+    """
+    drop_pct = _convert.as_float("bar_dead_cat_bounce", "drop_pct", drop_pct)
+    bounce_pct = _convert.as_float("bar_dead_cat_bounce", "bounce_pct", bounce_pct)
+    period = _convert.as_int("bar_dead_cat_bounce", "period", period)
+    columns, carrier = _convert.bars(
+        "bar_dead_cat_bounce",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_dead_cat_bounce(
+        *columns, drop_pct=drop_pct, bounce_pct=bounce_pct, period=period
+    )
+    return _convert.wrap_outputs(out, carrier, ("bar_dead_cat_bounce",))
+
+
+def bar_fakey(open=None, high=None, low=None, close=None) -> Any:
+    """Fakey.
+
+    Returns
+    -------
+    ndarray or Series
+        An inside bar, then a close beyond the bar it sat within.
+    """
+    columns, carrier = _convert.bars(
+        "bar_fakey",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_fakey(*columns)
+    return _convert.wrap_outputs(out, carrier, ("bar_fakey",))
+
+
+def bar_gap2h(open=None, high=None, low=None, close=None) -> Any:
+    """Gap Beyond Two Bars.
+
+    Returns
+    -------
+    ndarray or Series
+        An open beyond the highs or the lows of both bars before it.
+    """
+    columns, carrier = _convert.bars(
+        "bar_gap2h",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_gap2h(*columns)
+    return _convert.wrap_outputs(out, carrier, ("bar_gap2h",))
+
+
+def bar_hook_reversal(open=None, high=None, low=None, close=None) -> Any:
+    """Hook Reversal.
+
+    Returns
+    -------
+    ndarray or Series
+        An open inside the previous bar and a close past the previous open.
+    """
+    columns, carrier = _convert.bars(
+        "bar_hook_reversal",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_hook_reversal(*columns)
+    return _convert.wrap_outputs(out, carrier, ("bar_hook_reversal",))
+
+
+def bar_horn_bottom(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    tol: float = _PARAMS["bar_horn_bottom"]["tol"]["default"],
+) -> Any:
+    """Horn Bottom.
+
+    Parameters
+    ----------
+    tol : float, default 0.02
+        How far apart the two horns' lows may be, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        Two matching lows two bars apart with a higher bar between.
+    """
+    tol = _convert.as_float("bar_horn_bottom", "tol", tol)
+    columns, carrier = _convert.bars(
+        "bar_horn_bottom",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_horn_bottom(*columns, tol=tol)
+    return _convert.wrap_outputs(out, carrier, ("bar_horn_bottom",))
+
+
+def bar_horn_top(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    tol: float = _PARAMS["bar_horn_top"]["tol"]["default"],
+) -> Any:
+    """Horn Top.
+
+    Parameters
+    ----------
+    tol : float, default 0.02
+        How far apart the two horns' highs may be, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        Two matching highs two bars apart with a lower bar between.
+    """
+    tol = _convert.as_float("bar_horn_top", "tol", tol)
+    columns, carrier = _convert.bars(
+        "bar_horn_top",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_horn_top(*columns, tol=tol)
+    return _convert.wrap_outputs(out, carrier, ("bar_horn_top",))
+
+
+def bar_inside_day(open=None, high=None, low=None, close=None) -> Any:
+    """Inside Day.
+
+    Returns
+    -------
+    ndarray or Series
+        A range inside the previous bar's.
+    """
+    columns, carrier = _convert.bars(
+        "bar_inside_day",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_inside_day(*columns)
+    return _convert.wrap_outputs(out, carrier, ("bar_inside_day",))
+
+
+def bar_inverted_dead_cat_bounce(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    rise_pct: float = _PARAMS["bar_inverted_dead_cat_bounce"]["rise_pct"]["default"],
+    pullback_pct: float = _PARAMS["bar_inverted_dead_cat_bounce"]["pullback_pct"]["default"],
+    period: int = _PARAMS["bar_inverted_dead_cat_bounce"]["period"]["default"],
+) -> Any:
+    """Inverted Dead-Cat Bounce.
+
+    Parameters
+    ----------
+    rise_pct : float, default 0.1
+        Smallest rise that starts the pattern, as a fraction.
+    pullback_pct : float, default 0.5
+        Largest share of the rise the pullback may give back.
+    period : int, default 15
+        Bars the rise and pullback must fit in, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A shallow pullback after a sharp rise.
+    """
+    rise_pct = _convert.as_float("bar_inverted_dead_cat_bounce", "rise_pct", rise_pct)
+    pullback_pct = _convert.as_float("bar_inverted_dead_cat_bounce", "pullback_pct", pullback_pct)
+    period = _convert.as_int("bar_inverted_dead_cat_bounce", "period", period)
+    columns, carrier = _convert.bars(
+        "bar_inverted_dead_cat_bounce",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_inverted_dead_cat_bounce(
+        *columns, rise_pct=rise_pct, pullback_pct=pullback_pct, period=period
+    )
+    return _convert.wrap_outputs(out, carrier, ("bar_inverted_dead_cat_bounce",))
+
+
+def bar_key_reversal(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    lookback: int = _PARAMS["bar_key_reversal"]["lookback"]["default"],
+) -> Any:
+    """Key Reversal.
+
+    Parameters
+    ----------
+    lookback : int, default 5
+        Bars whose extreme the bar must exceed, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A new low or high for the window that closes back against the move.
+    """
+    lookback = _convert.as_int("bar_key_reversal", "lookback", lookback)
+    columns, carrier = _convert.bars(
+        "bar_key_reversal",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_key_reversal(*columns, lookback=lookback)
+    return _convert.wrap_outputs(out, carrier, ("bar_key_reversal",))
+
+
+def bar_narrow_range_4(open=None, high=None, low=None, close=None) -> Any:
+    """Narrow Range 4.
+
+    Returns
+    -------
+    ndarray or Series
+        The narrowest range of the last 4 bars.
+    """
+    columns, carrier = _convert.bars(
+        "bar_narrow_range_4",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_narrow_range_4(*columns)
+    return _convert.wrap_outputs(out, carrier, ("bar_narrow_range_4",))
+
+
+def bar_narrow_range_7(open=None, high=None, low=None, close=None) -> Any:
+    """Narrow Range 7.
+
+    Returns
+    -------
+    ndarray or Series
+        The narrowest range of the last 7 bars.
+    """
+    columns, carrier = _convert.bars(
+        "bar_narrow_range_7",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_narrow_range_7(*columns)
+    return _convert.wrap_outputs(out, carrier, ("bar_narrow_range_7",))
+
+
+def bar_one_day_reversal(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    lookback: int = _PARAMS["bar_one_day_reversal"]["lookback"]["default"],
+) -> Any:
+    """One-Day Reversal.
+
+    Parameters
+    ----------
+    lookback : int, default 10
+        Bars whose extreme the bar must exceed, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A new extreme for the window closing in the other half of the bar.
+    """
+    lookback = _convert.as_int("bar_one_day_reversal", "lookback", lookback)
+    columns, carrier = _convert.bars(
+        "bar_one_day_reversal",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_one_day_reversal(*columns, lookback=lookback)
+    return _convert.wrap_outputs(out, carrier, ("bar_one_day_reversal",))
+
+
+def bar_one_two_three(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["bar_one_two_three"]["period"]["default"],
+    pivot_n: int = _PARAMS["bar_one_two_three"]["pivot_n"]["default"],
+) -> Any:
+    """1-2-3 Reversal.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Bars back the two swing points may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 3
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Two swing points, the second less extreme, and a close through the swing between them.
+    """
+    period = _convert.as_int("bar_one_two_three", "period", period)
+    pivot_n = _convert.as_int("bar_one_two_three", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "bar_one_two_three",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_one_two_three(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("bar_one_two_three",))
+
+
+def bar_outside_day(open=None, high=None, low=None, close=None) -> Any:
+    """Outside Day.
+
+    Returns
+    -------
+    ndarray or Series
+        A bar covering the previous one and closing beyond it.
+    """
+    columns, carrier = _convert.bars(
+        "bar_outside_day",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_outside_day(*columns)
+    return _convert.wrap_outputs(out, carrier, ("bar_outside_day",))
+
+
+def bar_pipe_bottom(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    height_tol: float = _PARAMS["bar_pipe_bottom"]["height_tol"]["default"],
+) -> Any:
+    """Pipe Bottom.
+
+    Parameters
+    ----------
+    height_tol : float, default 0.02
+        How far apart the two spikes' lows may be, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        Two tall adjacent bars with matching lows.
+    """
+    height_tol = _convert.as_float("bar_pipe_bottom", "height_tol", height_tol)
+    columns, carrier = _convert.bars(
+        "bar_pipe_bottom",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_pipe_bottom(*columns, height_tol=height_tol)
+    return _convert.wrap_outputs(out, carrier, ("bar_pipe_bottom",))
+
+
+def bar_pipe_top(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    height_tol: float = _PARAMS["bar_pipe_top"]["height_tol"]["default"],
+) -> Any:
+    """Pipe Top.
+
+    Parameters
+    ----------
+    height_tol : float, default 0.02
+        How far apart the two spikes' highs may be, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        Two tall adjacent bars with matching highs.
+    """
+    height_tol = _convert.as_float("bar_pipe_top", "height_tol", height_tol)
+    columns, carrier = _convert.bars(
+        "bar_pipe_top",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_pipe_top(*columns, height_tol=height_tol)
+    return _convert.wrap_outputs(out, carrier, ("bar_pipe_top",))
+
+
+def bar_pivot_point_reversal(open=None, high=None, low=None, close=None) -> Any:
+    """Pivot Point Reversal.
+
+    Returns
+    -------
+    ndarray or Series
+        A gap past the previous bar's extreme and a close past the open.
+    """
+    columns, carrier = _convert.bars(
+        "bar_pivot_point_reversal",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_pivot_point_reversal(*columns)
+    return _convert.wrap_outputs(out, carrier, ("bar_pivot_point_reversal",))
+
+
+def bar_two_b(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    lookback: int = _PARAMS["bar_two_b"]["lookback"]["default"],
+    tol: float = _PARAMS["bar_two_b"]["tol"]["default"],
+) -> Any:
+    """2B Reversal.
+
+    Parameters
+    ----------
+    lookback : int, default 5
+        Bars before the breakout bar its high or low is compared with, from 1 to 100000.
+    tol : float, default 0.01
+        How far beyond the earlier extreme the breakout bar must reach, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A bar beyond the extreme of the bars before it, then a close back inside it.
+    """
+    lookback = _convert.as_int("bar_two_b", "lookback", lookback)
+    tol = _convert.as_float("bar_two_b", "tol", tol)
+    columns, carrier = _convert.bars(
+        "bar_two_b",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_two_b(*columns, lookback=lookback, tol=tol)
+    return _convert.wrap_outputs(out, carrier, ("bar_two_b",))
+
+
+def bar_wide_ranging_day(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    factor: float = _PARAMS["bar_wide_ranging_day"]["factor"]["default"],
+    lookback: int = _PARAMS["bar_wide_ranging_day"]["lookback"]["default"],
+) -> Any:
+    """Wide-Ranging Day.
+
+    Parameters
+    ----------
+    factor : float, default 2.0
+        How many times the average range the bar's range must exceed.
+    lookback : int, default 10
+        Bars the average range is taken over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A range well above the recent average, closing in its upper or lower half.
+    """
+    factor = _convert.as_float("bar_wide_ranging_day", "factor", factor)
+    lookback = _convert.as_int("bar_wide_ranging_day", "lookback", lookback)
+    columns, carrier = _convert.bars(
+        "bar_wide_ranging_day",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_wide_ranging_day(*columns, factor=factor, lookback=lookback)
+    return _convert.wrap_outputs(out, carrier, ("bar_wide_ranging_day",))
 
 
 def bbands(

@@ -1,0 +1,29 @@
+name: bar_key_reversal
+title: Key Reversal
+group: bars
+flags: [chart_pattern]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: lookback
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Bars whose extreme the bar must exceed
+outputs:
+  - name: bar_key_reversal
+    dtype: int32
+    plot: pattern
+    doc: A new low or high for the window that closes back against the move
+references:
+  - Jack D. Schwager, Technical Analysis, Wiley, 1996
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.key_reversal (oracle P)
+see_also: [bar_one_day_reversal, bar_two_b, bar_outside_day]

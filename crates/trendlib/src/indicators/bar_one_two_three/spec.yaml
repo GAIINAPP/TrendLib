@@ -1,0 +1,35 @@
+name: bar_one_two_three
+title: 1-2-3 Reversal
+group: bars
+flags: [chart_pattern, path_dependent]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 20
+    min: 2
+    max: 100000
+    doc: Bars back the two swing points may have been confirmed
+  - name: pivot_n
+    type: int
+    default: 3
+    min: 1
+    max: 100000
+    doc: Bars on each side a swing high must be at least as high as, and a swing low at least as low as
+outputs:
+  - name: bar_one_two_three
+    dtype: int32
+    plot: pattern
+    doc: Two swing points, the second less extreme, and a close through the swing between them
+references:
+  - Jack D. Schwager, Technical Analysis, Wiley, 1996
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.one_two_three (oracle P)
+see_also: [bar_two_b, chart_double_bottom, fractal]

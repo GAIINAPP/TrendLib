@@ -1,3 +1,4 @@
+pub mod bars;
 pub mod candles;
 pub mod chart;
 pub mod error;

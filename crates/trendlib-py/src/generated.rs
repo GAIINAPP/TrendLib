@@ -2381,6 +2381,3034 @@ impl PyAvgpriceStream {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+#[pyo3(name = "bar_dead_cat_bounce", signature = (open, high, low, close, *, drop_pct, bounce_pct, period))]
+pub fn bar_dead_cat_bounce<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    drop_pct: f64,
+    bounce_pct: f64,
+    period: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let drop_pct = float_param(
+        "bar_dead_cat_bounce",
+        "drop_pct",
+        drop_pct,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let bounce_pct = float_param(
+        "bar_dead_cat_bounce",
+        "bounce_pct",
+        bounce_pct,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let period = int_param("bar_dead_cat_bounce", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::bar_dead_cat_bounce::Params {
+        drop_pct,
+        bounce_pct,
+        period,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::bar_dead_cat_bounce::BarDeadCatBounce as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "BarDeadCatBounceStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyBarDeadCatBounceStream {
+    inner: BarStream<trendlib::indicators::bar_dead_cat_bounce::BarDeadCatBounce, 4, 1>,
+}
+
+#[pymethods]
+impl PyBarDeadCatBounceStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, drop_pct, bounce_pct, period))]
+    #[allow(clippy::too_many_arguments)]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        drop_pct: f64,
+        bounce_pct: f64,
+        period: i64,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let drop_pct = float_param(
+            "bar_dead_cat_bounce",
+            "drop_pct",
+            drop_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let bounce_pct = float_param(
+            "bar_dead_cat_bounce",
+            "bounce_pct",
+            bounce_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let period = int_param("bar_dead_cat_bounce", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_dead_cat_bounce::Params {
+            drop_pct,
+            bounce_pct,
+            period,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::bar_dead_cat_bounce::BarDeadCatBounce, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, drop_pct, bounce_pct, period))]
+    #[allow(clippy::too_many_arguments)]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        drop_pct: f64,
+        bounce_pct: f64,
+        period: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let drop_pct = float_param(
+            "bar_dead_cat_bounce",
+            "drop_pct",
+            drop_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let bounce_pct = float_param(
+            "bar_dead_cat_bounce",
+            "bounce_pct",
+            bounce_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let period = int_param("bar_dead_cat_bounce", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_dead_cat_bounce::Params {
+            drop_pct,
+            bounce_pct,
+            period,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::bar_dead_cat_bounce::BarDeadCatBounce as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bar_dead_cat_bounce"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bar_dead_cat_bounce bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "bar_fakey", signature = (open, high, low, close))]
+pub fn bar_fakey<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::bar_fakey::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::bar_fakey::BarFakey as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "BarFakeyStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyBarFakeyStream {
+    inner: BarStream<trendlib::indicators::bar_fakey::BarFakey, 4, 1>,
+}
+
+#[pymethods]
+impl PyBarFakeyStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::bar_fakey::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::bar_fakey::BarFakey, 4, 1> as Stream>::open(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::bar_fakey::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::bar_fakey::BarFakey as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bar_fakey"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bar_fakey bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "bar_gap2h", signature = (open, high, low, close))]
+pub fn bar_gap2h<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::bar_gap2h::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::bar_gap2h::BarGap2h as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "BarGap2hStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyBarGap2hStream {
+    inner: BarStream<trendlib::indicators::bar_gap2h::BarGap2h, 4, 1>,
+}
+
+#[pymethods]
+impl PyBarGap2hStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::bar_gap2h::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::bar_gap2h::BarGap2h, 4, 1> as Stream>::open(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::bar_gap2h::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::bar_gap2h::BarGap2h as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bar_gap2h"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bar_gap2h bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "bar_hook_reversal", signature = (open, high, low, close))]
+pub fn bar_hook_reversal<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::bar_hook_reversal::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::bar_hook_reversal::BarHookReversal as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "BarHookReversalStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyBarHookReversalStream {
+    inner: BarStream<trendlib::indicators::bar_hook_reversal::BarHookReversal, 4, 1>,
+}
+
+#[pymethods]
+impl PyBarHookReversalStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::bar_hook_reversal::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::bar_hook_reversal::BarHookReversal, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::bar_hook_reversal::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::bar_hook_reversal::BarHookReversal as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bar_hook_reversal"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bar_hook_reversal bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "bar_horn_bottom", signature = (open, high, low, close, *, tol))]
+pub fn bar_horn_bottom<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let tol = float_param("bar_horn_bottom", "tol", tol, 0.0, f64::INFINITY)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::bar_horn_bottom::Params { tol };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::bar_horn_bottom::BarHornBottom as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "BarHornBottomStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyBarHornBottomStream {
+    inner: BarStream<trendlib::indicators::bar_horn_bottom::BarHornBottom, 4, 1>,
+}
+
+#[pymethods]
+impl PyBarHornBottomStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        tol: f64,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let tol = float_param("bar_horn_bottom", "tol", tol, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_horn_bottom::Params { tol };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::bar_horn_bottom::BarHornBottom, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let tol = float_param("bar_horn_bottom", "tol", tol, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_horn_bottom::Params { tol };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::bar_horn_bottom::BarHornBottom as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bar_horn_bottom"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bar_horn_bottom bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "bar_horn_top", signature = (open, high, low, close, *, tol))]
+pub fn bar_horn_top<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let tol = float_param("bar_horn_top", "tol", tol, 0.0, f64::INFINITY)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::bar_horn_top::Params { tol };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::bar_horn_top::BarHornTop as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "BarHornTopStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyBarHornTopStream {
+    inner: BarStream<trendlib::indicators::bar_horn_top::BarHornTop, 4, 1>,
+}
+
+#[pymethods]
+impl PyBarHornTopStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        tol: f64,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let tol = float_param("bar_horn_top", "tol", tol, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_horn_top::Params { tol };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::bar_horn_top::BarHornTop, 4, 1> as Stream>::open(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let tol = float_param("bar_horn_top", "tol", tol, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_horn_top::Params { tol };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::bar_horn_top::BarHornTop as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bar_horn_top"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bar_horn_top bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "bar_inside_day", signature = (open, high, low, close))]
+pub fn bar_inside_day<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::bar_inside_day::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::bar_inside_day::BarInsideDay as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "BarInsideDayStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyBarInsideDayStream {
+    inner: BarStream<trendlib::indicators::bar_inside_day::BarInsideDay, 4, 1>,
+}
+
+#[pymethods]
+impl PyBarInsideDayStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::bar_inside_day::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::bar_inside_day::BarInsideDay, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::bar_inside_day::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::bar_inside_day::BarInsideDay as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bar_inside_day"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bar_inside_day bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+#[pyo3(name = "bar_inverted_dead_cat_bounce", signature = (open, high, low, close, *, rise_pct, pullback_pct, period))]
+pub fn bar_inverted_dead_cat_bounce<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    rise_pct: f64,
+    pullback_pct: f64,
+    period: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let rise_pct = float_param(
+        "bar_inverted_dead_cat_bounce",
+        "rise_pct",
+        rise_pct,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let pullback_pct = float_param(
+        "bar_inverted_dead_cat_bounce",
+        "pullback_pct",
+        pullback_pct,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let period = int_param("bar_inverted_dead_cat_bounce", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::bar_inverted_dead_cat_bounce::Params {
+        rise_pct,
+        pullback_pct,
+        period,
+    };
+    let out = py
+        .detach(|| <trendlib::indicators::bar_inverted_dead_cat_bounce::BarInvertedDeadCatBounce as Kernel<4, 1>>::batch([open, high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "BarInvertedDeadCatBounceStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyBarInvertedDeadCatBounceStream {
+    inner: BarStream<
+        trendlib::indicators::bar_inverted_dead_cat_bounce::BarInvertedDeadCatBounce,
+        4,
+        1,
+    >,
+}
+
+#[pymethods]
+impl PyBarInvertedDeadCatBounceStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, rise_pct, pullback_pct, period))]
+    #[allow(clippy::too_many_arguments)]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        rise_pct: f64,
+        pullback_pct: f64,
+        period: i64,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let rise_pct = float_param(
+            "bar_inverted_dead_cat_bounce",
+            "rise_pct",
+            rise_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let pullback_pct = float_param(
+            "bar_inverted_dead_cat_bounce",
+            "pullback_pct",
+            pullback_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let period = int_param("bar_inverted_dead_cat_bounce", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_inverted_dead_cat_bounce::Params {
+            rise_pct,
+            pullback_pct,
+            period,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<
+                    trendlib::indicators::bar_inverted_dead_cat_bounce::BarInvertedDeadCatBounce,
+                    4,
+                    1,
+                > as Stream>::open([open, high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, rise_pct, pullback_pct, period))]
+    #[allow(clippy::too_many_arguments)]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        rise_pct: f64,
+        pullback_pct: f64,
+        period: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let rise_pct = float_param(
+            "bar_inverted_dead_cat_bounce",
+            "rise_pct",
+            rise_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let pullback_pct = float_param(
+            "bar_inverted_dead_cat_bounce",
+            "pullback_pct",
+            pullback_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let period = int_param("bar_inverted_dead_cat_bounce", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_inverted_dead_cat_bounce::Params {
+            rise_pct,
+            pullback_pct,
+            period,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::bar_inverted_dead_cat_bounce::BarInvertedDeadCatBounce as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bar_inverted_dead_cat_bounce"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bar_inverted_dead_cat_bounce bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "bar_key_reversal", signature = (open, high, low, close, *, lookback))]
+pub fn bar_key_reversal<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    lookback: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let lookback = int_param("bar_key_reversal", "lookback", lookback, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::bar_key_reversal::Params { lookback };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::bar_key_reversal::BarKeyReversal as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "BarKeyReversalStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyBarKeyReversalStream {
+    inner: BarStream<trendlib::indicators::bar_key_reversal::BarKeyReversal, 4, 1>,
+}
+
+#[pymethods]
+impl PyBarKeyReversalStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, lookback))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        lookback: i64,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let lookback = int_param("bar_key_reversal", "lookback", lookback, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_key_reversal::Params { lookback };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::bar_key_reversal::BarKeyReversal, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, lookback))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        lookback: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let lookback = int_param("bar_key_reversal", "lookback", lookback, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_key_reversal::Params { lookback };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::bar_key_reversal::BarKeyReversal as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bar_key_reversal"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bar_key_reversal bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "bar_narrow_range_4", signature = (open, high, low, close))]
+pub fn bar_narrow_range_4<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::bar_narrow_range_4::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::bar_narrow_range_4::BarNarrowRange4 as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "BarNarrowRange4Stream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyBarNarrowRange4Stream {
+    inner: BarStream<trendlib::indicators::bar_narrow_range_4::BarNarrowRange4, 4, 1>,
+}
+
+#[pymethods]
+impl PyBarNarrowRange4Stream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::bar_narrow_range_4::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::bar_narrow_range_4::BarNarrowRange4, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::bar_narrow_range_4::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::bar_narrow_range_4::BarNarrowRange4 as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bar_narrow_range_4"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bar_narrow_range_4 bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "bar_narrow_range_7", signature = (open, high, low, close))]
+pub fn bar_narrow_range_7<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::bar_narrow_range_7::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::bar_narrow_range_7::BarNarrowRange7 as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "BarNarrowRange7Stream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyBarNarrowRange7Stream {
+    inner: BarStream<trendlib::indicators::bar_narrow_range_7::BarNarrowRange7, 4, 1>,
+}
+
+#[pymethods]
+impl PyBarNarrowRange7Stream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::bar_narrow_range_7::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::bar_narrow_range_7::BarNarrowRange7, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::bar_narrow_range_7::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::bar_narrow_range_7::BarNarrowRange7 as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bar_narrow_range_7"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bar_narrow_range_7 bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "bar_one_day_reversal", signature = (open, high, low, close, *, lookback))]
+pub fn bar_one_day_reversal<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    lookback: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let lookback = int_param("bar_one_day_reversal", "lookback", lookback, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::bar_one_day_reversal::Params { lookback };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::bar_one_day_reversal::BarOneDayReversal as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "BarOneDayReversalStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyBarOneDayReversalStream {
+    inner: BarStream<trendlib::indicators::bar_one_day_reversal::BarOneDayReversal, 4, 1>,
+}
+
+#[pymethods]
+impl PyBarOneDayReversalStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, lookback))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        lookback: i64,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let lookback = int_param("bar_one_day_reversal", "lookback", lookback, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_one_day_reversal::Params { lookback };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::bar_one_day_reversal::BarOneDayReversal, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, lookback))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        lookback: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let lookback = int_param("bar_one_day_reversal", "lookback", lookback, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_one_day_reversal::Params { lookback };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::bar_one_day_reversal::BarOneDayReversal as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bar_one_day_reversal"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bar_one_day_reversal bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "bar_one_two_three", signature = (open, high, low, close, *, period, pivot_n))]
+pub fn bar_one_two_three<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("bar_one_two_three", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("bar_one_two_three", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::bar_one_two_three::Params { period, pivot_n };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::bar_one_two_three::BarOneTwoThree as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "BarOneTwoThreeStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyBarOneTwoThreeStream {
+    inner: BarStream<trendlib::indicators::bar_one_two_three::BarOneTwoThree, 4, 1>,
+}
+
+#[pymethods]
+impl PyBarOneTwoThreeStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, period, pivot_n))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("bar_one_two_three", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("bar_one_two_three", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_one_two_three::Params { period, pivot_n };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::bar_one_two_three::BarOneTwoThree, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, period, pivot_n))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("bar_one_two_three", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("bar_one_two_three", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_one_two_three::Params { period, pivot_n };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::bar_one_two_three::BarOneTwoThree as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bar_one_two_three"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bar_one_two_three bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "bar_outside_day", signature = (open, high, low, close))]
+pub fn bar_outside_day<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::bar_outside_day::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::bar_outside_day::BarOutsideDay as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "BarOutsideDayStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyBarOutsideDayStream {
+    inner: BarStream<trendlib::indicators::bar_outside_day::BarOutsideDay, 4, 1>,
+}
+
+#[pymethods]
+impl PyBarOutsideDayStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::bar_outside_day::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::bar_outside_day::BarOutsideDay, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::bar_outside_day::Params;
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::bar_outside_day::BarOutsideDay as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bar_outside_day"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bar_outside_day bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "bar_pipe_bottom", signature = (open, high, low, close, *, height_tol))]
+pub fn bar_pipe_bottom<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    height_tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let height_tol = float_param(
+        "bar_pipe_bottom",
+        "height_tol",
+        height_tol,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::bar_pipe_bottom::Params { height_tol };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::bar_pipe_bottom::BarPipeBottom as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "BarPipeBottomStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyBarPipeBottomStream {
+    inner: BarStream<trendlib::indicators::bar_pipe_bottom::BarPipeBottom, 4, 1>,
+}
+
+#[pymethods]
+impl PyBarPipeBottomStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, height_tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        height_tol: f64,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let height_tol = float_param(
+            "bar_pipe_bottom",
+            "height_tol",
+            height_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_pipe_bottom::Params { height_tol };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::bar_pipe_bottom::BarPipeBottom, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, height_tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        height_tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let height_tol = float_param(
+            "bar_pipe_bottom",
+            "height_tol",
+            height_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_pipe_bottom::Params { height_tol };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::bar_pipe_bottom::BarPipeBottom as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bar_pipe_bottom"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bar_pipe_bottom bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "bar_pipe_top", signature = (open, high, low, close, *, height_tol))]
+pub fn bar_pipe_top<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    height_tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let height_tol = float_param("bar_pipe_top", "height_tol", height_tol, 0.0, f64::INFINITY)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::bar_pipe_top::Params { height_tol };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::bar_pipe_top::BarPipeTop as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "BarPipeTopStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyBarPipeTopStream {
+    inner: BarStream<trendlib::indicators::bar_pipe_top::BarPipeTop, 4, 1>,
+}
+
+#[pymethods]
+impl PyBarPipeTopStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, height_tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        height_tol: f64,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let height_tol = float_param("bar_pipe_top", "height_tol", height_tol, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_pipe_top::Params { height_tol };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::bar_pipe_top::BarPipeTop, 4, 1> as Stream>::open(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, height_tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        height_tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let height_tol = float_param("bar_pipe_top", "height_tol", height_tol, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_pipe_top::Params { height_tol };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::bar_pipe_top::BarPipeTop as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bar_pipe_top"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bar_pipe_top bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "bar_pivot_point_reversal", signature = (open, high, low, close))]
+pub fn bar_pivot_point_reversal<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::bar_pivot_point_reversal::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::bar_pivot_point_reversal::BarPivotPointReversal as Kernel<
+                4,
+                1,
+            >>::batch([open, high, low, close], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "BarPivotPointReversalStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyBarPivotPointReversalStream {
+    inner: BarStream<trendlib::indicators::bar_pivot_point_reversal::BarPivotPointReversal, 4, 1>,
+}
+
+#[pymethods]
+impl PyBarPivotPointReversalStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::bar_pivot_point_reversal::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<
+                    trendlib::indicators::bar_pivot_point_reversal::BarPivotPointReversal,
+                    4,
+                    1,
+                > as Stream>::open([open, high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::bar_pivot_point_reversal::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::bar_pivot_point_reversal::BarPivotPointReversal as Kernel<
+                    4,
+                    1,
+                >>::open_and_fill([open, high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bar_pivot_point_reversal"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bar_pivot_point_reversal bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "bar_two_b", signature = (open, high, low, close, *, lookback, tol))]
+pub fn bar_two_b<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    lookback: i64,
+    tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let lookback =
+        int_param("bar_two_b", "lookback", lookback, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+    let tol =
+        float_param("bar_two_b", "tol", tol, 0.0, f64::INFINITY).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::bar_two_b::Params { lookback, tol };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::bar_two_b::BarTwoB as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(module = "trendlib._core", name = "BarTwoBStream", skip_from_py_object)]
+#[derive(Clone, Debug)]
+pub struct PyBarTwoBStream {
+    inner: BarStream<trendlib::indicators::bar_two_b::BarTwoB, 4, 1>,
+}
+
+#[pymethods]
+impl PyBarTwoBStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, lookback, tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        lookback: i64,
+        tol: f64,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let lookback = int_param("bar_two_b", "lookback", lookback, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let tol = float_param("bar_two_b", "tol", tol, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_two_b::Params { lookback, tol };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::bar_two_b::BarTwoB, 4, 1> as Stream>::open(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, lookback, tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        lookback: i64,
+        tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let lookback = int_param("bar_two_b", "lookback", lookback, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let tol = float_param("bar_two_b", "tol", tol, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_two_b::Params { lookback, tol };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::bar_two_b::BarTwoB as Kernel<4, 1>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bar_two_b"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bar_two_b bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "bar_wide_ranging_day", signature = (open, high, low, close, *, factor, lookback))]
+pub fn bar_wide_ranging_day<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    factor: f64,
+    lookback: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let factor = float_param("bar_wide_ranging_day", "factor", factor, 0.0, f64::INFINITY)
+        .map_err(|e| to_py_err(py, &e))?;
+    let lookback = int_param("bar_wide_ranging_day", "lookback", lookback, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::bar_wide_ranging_day::Params { factor, lookback };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::bar_wide_ranging_day::BarWideRangingDay as Kernel<4, 1>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "BarWideRangingDayStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyBarWideRangingDayStream {
+    inner: BarStream<trendlib::indicators::bar_wide_ranging_day::BarWideRangingDay, 4, 1>,
+}
+
+#[pymethods]
+impl PyBarWideRangingDayStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, factor, lookback))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        factor: f64,
+        lookback: i64,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let factor = float_param("bar_wide_ranging_day", "factor", factor, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let lookback = int_param("bar_wide_ranging_day", "lookback", lookback, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_wide_ranging_day::Params { factor, lookback };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::bar_wide_ranging_day::BarWideRangingDay, 4, 1> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close, *, factor, lookback))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        factor: f64,
+        lookback: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let factor = float_param("bar_wide_ranging_day", "factor", factor, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let lookback = int_param("bar_wide_ranging_day", "lookback", lookback, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::bar_wide_ranging_day::Params { factor, lookback };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::bar_wide_ranging_day::BarWideRangingDay as Kernel<4, 1>>::open_and_fill([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(&self, py: Python<'_>, open: f64, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "bar_wide_ranging_day"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream bar_wide_ranging_day bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
 type BbandsOutputs<'py> = (
     Bound<'py, PyArray1<f64>>,
     Bound<'py, PyArray1<f64>>,
@@ -31757,6 +34785,25 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(atr, m)?)?;
     m.add_function(wrap_pyfunction!(avgdev, m)?)?;
     m.add_function(wrap_pyfunction!(avgprice, m)?)?;
+    m.add_function(wrap_pyfunction!(bar_dead_cat_bounce, m)?)?;
+    m.add_function(wrap_pyfunction!(bar_fakey, m)?)?;
+    m.add_function(wrap_pyfunction!(bar_gap2h, m)?)?;
+    m.add_function(wrap_pyfunction!(bar_hook_reversal, m)?)?;
+    m.add_function(wrap_pyfunction!(bar_horn_bottom, m)?)?;
+    m.add_function(wrap_pyfunction!(bar_horn_top, m)?)?;
+    m.add_function(wrap_pyfunction!(bar_inside_day, m)?)?;
+    m.add_function(wrap_pyfunction!(bar_inverted_dead_cat_bounce, m)?)?;
+    m.add_function(wrap_pyfunction!(bar_key_reversal, m)?)?;
+    m.add_function(wrap_pyfunction!(bar_narrow_range_4, m)?)?;
+    m.add_function(wrap_pyfunction!(bar_narrow_range_7, m)?)?;
+    m.add_function(wrap_pyfunction!(bar_one_day_reversal, m)?)?;
+    m.add_function(wrap_pyfunction!(bar_one_two_three, m)?)?;
+    m.add_function(wrap_pyfunction!(bar_outside_day, m)?)?;
+    m.add_function(wrap_pyfunction!(bar_pipe_bottom, m)?)?;
+    m.add_function(wrap_pyfunction!(bar_pipe_top, m)?)?;
+    m.add_function(wrap_pyfunction!(bar_pivot_point_reversal, m)?)?;
+    m.add_function(wrap_pyfunction!(bar_two_b, m)?)?;
+    m.add_function(wrap_pyfunction!(bar_wide_ranging_day, m)?)?;
     m.add_function(wrap_pyfunction!(bbands, m)?)?;
     m.add_function(wrap_pyfunction!(beta, m)?)?;
     m.add_function(wrap_pyfunction!(bop, m)?)?;
@@ -31983,6 +35030,25 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyAtrStream>()?;
     m.add_class::<PyAvgdevStream>()?;
     m.add_class::<PyAvgpriceStream>()?;
+    m.add_class::<PyBarDeadCatBounceStream>()?;
+    m.add_class::<PyBarFakeyStream>()?;
+    m.add_class::<PyBarGap2hStream>()?;
+    m.add_class::<PyBarHookReversalStream>()?;
+    m.add_class::<PyBarHornBottomStream>()?;
+    m.add_class::<PyBarHornTopStream>()?;
+    m.add_class::<PyBarInsideDayStream>()?;
+    m.add_class::<PyBarInvertedDeadCatBounceStream>()?;
+    m.add_class::<PyBarKeyReversalStream>()?;
+    m.add_class::<PyBarNarrowRange4Stream>()?;
+    m.add_class::<PyBarNarrowRange7Stream>()?;
+    m.add_class::<PyBarOneDayReversalStream>()?;
+    m.add_class::<PyBarOneTwoThreeStream>()?;
+    m.add_class::<PyBarOutsideDayStream>()?;
+    m.add_class::<PyBarPipeBottomStream>()?;
+    m.add_class::<PyBarPipeTopStream>()?;
+    m.add_class::<PyBarPivotPointReversalStream>()?;
+    m.add_class::<PyBarTwoBStream>()?;
+    m.add_class::<PyBarWideRangingDayStream>()?;
     m.add_class::<PyBbandsStream>()?;
     m.add_class::<PyBetaStream>()?;
     m.add_class::<PyBopStream>()?;
@@ -32425,6 +35491,226 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     {
         let params = PyDict::new(py);
         table.set_item("avgprice", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.1)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("drop_pct", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.5)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("bounce_pct", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 15)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        table.set_item("bar_dead_cat_bounce", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("bar_fakey", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("bar_gap2h", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("bar_hook_reversal", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.02)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("tol", entry)?;
+        }
+        table.set_item("bar_horn_bottom", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.02)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("tol", entry)?;
+        }
+        table.set_item("bar_horn_top", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("bar_inside_day", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.1)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("rise_pct", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.5)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pullback_pct", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 15)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        table.set_item("bar_inverted_dead_cat_bounce", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("lookback", entry)?;
+        }
+        table.set_item("bar_key_reversal", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("bar_narrow_range_4", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("bar_narrow_range_7", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 10)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("lookback", entry)?;
+        }
+        table.set_item("bar_one_day_reversal", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 20)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 3)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        table.set_item("bar_one_two_three", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("bar_outside_day", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.02)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("height_tol", entry)?;
+        }
+        table.set_item("bar_pipe_bottom", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.02)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("height_tol", entry)?;
+        }
+        table.set_item("bar_pipe_top", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("bar_pivot_point_reversal", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("lookback", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.01)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("tol", entry)?;
+        }
+        table.set_item("bar_two_b", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 2.0)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("factor", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 10)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("lookback", entry)?;
+        }
+        table.set_item("bar_wide_ranging_day", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -35212,6 +38498,31 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("atr", vec!["high", "low", "close"])?;
     table.set_item("avgdev", vec!["source"])?;
     table.set_item("avgprice", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_dead_cat_bounce", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_fakey", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_gap2h", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_hook_reversal", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_horn_bottom", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_horn_top", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_inside_day", vec!["open", "high", "low", "close"])?;
+    table.set_item(
+        "bar_inverted_dead_cat_bounce",
+        vec!["open", "high", "low", "close"],
+    )?;
+    table.set_item("bar_key_reversal", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_narrow_range_4", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_narrow_range_7", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_one_day_reversal", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_one_two_three", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_outside_day", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_pipe_bottom", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_pipe_top", vec!["open", "high", "low", "close"])?;
+    table.set_item(
+        "bar_pivot_point_reversal",
+        vec!["open", "high", "low", "close"],
+    )?;
+    table.set_item("bar_two_b", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_wide_ranging_day", vec!["open", "high", "low", "close"])?;
     table.set_item("bbands", vec!["source"])?;
     table.set_item("beta", vec!["source0", "source1"])?;
     table.set_item("bop", vec!["open", "high", "low", "close"])?;
@@ -35447,6 +38758,31 @@ fn kinds_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("atr", vec!["high", "low", "close"])?;
     table.set_item("avgdev", vec!["series"])?;
     table.set_item("avgprice", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_dead_cat_bounce", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_fakey", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_gap2h", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_hook_reversal", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_horn_bottom", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_horn_top", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_inside_day", vec!["open", "high", "low", "close"])?;
+    table.set_item(
+        "bar_inverted_dead_cat_bounce",
+        vec!["open", "high", "low", "close"],
+    )?;
+    table.set_item("bar_key_reversal", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_narrow_range_4", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_narrow_range_7", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_one_day_reversal", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_one_two_three", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_outside_day", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_pipe_bottom", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_pipe_top", vec!["open", "high", "low", "close"])?;
+    table.set_item(
+        "bar_pivot_point_reversal",
+        vec!["open", "high", "low", "close"],
+    )?;
+    table.set_item("bar_two_b", vec!["open", "high", "low", "close"])?;
+    table.set_item("bar_wide_ranging_day", vec!["open", "high", "low", "close"])?;
     table.set_item("bbands", vec!["series"])?;
     table.set_item("beta", vec!["series", "series"])?;
     table.set_item("bop", vec!["open", "high", "low", "close"])?;
@@ -35685,6 +39021,28 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("atr", vec!["atr"])?;
     table.set_item("avgdev", vec!["avgdev"])?;
     table.set_item("avgprice", vec!["avgprice"])?;
+    table.set_item("bar_dead_cat_bounce", vec!["bar_dead_cat_bounce"])?;
+    table.set_item("bar_fakey", vec!["bar_fakey"])?;
+    table.set_item("bar_gap2h", vec!["bar_gap2h"])?;
+    table.set_item("bar_hook_reversal", vec!["bar_hook_reversal"])?;
+    table.set_item("bar_horn_bottom", vec!["bar_horn_bottom"])?;
+    table.set_item("bar_horn_top", vec!["bar_horn_top"])?;
+    table.set_item("bar_inside_day", vec!["bar_inside_day"])?;
+    table.set_item(
+        "bar_inverted_dead_cat_bounce",
+        vec!["bar_inverted_dead_cat_bounce"],
+    )?;
+    table.set_item("bar_key_reversal", vec!["bar_key_reversal"])?;
+    table.set_item("bar_narrow_range_4", vec!["bar_narrow_range_4"])?;
+    table.set_item("bar_narrow_range_7", vec!["bar_narrow_range_7"])?;
+    table.set_item("bar_one_day_reversal", vec!["bar_one_day_reversal"])?;
+    table.set_item("bar_one_two_three", vec!["bar_one_two_three"])?;
+    table.set_item("bar_outside_day", vec!["bar_outside_day"])?;
+    table.set_item("bar_pipe_bottom", vec!["bar_pipe_bottom"])?;
+    table.set_item("bar_pipe_top", vec!["bar_pipe_top"])?;
+    table.set_item("bar_pivot_point_reversal", vec!["bar_pivot_point_reversal"])?;
+    table.set_item("bar_two_b", vec!["bar_two_b"])?;
+    table.set_item("bar_wide_ranging_day", vec!["bar_wide_ranging_day"])?;
     table.set_item(
         "bbands",
         vec!["bbands_upper", "bbands_middle", "bbands_lower"],
@@ -35978,6 +39336,25 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("atr", vec!["float64"])?;
     table.set_item("avgdev", vec!["float64"])?;
     table.set_item("avgprice", vec!["float64"])?;
+    table.set_item("bar_dead_cat_bounce", vec!["int32"])?;
+    table.set_item("bar_fakey", vec!["int32"])?;
+    table.set_item("bar_gap2h", vec!["int32"])?;
+    table.set_item("bar_hook_reversal", vec!["int32"])?;
+    table.set_item("bar_horn_bottom", vec!["int32"])?;
+    table.set_item("bar_horn_top", vec!["int32"])?;
+    table.set_item("bar_inside_day", vec!["int32"])?;
+    table.set_item("bar_inverted_dead_cat_bounce", vec!["int32"])?;
+    table.set_item("bar_key_reversal", vec!["int32"])?;
+    table.set_item("bar_narrow_range_4", vec!["int32"])?;
+    table.set_item("bar_narrow_range_7", vec!["int32"])?;
+    table.set_item("bar_one_day_reversal", vec!["int32"])?;
+    table.set_item("bar_one_two_three", vec!["int32"])?;
+    table.set_item("bar_outside_day", vec!["int32"])?;
+    table.set_item("bar_pipe_bottom", vec!["int32"])?;
+    table.set_item("bar_pipe_top", vec!["int32"])?;
+    table.set_item("bar_pivot_point_reversal", vec!["int32"])?;
+    table.set_item("bar_two_b", vec!["int32"])?;
+    table.set_item("bar_wide_ranging_day", vec!["int32"])?;
     table.set_item("bbands", vec!["float64", "float64", "float64"])?;
     table.set_item("beta", vec!["float64"])?;
     table.set_item("bop", vec!["float64"])?;
@@ -36220,6 +39597,25 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("atr", vec!["unstable"])?;
     table.set_item("avgdev", Vec::<&str>::new())?;
     table.set_item("avgprice", vec!["overlap"])?;
+    table.set_item("bar_dead_cat_bounce", vec!["chart_pattern"])?;
+    table.set_item("bar_fakey", vec!["chart_pattern"])?;
+    table.set_item("bar_gap2h", vec!["chart_pattern"])?;
+    table.set_item("bar_hook_reversal", vec!["chart_pattern"])?;
+    table.set_item("bar_horn_bottom", vec!["chart_pattern"])?;
+    table.set_item("bar_horn_top", vec!["chart_pattern"])?;
+    table.set_item("bar_inside_day", vec!["chart_pattern"])?;
+    table.set_item("bar_inverted_dead_cat_bounce", vec!["chart_pattern"])?;
+    table.set_item("bar_key_reversal", vec!["chart_pattern"])?;
+    table.set_item("bar_narrow_range_4", vec!["chart_pattern"])?;
+    table.set_item("bar_narrow_range_7", vec!["chart_pattern"])?;
+    table.set_item("bar_one_day_reversal", vec!["chart_pattern"])?;
+    table.set_item("bar_one_two_three", vec!["chart_pattern", "path_dependent"])?;
+    table.set_item("bar_outside_day", vec!["chart_pattern"])?;
+    table.set_item("bar_pipe_bottom", vec!["chart_pattern"])?;
+    table.set_item("bar_pipe_top", vec!["chart_pattern"])?;
+    table.set_item("bar_pivot_point_reversal", vec!["chart_pattern"])?;
+    table.set_item("bar_two_b", vec!["chart_pattern"])?;
+    table.set_item("bar_wide_ranging_day", vec!["chart_pattern"])?;
     table.set_item("bbands", vec!["overlap", "nan_inf_output"])?;
     table.set_item("beta", Vec::<&str>::new())?;
     table.set_item("bop", Vec::<&str>::new())?;
@@ -36508,6 +39904,25 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("atr", "volatility")?;
     table.set_item("avgdev", "statistic")?;
     table.set_item("avgprice", "price")?;
+    table.set_item("bar_dead_cat_bounce", "bars")?;
+    table.set_item("bar_fakey", "bars")?;
+    table.set_item("bar_gap2h", "bars")?;
+    table.set_item("bar_hook_reversal", "bars")?;
+    table.set_item("bar_horn_bottom", "bars")?;
+    table.set_item("bar_horn_top", "bars")?;
+    table.set_item("bar_inside_day", "bars")?;
+    table.set_item("bar_inverted_dead_cat_bounce", "bars")?;
+    table.set_item("bar_key_reversal", "bars")?;
+    table.set_item("bar_narrow_range_4", "bars")?;
+    table.set_item("bar_narrow_range_7", "bars")?;
+    table.set_item("bar_one_day_reversal", "bars")?;
+    table.set_item("bar_one_two_three", "bars")?;
+    table.set_item("bar_outside_day", "bars")?;
+    table.set_item("bar_pipe_bottom", "bars")?;
+    table.set_item("bar_pipe_top", "bars")?;
+    table.set_item("bar_pivot_point_reversal", "bars")?;
+    table.set_item("bar_two_b", "bars")?;
+    table.set_item("bar_wide_ranging_day", "bars")?;
     table.set_item("bbands", "overlap")?;
     table.set_item("beta", "statistic")?;
     table.set_item("bop", "momentum")?;
@@ -36862,6 +40277,105 @@ pub fn lookback_of(
         }
         "avgprice" => {
             Ok(<trendlib::indicators::avgprice::Avgprice as Kernel<4, 1>>::lookback(&trendlib::indicators::avgprice::Params { }))
+        }
+        "bar_dead_cat_bounce" => {
+            let drop_pct = 0.1;
+            let bounce_pct = 0.5;
+            let period = match get("period")? {
+                Some(value) => int_param("bar_dead_cat_bounce", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 15,
+            };
+            Ok(<trendlib::indicators::bar_dead_cat_bounce::BarDeadCatBounce as Kernel<4, 1>>::lookback(&trendlib::indicators::bar_dead_cat_bounce::Params { drop_pct, bounce_pct, period, }))
+        }
+        "bar_fakey" => {
+            Ok(<trendlib::indicators::bar_fakey::BarFakey as Kernel<4, 1>>::lookback(&trendlib::indicators::bar_fakey::Params { }))
+        }
+        "bar_gap2h" => {
+            Ok(<trendlib::indicators::bar_gap2h::BarGap2h as Kernel<4, 1>>::lookback(&trendlib::indicators::bar_gap2h::Params { }))
+        }
+        "bar_hook_reversal" => {
+            Ok(<trendlib::indicators::bar_hook_reversal::BarHookReversal as Kernel<4, 1>>::lookback(&trendlib::indicators::bar_hook_reversal::Params { }))
+        }
+        "bar_horn_bottom" => {
+            let tol = 0.02;
+            Ok(<trendlib::indicators::bar_horn_bottom::BarHornBottom as Kernel<4, 1>>::lookback(&trendlib::indicators::bar_horn_bottom::Params { tol, }))
+        }
+        "bar_horn_top" => {
+            let tol = 0.02;
+            Ok(<trendlib::indicators::bar_horn_top::BarHornTop as Kernel<4, 1>>::lookback(&trendlib::indicators::bar_horn_top::Params { tol, }))
+        }
+        "bar_inside_day" => {
+            Ok(<trendlib::indicators::bar_inside_day::BarInsideDay as Kernel<4, 1>>::lookback(&trendlib::indicators::bar_inside_day::Params { }))
+        }
+        "bar_inverted_dead_cat_bounce" => {
+            let rise_pct = 0.1;
+            let pullback_pct = 0.5;
+            let period = match get("period")? {
+                Some(value) => int_param("bar_inverted_dead_cat_bounce", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 15,
+            };
+            Ok(<trendlib::indicators::bar_inverted_dead_cat_bounce::BarInvertedDeadCatBounce as Kernel<4, 1>>::lookback(&trendlib::indicators::bar_inverted_dead_cat_bounce::Params { rise_pct, pullback_pct, period, }))
+        }
+        "bar_key_reversal" => {
+            let lookback = match get("lookback")? {
+                Some(value) => int_param("bar_key_reversal", "lookback", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            Ok(<trendlib::indicators::bar_key_reversal::BarKeyReversal as Kernel<4, 1>>::lookback(&trendlib::indicators::bar_key_reversal::Params { lookback, }))
+        }
+        "bar_narrow_range_4" => {
+            Ok(<trendlib::indicators::bar_narrow_range_4::BarNarrowRange4 as Kernel<4, 1>>::lookback(&trendlib::indicators::bar_narrow_range_4::Params { }))
+        }
+        "bar_narrow_range_7" => {
+            Ok(<trendlib::indicators::bar_narrow_range_7::BarNarrowRange7 as Kernel<4, 1>>::lookback(&trendlib::indicators::bar_narrow_range_7::Params { }))
+        }
+        "bar_one_day_reversal" => {
+            let lookback = match get("lookback")? {
+                Some(value) => int_param("bar_one_day_reversal", "lookback", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 10,
+            };
+            Ok(<trendlib::indicators::bar_one_day_reversal::BarOneDayReversal as Kernel<4, 1>>::lookback(&trendlib::indicators::bar_one_day_reversal::Params { lookback, }))
+        }
+        "bar_one_two_three" => {
+            let period = match get("period")? {
+                Some(value) => int_param("bar_one_two_three", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 20,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("bar_one_two_three", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 3,
+            };
+            Ok(<trendlib::indicators::bar_one_two_three::BarOneTwoThree as Kernel<4, 1>>::lookback(&trendlib::indicators::bar_one_two_three::Params { period, pivot_n, }))
+        }
+        "bar_outside_day" => {
+            Ok(<trendlib::indicators::bar_outside_day::BarOutsideDay as Kernel<4, 1>>::lookback(&trendlib::indicators::bar_outside_day::Params { }))
+        }
+        "bar_pipe_bottom" => {
+            let height_tol = 0.02;
+            Ok(<trendlib::indicators::bar_pipe_bottom::BarPipeBottom as Kernel<4, 1>>::lookback(&trendlib::indicators::bar_pipe_bottom::Params { height_tol, }))
+        }
+        "bar_pipe_top" => {
+            let height_tol = 0.02;
+            Ok(<trendlib::indicators::bar_pipe_top::BarPipeTop as Kernel<4, 1>>::lookback(&trendlib::indicators::bar_pipe_top::Params { height_tol, }))
+        }
+        "bar_pivot_point_reversal" => {
+            Ok(<trendlib::indicators::bar_pivot_point_reversal::BarPivotPointReversal as Kernel<4, 1>>::lookback(&trendlib::indicators::bar_pivot_point_reversal::Params { }))
+        }
+        "bar_two_b" => {
+            let lookback = match get("lookback")? {
+                Some(value) => int_param("bar_two_b", "lookback", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let tol = 0.01;
+            Ok(<trendlib::indicators::bar_two_b::BarTwoB as Kernel<4, 1>>::lookback(&trendlib::indicators::bar_two_b::Params { lookback, tol, }))
+        }
+        "bar_wide_ranging_day" => {
+            let factor = 2.0;
+            let lookback = match get("lookback")? {
+                Some(value) => int_param("bar_wide_ranging_day", "lookback", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 10,
+            };
+            Ok(<trendlib::indicators::bar_wide_ranging_day::BarWideRangingDay as Kernel<4, 1>>::lookback(&trendlib::indicators::bar_wide_ranging_day::Params { factor, lookback, }))
         }
         "bbands" => {
             let period = match get("period")? {
