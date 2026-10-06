@@ -32,10 +32,10 @@ loads the dataset, calls the TA-Lib function with the case's parameters (renamed
 marks rows affected by a `CONVENTIONS.md` § 9 deviation as excluded. For `vwap` it
 runs TA-Lib `VWAP` once per session slice.
 
-**P — ta-patterns 1.2.1.** For the chart patterns of `INDICATORS.md` section 5.1,
-which TA-Lib does not have. Pinned in the `dev` extra as `ta-patterns==1.2.1`
+**P — ta-patterns 1.2.1.** For the chart, bar and harmonic patterns of
+`INDICATORS.md` sections 5.1 and 5.2, which TA-Lib does not have. Pinned in the `dev` extra as `ta-patterns==1.2.1`
 (MIT, pure NumPy, no compiled code). `scripts/oracle/chart_golden.py <name>
---case <case>` calls the oracle function the table in section 5.1 names, with the
+--case <case>` calls the oracle function the tables in sections 5.1 and 5.2 name, with the
 parameters renamed back (`period` is its `window`), multiplies its `+1`/`-1` by
 100, and writes the file in the format of `SPEC_FORMAT.md` § 4. For the two-sided
 functions built from two oracle functions (`chart_broadening`, `chart_rectangle`)
@@ -65,9 +65,24 @@ formula would go unnoticed, and stronger than values TrendLib computed for
 itself, which the rule above forbids. The header of each such file says which
 functions produced it.
 
+The same oracle covers Ichimoku and the indicators of `INDICATORS.md` § 5.3
+(D20), for which no runnable library was found. `scripts/oracle/formula_golden.py
+<name> --case <case>` evaluates the cited published formula through TA-Lib's own
+functions wherever one computes a step (`MIDPRICE`, `EMA`, `SMA`, `RSI`, `ATR`,
+`CCI`, `MACD`, `MAX`, `MIN`, `LINEARREG`) and NumPy for the rest, and names both
+in the header. For a step that is control flow rather than arithmetic - a
+streak count, a box that holds until it is broken - the oracle is only as
+independent as that transcription of the rule, and the header says that too.
+
 H is still the stronger evidence for those three and open question Q4 still
 asks for it; A is what ships until then. Do not substitute self-computed
 values for either.
+
+**F — finta 1.3.** For the four indicators of `INDICATORS.md` § 5.4, which no MIT
+library implements (D19). LGPL-3 and test-only: pinned in the `dev` extra as
+`finta==1.3`, installed by the CI python jobs, never imported by the package.
+`scripts/oracle/finta_golden.py <name> --case <case>` calls the `TA` method the
+table names and writes what it returns.
 
 **Upgrading an oracle version** regenerates every golden from that oracle in one
 PR whose description summarises any value changes.
@@ -77,7 +92,7 @@ Oracle A's three functions have since been cross-checked against `pandas-ta`'s
 fourteen of their eighteen outputs agree over all 1,999 valid rows, most of them
 bitwise. The four that do not are `pivots_traditional`'s `r3`/`s3`, where the two
 libraries follow different published conventions, and `cpr`'s `bc`/`tc`, which no
-runnable implementation was found for. `DECISIONS.md` A19 has the numbers, and
+runnable implementation was found for. `DECISIONS.md` A24 has the numbers, and
 those four are what Q4 still needs a human for.
 
 ## 3. Test data

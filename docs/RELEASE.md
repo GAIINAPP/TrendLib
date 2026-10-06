@@ -117,7 +117,7 @@ No API tokens. GitHub Actions proves its identity to PyPI with OIDC.
 2. Bump `[workspace.package] version`.
 3. `cargo xtask regen-check` clean; `api/public_api.txt` changes reviewed.
 4. Benchmark budget: `cargo xtask bench --enforce` exits zero. It does not
-   today (`DECISIONS.md` A18): most shared indicators are 15× to 30× TA-Lib
+   today (`DECISIONS.md` A23): most shared indicators are 15× to 30× TA-Lib
    because they re-sum each window rather than carry a running total, which is
    what makes them the more accurate of the two. Q6 has to be answered before
    0.1.0 — either the budget moves or the numerics do.

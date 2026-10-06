@@ -38,8 +38,8 @@ pub const FLAGS: &[&str] = &[
     "unstable",
     "requires_timestamps",
     "pattern",
-    // A chart pattern (`docs/INDICATORS.md` section 5.1), int32 +-100 output,
-    // checked against ta-patterns rather than TA-Lib.
+    // A chart, bar or harmonic pattern (`docs/INDICATORS.md` sections 5.1 and
+    // 5.2), int32 +-100 output, checked against ta-patterns rather than TA-Lib.
     "chart_pattern",
     // The output can legitimately be NaN or infinite for finite input: a
     // logarithm of zero, an arc cosine outside [-1, 1], a division by zero.

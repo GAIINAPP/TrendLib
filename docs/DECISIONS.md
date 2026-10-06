@@ -26,6 +26,9 @@ proceed on a judgment call.
 | D17 | The catalogue is **derived by interrogating the oracle**, not transcribed from TA-Lib's source: names, groups, defaults and output names from `talib.abstract`, integer ranges by bisecting the library until it answers `TA_BAD_PARAM`. `scripts/catalogue/talib_catalogue.py` regenerates it and CI checks it. | A transcription would be a copy that silently rots; a probe is reproducible from the pinned dev dependency and cannot disagree with the tests. Algorithms are still written from published formulas, never ported (`CONVENTIONS.md` § 4). |
 | D15 | **No data source lives in the library.** TrendLib accepts arrays and frames only, never a connection, driver, DSN or table name. The input frame contract and the loader patterns that satisfy it are documented in `DATA_INTEGRATION.md`. | Keeps the core crate dependency-free and the non-goal in `SPEC.md` § 3 honest. Callers own credentials, pooling and caching, so a schema change never becomes a library upgrade. |
 | D18 | **Oracle P for the chart patterns is `ta-patterns` 1.2.1** (MIT), pinned in the `dev` extra and installed by every CI python job. TrendLib takes its definitions and defaults for the chart patterns of `INDICATORS.md` § 5.1 the way D6 takes TA-Lib's, and departs from it only where `CONVENTIONS.md` § 9 lists a deviation (8 and 9). | Owner decision, 2026-10-06, confirming A19. It is the only runnable library found that implements every shape, under a licence that allows it, point in time. |
+| D19 | **Oracle F is `finta` 1.3** (LGPL-3), a test-only dependency for the four indicators `INDICATORS.md` § 5.4 lists. It is installed for producing and checking golden files and is never imported by the package or shipped in a wheel. | Owner decision, 2026-10-06. They exist in no MIT library; a test-only dependency does not put LGPL code in what TrendLib distributes. |
+| D20 | **Oracle A also covers Ichimoku and the indicators `INDICATORS.md` § 5.3 lists**, for which no runnable library was found: the cited published formula evaluated through TA-Lib's functions and NumPy by `scripts/oracle/formula_golden.py`, every golden header saying which. | Owner decision, 2026-10-06. Weaker than an independent implementation, as `TESTING.md` § 2 says; stronger than values TrendLib computed for itself. |
+| D21 | **`pandas-ta-classic` is not adopted as an oracle for now**; the indicators only it implements are deferred (`INDICATORS.md` § 5.5). | Owner decision, 2026-10-06. |
 
 ## Open questions (ask; do not guess)
 
@@ -34,9 +37,9 @@ proceed on a judgment call.
 | Q1 | GitHub org: under GAIIN's org, or a neutral `trendlib` org? The repository already exists at `GAIINAPP/TrendLib` and M0 used it (A1); confirm or move it before M3. | M3 (Trusted Publishing is bound to owner/repo) |
 | Q2 | Add a `compat="tradingview"` mode where TradingView and TA-Lib conventions differ (Supertrend seed and sign, etc.)? | M6 |
 | Q3 | Ship a WASM/JS build for GAIIN's web frontend? | After 0.1.0 |
-| Q4 | A human transcriber is now needed for **four outputs, not eighteen**: `pivots_traditional`'s `r3`/`s3` and `cpr`'s `bc`/`tc`. The other fourteen are independently confirmed (A19). The `r3`/`s3` transcription has to settle a real split in the field: TradingView's `H + 2(pp − L)` against Sierra Chart's `pp + 2(H − L)`. Not blocking: oracle A ships meanwhile (A16). | M5 |
+| Q4 | A human transcriber is now needed for **four outputs, not eighteen**: `pivots_traditional`'s `r3`/`s3` and `cpr`'s `bc`/`tc`. The other fourteen are independently confirmed (A24). The `r3`/`s3` transcription has to settle a real split in the field: TradingView's `H + 2(pp − L)` against Sierra Chart's `pp + 2(H − L)`. Not blocking: oracle A ships meanwhile (A16). | M5 |
 | Q5 | Docs domain (e.g. `trendlib.dev`) or GitHub Pages default URL? | M5 |
-| Q6 | Most shared indicators are 15x to 30x TA-Lib because TrendLib re-sums each window instead of carrying a running total, which is what makes it the more accurate of the two. Keep the accuracy and raise or drop M4's 1.5x budget, or add a faster path and accept the oracle's error? Measured in `TESTING.md` § 8 and A18. | M5 |
+| Q6 | Most shared indicators are 15x to 30x TA-Lib because TrendLib re-sums each window instead of carrying a running total, which is what makes it the more accurate of the two. Keep the accuracy and raise or drop M4's 1.5x budget, or add a faster path and accept the oracle's error? Measured in `TESTING.md` § 8 and A23. | M5 |
 
 ## Assumptions pending review
 
@@ -194,7 +197,7 @@ oracle beside `ta-lib-python` and `manual`, and
 `tests/test_catalogue.py` counts the section 5.1 list in the approved total that
 `docs/PROGRESS.md` must cover. Confirmed by the owner on 2026-10-06.
 
-A18 (M4, 2026-10-06): `cargo xtask bench` is implemented and M4's acceptance
+A23 (M4, 2026-10-06): `cargo xtask bench` is implemented and M4's acceptance
 check "no shared indicator slower than 1.5x TA-Lib" **fails as the library
 stands**: at 1,000,000 bars, 24 of 201 shared indicators are inside the budget.
 The cause was measured rather than assumed. Timing the Rust core directly with
@@ -208,7 +211,7 @@ the accuracy back is a product decision; it is Q6. The benchmark, the table and
 the nightly job all ship, so the number is now measured every night instead of
 being unknown.
 
-A19 (M4, 2026-10-06): the three `levels` functions were cross-checked against
+A24 (M4, 2026-10-06): the three `levels` functions were cross-checked against
 `pandas-ta`'s `pivots`, an implementation independent of both TrendLib and the
 approved formulas, over all 1,999 valid rows of `daily_2000.csv`. Fourteen of
 the eighteen outputs are confirmed:
@@ -234,3 +237,17 @@ Not confirmed, and still Q4's job:
 
 `pandas-ta` was not adopted as an oracle and is not a dependency: that is a
 D18-shaped decision for the owner, and this was a check, not a commitment.
+
+A25 (M7, 2026-10-06): the owner asked on 2026-10-06 for the patterns and
+indicators trading platforms offer that TrendLib lacked, from a list of four
+groups. That is read as approving `INDICATORS.md` §§ 5.2 to 5.4: 78 patterns on
+oracle P, 23 indicators on oracle A and 4 on oracle F. Pattern names are the
+oracle's function names with a `bar_`, `chart_` or `harmonic_` prefix, and a
+shape the oracle already has a two-sided function for ships as that one
+function. Indicator names, parameters and defaults come from the source each
+row cites; where a source names no default (the Swing Index's limit move, the
+envelope's percent), the default of the platform the row names is used. The
+names that read as a trade instruction were reworded (D11). Every item the
+owner named that TrendLib already had - flags, pennants, triangles, wedges, head
+and shoulders, channels, double and triple tops and bottoms, Supertrend - was
+left as it is.

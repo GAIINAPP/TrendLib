@@ -10,3 +10,5 @@
 - { key: levels,     title: Levels }
 - { key: patterns,   title: Candlestick patterns }
 - { key: chart,      title: Chart patterns }
+- { key: bars,       title: Bar patterns }
+- { key: harmonic,   title: Harmonic patterns }

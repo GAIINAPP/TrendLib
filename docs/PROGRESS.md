@@ -2,8 +2,8 @@
 
 # Progress
 
-**223 of 223 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 0 not started.
+**223 of 328 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 105 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -27,7 +27,11 @@ something is done that is not. CI checks it is current.
 | Math operators | 12 | 12 |
 | Candlestick patterns | 61 | 61 |
 | Levels | 3 | 3 |
-| Chart patterns | 19 | 19 |
+| Chart patterns | 19 | 66 |
+| Bar patterns | 0 | 19 |
+| Harmonic patterns | 0 | 12 |
+| Indicators on oracle A | 0 | 23 |
+| Indicators on oracle F | 0 | 4 |
 
 ## Overlap studies (25 of 25)
 
@@ -266,24 +270,141 @@ something is done that is not. CI checks it is current.
 - [x] `pivots_camarilla` -- Camarilla Pivot Points *
 - [x] `pivots_traditional` -- Traditional Pivot Points *
 
-## Chart patterns (19 of 19)
+## Chart patterns (19 of 66)
 
+- [ ] `chart_ascending_broadening_wedge` -- Ascending Broadening Wedge
 - [x] `chart_ascending_channel` -- Ascending Channel
+- [ ] `chart_ascending_right_angle_broadening` -- Ascending Right-Angled Broadening
+- [ ] `chart_ascending_scallop` -- Ascending Scallop
 - [x] `chart_ascending_triangle` -- Ascending Triangle
 - [x] `chart_bear_flag` -- Bear Flag
 - [x] `chart_bear_pennant` -- Bear Pennant
+- [ ] `chart_big_m` -- Big M
+- [ ] `chart_big_w` -- Big W
 - [x] `chart_broadening` -- Broadening Formation
 - [x] `chart_bull_flag` -- Bull Flag
 - [x] `chart_bull_pennant` -- Bull Pennant
+- [ ] `chart_bump_and_run_bottom` -- Bump-and-Run Reversal Bottom
+- [ ] `chart_bump_and_run_top` -- Bump-and-Run Reversal Top
+- [ ] `chart_busted_ascending_triangle` -- Busted Ascending Triangle
+- [ ] `chart_busted_descending_triangle` -- Busted Descending Triangle
+- [ ] `chart_busted_double_bottom` -- Busted Double Bottom
+- [ ] `chart_busted_double_top` -- Busted Double Top
+- [ ] `chart_busted_head_shoulders` -- Busted Head and Shoulders
+- [ ] `chart_busted_inverse_head_shoulders` -- Busted Inverse Head and Shoulders
+- [ ] `chart_busted_rectangle` -- Busted Rectangle
+- [ ] `chart_busted_symmetrical_triangle` -- Busted Symmetrical Triangle
+- [ ] `chart_busted_triple_bottom` -- Busted Triple Bottom
+- [ ] `chart_busted_triple_top` -- Busted Triple Top
+- [ ] `chart_complex_head_shoulders` -- Complex Head and Shoulders
+- [ ] `chart_complex_inverse_head_shoulders` -- Complex Inverse Head and Shoulders
+- [ ] `chart_cup_with_handle` -- Cup with Handle
+- [ ] `chart_descending_broadening_wedge` -- Descending Broadening Wedge
 - [x] `chart_descending_channel` -- Descending Channel
+- [ ] `chart_descending_right_angle_broadening` -- Descending Right-Angled Broadening
+- [ ] `chart_descending_scallop` -- Descending Scallop
 - [x] `chart_descending_triangle` -- Descending Triangle
+- [ ] `chart_diamond_bottom` -- Diamond Bottom
+- [ ] `chart_diamond_top` -- Diamond Top
 - [x] `chart_double_bottom` -- Double Bottom
+- [ ] `chart_double_bottom_adam_adam` -- Double Bottom, Adam and Adam
+- [ ] `chart_double_bottom_adam_eve` -- Double Bottom, Adam and Eve
+- [ ] `chart_double_bottom_eve_adam` -- Double Bottom, Eve and Adam
+- [ ] `chart_double_bottom_eve_eve` -- Double Bottom, Eve and Eve
 - [x] `chart_double_top` -- Double Top
+- [ ] `chart_double_top_adam_adam` -- Double Top, Adam and Adam
+- [ ] `chart_double_top_adam_eve` -- Double Top, Adam and Eve
+- [ ] `chart_double_top_eve_adam` -- Double Top, Eve and Adam
+- [ ] `chart_double_top_eve_eve` -- Double Top, Eve and Eve
 - [x] `chart_falling_wedge` -- Falling Wedge
 - [x] `chart_head_shoulders` -- Head and Shoulders
+- [ ] `chart_high_tight_flag` -- High and Tight Flag
 - [x] `chart_inverse_head_shoulders` -- Inverse Head and Shoulders
+- [ ] `chart_inverted_ascending_scallop` -- Inverted Ascending Scallop
+- [ ] `chart_inverted_cup_with_handle` -- Inverted Cup with Handle
+- [ ] `chart_inverted_descending_scallop` -- Inverted Descending Scallop
+- [ ] `chart_island_bottom` -- Island Bottom
+- [ ] `chart_island_top` -- Island Top
+- [ ] `chart_measured_move_down` -- Measured Move Down
+- [ ] `chart_measured_move_up` -- Measured Move Up
 - [x] `chart_rectangle` -- Rectangle
 - [x] `chart_rising_wedge` -- Rising Wedge
+- [ ] `chart_rounding_bottom` -- Rounding Bottom
+- [ ] `chart_rounding_top` -- Rounding Top
 - [x] `chart_symmetrical_triangle` -- Symmetrical Triangle
+- [ ] `chart_three_peaks` -- Three Peaks
+- [ ] `chart_three_valleys` -- Three Valleys
 - [x] `chart_triple_bottom` -- Triple Bottom
 - [x] `chart_triple_top` -- Triple Top
+- [ ] `chart_v_bottom` -- V-Bottom
+- [ ] `chart_v_top` -- V-Top
+
+## Bar patterns (0 of 19)
+
+- [ ] `bar_dead_cat_bounce` -- Dead-Cat Bounce
+- [ ] `bar_fakey` -- Fakey
+- [ ] `bar_gap2h` -- Gap Beyond Two Bars
+- [ ] `bar_hook_reversal` -- Hook Reversal
+- [ ] `bar_horn_bottom` -- Horn Bottom
+- [ ] `bar_horn_top` -- Horn Top
+- [ ] `bar_inside_day` -- Inside Day
+- [ ] `bar_inverted_dead_cat_bounce` -- Inverted Dead-Cat Bounce
+- [ ] `bar_key_reversal` -- Key Reversal
+- [ ] `bar_narrow_range_4` -- Narrow Range 4
+- [ ] `bar_narrow_range_7` -- Narrow Range 7
+- [ ] `bar_one_day_reversal` -- One-Day Reversal
+- [ ] `bar_one_two_three` -- 1-2-3 Reversal
+- [ ] `bar_outside_day` -- Outside Day
+- [ ] `bar_pipe_bottom` -- Pipe Bottom
+- [ ] `bar_pipe_top` -- Pipe Top
+- [ ] `bar_pivot_point_reversal` -- Pivot Point Reversal
+- [ ] `bar_two_b` -- 2B Reversal
+- [ ] `bar_wide_ranging_day` -- Wide-Ranging Day
+
+## Harmonic patterns (0 of 12)
+
+- [ ] `harmonic_abcd_bearish` -- Bearish AB=CD
+- [ ] `harmonic_abcd_bullish` -- Bullish AB=CD
+- [ ] `harmonic_bat_bearish` -- Bearish Bat
+- [ ] `harmonic_bat_bullish` -- Bullish Bat
+- [ ] `harmonic_butterfly_bearish` -- Bearish Butterfly
+- [ ] `harmonic_butterfly_bullish` -- Bullish Butterfly
+- [ ] `harmonic_crab_bearish` -- Bearish Crab
+- [ ] `harmonic_crab_bullish` -- Bullish Crab
+- [ ] `harmonic_gartley_bearish` -- Bearish Gartley
+- [ ] `harmonic_gartley_bullish` -- Bullish Gartley
+- [ ] `harmonic_wolfe_wave_bearish` -- Bearish Wolfe Wave
+- [ ] `harmonic_wolfe_wave_bullish` -- Bullish Wolfe Wave
+
+## Indicators on oracle A (0 of 23)
+
+- [ ] `alligator` -- Williams Alligator
+- [ ] `asi` -- Accumulative Swing Index
+- [ ] `atr_bands` -- ATR Bands
+- [ ] `connors_rsi` -- Connors RSI
+- [ ] `darvas_box` -- Darvas Box
+- [ ] `elder_impulse` -- Elder Impulse System
+- [ ] `envelope` -- Moving Average Envelope
+- [ ] `fractal_chaos_bands` -- Fractal Chaos Bands
+- [ ] `frama` -- Fractal Adaptive Moving Average
+- [ ] `gapo` -- Gopalakrishnan Range Index
+- [ ] `gator` -- Gator Oscillator
+- [ ] `guppy` -- Guppy Multiple Moving Average
+- [ ] `ichimoku` -- Ichimoku Kinko Hyo
+- [ ] `linreg_channel` -- Linear Regression Channel
+- [ ] `pivots_demark` -- DeMark Pivot Points
+- [ ] `pivots_woodie` -- Woodie Pivot Points
+- [ ] `pmo` -- Price Momentum Oscillator
+- [ ] `rwi` -- Random Walk Index
+- [ ] `safezone` -- Elder SafeZone
+- [ ] `swing_index` -- Swing Index
+- [ ] `twiggs_mf` -- Twiggs Money Flow
+- [ ] `wilder_volatility` -- Wilder Volatility System
+- [ ] `woodies_cci` -- Woodies CCI
+
+## Indicators on oracle F (0 of 4)
+
+- [ ] `ift_rsi` -- Inverse Fisher Transform of RSI
+- [ ] `pivots_fibonacci` -- Fibonacci Pivot Points
+- [ ] `vzo` -- Volume Zone Oscillator
+- [ ] `wavetrend` -- WaveTrend Oscillator

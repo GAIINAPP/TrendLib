@@ -38,21 +38,38 @@ OWN = [
     ("Levels", "pivots_camarilla", "Camarilla pivots"),
 ]
 
-# The chart patterns, approved on top of the catalogue and checked against a
-# second oracle (`docs/INDICATORS.md` section 5.1). Read from that table rather
-# than listed here, so approving one more is one edit, in the document.
-CHART_ROW = re.compile(r"^\| `(chart_[a-z0-9_]+)` \| ([^|]+?) \|")
+# Everything approved beyond the catalogue (`docs/INDICATORS.md` sections 5.1 to
+# 5.4), each listed under the heading it is approved in. Read from those tables
+# rather than listed here, so approving one more is one edit, in the document.
+BEYOND_ROW = re.compile(r"^\| `([a-z][a-z0-9_]*)` \| ([^|]+?) \|")
+BEYOND_GROUPS = {
+    "### 5.1 Chart patterns": "Chart patterns",
+    "#### Bar patterns": "Bar patterns",
+    "#### Chart patterns": "Chart patterns",
+    "#### Harmonic patterns": "Harmonic patterns",
+    "### 5.3 Indicators on oracle A": "Indicators on oracle A",
+    "### 5.4 Indicators on oracle F": "Indicators on oracle F",
+}
 
 
-def chart_entries() -> list[tuple[str, str, str]]:
-    """`(group title, trendlib name, title)` for every approved chart pattern."""
+def beyond_entries() -> list[tuple[str, str, str]]:
+    """`(group title, trendlib name, title)` for everything sections 5.1-5.4 approve."""
     text = (REPO_ROOT / "docs" / "INDICATORS.md").read_text(encoding="utf-8")
-    section = text.split("### 5.1 Chart patterns", 1)[1]
-    return [
-        ("Chart patterns", row.group(1), row.group(2).strip())
-        for line in section.splitlines()
-        if (row := CHART_ROW.match(line))
-    ]
+    section = text.split("## 5. Beyond TA-Lib", 1)[1].split("### 5.5", 1)[0]
+    entries = []
+    group = None
+    for line in section.splitlines():
+        heading = next((title for start, title in BEYOND_GROUPS.items() if line.startswith(start)), None)
+        if heading:
+            group = heading
+            continue
+        if line.startswith("#"):
+            group = None
+            continue
+        row = BEYOND_ROW.match(line)
+        if row and group:
+            entries.append((group, row.group(1), row.group(2).strip()))
+    return entries
 
 
 # The slice the first public release ships (`docs/INDICATORS.md` section 2.1).
@@ -139,7 +156,7 @@ def render() -> str:
     grouped: dict[str, list[tuple[str, str, str]]] = {}
     for group, name, alias in catalogue_entries():
         grouped.setdefault(group, []).append((name, alias, known.get(name, "")))
-    for group, name, title in OWN + chart_entries():
+    for group, name, title in OWN + beyond_entries():
         grouped.setdefault(group, []).append((name, "", known.get(name, title)))
 
     states = {name: state_of(name, in_python) for group in grouped.values() for name, _, _ in group}

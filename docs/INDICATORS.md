@@ -280,3 +280,191 @@ The oracle's `mode="forming"` (report the shape before price leaves it) and its
 `mode="confirmed"` reading with no ZigZag filter, and either can be added later
 as a new parameter without changing a value. Where TrendLib and the oracle part
 company, `docs/CONVENTIONS.md` section 9 lists it (deviations 8 and 9).
+
+### 5.2 More chart, bar and harmonic patterns (approved 2026-10-06)
+
+The owner asked on 2026-10-06 for the patterns trading platforms offer that
+TrendLib did not have yet, and approved them here (A25). Every one is checked
+against oracle P (`ta-patterns` 1.2.1, D18) exactly as section 5.1's are: each
+row names the oracle function, TrendLib reads its `+1`/`-1` as `+100`/`-100`,
+and its parameters are the oracle's keyword parameters and defaults, with
+`window` called `period` (D12) and `mode="confirmed"`, `pivot_pct` not offered.
+The ranges are TrendLib's: whole numbers from 1 (2 for a span a shape has to
+fit in) to 100000, fractions from 0 with no ceiling.
+
+Where the oracle has one function for both directions of a shape, TrendLib
+ships that one; otherwise each direction is its own function, named after the
+oracle's. Bar patterns take `open`, `high`, `low` and `close`; chart and
+harmonic patterns take `high`, `low` and `close`. "+100 (shape)" marks a
+pattern with no direction, which reads `+100` wherever the shape is.
+
+#### Bar patterns
+
+| Function | Title | Oracle | Reads | Parameters (default [min, max]) |
+| --- | --- | --- | --- | --- |
+| `bar_two_b` | 2B Reversal | `two_b` | ±100 | `lookback` 5 [1, 100000], `tol` 0.01 [0.0, any] |
+| `bar_one_two_three` | 1-2-3 Reversal | `one_two_three` | ±100 | `period` 20 [2, 100000], `pivot_n` 3 [1, 100000] |
+| `bar_gap2h` | Gap Beyond Two Bars | `gap2h_combined` | ±100 | none |
+| `bar_key_reversal` | Key Reversal | `key_reversal` | ±100 | `lookback` 5 [1, 100000] |
+| `bar_hook_reversal` | Hook Reversal | `hook_reversal` | ±100 | none |
+| `bar_outside_day` | Outside Day | `outside_day` | ±100 | none |
+| `bar_one_day_reversal` | One-Day Reversal | `one_day_reversal` | ±100 | `lookback` 10 [1, 100000] |
+| `bar_pivot_point_reversal` | Pivot Point Reversal | `pivot_point_reversal` | ±100 | none |
+| `bar_fakey` | Fakey | `fakey` | ±100 | none |
+| `bar_wide_ranging_day` | Wide-Ranging Day | `wide_ranging_day` | ±100 | `factor` 2.0 [0.0, any], `lookback` 10 [1, 100000] |
+| `bar_inside_day` | Inside Day | `inside_day` | +100 (shape) | none |
+| `bar_narrow_range_4` | Narrow Range 4 | `narrow_range_4` | +100 (shape) | none |
+| `bar_narrow_range_7` | Narrow Range 7 | `narrow_range_7` | +100 (shape) | none |
+| `bar_pipe_top` | Pipe Top | `pipe_top` | -100 | `height_tol` 0.02 [0.0, any] |
+| `bar_pipe_bottom` | Pipe Bottom | `pipe_bottom` | +100 | `height_tol` 0.02 [0.0, any] |
+| `bar_horn_top` | Horn Top | `horn_top` | -100 | `tol` 0.02 [0.0, any] |
+| `bar_horn_bottom` | Horn Bottom | `horn_bottom` | +100 | `tol` 0.02 [0.0, any] |
+| `bar_dead_cat_bounce` | Dead-Cat Bounce | `dead_cat_bounce` | -100 | `drop_pct` 0.1 [0.0, any], `bounce_pct` 0.5 [0.0, any], `period` 15 [2, 100000] |
+| `bar_inverted_dead_cat_bounce` | Inverted Dead-Cat Bounce | `dead_cat_bounce_inv` | +100 | `rise_pct` 0.1 [0.0, any], `pullback_pct` 0.5 [0.0, any], `period` 15 [2, 100000] |
+
+#### Chart patterns
+
+| Function | Title | Oracle | Reads | Parameters (default [min, max]) |
+| --- | --- | --- | --- | --- |
+| `chart_cup_with_handle` | Cup with Handle | `cup_with_handle` | +100 | `cup_window` 65 [2, 100000], `handle_window` 15 [2, 100000], `pivot_n` 5 [1, 100000], `max_handle_retrace` 0.5 [0.0, any] |
+| `chart_inverted_cup_with_handle` | Inverted Cup with Handle | `inverted_cup_with_handle` | -100 | `cup_window` 65 [2, 100000], `handle_window` 15 [2, 100000], `pivot_n` 5 [1, 100000], `max_handle_retrace` 0.5 [0.0, any] |
+| `chart_rounding_bottom` | Rounding Bottom | `rounding_bottom` | +100 | `period` 40 [2, 100000], `min_depth` 0.05 [0.0, any] |
+| `chart_rounding_top` | Rounding Top | `rounding_top` | -100 | `period` 40 [2, 100000], `min_depth` 0.05 [0.0, any] |
+| `chart_diamond_top` | Diamond Top | `diamond_top` | -100 | `period` 60 [2, 100000], `pivot_n` 4 [1, 100000] |
+| `chart_diamond_bottom` | Diamond Bottom | `diamond_bottom` | +100 | `period` 60 [2, 100000], `pivot_n` 4 [1, 100000] |
+| `chart_bump_and_run_top` | Bump-and-Run Reversal Top | `bump_and_run_top` | -100 | `lead_window` 30 [2, 100000], `bump_window` 15 [2, 100000], `bump_factor` 2.0 [0.0, any], `pivot_n` 4 [1, 100000] |
+| `chart_bump_and_run_bottom` | Bump-and-Run Reversal Bottom | `bump_and_run_bottom` | +100 | `lead_window` 30 [2, 100000], `bump_window` 15 [2, 100000], `bump_factor` 2.0 [0.0, any], `pivot_n` 4 [1, 100000] |
+| `chart_island_top` | Island Top | `island_top` | -100 | `max_island_bars` 10 [1, 100000] |
+| `chart_island_bottom` | Island Bottom | `island_bottom` | +100 | `max_island_bars` 10 [1, 100000] |
+| `chart_v_bottom` | V-Bottom | `v_bottom` | +100 | `period` 10 [2, 100000], `min_drop` 0.05 [0.0, any] |
+| `chart_v_top` | V-Top | `v_top` | -100 | `period` 10 [2, 100000], `min_rise` 0.05 [0.0, any] |
+| `chart_complex_head_shoulders` | Complex Head and Shoulders | `complex_hs_top` | -100 | `period` 200 [2, 100000], `pivot_n` 5 [1, 100000], `shoulder_tol` 0.08 [0.0, any], `min_separation` 8 [1, 100000] |
+| `chart_complex_inverse_head_shoulders` | Complex Inverse Head and Shoulders | `complex_hs_bottom` | +100 | `period` 200 [2, 100000], `pivot_n` 5 [1, 100000], `shoulder_tol` 0.08 [0.0, any], `min_separation` 8 [1, 100000] |
+| `chart_high_tight_flag` | High and Tight Flag | `flag_high_tight` | +100 | `period` 20 [2, 100000], `pole_bars` 10 [1, 100000], `min_pole` 0.4 [0.0, any], `max_retrace` 0.2 [0.0, any] |
+| `chart_measured_move_up` | Measured Move Up | `measured_move_up` | +100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `leg_tol` 0.2 [0.0, any] |
+| `chart_measured_move_down` | Measured Move Down | `measured_move_down` | -100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `leg_tol` 0.2 [0.0, any] |
+| `chart_ascending_broadening_wedge` | Ascending Broadening Wedge | `broadening_wedge_asc` | -100 | `period` 80 [2, 100000], `pivot_n` 5 [1, 100000] |
+| `chart_descending_broadening_wedge` | Descending Broadening Wedge | `broadening_wedge_desc` | +100 | `period` 80 [2, 100000], `pivot_n` 5 [1, 100000] |
+| `chart_ascending_right_angle_broadening` | Ascending Right-Angled Broadening | `right_angle_broadening_asc` | -100 | `period` 80 [2, 100000], `pivot_n` 5 [1, 100000], `flat_tol` 0.015 [0.0, any] |
+| `chart_descending_right_angle_broadening` | Descending Right-Angled Broadening | `right_angle_broadening_desc` | +100 | `period` 80 [2, 100000], `pivot_n` 5 [1, 100000], `flat_tol` 0.015 [0.0, any] |
+| `chart_ascending_scallop` | Ascending Scallop | `scallop_asc` | +100 | `period` 25 [2, 100000] |
+| `chart_inverted_ascending_scallop` | Inverted Ascending Scallop | `scallop_asc_inv` | -100 | `period` 25 [2, 100000] |
+| `chart_descending_scallop` | Descending Scallop | `scallop_desc` | -100 | `period` 25 [2, 100000] |
+| `chart_inverted_descending_scallop` | Inverted Descending Scallop | `scallop_desc_inv` | +100 | `period` 25 [2, 100000] |
+| `chart_double_top_adam_adam` | Double Top, Adam and Adam | `double_top_adam_adam` | -100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
+| `chart_double_top_adam_eve` | Double Top, Adam and Eve | `double_top_adam_eve` | -100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
+| `chart_double_top_eve_adam` | Double Top, Eve and Adam | `double_top_eve_adam` | -100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
+| `chart_double_top_eve_eve` | Double Top, Eve and Eve | `double_top_eve_eve` | -100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
+| `chart_double_bottom_adam_adam` | Double Bottom, Adam and Adam | `double_bottom_adam_adam` | +100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
+| `chart_double_bottom_adam_eve` | Double Bottom, Adam and Eve | `double_bottom_adam_eve` | +100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
+| `chart_double_bottom_eve_adam` | Double Bottom, Eve and Adam | `double_bottom_eve_adam` | +100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
+| `chart_double_bottom_eve_eve` | Double Bottom, Eve and Eve | `double_bottom_eve_eve` | +100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
+| `chart_big_m` | Big M | `big_m` | -100 | `period` 150 [2, 100000], `pivot_n` 7 [1, 100000], `tol` 0.03 [0.0, any], `min_sep` 15 [1, 100000], `min_depth` 0.05 [0.0, any] |
+| `chart_big_w` | Big W | `big_w` | +100 | `period` 150 [2, 100000], `pivot_n` 7 [1, 100000], `tol` 0.03 [0.0, any], `min_sep` 15 [1, 100000], `min_depth` 0.05 [0.0, any] |
+| `chart_three_peaks` | Three Peaks | `three_peaks` | -100 | `period` 120 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.04 [0.0, any], `min_separation` 8 [1, 100000] |
+| `chart_three_valleys` | Three Valleys | `three_valleys` | +100 | `period` 120 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.04 [0.0, any], `min_separation` 8 [1, 100000] |
+| `chart_busted_ascending_triangle` | Busted Ascending Triangle | `busted_asc_triangle` | -100 | `reversal_bars` 10 [1, 100000], `reversal_pct` 0.05 [0.0, any] |
+| `chart_busted_descending_triangle` | Busted Descending Triangle | `busted_desc_triangle` | +100 | `reversal_bars` 10 [1, 100000], `reversal_pct` 0.05 [0.0, any] |
+| `chart_busted_double_bottom` | Busted Double Bottom | `busted_double_bottom` | -100 | `reversal_bars` 10 [1, 100000], `reversal_pct` 0.05 [0.0, any] |
+| `chart_busted_double_top` | Busted Double Top | `busted_double_top` | +100 | `reversal_bars` 10 [1, 100000], `reversal_pct` 0.05 [0.0, any] |
+| `chart_busted_inverse_head_shoulders` | Busted Inverse Head and Shoulders | `busted_hs_bottom` | -100 | `reversal_bars` 10 [1, 100000], `reversal_pct` 0.05 [0.0, any] |
+| `chart_busted_head_shoulders` | Busted Head and Shoulders | `busted_hs_top` | +100 | `reversal_bars` 10 [1, 100000], `reversal_pct` 0.05 [0.0, any] |
+| `chart_busted_rectangle` | Busted Rectangle | `busted_rectangle` | ±100 | `reversal_bars` 10 [1, 100000], `reversal_pct` 0.05 [0.0, any] |
+| `chart_busted_symmetrical_triangle` | Busted Symmetrical Triangle | `busted_sym_triangle` | ±100 | `reversal_bars` 10 [1, 100000], `reversal_pct` 0.05 [0.0, any] |
+| `chart_busted_triple_bottom` | Busted Triple Bottom | `busted_triple_bottom` | -100 | `reversal_bars` 10 [1, 100000], `reversal_pct` 0.05 [0.0, any] |
+| `chart_busted_triple_top` | Busted Triple Top | `busted_triple_top` | +100 | `reversal_bars` 10 [1, 100000], `reversal_pct` 0.05 [0.0, any] |
+
+#### Harmonic patterns
+
+| Function | Title | Oracle | Reads | Parameters (default [min, max]) |
+| --- | --- | --- | --- | --- |
+| `harmonic_abcd_bullish` | Bullish AB=CD | `abcd_bull` | +100 | `period` 100 [2, 100000], `pivot_n` 5 [1, 100000], `fib_tol` 0.05 [0.0, any] |
+| `harmonic_abcd_bearish` | Bearish AB=CD | `abcd_bear` | -100 | `period` 100 [2, 100000], `pivot_n` 5 [1, 100000], `fib_tol` 0.05 [0.0, any] |
+| `harmonic_gartley_bullish` | Bullish Gartley | `gartley_bull` | +100 | `period` 100 [2, 100000], `pivot_n` 5 [1, 100000], `fib_tol` 0.05 [0.0, any] |
+| `harmonic_gartley_bearish` | Bearish Gartley | `gartley_bear` | -100 | `period` 100 [2, 100000], `pivot_n` 5 [1, 100000], `fib_tol` 0.05 [0.0, any] |
+| `harmonic_bat_bullish` | Bullish Bat | `bat_bull` | +100 | `period` 100 [2, 100000], `pivot_n` 5 [1, 100000], `fib_tol` 0.05 [0.0, any] |
+| `harmonic_bat_bearish` | Bearish Bat | `bat_bear` | -100 | `period` 100 [2, 100000], `pivot_n` 5 [1, 100000], `fib_tol` 0.05 [0.0, any] |
+| `harmonic_butterfly_bullish` | Bullish Butterfly | `butterfly_bull` | +100 | `period` 100 [2, 100000], `pivot_n` 5 [1, 100000], `fib_tol` 0.06 [0.0, any] |
+| `harmonic_butterfly_bearish` | Bearish Butterfly | `butterfly_bear` | -100 | `period` 100 [2, 100000], `pivot_n` 5 [1, 100000], `fib_tol` 0.06 [0.0, any] |
+| `harmonic_crab_bullish` | Bullish Crab | `crab_bull` | +100 | `period` 100 [2, 100000], `pivot_n` 5 [1, 100000], `fib_tol` 0.06 [0.0, any] |
+| `harmonic_crab_bearish` | Bearish Crab | `crab_bear` | -100 | `period` 100 [2, 100000], `pivot_n` 5 [1, 100000], `fib_tol` 0.06 [0.0, any] |
+| `harmonic_wolfe_wave_bullish` | Bullish Wolfe Wave | `wolfe_wave_bull` | +100 | `period` 60 [2, 100000], `pivot_n` 4 [1, 100000] |
+| `harmonic_wolfe_wave_bearish` | Bearish Wolfe Wave | `wolfe_wave_bear` | -100 | `period` 60 [2, 100000], `pivot_n` 4 [1, 100000] |
+
+### 5.3 Indicators on oracle A (approved 2026-10-06)
+
+No runnable library implements these, so the owner chose oracle A for them on
+2026-10-06 (D20): the published formula each row cites, evaluated through
+TA-Lib's own functions where one exists and NumPy arithmetic where not, by
+`scripts/oracle/formula_golden.py` (`docs/TESTING.md` section 2). It is the
+weaker oracle: it proves TrendLib computes the documented formula, not that
+the formula is the one a platform draws, and every golden header says so.
+Names that would read as a trade instruction are reworded (D11): Elder's
+"SafeZone stop" is `safezone`, Wilder's volatility "stop" is
+`wilder_volatility`.
+
+| Function | Title | Group | Inputs | Outputs | Parameters (default [min, max]) | Source |
+| --- | --- | --- | --- | --- | --- | --- |
+| `ichimoku` | Ichimoku Kinko Hyo | overlap | high, low | `ichimoku_tenkan`, `ichimoku_kijun`, `ichimoku_senkou_a`, `ichimoku_senkou_b` | `tenkan_period` 9 [1, 100000], `kijun_period` 26 [1, 100000], `senkou_period` 52 [1, 100000], `displacement` 26 [0, 100000] | Goichi Hosoda, Ichimoku Kinko Hyo, 1969 |
+| `alligator` | Williams Alligator | overlap | high, low | `alligator_jaw`, `alligator_teeth`, `alligator_lips` | `jaw_period` 13 [1, 100000], `jaw_shift` 8 [0, 100000], `teeth_period` 8 [1, 100000], `teeth_shift` 5 [0, 100000], `lips_period` 5 [1, 100000], `lips_shift` 3 [0, 100000] | Bill Williams, Trading Chaos, Wiley, 1995 |
+| `gator` | Gator Oscillator | momentum | high, low | `gator_upper`, `gator_lower` | `jaw_period` 13 [1, 100000], `jaw_shift` 8 [0, 100000], `teeth_period` 8 [1, 100000], `teeth_shift` 5 [0, 100000], `lips_period` 5 [1, 100000], `lips_shift` 3 [0, 100000] | Bill Williams, New Trading Dimensions, Wiley, 1998 |
+| `connors_rsi` | Connors RSI | momentum | source | `connors_rsi` | `rsi_period` 3 [2, 100000], `streak_period` 2 [2, 100000], `rank_period` 100 [1, 100000] | Larry Connors, Cesar Alvarez and Matt Radtke, An Introduction to ConnorsRSI, 2012 |
+| `pmo` | Price Momentum Oscillator | momentum | source | `pmo`, `pmo_signal` | `first_period` 35 [2, 100000], `second_period` 20 [2, 100000], `signal_period` 10 [1, 100000] | Carl Swenlin, DecisionPoint Price Momentum Oscillator |
+| `elder_impulse` | Elder Impulse System | momentum | source | `elder_impulse` | `ema_period` 13 [2, 100000], `fast_period` 12 [2, 100000], `slow_period` 26 [2, 100000], `signal_period` 9 [1, 100000] | Alexander Elder, Come Into My Trading Room, Wiley, 2002 |
+| `safezone` | Elder SafeZone | overlap | high, low | `safezone_lower`, `safezone_upper` | `period` 10 [1, 100000], `coefficient` 2.0 [0.0, any], `hold` 3 [1, 100000] | Alexander Elder, Come Into My Trading Room, Wiley, 2002 |
+| `wilder_volatility` | Wilder Volatility System | overlap | high, low, close | `wilder_volatility`, `wilder_volatility_direction` | `period` 7 [1, 100000], `multiplier` 3.0 [0.0, any] | J. Welles Wilder, New Concepts in Technical Trading Systems, Trend Research, 1978 |
+| `atr_bands` | ATR Bands | volatility | high, low, close | `atr_bands_upper`, `atr_bands_lower` | `period` 5 [1, 100000], `shift` 3.0 [0.0, any] | ChartIQ, ATR Bands |
+| `swing_index` | Swing Index | momentum | open, high, low, close | `swing_index` | `limit_move` 0.5 [0.0, any] | J. Welles Wilder, New Concepts in Technical Trading Systems, Trend Research, 1978 |
+| `asi` | Accumulative Swing Index | momentum | open, high, low, close | `asi` | `limit_move` 0.5 [0.0, any] | J. Welles Wilder, New Concepts in Technical Trading Systems, Trend Research, 1978 |
+| `rwi` | Random Walk Index | momentum | high, low, close | `rwi_high`, `rwi_low` | `period` 14 [1, 100000] | Michael Poulos, Of Trends and Random Walks, Technical Analysis of Stocks & Commodities, 1991 |
+| `gapo` | Gopalakrishnan Range Index | volatility | high, low | `gapo` | `period` 5 [2, 100000] | Jayanthi Gopalakrishnan, Technical Analysis of Stocks & Commodities, January 2001 |
+| `fractal_chaos_bands` | Fractal Chaos Bands | overlap | high, low | `fractal_chaos_upper`, `fractal_chaos_lower` | `left_bars` 2 [1, 100000], `right_bars` 2 [1, 100000] | Bill Williams, Trading Chaos, Wiley, 1995 |
+| `darvas_box` | Darvas Box | overlap | high, low | `darvas_top`, `darvas_bottom` | `confirm_bars` 3 [1, 100000] | Nicolas Darvas, How I Made $2,000,000 in the Stock Market, 1960 |
+| `woodies_cci` | Woodies CCI | momentum | high, low, close | `woodies_cci`, `woodies_cci_turbo` | `cci_period` 14 [2, 100000], `turbo_period` 6 [2, 100000] | Ken Wood, Woodies CCI Club |
+| `envelope` | Moving Average Envelope | overlap | source | `envelope_upper`, `envelope_middle`, `envelope_lower` | `period` 20 [2, 100000], `percent` 10.0 [0.0, any] | TradingView, Envelope |
+| `guppy` | Guppy Multiple Moving Average | overlap | source | `guppy_short_3`, `guppy_short_5`, `guppy_short_8`, `guppy_short_10`, `guppy_short_12`, `guppy_short_15`, `guppy_long_30`, `guppy_long_35`, `guppy_long_40`, `guppy_long_45`, `guppy_long_50`, `guppy_long_60` | none | Daryl Guppy, Trading Tactics, Wrightbooks, 1997 |
+| `linreg_channel` | Linear Regression Channel | statistic | source | `linreg_channel_upper`, `linreg_channel_middle`, `linreg_channel_lower` | `period` 100 [2, 100000], `deviation` 2.0 [0.0, any] | TradingView, Linear Regression Channel |
+| `pivots_woodie` | Woodie Pivot Points | levels | high, low, close | `woodie_pp`, `woodie_r1`, `woodie_s1`, `woodie_r2`, `woodie_s2` | none | Ken Wood; TradingView, Pivot Points Standard, type Woodie |
+| `pivots_demark` | DeMark Pivot Points | levels | open, high, low, close | `demark_pp`, `demark_r1`, `demark_s1` | none | Tom DeMark; TradingView, Pivot Points Standard, type DM |
+| `frama` | Fractal Adaptive Moving Average | overlap | high, low | `frama` | `period` 16 [2, 100000] | John Ehlers, FRAMA - Fractal Adaptive Moving Average, Technical Analysis of Stocks & Commodities, 2005 |
+| `twiggs_mf` | Twiggs Money Flow | volume | high, low, close, volume | `twiggs_mf` | `period` 21 [1, 100000] | Colin Twiggs, Twiggs Money Flow, Incredible Charts |
+
+### 5.4 Indicators on oracle F (approved 2026-10-06)
+
+Oracle F is `finta` 1.3 (LGPL-3), a test-only dependency the owner approved on
+2026-10-06 (D19). It is never shipped in a wheel. Parameter names follow finta's
+except its misspelt `channel_lenght` and `average_lenght`; `adjust` keeps
+finta's default. Two indicators first planned here moved to section 5.3:
+finta's `TMF` raises `NotImplementedError`, and its `FRAMA` ignores its own
+`period` and departs from Ehlers' published definition.
+
+| Function | Title | Group | Oracle | Inputs | Outputs | Parameters (default [min, max]) |
+| --- | --- | --- | --- | --- | --- | --- |
+| `wavetrend` | WaveTrend Oscillator | momentum | `TA.WTO` | high, low, close | `wavetrend_1`, `wavetrend_2` | `channel_length` 10 [2, 100000], `average_length` 21 [2, 100000] |
+| `ift_rsi` | Inverse Fisher Transform of RSI | momentum | `TA.IFT_RSI` | source | `ift_rsi` | `rsi_period` 5 [2, 100000], `wma_period` 9 [2, 100000] |
+| `vzo` | Volume Zone Oscillator | volume | `TA.VZO` | close, volume | `vzo` | `period` 14 [2, 100000] |
+| `pivots_fibonacci` | Fibonacci Pivot Points | levels | `TA.PIVOT_FIB` | high, low, close | `fibonacci_pp`, `fibonacci_s1`, `fibonacci_s2`, `fibonacci_s3`, `fibonacci_s4`, `fibonacci_r1`, `fibonacci_r2`, `fibonacci_r3`, `fibonacci_r4` | none |
+
+### 5.5 Not built yet
+
+- **Deferred by the owner (2026-10-06):** the indicators
+  `pandas-ta-classic` implements and TrendLib does not - Know Sure Thing,
+  Schaff Trend Cycle, TTM Squeeze, Fisher Transform, Relative Vigor Index,
+  QQE, Laguerre RSI, RSX, TD Sequential, Center of Gravity, Correlation Trend,
+  Pretty Good Oscillator, Psychological Line, Bias, Even Better Sinewave,
+  Choppiness Index, Ulcer Index, Bollinger %B and Bandwidth, historical
+  volatility, Elder Thermometer, Aberration, Holt-Winters channel, Chandelier
+  and Chande Kroll levels, Ease of Movement, Klinger, Volume Flow Indicator,
+  Archer OBV, Volume Oscillator, volume-weighted MACD, ALMA, VIDYA, McGinley
+  Dynamic, Gann HiLo, Super Smoother, TTM Trend and the rolling statistics.
+  Adopting that library as an oracle was declined for now.
+- **Blocked, no usable definition:** Half Trend, whose only definition is an
+  MPL-2.0 TradingView script, so it cannot be ported into this MIT/Apache crate.
+- **Need a decision first:** Smart Money Concepts (the only implementation
+  labels bars with later bars), Volume and Market Profile and Renko, Kagi,
+  Point & Figure and Line Break (none is one value per input bar), ZigZag and
+  auto-Fibonacci (the last leg redraws), anchored VWAP and session levels
+  (timestamp anchors, A15), relative strength against a benchmark (two symbols),
+  and the India data set already listed above.
+- **Not to be built:** Elliott Wave (no deterministic rule) and scripts whose
+  output is a buy or sell instruction (D11).

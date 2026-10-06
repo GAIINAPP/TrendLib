@@ -124,13 +124,14 @@ def test_the_progress_list_covers_every_approved_indicator(repo_root, catalogue_
     missing = set(catalogue_names) - listed
     assert not missing, f"not listed in PROGRESS.md: {sorted(missing)[:10]}"
     # The three TrendLib defines itself are approved too (INDICATORS.md § 3),
-    # and so are the chart patterns of section 5.1, which a second oracle checks.
+    # and so is everything sections 5.1 to 5.4 approve beyond the catalogue.
     assert {"cpr", "pivots_traditional", "pivots_camarilla"} <= listed
     indicators = (repo_root / "docs" / "INDICATORS.md").read_text()
-    charts = set(re.findall(r"^\| `(chart_[a-z0-9_]+)` \|", indicators.split("### 5.1")[1], re.M))
-    assert charts, "INDICATORS.md section 5.1 approves no chart pattern"
-    assert charts <= listed, f"not listed in PROGRESS.md: {sorted(charts - listed)}"
-    assert len(listed) == len(catalogue_names) + 3 + len(charts)
+    approved = indicators.split("## 5. Beyond TA-Lib")[1].split("### 5.5")[0]
+    beyond = set(re.findall(r"^\| `([a-z][a-z0-9_]*)` \|", approved, re.M))
+    assert beyond, "INDICATORS.md section 5 approves nothing beyond the catalogue"
+    assert beyond <= listed, f"not listed in PROGRESS.md: {sorted(beyond - listed)}"
+    assert len(listed) == len(catalogue_names) + 3 + len(beyond)
 
 
 def test_nothing_is_ticked_that_is_not_actually_there(repo_root):
