@@ -1,0 +1,30 @@
+name: pivots_demark
+title: DeMark Pivot Points
+group: levels
+flags: [overlap]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: demark_pp
+    dtype: float64
+    plot: level
+    doc: A quarter of DeMark's weighted sum of the previous bar
+  - name: demark_r1
+    dtype: float64
+    plot: level
+    doc: Half that sum less the previous low
+  - name: demark_s1
+    dtype: float64
+    plot: level
+    doc: Half that sum less the previous high
+references:
+  - Tom DeMark, as TradingView attributes the levels
+  - TradingView, Pivot Points Standard, type DM
+see_also: [pivots_traditional, pivots_woodie, pivots_fibonacci]

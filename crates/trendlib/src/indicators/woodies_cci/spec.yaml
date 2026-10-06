@@ -1,0 +1,36 @@
+name: woodies_cci
+title: Woodies CCI
+group: momentum
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: cci_period
+    type: int
+    default: 14
+    min: 2
+    max: 100000
+    doc: Bars of the main CCI
+  - name: turbo_period
+    type: int
+    default: 6
+    min: 2
+    max: 100000
+    doc: Bars of the turbo CCI
+outputs:
+  - name: woodies_cci
+    dtype: float64
+    plot: line
+    doc: Commodity Channel Index over cci_period bars
+  - name: woodies_cci_turbo
+    dtype: float64
+    plot: line
+    doc: Commodity Channel Index over turbo_period bars
+references:
+  - Ken Wood, Woodies CCI Club
+  - Donald Lambert, Commodity Channel Index, Commodities, 1980
+see_also: [cci, smi, willr]

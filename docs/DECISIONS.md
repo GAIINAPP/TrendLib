@@ -260,3 +260,17 @@ indicator whose lookback is longer, as Big M's oracle default of 150 is. It
 now skips the warm-up rows instead of slicing past them: the same assertion
 over the same rows, and none when there are none. A shared test changed
 without loosening anything, recorded here as A22 asks.
+
+A27 (M7, 2026-10-07): where a source in `INDICATORS.md` § 5.3 leaves a detail
+of its formula open, TrendLib fixes it as below, and each `doc.md` says so.
+Each is a guess at what the source meant; none adds a parameter.
+
+- Williams' smoothed average (Alligator, Gator) is Wilder's smoothing, written
+  as the step `S + (M - S) / n` rather than `(S (n - 1) + M) / n`. The two are
+  equal in exact arithmetic; the first leaves a flat median exactly flat, which
+  the edge-case suite requires.
+- The Alligator's lines are given as drawn on each bar, `shift` bars after the
+  bar that computed them, as Ichimoku's leading spans are.
+- Woodie pivots take the previous bar's close, Wood's own formula and the
+  inputs the table lists. TradingView's Woodie type uses the current period's
+  open instead.

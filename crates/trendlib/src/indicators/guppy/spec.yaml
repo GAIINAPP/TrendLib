@@ -1,0 +1,59 @@
+name: guppy
+title: Guppy Multiple Moving Average
+group: overlap
+flags: [overlap, unstable]
+inputs:
+  - name: source
+    kind: series
+outputs:
+  - name: guppy_short_3
+    dtype: float64
+    plot: line
+    doc: Exponential moving average over 3 bars
+  - name: guppy_short_5
+    dtype: float64
+    plot: line
+    doc: Exponential moving average over 5 bars
+  - name: guppy_short_8
+    dtype: float64
+    plot: line
+    doc: Exponential moving average over 8 bars
+  - name: guppy_short_10
+    dtype: float64
+    plot: line
+    doc: Exponential moving average over 10 bars
+  - name: guppy_short_12
+    dtype: float64
+    plot: line
+    doc: Exponential moving average over 12 bars
+  - name: guppy_short_15
+    dtype: float64
+    plot: line
+    doc: Exponential moving average over 15 bars
+  - name: guppy_long_30
+    dtype: float64
+    plot: line
+    doc: Exponential moving average over 30 bars
+  - name: guppy_long_35
+    dtype: float64
+    plot: line
+    doc: Exponential moving average over 35 bars
+  - name: guppy_long_40
+    dtype: float64
+    plot: line
+    doc: Exponential moving average over 40 bars
+  - name: guppy_long_45
+    dtype: float64
+    plot: line
+    doc: Exponential moving average over 45 bars
+  - name: guppy_long_50
+    dtype: float64
+    plot: line
+    doc: Exponential moving average over 50 bars
+  - name: guppy_long_60
+    dtype: float64
+    plot: line
+    doc: Exponential moving average over 60 bars
+references:
+  - Daryl Guppy, Trading Tactics, Wrightbooks, 1997
+see_also: [ema, ma, dema]

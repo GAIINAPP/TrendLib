@@ -1,0 +1,58 @@
+name: gator
+title: Gator Oscillator
+group: momentum
+flags: [unstable]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+params:
+  - name: jaw_period
+    type: int
+    default: 13
+    min: 1
+    max: 100000
+    doc: Bars the jaw's smoothed median spans
+  - name: jaw_shift
+    type: int
+    default: 8
+    min: 1
+    max: 100000
+    doc: Bars the jaw is drawn ahead
+  - name: teeth_period
+    type: int
+    default: 8
+    min: 1
+    max: 100000
+    doc: Bars the teeth's smoothed median spans
+  - name: teeth_shift
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Bars the teeth are drawn ahead
+  - name: lips_period
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Bars the lips' smoothed median spans
+  - name: lips_shift
+    type: int
+    default: 3
+    min: 1
+    max: 100000
+    doc: Bars the lips are drawn ahead
+outputs:
+  - name: gator_upper
+    dtype: float64
+    plot: histogram
+    doc: Distance between the jaw and the teeth
+  - name: gator_lower
+    dtype: float64
+    plot: histogram
+    doc: Distance between the teeth and the lips, negated
+references:
+  - Bill Williams, New Trading Dimensions, Wiley, 1998
+see_also: [alligator, ao, ac]

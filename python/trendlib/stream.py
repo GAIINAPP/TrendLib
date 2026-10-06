@@ -23,6 +23,7 @@ __all__ = [
     "adr",
     "adx",
     "adxr",
+    "alligator",
     "ao",
     "apo",
     "aroon",
@@ -30,6 +31,7 @@ __all__ = [
     "asin",
     "atan",
     "atr",
+    "atr_bands",
     "avgdev",
     "avgprice",
     "bar_dead_cat_bounce",
@@ -197,12 +199,15 @@ __all__ = [
     "dx",
     "efi",
     "ema",
+    "envelope",
     "er",
     "eri",
     "exp",
     "floor",
     "fosc",
     "fractal",
+    "gator",
+    "guppy",
     "ha",
     "harmonic_abcd_bearish",
     "harmonic_abcd_bullish",
@@ -263,8 +268,10 @@ __all__ = [
     "percentile",
     "percentrank",
     "pivots_camarilla",
+    "pivots_demark",
     "pivots_fibonacci",
     "pivots_traditional",
+    "pivots_woodie",
     "plus_di",
     "plus_dm",
     "ppo",
@@ -316,6 +323,7 @@ __all__ = [
     "wclprice",
     "willr",
     "wma",
+    "woodies_cci",
     "zlema",
 ]
 
@@ -442,6 +450,23 @@ adxr = Factory(
     ),
     ("adxr",),
 )
+alligator = Factory(
+    "alligator",
+    _core.AlligatorStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "alligator_jaw",
+        "alligator_teeth",
+        "alligator_lips",
+    ),
+)
 ao = Factory(
     "ao",
     _core.AoStream,
@@ -501,6 +526,24 @@ atr = Factory(
         "close",
     ),
     ("atr",),
+)
+atr_bands = Factory(
+    "atr_bands",
+    _core.AtrBandsStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "atr_bands_upper",
+        "atr_bands_lower",
+    ),
 )
 avgdev = Factory("avgdev", _core.AvgdevStream, ("source",), ("series",), ("avgdev",))
 avgprice = Factory(
@@ -3011,6 +3054,17 @@ efi = Factory(
     ("efi",),
 )
 ema = Factory("ema", _core.EmaStream, ("source",), ("series",), ("ema",))
+envelope = Factory(
+    "envelope",
+    _core.EnvelopeStream,
+    ("source",),
+    ("series",),
+    (
+        "envelope_upper",
+        "envelope_middle",
+        "envelope_lower",
+    ),
+)
 er = Factory("er", _core.ErStream, ("source",), ("series",), ("er",))
 eri = Factory(
     "eri",
@@ -3047,6 +3101,42 @@ fractal = Factory(
     (
         "fractal_swing_high",
         "fractal_swing_low",
+    ),
+)
+gator = Factory(
+    "gator",
+    _core.GatorStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "gator_upper",
+        "gator_lower",
+    ),
+)
+guppy = Factory(
+    "guppy",
+    _core.GuppyStream,
+    ("source",),
+    ("series",),
+    (
+        "guppy_short_3",
+        "guppy_short_5",
+        "guppy_short_8",
+        "guppy_short_10",
+        "guppy_short_12",
+        "guppy_short_15",
+        "guppy_long_30",
+        "guppy_long_35",
+        "guppy_long_40",
+        "guppy_long_45",
+        "guppy_long_50",
+        "guppy_long_60",
     ),
 )
 ha = Factory(
@@ -3635,6 +3725,27 @@ pivots_camarilla = Factory(
         "camarilla_s4",
     ),
 )
+pivots_demark = Factory(
+    "pivots_demark",
+    _core.PivotsDemarkStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "demark_pp",
+        "demark_r1",
+        "demark_s1",
+    ),
+)
 pivots_fibonacci = Factory(
     "pivots_fibonacci",
     _core.PivotsFibonacciStream,
@@ -3681,6 +3792,27 @@ pivots_traditional = Factory(
         "pivots_traditional_s1",
         "pivots_traditional_s2",
         "pivots_traditional_s3",
+    ),
+)
+pivots_woodie = Factory(
+    "pivots_woodie",
+    _core.PivotsWoodieStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "woodie_pp",
+        "woodie_r1",
+        "woodie_s1",
+        "woodie_r2",
+        "woodie_s2",
     ),
 )
 plus_di = Factory(
@@ -4069,6 +4201,24 @@ willr = Factory(
     ("willr",),
 )
 wma = Factory("wma", _core.WmaStream, ("source",), ("series",), ("wma",))
+woodies_cci = Factory(
+    "woodies_cci",
+    _core.WoodiesCciStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "woodies_cci",
+        "woodies_cci_turbo",
+    ),
+)
 zlema = Factory("zlema", _core.ZlemaStream, ("source",), ("series",), ("zlema",))
 
 _ = (Any, _convert)

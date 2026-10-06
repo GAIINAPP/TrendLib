@@ -73,6 +73,9 @@ functions wherever one computes a step (`MIDPRICE`, `EMA`, `SMA`, `RSI`, `ATR`,
 in the header. For a step that is control flow rather than arithmetic - a
 streak count, a box that holds until it is broken - the oracle is only as
 independent as that transcription of the rule, and the header says that too.
+Where the daily walk never reaches a branch of a formula, a case at the
+defaults runs on another committed dataset: `pivots_demark`'s `patterns` case
+reads `patterns_1080.csv`, whose doji bars close exactly at their open.
 
 H is still the stronger evidence for those three and open question Q4 still
 asks for it; A is what ships until then. Do not substitute self-computed

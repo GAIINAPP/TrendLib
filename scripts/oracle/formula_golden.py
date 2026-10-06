@@ -29,6 +29,12 @@ TESTDATA = REPO_ROOT / "testdata"
 TOLERANCE = "rel=1e-10 abs=1e-12"
 DAILY = "daily_2000.csv"
 
+# Cases run at the defaults on another dataset, for a branch of the formula the
+# daily walk never reaches. patterns_1080.csv has bars that close at their open.
+OTHER_DATA = {
+    "pivots_demark": {"patterns": "patterns_1080.csv"},
+}
+
 
 def load_spec(name: str) -> dict:
     import yaml
@@ -53,7 +59,13 @@ def cases(spec: dict) -> dict[str, dict]:
     }
     if floors:
         found["min_period"] = {**defaults(spec), **floors}
+    for case in OTHER_DATA.get(spec["name"], {}):
+        found[case] = defaults(spec)
     return found
+
+
+def dataset_for(name: str, case: str) -> str:
+    return OTHER_DATA.get(name, {}).get(case, DAILY)
 
 
 def read_columns(filename: str):
@@ -106,8 +118,130 @@ def ichimoku(cols, p):
     return outputs, longest - 1 + d, "talib.MIDPRICE (MEDPRICE for a one-bar window), ADD and MULT"
 
 
+def constant(like, value: float):
+    import numpy as np
+
+    return np.full_like(like, value)
+
+
+def smma(values, period: int):
+    """Williams' smoothed average: TA-Lib's SMA of the first `period`, then each bar
+    moves it `1 / period` of the way to the new value."""
+    import numpy as np
+    import talib
+
+    out = talib.SMA(values, timeperiod=period)
+    if period == 1:
+        return out
+    k = 1.0 / period
+    start = int(np.flatnonzero(~np.isnan(out))[0])
+    for t in range(start + 1, len(values)):
+        out[t] = (values[t] - out[t - 1]) * k + out[t - 1]
+    return out
+
+
+def alligator_lines(cols, p):
+    import talib
+
+    median = talib.MEDPRICE(cols["high"], cols["low"])
+    names = ("jaw", "teeth", "lips")
+    lines = [shifted(smma(median, p[f"{n}_period"]), p[f"{n}_shift"]) for n in names]
+    return lines, max(p[f"{n}_period"] - 1 + p[f"{n}_shift"] for n in names)
+
+
+def alligator(cols, p):
+    lines, lookback = alligator_lines(cols, p)
+    return lines, lookback, "talib.MEDPRICE and SMA (the seed), the smoothing step in NumPy"
+
+
+def gator(cols, p):
+    import numpy as np
+    import talib
+
+    (jaw, teeth, lips), lookback = alligator_lines(cols, p)
+    outputs = [np.abs(talib.SUB(jaw, teeth)), -np.abs(talib.SUB(teeth, lips))]
+    return outputs, lookback, "talib.MEDPRICE, SMA (the seed) and SUB, the smoothing step in NumPy"
+
+
+def envelope(cols, p):
+    import talib
+
+    middle = talib.SMA(cols["source"], timeperiod=p["period"])
+    upper = talib.MULT(middle, constant(middle, 1.0 + p["percent"] / 100.0))
+    lower = talib.MULT(middle, constant(middle, 1.0 - p["percent"] / 100.0))
+    return [upper, middle, lower], p["period"] - 1, "talib.SMA and MULT"
+
+
+GUPPY = (3, 5, 8, 10, 12, 15, 30, 35, 40, 45, 50, 60)
+
+
+def guppy(cols, p):
+    import talib
+
+    lines = [talib.EMA(cols["source"], timeperiod=n) for n in GUPPY]
+    return lines, max(GUPPY) - 1, "talib.EMA"
+
+
+def woodies_cci(cols, p):
+    import talib
+
+    hlc = (cols["high"], cols["low"], cols["close"])
+    outputs = [
+        talib.CCI(*hlc, timeperiod=p["cci_period"]),
+        talib.CCI(*hlc, timeperiod=p["turbo_period"]),
+    ]
+    return outputs, max(p["cci_period"], p["turbo_period"]) - 1, "talib.CCI"
+
+
+def atr_bands(cols, p):
+    import talib
+
+    average = talib.ATR(cols["high"], cols["low"], cols["close"], timeperiod=p["period"])
+    width = talib.MULT(average, constant(average, p["shift"]))
+    outputs = [talib.ADD(cols["close"], width), talib.SUB(cols["close"], width)]
+    return outputs, p["period"], "talib.ATR, MULT, ADD and SUB"
+
+
+def pivots_woodie(cols, p):
+    import talib
+
+    high, low, close = (shifted(cols[k], 1) for k in ("high", "low", "close"))
+    two = constant(close, 2.0)
+    pivot = talib.DIV(talib.ADD(talib.ADD(high, low), talib.MULT(two, close)), constant(close, 4.0))
+    span = talib.SUB(high, low)
+    outputs = [
+        pivot,
+        talib.SUB(talib.MULT(two, pivot), low),
+        talib.SUB(talib.MULT(two, pivot), high),
+        talib.ADD(pivot, span),
+        talib.SUB(pivot, span),
+    ]
+    return outputs, 1, "talib.ADD, SUB, MULT and DIV"
+
+
+def pivots_demark(cols, p):
+    import numpy as np
+
+    opened, high, low, close = (shifted(cols[k], 1) for k in ("open", "high", "low", "close"))
+    total = np.where(
+        close < opened,
+        high + 2.0 * low + close,
+        np.where(close > opened, 2.0 * high + low + close, high + low + 2.0 * close),
+    )
+    outputs = [total / 4.0, total / 2.0 - low, total / 2.0 - high]
+    return outputs, 1, "nothing: NumPy arithmetic, as no TA-Lib function computes a step"
+
+
 FORMULAS = {
     "ichimoku": ichimoku,
+    "alligator": alligator,
+    "gator": gator,
+    "envelope": envelope,
+    "guppy": guppy,
+    "woodies_cci": woodies_cci,
+    "atr_bands": atr_bands,
+    "pivots_woodie": pivots_woodie,
+    "pivots_demark": pivots_demark,
 }
 
 
@@ -126,7 +260,8 @@ def warm_up(outputs, lookback: int):
 def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
     import talib
 
-    columns = read_columns(DAILY)
+    dataset = dataset_for(name, case)
+    columns = read_columns(dataset)
     outputs, lookback, functions = FORMULAS[name](columns, params)
     outputs = warm_up(outputs, lookback)
     if len(outputs) != len(spec["outputs"]):
@@ -142,7 +277,7 @@ def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
         f"# oracle: oracle A, the formula of INDICATORS.md section 5.3 evaluated through "
         f"ta-lib-python {talib.__version__} {functions}",
         f"# produced_by: python scripts/oracle/formula_golden.py {name} --case {case}",
-        f"# input: testdata/{DAILY} (all rows)",
+        f"# input: testdata/{dataset} (all rows)",
         f"# tolerance: {TOLERANCE}",
         "# excluded_rows: none",
         f"# note: rows before {lookback} are warm-up for every output (CONVENTIONS.md section 2)",

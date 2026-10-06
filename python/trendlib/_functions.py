@@ -223,6 +223,7 @@ __all__ = [
     "adr",
     "adx",
     "adxr",
+    "alligator",
     "ao",
     "apo",
     "aroon",
@@ -230,6 +231,7 @@ __all__ = [
     "asin",
     "atan",
     "atr",
+    "atr_bands",
     "avgdev",
     "avgprice",
     "bar_dead_cat_bounce",
@@ -397,12 +399,15 @@ __all__ = [
     "dx",
     "efi",
     "ema",
+    "envelope",
     "er",
     "eri",
     "exp",
     "floor",
     "fosc",
     "fractal",
+    "gator",
+    "guppy",
     "ha",
     "harmonic_abcd_bearish",
     "harmonic_abcd_bullish",
@@ -464,8 +469,10 @@ __all__ = [
     "percentile",
     "percentrank",
     "pivots_camarilla",
+    "pivots_demark",
     "pivots_fibonacci",
     "pivots_traditional",
+    "pivots_woodie",
     "plus_di",
     "plus_dm",
     "ppo",
@@ -517,6 +524,7 @@ __all__ = [
     "wclprice",
     "willr",
     "wma",
+    "woodies_cci",
     "zlema",
 ]
 
@@ -820,6 +828,79 @@ def adxr(
     return _convert.wrap_outputs(out, carrier, ("adxr",))
 
 
+def alligator(
+    high=None,
+    low=None,
+    *,
+    jaw_period: int = _PARAMS["alligator"]["jaw_period"]["default"],
+    jaw_shift: int = _PARAMS["alligator"]["jaw_shift"]["default"],
+    teeth_period: int = _PARAMS["alligator"]["teeth_period"]["default"],
+    teeth_shift: int = _PARAMS["alligator"]["teeth_shift"]["default"],
+    lips_period: int = _PARAMS["alligator"]["lips_period"]["default"],
+    lips_shift: int = _PARAMS["alligator"]["lips_shift"]["default"],
+) -> Any:
+    """Williams Alligator.
+
+    Parameters
+    ----------
+    jaw_period : int, default 13
+        Bars the jaw's smoothed median spans, from 1 to 100000.
+    jaw_shift : int, default 8
+        Bars the jaw is drawn ahead, from 1 to 100000.
+    teeth_period : int, default 8
+        Bars the teeth's smoothed median spans, from 1 to 100000.
+    teeth_shift : int, default 5
+        Bars the teeth are drawn ahead, from 1 to 100000.
+    lips_period : int, default 5
+        Bars the lips' smoothed median spans, from 1 to 100000.
+    lips_shift : int, default 3
+        Bars the lips are drawn ahead, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        alligator_jaw: Jaw, the jaw_period smoothed median drawn jaw_shift bars ahead.
+        alligator_teeth: Teeth, the teeth_period smoothed median drawn teeth_shift bars ahead.
+        alligator_lips: Lips, the lips_period smoothed median drawn lips_shift bars ahead.
+    """
+    jaw_period = _convert.as_int("alligator", "jaw_period", jaw_period)
+    jaw_shift = _convert.as_int("alligator", "jaw_shift", jaw_shift)
+    teeth_period = _convert.as_int("alligator", "teeth_period", teeth_period)
+    teeth_shift = _convert.as_int("alligator", "teeth_shift", teeth_shift)
+    lips_period = _convert.as_int("alligator", "lips_period", lips_period)
+    lips_shift = _convert.as_int("alligator", "lips_shift", lips_shift)
+    columns, carrier = _convert.bars(
+        "alligator",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.alligator(
+        *columns,
+        jaw_period=jaw_period,
+        jaw_shift=jaw_shift,
+        teeth_period=teeth_period,
+        teeth_shift=teeth_shift,
+        lips_period=lips_period,
+        lips_shift=lips_shift,
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "alligator_jaw",
+            "alligator_teeth",
+            "alligator_lips",
+        ),
+    )
+
+
 def ao(
     high=None,
     low=None,
@@ -1016,6 +1097,56 @@ def atr(
     )
     out = _core.atr(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("atr",))
+
+
+def atr_bands(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["atr_bands"]["period"]["default"],
+    shift: float = _PARAMS["atr_bands"]["shift"]["default"],
+) -> Any:
+    """ATR Bands.
+
+    Parameters
+    ----------
+    period : int, default 5
+        Bars of the average true range, from 1 to 100000.
+    shift : float, default 3.0
+        Multiple of the average true range each band sits from the close.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        atr_bands_upper: Close plus shift average true ranges.
+        atr_bands_lower: Close minus shift average true ranges.
+    """
+    period = _convert.as_int("atr_bands", "period", period)
+    shift = _convert.as_float("atr_bands", "shift", shift)
+    columns, carrier = _convert.bars(
+        "atr_bands",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.atr_bands(*columns, period=period, shift=shift)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "atr_bands_upper",
+            "atr_bands_lower",
+        ),
+    )
 
 
 def avgdev(source=None, *, period: int = _PARAMS["avgdev"]["period"]["default"]) -> Any:
@@ -7289,6 +7420,43 @@ def ema(source=None, *, period: int = _PARAMS["ema"]["period"]["default"]) -> An
     return _convert.wrap_outputs(out, carrier, ("ema",))
 
 
+def envelope(
+    source=None,
+    *,
+    period: int = _PARAMS["envelope"]["period"]["default"],
+    percent: float = _PARAMS["envelope"]["percent"]["default"],
+) -> Any:
+    """Moving Average Envelope.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Bars of the simple moving average, from 2 to 100000.
+    percent : float, default 10.0
+        Percent each band sits from the average.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        envelope_upper: The average raised by percent.
+        envelope_middle: The simple moving average.
+        envelope_lower: The average lowered by percent.
+    """
+    period = _convert.as_int("envelope", "period", period)
+    percent = _convert.as_float("envelope", "percent", percent)
+    columns, carrier = _convert.bars("envelope", (source,), ("source",), ("series",))
+    out = _core.envelope(*columns, period=period, percent=percent)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "envelope_upper",
+            "envelope_middle",
+            "envelope_lower",
+        ),
+    )
+
+
 def er(source=None, *, period: int = _PARAMS["er"]["period"]["default"]) -> Any:
     """Efficiency Ratio.
 
@@ -7438,6 +7606,118 @@ def fractal(
         (
             "fractal_swing_high",
             "fractal_swing_low",
+        ),
+    )
+
+
+def gator(
+    high=None,
+    low=None,
+    *,
+    jaw_period: int = _PARAMS["gator"]["jaw_period"]["default"],
+    jaw_shift: int = _PARAMS["gator"]["jaw_shift"]["default"],
+    teeth_period: int = _PARAMS["gator"]["teeth_period"]["default"],
+    teeth_shift: int = _PARAMS["gator"]["teeth_shift"]["default"],
+    lips_period: int = _PARAMS["gator"]["lips_period"]["default"],
+    lips_shift: int = _PARAMS["gator"]["lips_shift"]["default"],
+) -> Any:
+    """Gator Oscillator.
+
+    Parameters
+    ----------
+    jaw_period : int, default 13
+        Bars the jaw's smoothed median spans, from 1 to 100000.
+    jaw_shift : int, default 8
+        Bars the jaw is drawn ahead, from 1 to 100000.
+    teeth_period : int, default 8
+        Bars the teeth's smoothed median spans, from 1 to 100000.
+    teeth_shift : int, default 5
+        Bars the teeth are drawn ahead, from 1 to 100000.
+    lips_period : int, default 5
+        Bars the lips' smoothed median spans, from 1 to 100000.
+    lips_shift : int, default 3
+        Bars the lips are drawn ahead, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        gator_upper: Distance between the jaw and the teeth.
+        gator_lower: Distance between the teeth and the lips, negated.
+    """
+    jaw_period = _convert.as_int("gator", "jaw_period", jaw_period)
+    jaw_shift = _convert.as_int("gator", "jaw_shift", jaw_shift)
+    teeth_period = _convert.as_int("gator", "teeth_period", teeth_period)
+    teeth_shift = _convert.as_int("gator", "teeth_shift", teeth_shift)
+    lips_period = _convert.as_int("gator", "lips_period", lips_period)
+    lips_shift = _convert.as_int("gator", "lips_shift", lips_shift)
+    columns, carrier = _convert.bars(
+        "gator",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.gator(
+        *columns,
+        jaw_period=jaw_period,
+        jaw_shift=jaw_shift,
+        teeth_period=teeth_period,
+        teeth_shift=teeth_shift,
+        lips_period=lips_period,
+        lips_shift=lips_shift,
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "gator_upper",
+            "gator_lower",
+        ),
+    )
+
+
+def guppy(source=None) -> Any:
+    """Guppy Multiple Moving Average.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        guppy_short_3: Exponential moving average over 3 bars.
+        guppy_short_5: Exponential moving average over 5 bars.
+        guppy_short_8: Exponential moving average over 8 bars.
+        guppy_short_10: Exponential moving average over 10 bars.
+        guppy_short_12: Exponential moving average over 12 bars.
+        guppy_short_15: Exponential moving average over 15 bars.
+        guppy_long_30: Exponential moving average over 30 bars.
+        guppy_long_35: Exponential moving average over 35 bars.
+        guppy_long_40: Exponential moving average over 40 bars.
+        guppy_long_45: Exponential moving average over 45 bars.
+        guppy_long_50: Exponential moving average over 50 bars.
+        guppy_long_60: Exponential moving average over 60 bars.
+    """
+    columns, carrier = _convert.bars("guppy", (source,), ("source",), ("series",))
+    out = _core.guppy(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "guppy_short_3",
+            "guppy_short_5",
+            "guppy_short_8",
+            "guppy_short_10",
+            "guppy_short_12",
+            "guppy_short_15",
+            "guppy_long_30",
+            "guppy_long_35",
+            "guppy_long_40",
+            "guppy_long_45",
+            "guppy_long_50",
+            "guppy_long_60",
         ),
     )
 
@@ -9364,6 +9644,44 @@ def pivots_camarilla(high=None, low=None, close=None) -> Any:
     )
 
 
+def pivots_demark(open=None, high=None, low=None, close=None) -> Any:
+    """DeMark Pivot Points.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        demark_pp: A quarter of DeMark's weighted sum of the previous bar.
+        demark_r1: Half that sum less the previous low.
+        demark_s1: Half that sum less the previous high.
+    """
+    columns, carrier = _convert.bars(
+        "pivots_demark",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.pivots_demark(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "demark_pp",
+            "demark_r1",
+            "demark_s1",
+        ),
+    )
+
+
 def pivots_fibonacci(high=None, low=None, close=None) -> Any:
     """Fibonacci Pivot Points.
 
@@ -9452,6 +9770,46 @@ def pivots_traditional(high=None, low=None, close=None) -> Any:
             "pivots_traditional_s1",
             "pivots_traditional_s2",
             "pivots_traditional_s3",
+        ),
+    )
+
+
+def pivots_woodie(high=None, low=None, close=None) -> Any:
+    """Woodie Pivot Points.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        woodie_pp: The previous bar's high, low and twice its close, averaged.
+        woodie_r1: Twice the pivot less the previous low.
+        woodie_s1: Twice the pivot less the previous high.
+        woodie_r2: Pivot plus the previous range.
+        woodie_s2: Pivot less the previous range.
+    """
+    columns, carrier = _convert.bars(
+        "pivots_woodie",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.pivots_woodie(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "woodie_pp",
+            "woodie_r1",
+            "woodie_s1",
+            "woodie_r2",
+            "woodie_s2",
         ),
     )
 
@@ -10956,6 +11314,56 @@ def wma(source=None, *, period: int = _PARAMS["wma"]["period"]["default"]) -> An
     columns, carrier = _convert.bars("wma", (source,), ("source",), ("series",))
     out = _core.wma(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("wma",))
+
+
+def woodies_cci(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    cci_period: int = _PARAMS["woodies_cci"]["cci_period"]["default"],
+    turbo_period: int = _PARAMS["woodies_cci"]["turbo_period"]["default"],
+) -> Any:
+    """Woodies CCI.
+
+    Parameters
+    ----------
+    cci_period : int, default 14
+        Bars of the main CCI, from 2 to 100000.
+    turbo_period : int, default 6
+        Bars of the turbo CCI, from 2 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        woodies_cci: Commodity Channel Index over cci_period bars.
+        woodies_cci_turbo: Commodity Channel Index over turbo_period bars.
+    """
+    cci_period = _convert.as_int("woodies_cci", "cci_period", cci_period)
+    turbo_period = _convert.as_int("woodies_cci", "turbo_period", turbo_period)
+    columns, carrier = _convert.bars(
+        "woodies_cci",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.woodies_cci(*columns, cci_period=cci_period, turbo_period=turbo_period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "woodies_cci",
+            "woodies_cci_turbo",
+        ),
+    )
 
 
 def zlema(source=None, *, period: int = _PARAMS["zlema"]["period"]["default"]) -> Any:

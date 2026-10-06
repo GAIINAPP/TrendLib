@@ -1,0 +1,35 @@
+name: atr_bands
+title: ATR Bands
+group: volatility
+flags: [overlap, unstable]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Bars of the average true range
+  - name: shift
+    type: float
+    default: 3.0
+    min: 0.0
+    doc: Multiple of the average true range each band sits from the close
+outputs:
+  - name: atr_bands_upper
+    dtype: float64
+    plot: upper_band
+    doc: Close plus shift average true ranges
+  - name: atr_bands_lower
+    dtype: float64
+    plot: lower_band
+    doc: Close minus shift average true ranges
+references:
+  - ChartIQ, ATR Bands
+see_also: [atr, kc, supertrend]

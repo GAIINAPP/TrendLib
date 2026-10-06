@@ -1,0 +1,36 @@
+name: pivots_woodie
+title: Woodie Pivot Points
+group: levels
+flags: [overlap]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+outputs:
+  - name: woodie_pp
+    dtype: float64
+    plot: level
+    doc: The previous bar's high, low and twice its close, averaged
+  - name: woodie_r1
+    dtype: float64
+    plot: level
+    doc: Twice the pivot less the previous low
+  - name: woodie_s1
+    dtype: float64
+    plot: level
+    doc: Twice the pivot less the previous high
+  - name: woodie_r2
+    dtype: float64
+    plot: level
+    doc: Pivot plus the previous range
+  - name: woodie_s2
+    dtype: float64
+    plot: level
+    doc: Pivot less the previous range
+references:
+  - Ken Wood, Woodies CCI Club
+  - TradingView, Pivot Points Standard, type Woodie
+see_also: [pivots_traditional, pivots_fibonacci, pivots_camarilla]

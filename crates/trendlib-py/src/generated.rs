@@ -1249,6 +1249,224 @@ impl PyAdxrStream {
     }
 }
 
+type AlligatorOutputs<'py> = (
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+);
+
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+#[pyo3(name = "alligator", signature = (high, low, *, jaw_period, jaw_shift, teeth_period, teeth_shift, lips_period, lips_shift))]
+pub fn alligator<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    jaw_period: i64,
+    jaw_shift: i64,
+    teeth_period: i64,
+    teeth_shift: i64,
+    lips_period: i64,
+    lips_shift: i64,
+) -> PyResult<AlligatorOutputs<'py>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let jaw_period = int_param("alligator", "jaw_period", jaw_period, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let jaw_shift =
+        int_param("alligator", "jaw_shift", jaw_shift, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+    let teeth_period = int_param("alligator", "teeth_period", teeth_period, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let teeth_shift = int_param("alligator", "teeth_shift", teeth_shift, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let lips_period = int_param("alligator", "lips_period", lips_period, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let lips_shift = int_param("alligator", "lips_shift", lips_shift, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::alligator::Params {
+        jaw_period,
+        jaw_shift,
+        teeth_period,
+        teeth_shift,
+        lips_period,
+        lips_shift,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::alligator::Alligator as Kernel<2, 3>>::batch(
+                [high, low],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok((
+        std::mem::take(&mut out[0]).into_pyarray(py),
+        std::mem::take(&mut out[1]).into_pyarray(py),
+        std::mem::take(&mut out[2]).into_pyarray(py),
+    ))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "AlligatorStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyAlligatorStream {
+    inner: BarStream<trendlib::indicators::alligator::Alligator, 2, 3>,
+}
+
+#[pymethods]
+impl PyAlligatorStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, jaw_period, jaw_shift, teeth_period, teeth_shift, lips_period, lips_shift))]
+    #[allow(clippy::too_many_arguments)]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        jaw_period: i64,
+        jaw_shift: i64,
+        teeth_period: i64,
+        teeth_shift: i64,
+        lips_period: i64,
+        lips_shift: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let jaw_period = int_param("alligator", "jaw_period", jaw_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let jaw_shift = int_param("alligator", "jaw_shift", jaw_shift, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let teeth_period = int_param("alligator", "teeth_period", teeth_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let teeth_shift = int_param("alligator", "teeth_shift", teeth_shift, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let lips_period = int_param("alligator", "lips_period", lips_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let lips_shift = int_param("alligator", "lips_shift", lips_shift, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::alligator::Params {
+            jaw_period,
+            jaw_shift,
+            teeth_period,
+            teeth_shift,
+            lips_period,
+            lips_shift,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::alligator::Alligator, 2, 3> as Stream>::open(
+                    [high, low],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, jaw_period, jaw_shift, teeth_period, teeth_shift, lips_period, lips_shift))]
+    #[allow(clippy::too_many_arguments)]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        jaw_period: i64,
+        jaw_shift: i64,
+        teeth_period: i64,
+        teeth_shift: i64,
+        lips_period: i64,
+        lips_shift: i64,
+    ) -> PyResult<(Self, AlligatorOutputs<'py>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let jaw_period = int_param("alligator", "jaw_period", jaw_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let jaw_shift = int_param("alligator", "jaw_shift", jaw_shift, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let teeth_period = int_param("alligator", "teeth_period", teeth_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let teeth_shift = int_param("alligator", "teeth_shift", teeth_shift, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let lips_period = int_param("alligator", "lips_period", lips_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let lips_shift = int_param("alligator", "lips_shift", lips_shift, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::alligator::Params {
+            jaw_period,
+            jaw_shift,
+            teeth_period,
+            teeth_shift,
+            lips_period,
+            lips_shift,
+        };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::alligator::Alligator as Kernel<2, 3>>::open_and_fill(
+                    [high, low],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            (
+                std::mem::take(&mut out[0]).into_pyarray(py),
+                std::mem::take(&mut out[1]).into_pyarray(py),
+                std::mem::take(&mut out[2]).into_pyarray(py),
+            )
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64) -> PyResult<(f64, f64, f64)> {
+        let row = self
+            .inner
+            .update([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1], row[2]))
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64) -> PyResult<(f64, f64, f64)> {
+        let row = self
+            .inner
+            .peek([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1], row[2]))
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64, f64)> {
+        self.inner.value().map(|row| (row[0], row[1], row[2]))
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "alligator"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream alligator bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
 #[pyfunction]
 #[pyo3(name = "ao", signature = (high, low, *, fast_period, slow_period))]
 pub fn ao<'py>(
@@ -2117,6 +2335,164 @@ impl PyAtrStream {
     fn __repr__(&self) -> String {
         format!(
             "<trendlib stream atr bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+type AtrBandsOutputs<'py> = (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>);
+
+#[pyfunction]
+#[pyo3(name = "atr_bands", signature = (high, low, close, *, period, shift))]
+pub fn atr_bands<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    shift: f64,
+) -> PyResult<AtrBandsOutputs<'py>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period =
+        int_param("atr_bands", "period", period, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+    let shift = float_param("atr_bands", "shift", shift, 0.0, f64::INFINITY)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::atr_bands::Params { period, shift };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::atr_bands::AtrBands as Kernel<3, 2>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok((
+        std::mem::take(&mut out[0]).into_pyarray(py),
+        std::mem::take(&mut out[1]).into_pyarray(py),
+    ))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "AtrBandsStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyAtrBandsStream {
+    inner: BarStream<trendlib::indicators::atr_bands::AtrBands, 3, 2>,
+}
+
+#[pymethods]
+impl PyAtrBandsStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, shift))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        shift: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period =
+            int_param("atr_bands", "period", period, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+        let shift = float_param("atr_bands", "shift", shift, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::atr_bands::Params { period, shift };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::atr_bands::AtrBands, 3, 2> as Stream>::open(
+                    [high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, shift))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        shift: f64,
+    ) -> PyResult<(Self, AtrBandsOutputs<'py>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period =
+            int_param("atr_bands", "period", period, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+        let shift = float_param("atr_bands", "shift", shift, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::atr_bands::Params { period, shift };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::atr_bands::AtrBands as Kernel<3, 2>>::open_and_fill(
+                    [high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            (
+                std::mem::take(&mut out[0]).into_pyarray(py),
+                std::mem::take(&mut out[1]).into_pyarray(py),
+            )
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<(f64, f64)> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1]))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<(f64, f64)> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1]))
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64)> {
+        self.inner.value().map(|row| (row[0], row[1]))
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "atr_bands"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream atr_bands bars_seen={} value={:?}>",
             self.inner.bars_seen(),
             self.inner.value()
         )
@@ -29353,6 +29729,149 @@ impl PyEmaStream {
     }
 }
 
+type EnvelopeOutputs<'py> = (
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+);
+
+#[pyfunction]
+#[pyo3(name = "envelope", signature = (source, *, period, percent))]
+pub fn envelope<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    percent: f64,
+) -> PyResult<EnvelopeOutputs<'py>> {
+    let source = as_slice(&source, "source")?;
+    let period =
+        int_param("envelope", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+    let percent = float_param("envelope", "percent", percent, 0.0, f64::INFINITY)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::envelope::Params { period, percent };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::envelope::Envelope as Kernel<1, 3>>::batch([source], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok((
+        std::mem::take(&mut out[0]).into_pyarray(py),
+        std::mem::take(&mut out[1]).into_pyarray(py),
+        std::mem::take(&mut out[2]).into_pyarray(py),
+    ))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "EnvelopeStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyEnvelopeStream {
+    inner: BarStream<trendlib::indicators::envelope::Envelope, 1, 3>,
+}
+
+#[pymethods]
+impl PyEnvelopeStream {
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period, percent))]
+    fn open<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        percent: f64,
+    ) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("envelope", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let percent = float_param("envelope", "percent", percent, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::envelope::Params { period, percent };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::envelope::Envelope, 1, 3> as Stream>::open(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source, *, period, percent))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        percent: f64,
+    ) -> PyResult<(Self, EnvelopeOutputs<'py>)> {
+        let source = as_slice(&source, "source")?;
+        let period =
+            int_param("envelope", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+        let percent = float_param("envelope", "percent", percent, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::envelope::Params { period, percent };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::envelope::Envelope as Kernel<1, 3>>::open_and_fill(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            (
+                std::mem::take(&mut out[0]).into_pyarray(py),
+                std::mem::take(&mut out[1]).into_pyarray(py),
+                std::mem::take(&mut out[2]).into_pyarray(py),
+            )
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(&mut self, py: Python<'_>, source: f64) -> PyResult<(f64, f64, f64)> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1], row[2]))
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(&self, py: Python<'_>, source: f64) -> PyResult<(f64, f64, f64)> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1], row[2]))
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64, f64)> {
+        self.inner.value().map(|row| (row[0], row[1], row[2]))
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "envelope"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream envelope bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
 #[pyfunction]
 #[pyo3(name = "er", signature = (source, *, period))]
 pub fn er<'py>(
@@ -30069,6 +30588,373 @@ impl PyFractalStream {
     fn __repr__(&self) -> String {
         format!(
             "<trendlib stream fractal bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+type GatorOutputs<'py> = (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>);
+
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+#[pyo3(name = "gator", signature = (high, low, *, jaw_period, jaw_shift, teeth_period, teeth_shift, lips_period, lips_shift))]
+pub fn gator<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    jaw_period: i64,
+    jaw_shift: i64,
+    teeth_period: i64,
+    teeth_shift: i64,
+    lips_period: i64,
+    lips_shift: i64,
+) -> PyResult<GatorOutputs<'py>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let jaw_period =
+        int_param("gator", "jaw_period", jaw_period, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+    let jaw_shift =
+        int_param("gator", "jaw_shift", jaw_shift, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+    let teeth_period = int_param("gator", "teeth_period", teeth_period, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let teeth_shift =
+        int_param("gator", "teeth_shift", teeth_shift, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+    let lips_period =
+        int_param("gator", "lips_period", lips_period, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+    let lips_shift =
+        int_param("gator", "lips_shift", lips_shift, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::gator::Params {
+        jaw_period,
+        jaw_shift,
+        teeth_period,
+        teeth_shift,
+        lips_period,
+        lips_shift,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::gator::Gator as Kernel<2, 2>>::batch([high, low], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok((
+        std::mem::take(&mut out[0]).into_pyarray(py),
+        std::mem::take(&mut out[1]).into_pyarray(py),
+    ))
+}
+
+#[pyclass(module = "trendlib._core", name = "GatorStream", skip_from_py_object)]
+#[derive(Clone, Debug)]
+pub struct PyGatorStream {
+    inner: BarStream<trendlib::indicators::gator::Gator, 2, 2>,
+}
+
+#[pymethods]
+impl PyGatorStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, jaw_period, jaw_shift, teeth_period, teeth_shift, lips_period, lips_shift))]
+    #[allow(clippy::too_many_arguments)]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        jaw_period: i64,
+        jaw_shift: i64,
+        teeth_period: i64,
+        teeth_shift: i64,
+        lips_period: i64,
+        lips_shift: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let jaw_period = int_param("gator", "jaw_period", jaw_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let jaw_shift =
+            int_param("gator", "jaw_shift", jaw_shift, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+        let teeth_period = int_param("gator", "teeth_period", teeth_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let teeth_shift = int_param("gator", "teeth_shift", teeth_shift, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let lips_period = int_param("gator", "lips_period", lips_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let lips_shift = int_param("gator", "lips_shift", lips_shift, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::gator::Params {
+            jaw_period,
+            jaw_shift,
+            teeth_period,
+            teeth_shift,
+            lips_period,
+            lips_shift,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::gator::Gator, 2, 2> as Stream>::open(
+                    [high, low],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, jaw_period, jaw_shift, teeth_period, teeth_shift, lips_period, lips_shift))]
+    #[allow(clippy::too_many_arguments)]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        jaw_period: i64,
+        jaw_shift: i64,
+        teeth_period: i64,
+        teeth_shift: i64,
+        lips_period: i64,
+        lips_shift: i64,
+    ) -> PyResult<(Self, GatorOutputs<'py>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let jaw_period = int_param("gator", "jaw_period", jaw_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let jaw_shift =
+            int_param("gator", "jaw_shift", jaw_shift, 1, 100000).map_err(|e| to_py_err(py, &e))?;
+        let teeth_period = int_param("gator", "teeth_period", teeth_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let teeth_shift = int_param("gator", "teeth_shift", teeth_shift, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let lips_period = int_param("gator", "lips_period", lips_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let lips_shift = int_param("gator", "lips_shift", lips_shift, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::gator::Params {
+            jaw_period,
+            jaw_shift,
+            teeth_period,
+            teeth_shift,
+            lips_period,
+            lips_shift,
+        };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::gator::Gator as Kernel<2, 2>>::open_and_fill(
+                    [high, low],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            (
+                std::mem::take(&mut out[0]).into_pyarray(py),
+                std::mem::take(&mut out[1]).into_pyarray(py),
+            )
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64) -> PyResult<(f64, f64)> {
+        let row = self
+            .inner
+            .update([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1]))
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64) -> PyResult<(f64, f64)> {
+        let row = self
+            .inner
+            .peek([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1]))
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64)> {
+        self.inner.value().map(|row| (row[0], row[1]))
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "gator"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream gator bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+type GuppyOutputs<'py> = (
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+);
+
+#[pyfunction]
+#[pyo3(name = "guppy", signature = (source))]
+pub fn guppy<'py>(
+    py: Python<'py>,
+    source: PyReadonlyArray1<'py, f64>,
+) -> PyResult<GuppyOutputs<'py>> {
+    let source = as_slice(&source, "source")?;
+    let params = trendlib::indicators::guppy::Params;
+    let out = py
+        .detach(|| <trendlib::indicators::guppy::Guppy as Kernel<1, 12>>::batch([source], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok((
+        std::mem::take(&mut out[0]).into_pyarray(py),
+        std::mem::take(&mut out[1]).into_pyarray(py),
+        std::mem::take(&mut out[2]).into_pyarray(py),
+        std::mem::take(&mut out[3]).into_pyarray(py),
+        std::mem::take(&mut out[4]).into_pyarray(py),
+        std::mem::take(&mut out[5]).into_pyarray(py),
+        std::mem::take(&mut out[6]).into_pyarray(py),
+        std::mem::take(&mut out[7]).into_pyarray(py),
+        std::mem::take(&mut out[8]).into_pyarray(py),
+        std::mem::take(&mut out[9]).into_pyarray(py),
+        std::mem::take(&mut out[10]).into_pyarray(py),
+        std::mem::take(&mut out[11]).into_pyarray(py),
+    ))
+}
+
+#[pyclass(module = "trendlib._core", name = "GuppyStream", skip_from_py_object)]
+#[derive(Clone, Debug)]
+pub struct PyGuppyStream {
+    inner: BarStream<trendlib::indicators::guppy::Guppy, 1, 12>,
+}
+
+#[pymethods]
+impl PyGuppyStream {
+    #[staticmethod]
+    #[pyo3(signature = (source))]
+    fn open<'py>(py: Python<'py>, source: PyReadonlyArray1<'py, f64>) -> PyResult<Self> {
+        let source = as_slice(&source, "source")?;
+        let params = trendlib::indicators::guppy::Params;
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::guppy::Guppy, 1, 12> as Stream>::open(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (source))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        source: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, GuppyOutputs<'py>)> {
+        let source = as_slice(&source, "source")?;
+        let params = trendlib::indicators::guppy::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::guppy::Guppy as Kernel<1, 12>>::open_and_fill(
+                    [source],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            (
+                std::mem::take(&mut out[0]).into_pyarray(py),
+                std::mem::take(&mut out[1]).into_pyarray(py),
+                std::mem::take(&mut out[2]).into_pyarray(py),
+                std::mem::take(&mut out[3]).into_pyarray(py),
+                std::mem::take(&mut out[4]).into_pyarray(py),
+                std::mem::take(&mut out[5]).into_pyarray(py),
+                std::mem::take(&mut out[6]).into_pyarray(py),
+                std::mem::take(&mut out[7]).into_pyarray(py),
+                std::mem::take(&mut out[8]).into_pyarray(py),
+                std::mem::take(&mut out[9]).into_pyarray(py),
+                std::mem::take(&mut out[10]).into_pyarray(py),
+                std::mem::take(&mut out[11]).into_pyarray(py),
+            )
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (source))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        source: f64,
+    ) -> PyResult<(f64, f64, f64, f64, f64, f64, f64, f64, f64, f64, f64, f64)> {
+        let row = self.inner.update([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok((
+            row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9],
+            row[10], row[11],
+        ))
+    }
+
+    #[pyo3(signature = (source))]
+    fn peek(
+        &self,
+        py: Python<'_>,
+        source: f64,
+    ) -> PyResult<(f64, f64, f64, f64, f64, f64, f64, f64, f64, f64, f64, f64)> {
+        let row = self.inner.peek([source]).map_err(|e| to_py_err(py, &e))?;
+        Ok((
+            row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9],
+            row[10], row[11],
+        ))
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64, f64, f64, f64, f64, f64, f64, f64, f64, f64, f64)> {
+        self.inner.value().map(|row| {
+            (
+                row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9],
+                row[10], row[11],
+            )
+        })
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "guppy"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream guppy bars_seen={} value={:?}>",
             self.inner.bars_seen(),
             self.inner.value()
         )
@@ -38506,6 +39392,167 @@ impl PyPivotsCamarillaStream {
     }
 }
 
+type PivotsDemarkOutputs<'py> = (
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+);
+
+#[pyfunction]
+#[pyo3(name = "pivots_demark", signature = (open, high, low, close))]
+pub fn pivots_demark<'py>(
+    py: Python<'py>,
+    open: PyReadonlyArray1<'py, f64>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<PivotsDemarkOutputs<'py>> {
+    let open = as_slice(&open, "open")?;
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::pivots_demark::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::pivots_demark::PivotsDemark as Kernel<4, 3>>::batch(
+                [open, high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok((
+        std::mem::take(&mut out[0]).into_pyarray(py),
+        std::mem::take(&mut out[1]).into_pyarray(py),
+        std::mem::take(&mut out[2]).into_pyarray(py),
+    ))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "PivotsDemarkStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyPivotsDemarkStream {
+    inner: BarStream<trendlib::indicators::pivots_demark::PivotsDemark, 4, 3>,
+}
+
+#[pymethods]
+impl PyPivotsDemarkStream {
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::pivots_demark::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::pivots_demark::PivotsDemark, 4, 3> as Stream>::open([open, high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (open, high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        open: PyReadonlyArray1<'py, f64>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, PivotsDemarkOutputs<'py>)> {
+        let open = as_slice(&open, "open")?;
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::pivots_demark::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::pivots_demark::PivotsDemark as Kernel<4, 3>>::open_and_fill(
+                    [open, high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            (
+                std::mem::take(&mut out[0]).into_pyarray(py),
+                std::mem::take(&mut out[1]).into_pyarray(py),
+                std::mem::take(&mut out[2]).into_pyarray(py),
+            )
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<(f64, f64, f64)> {
+        let row = self
+            .inner
+            .update([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1], row[2]))
+    }
+
+    #[pyo3(signature = (open, high, low, close))]
+    fn peek(
+        &self,
+        py: Python<'_>,
+        open: f64,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<(f64, f64, f64)> {
+        let row = self
+            .inner
+            .peek([open, high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1], row[2]))
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64, f64)> {
+        self.inner.value().map(|row| (row[0], row[1], row[2]))
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "pivots_demark"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream pivots_demark bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
 type PivotsFibonacciOutputs<'py> = (
     Bound<'py, PyArray1<f64>>,
     Bound<'py, PyArray1<f64>>,
@@ -38836,6 +39883,167 @@ impl PyPivotsTraditionalStream {
     fn __repr__(&self) -> String {
         format!(
             "<trendlib stream pivots_traditional bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+type PivotsWoodieOutputs<'py> = (
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+);
+
+#[pyfunction]
+#[pyo3(name = "pivots_woodie", signature = (high, low, close))]
+pub fn pivots_woodie<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+) -> PyResult<PivotsWoodieOutputs<'py>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let params = trendlib::indicators::pivots_woodie::Params;
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::pivots_woodie::PivotsWoodie as Kernel<3, 5>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok((
+        std::mem::take(&mut out[0]).into_pyarray(py),
+        std::mem::take(&mut out[1]).into_pyarray(py),
+        std::mem::take(&mut out[2]).into_pyarray(py),
+        std::mem::take(&mut out[3]).into_pyarray(py),
+        std::mem::take(&mut out[4]).into_pyarray(py),
+    ))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "PivotsWoodieStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyPivotsWoodieStream {
+    inner: BarStream<trendlib::indicators::pivots_woodie::PivotsWoodie, 3, 5>,
+}
+
+#[pymethods]
+impl PyPivotsWoodieStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::pivots_woodie::Params;
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::pivots_woodie::PivotsWoodie, 3, 5> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+    ) -> PyResult<(Self, PivotsWoodieOutputs<'py>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let params = trendlib::indicators::pivots_woodie::Params;
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::pivots_woodie::PivotsWoodie as Kernel<3, 5>>::open_and_fill(
+                    [high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            (
+                std::mem::take(&mut out[0]).into_pyarray(py),
+                std::mem::take(&mut out[1]).into_pyarray(py),
+                std::mem::take(&mut out[2]).into_pyarray(py),
+                std::mem::take(&mut out[3]).into_pyarray(py),
+                std::mem::take(&mut out[4]).into_pyarray(py),
+            )
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<(f64, f64, f64, f64, f64)> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1], row[2], row[3], row[4]))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(
+        &self,
+        py: Python<'_>,
+        high: f64,
+        low: f64,
+        close: f64,
+    ) -> PyResult<(f64, f64, f64, f64, f64)> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1], row[2], row[3], row[4]))
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64, f64, f64, f64)> {
+        self.inner
+            .value()
+            .map(|row| (row[0], row[1], row[2], row[3], row[4]))
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "pivots_woodie"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream pivots_woodie bars_seen={} value={:?}>",
             self.inner.bars_seen(),
             self.inner.value()
         )
@@ -45537,6 +46745,173 @@ impl PyWmaStream {
     }
 }
 
+type WoodiesCciOutputs<'py> = (Bound<'py, PyArray1<f64>>, Bound<'py, PyArray1<f64>>);
+
+#[pyfunction]
+#[pyo3(name = "woodies_cci", signature = (high, low, close, *, cci_period, turbo_period))]
+pub fn woodies_cci<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    cci_period: i64,
+    turbo_period: i64,
+) -> PyResult<WoodiesCciOutputs<'py>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let cci_period = int_param("woodies_cci", "cci_period", cci_period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let turbo_period = int_param("woodies_cci", "turbo_period", turbo_period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::woodies_cci::Params {
+        cci_period,
+        turbo_period,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::woodies_cci::WoodiesCci as Kernel<3, 2>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok((
+        std::mem::take(&mut out[0]).into_pyarray(py),
+        std::mem::take(&mut out[1]).into_pyarray(py),
+    ))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "WoodiesCciStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyWoodiesCciStream {
+    inner: BarStream<trendlib::indicators::woodies_cci::WoodiesCci, 3, 2>,
+}
+
+#[pymethods]
+impl PyWoodiesCciStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, cci_period, turbo_period))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        cci_period: i64,
+        turbo_period: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let cci_period = int_param("woodies_cci", "cci_period", cci_period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let turbo_period = int_param("woodies_cci", "turbo_period", turbo_period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::woodies_cci::Params {
+            cci_period,
+            turbo_period,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::woodies_cci::WoodiesCci, 3, 2> as Stream>::open(
+                    [high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, cci_period, turbo_period))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        cci_period: i64,
+        turbo_period: i64,
+    ) -> PyResult<(Self, WoodiesCciOutputs<'py>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let cci_period = int_param("woodies_cci", "cci_period", cci_period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let turbo_period = int_param("woodies_cci", "turbo_period", turbo_period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::woodies_cci::Params {
+            cci_period,
+            turbo_period,
+        };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::woodies_cci::WoodiesCci as Kernel<3, 2>>::open_and_fill(
+                    [high, low, close],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            (
+                std::mem::take(&mut out[0]).into_pyarray(py),
+                std::mem::take(&mut out[1]).into_pyarray(py),
+            )
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<(f64, f64)> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1]))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<(f64, f64)> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1]))
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64)> {
+        self.inner.value().map(|row| (row[0], row[1]))
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "woodies_cci"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream woodies_cci bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
 #[pyfunction]
 #[pyo3(name = "zlema", signature = (source, *, period))]
 pub fn zlema<'py>(
@@ -45660,6 +47035,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(adr, m)?)?;
     m.add_function(wrap_pyfunction!(adx, m)?)?;
     m.add_function(wrap_pyfunction!(adxr, m)?)?;
+    m.add_function(wrap_pyfunction!(alligator, m)?)?;
     m.add_function(wrap_pyfunction!(ao, m)?)?;
     m.add_function(wrap_pyfunction!(apo, m)?)?;
     m.add_function(wrap_pyfunction!(aroon, m)?)?;
@@ -45667,6 +47043,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(asin, m)?)?;
     m.add_function(wrap_pyfunction!(atan, m)?)?;
     m.add_function(wrap_pyfunction!(atr, m)?)?;
+    m.add_function(wrap_pyfunction!(atr_bands, m)?)?;
     m.add_function(wrap_pyfunction!(avgdev, m)?)?;
     m.add_function(wrap_pyfunction!(avgprice, m)?)?;
     m.add_function(wrap_pyfunction!(bar_dead_cat_bounce, m)?)?;
@@ -45837,12 +47214,15 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(dx, m)?)?;
     m.add_function(wrap_pyfunction!(efi, m)?)?;
     m.add_function(wrap_pyfunction!(ema, m)?)?;
+    m.add_function(wrap_pyfunction!(envelope, m)?)?;
     m.add_function(wrap_pyfunction!(er, m)?)?;
     m.add_function(wrap_pyfunction!(eri, m)?)?;
     m.add_function(wrap_pyfunction!(exp, m)?)?;
     m.add_function(wrap_pyfunction!(floor, m)?)?;
     m.add_function(wrap_pyfunction!(fosc, m)?)?;
     m.add_function(wrap_pyfunction!(fractal, m)?)?;
+    m.add_function(wrap_pyfunction!(gator, m)?)?;
+    m.add_function(wrap_pyfunction!(guppy, m)?)?;
     m.add_function(wrap_pyfunction!(ha, m)?)?;
     m.add_function(wrap_pyfunction!(harmonic_abcd_bearish, m)?)?;
     m.add_function(wrap_pyfunction!(harmonic_abcd_bullish, m)?)?;
@@ -45903,8 +47283,10 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(percentile, m)?)?;
     m.add_function(wrap_pyfunction!(percentrank, m)?)?;
     m.add_function(wrap_pyfunction!(pivots_camarilla, m)?)?;
+    m.add_function(wrap_pyfunction!(pivots_demark, m)?)?;
     m.add_function(wrap_pyfunction!(pivots_fibonacci, m)?)?;
     m.add_function(wrap_pyfunction!(pivots_traditional, m)?)?;
+    m.add_function(wrap_pyfunction!(pivots_woodie, m)?)?;
     m.add_function(wrap_pyfunction!(plus_di, m)?)?;
     m.add_function(wrap_pyfunction!(plus_dm, m)?)?;
     m.add_function(wrap_pyfunction!(ppo, m)?)?;
@@ -45956,6 +47338,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(wclprice, m)?)?;
     m.add_function(wrap_pyfunction!(willr, m)?)?;
     m.add_function(wrap_pyfunction!(wma, m)?)?;
+    m.add_function(wrap_pyfunction!(woodies_cci, m)?)?;
     m.add_function(wrap_pyfunction!(zlema, m)?)?;
     m.add_class::<PyAcStream>()?;
     m.add_class::<PyAccbandsStream>()?;
@@ -45966,6 +47349,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyAdrStream>()?;
     m.add_class::<PyAdxStream>()?;
     m.add_class::<PyAdxrStream>()?;
+    m.add_class::<PyAlligatorStream>()?;
     m.add_class::<PyAoStream>()?;
     m.add_class::<PyApoStream>()?;
     m.add_class::<PyAroonStream>()?;
@@ -45973,6 +47357,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyAsinStream>()?;
     m.add_class::<PyAtanStream>()?;
     m.add_class::<PyAtrStream>()?;
+    m.add_class::<PyAtrBandsStream>()?;
     m.add_class::<PyAvgdevStream>()?;
     m.add_class::<PyAvgpriceStream>()?;
     m.add_class::<PyBarDeadCatBounceStream>()?;
@@ -46140,12 +47525,15 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyDxStream>()?;
     m.add_class::<PyEfiStream>()?;
     m.add_class::<PyEmaStream>()?;
+    m.add_class::<PyEnvelopeStream>()?;
     m.add_class::<PyErStream>()?;
     m.add_class::<PyEriStream>()?;
     m.add_class::<PyExpStream>()?;
     m.add_class::<PyFloorStream>()?;
     m.add_class::<PyFoscStream>()?;
     m.add_class::<PyFractalStream>()?;
+    m.add_class::<PyGatorStream>()?;
+    m.add_class::<PyGuppyStream>()?;
     m.add_class::<PyHaStream>()?;
     m.add_class::<PyHarmonicAbcdBearishStream>()?;
     m.add_class::<PyHarmonicAbcdBullishStream>()?;
@@ -46206,8 +47594,10 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyPercentileStream>()?;
     m.add_class::<PyPercentrankStream>()?;
     m.add_class::<PyPivotsCamarillaStream>()?;
+    m.add_class::<PyPivotsDemarkStream>()?;
     m.add_class::<PyPivotsFibonacciStream>()?;
     m.add_class::<PyPivotsTraditionalStream>()?;
+    m.add_class::<PyPivotsWoodieStream>()?;
     m.add_class::<PyPlusDiStream>()?;
     m.add_class::<PyPlusDmStream>()?;
     m.add_class::<PyPpoStream>()?;
@@ -46259,6 +47649,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyWclpriceStream>()?;
     m.add_class::<PyWillrStream>()?;
     m.add_class::<PyWmaStream>()?;
+    m.add_class::<PyWoodiesCciStream>()?;
     m.add_class::<PyZlemaStream>()?;
     m.add("PARAMS", params_table(m.py())?)?;
     m.add("INPUTS", inputs_table(m.py())?)?;
@@ -46385,6 +47776,58 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
         let params = PyDict::new(py);
         {
             let entry = PyDict::new(py);
+            entry.set_item("default", 13)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("jaw_period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 8)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("jaw_shift", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 8)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("teeth_period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("teeth_shift", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("lips_period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 3)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("lips_shift", entry)?;
+        }
+        table.set_item("alligator", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
             entry.set_item("default", 5)?;
             entry.set_item("min", 2)?;
             entry.set_item("max", 100000)?;
@@ -46478,6 +47921,26 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
             params.set_item("period", entry)?;
         }
         table.set_item("atr", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 3.0)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("shift", entry)?;
+        }
+        table.set_item("atr_bands", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -49029,6 +50492,26 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
         let params = PyDict::new(py);
         {
             let entry = PyDict::new(py);
+            entry.set_item("default", 20)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 10.0)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("percent", entry)?;
+        }
+        table.set_item("envelope", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
             entry.set_item("default", 10)?;
             entry.set_item("min", 2)?;
             entry.set_item("max", 100000)?;
@@ -49088,6 +50571,62 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
             params.set_item("right_bars", entry)?;
         }
         table.set_item("fractal", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 13)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("jaw_period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 8)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("jaw_shift", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 8)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("teeth_period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("teeth_shift", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("lips_period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 3)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("lips_shift", entry)?;
+        }
+        table.set_item("gator", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("guppy", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -50093,11 +51632,19 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     }
     {
         let params = PyDict::new(py);
+        table.set_item("pivots_demark", params)?;
+    }
+    {
+        let params = PyDict::new(py);
         table.set_item("pivots_fibonacci", params)?;
     }
     {
         let params = PyDict::new(py);
         table.set_item("pivots_traditional", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        table.set_item("pivots_woodie", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -50925,6 +52472,26 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
         let params = PyDict::new(py);
         {
             let entry = PyDict::new(py);
+            entry.set_item("default", 14)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("cci_period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 6)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("turbo_period", entry)?;
+        }
+        table.set_item("woodies_cci", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
             entry.set_item("default", 30)?;
             entry.set_item("min", 1)?;
             entry.set_item("max", 100000)?;
@@ -50948,6 +52515,7 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("adr", vec!["high", "low"])?;
     table.set_item("adx", vec!["high", "low", "close"])?;
     table.set_item("adxr", vec!["high", "low", "close"])?;
+    table.set_item("alligator", vec!["high", "low"])?;
     table.set_item("ao", vec!["high", "low"])?;
     table.set_item("apo", vec!["source"])?;
     table.set_item("aroon", vec!["high", "low"])?;
@@ -50955,6 +52523,7 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("asin", vec!["source"])?;
     table.set_item("atan", vec!["source"])?;
     table.set_item("atr", vec!["high", "low", "close"])?;
+    table.set_item("atr_bands", vec!["high", "low", "close"])?;
     table.set_item("avgdev", vec!["source"])?;
     table.set_item("avgprice", vec!["open", "high", "low", "close"])?;
     table.set_item("bar_dead_cat_bounce", vec!["open", "high", "low", "close"])?;
@@ -51158,12 +52727,15 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("dx", vec!["high", "low", "close"])?;
     table.set_item("efi", vec!["close", "volume"])?;
     table.set_item("ema", vec!["source"])?;
+    table.set_item("envelope", vec!["source"])?;
     table.set_item("er", vec!["source"])?;
     table.set_item("eri", vec!["high", "low", "close"])?;
     table.set_item("exp", vec!["source"])?;
     table.set_item("floor", vec!["source"])?;
     table.set_item("fosc", vec!["source"])?;
     table.set_item("fractal", vec!["high", "low"])?;
+    table.set_item("gator", vec!["high", "low"])?;
+    table.set_item("guppy", vec!["source"])?;
     table.set_item("ha", vec!["open", "high", "low", "close"])?;
     table.set_item("harmonic_abcd_bearish", vec!["high", "low", "close"])?;
     table.set_item("harmonic_abcd_bullish", vec!["high", "low", "close"])?;
@@ -51224,8 +52796,10 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("percentile", vec!["source"])?;
     table.set_item("percentrank", vec!["source"])?;
     table.set_item("pivots_camarilla", vec!["high", "low", "close"])?;
+    table.set_item("pivots_demark", vec!["open", "high", "low", "close"])?;
     table.set_item("pivots_fibonacci", vec!["high", "low", "close"])?;
     table.set_item("pivots_traditional", vec!["high", "low", "close"])?;
+    table.set_item("pivots_woodie", vec!["high", "low", "close"])?;
     table.set_item("plus_di", vec!["high", "low", "close"])?;
     table.set_item("plus_dm", vec!["high", "low"])?;
     table.set_item("ppo", vec!["source"])?;
@@ -51277,6 +52851,7 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("wclprice", vec!["high", "low", "close"])?;
     table.set_item("willr", vec!["high", "low", "close"])?;
     table.set_item("wma", vec!["source"])?;
+    table.set_item("woodies_cci", vec!["high", "low", "close"])?;
     table.set_item("zlema", vec!["source"])?;
     Ok(table)
 }
@@ -51293,6 +52868,7 @@ fn kinds_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("adr", vec!["high", "low"])?;
     table.set_item("adx", vec!["high", "low", "close"])?;
     table.set_item("adxr", vec!["high", "low", "close"])?;
+    table.set_item("alligator", vec!["high", "low"])?;
     table.set_item("ao", vec!["high", "low"])?;
     table.set_item("apo", vec!["series"])?;
     table.set_item("aroon", vec!["high", "low"])?;
@@ -51300,6 +52876,7 @@ fn kinds_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("asin", vec!["series"])?;
     table.set_item("atan", vec!["series"])?;
     table.set_item("atr", vec!["high", "low", "close"])?;
+    table.set_item("atr_bands", vec!["high", "low", "close"])?;
     table.set_item("avgdev", vec!["series"])?;
     table.set_item("avgprice", vec!["open", "high", "low", "close"])?;
     table.set_item("bar_dead_cat_bounce", vec!["open", "high", "low", "close"])?;
@@ -51503,12 +53080,15 @@ fn kinds_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("dx", vec!["high", "low", "close"])?;
     table.set_item("efi", vec!["close", "volume"])?;
     table.set_item("ema", vec!["series"])?;
+    table.set_item("envelope", vec!["series"])?;
     table.set_item("er", vec!["series"])?;
     table.set_item("eri", vec!["high", "low", "close"])?;
     table.set_item("exp", vec!["series"])?;
     table.set_item("floor", vec!["series"])?;
     table.set_item("fosc", vec!["series"])?;
     table.set_item("fractal", vec!["high", "low"])?;
+    table.set_item("gator", vec!["high", "low"])?;
+    table.set_item("guppy", vec!["series"])?;
     table.set_item("ha", vec!["open", "high", "low", "close"])?;
     table.set_item("harmonic_abcd_bearish", vec!["high", "low", "close"])?;
     table.set_item("harmonic_abcd_bullish", vec!["high", "low", "close"])?;
@@ -51569,8 +53149,10 @@ fn kinds_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("percentile", vec!["series"])?;
     table.set_item("percentrank", vec!["series"])?;
     table.set_item("pivots_camarilla", vec!["high", "low", "close"])?;
+    table.set_item("pivots_demark", vec!["open", "high", "low", "close"])?;
     table.set_item("pivots_fibonacci", vec!["high", "low", "close"])?;
     table.set_item("pivots_traditional", vec!["high", "low", "close"])?;
+    table.set_item("pivots_woodie", vec!["high", "low", "close"])?;
     table.set_item("plus_di", vec!["high", "low", "close"])?;
     table.set_item("plus_dm", vec!["high", "low"])?;
     table.set_item("ppo", vec!["series"])?;
@@ -51622,6 +53204,7 @@ fn kinds_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("wclprice", vec!["high", "low", "close"])?;
     table.set_item("willr", vec!["high", "low", "close"])?;
     table.set_item("wma", vec!["series"])?;
+    table.set_item("woodies_cci", vec!["high", "low", "close"])?;
     table.set_item("zlema", vec!["series"])?;
     Ok(table)
 }
@@ -51641,6 +53224,10 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("adr", vec!["adr"])?;
     table.set_item("adx", vec!["adx"])?;
     table.set_item("adxr", vec!["adxr"])?;
+    table.set_item(
+        "alligator",
+        vec!["alligator_jaw", "alligator_teeth", "alligator_lips"],
+    )?;
     table.set_item("ao", vec!["ao"])?;
     table.set_item("apo", vec!["apo"])?;
     table.set_item("aroon", vec!["aroon_down", "aroon_up"])?;
@@ -51648,6 +53235,7 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("asin", vec!["asin"])?;
     table.set_item("atan", vec!["atan"])?;
     table.set_item("atr", vec!["atr"])?;
+    table.set_item("atr_bands", vec!["atr_bands_upper", "atr_bands_lower"])?;
     table.set_item("avgdev", vec!["avgdev"])?;
     table.set_item("avgprice", vec!["avgprice"])?;
     table.set_item("bar_dead_cat_bounce", vec!["bar_dead_cat_bounce"])?;
@@ -51896,12 +53484,34 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("dx", vec!["dx"])?;
     table.set_item("efi", vec!["efi"])?;
     table.set_item("ema", vec!["ema"])?;
+    table.set_item(
+        "envelope",
+        vec!["envelope_upper", "envelope_middle", "envelope_lower"],
+    )?;
     table.set_item("er", vec!["er"])?;
     table.set_item("eri", vec!["eri_bull_power", "eri_bear_power"])?;
     table.set_item("exp", vec!["exp"])?;
     table.set_item("floor", vec!["floor"])?;
     table.set_item("fosc", vec!["fosc"])?;
     table.set_item("fractal", vec!["fractal_swing_high", "fractal_swing_low"])?;
+    table.set_item("gator", vec!["gator_upper", "gator_lower"])?;
+    table.set_item(
+        "guppy",
+        vec![
+            "guppy_short_3",
+            "guppy_short_5",
+            "guppy_short_8",
+            "guppy_short_10",
+            "guppy_short_12",
+            "guppy_short_15",
+            "guppy_long_30",
+            "guppy_long_35",
+            "guppy_long_40",
+            "guppy_long_45",
+            "guppy_long_50",
+            "guppy_long_60",
+        ],
+    )?;
     table.set_item("ha", vec!["ha_open", "ha_high", "ha_low", "ha_close"])?;
     table.set_item("harmonic_abcd_bearish", vec!["harmonic_abcd_bearish"])?;
     table.set_item("harmonic_abcd_bullish", vec!["harmonic_abcd_bullish"])?;
@@ -52006,6 +53616,7 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
             "camarilla_s4",
         ],
     )?;
+    table.set_item("pivots_demark", vec!["demark_pp", "demark_r1", "demark_s1"])?;
     table.set_item(
         "pivots_fibonacci",
         vec![
@@ -52030,6 +53641,16 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
             "pivots_traditional_s1",
             "pivots_traditional_s2",
             "pivots_traditional_s3",
+        ],
+    )?;
+    table.set_item(
+        "pivots_woodie",
+        vec![
+            "woodie_pp",
+            "woodie_r1",
+            "woodie_s1",
+            "woodie_r2",
+            "woodie_s2",
         ],
     )?;
     table.set_item("plus_di", vec!["plus_di"])?;
@@ -52083,6 +53704,7 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("wclprice", vec!["wclprice"])?;
     table.set_item("willr", vec!["willr"])?;
     table.set_item("wma", vec!["wma"])?;
+    table.set_item("woodies_cci", vec!["woodies_cci", "woodies_cci_turbo"])?;
     table.set_item("zlema", vec!["zlema"])?;
     Ok(table)
 }
@@ -52099,6 +53721,7 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("adr", vec!["float64"])?;
     table.set_item("adx", vec!["float64"])?;
     table.set_item("adxr", vec!["float64"])?;
+    table.set_item("alligator", vec!["float64", "float64", "float64"])?;
     table.set_item("ao", vec!["float64"])?;
     table.set_item("apo", vec!["float64"])?;
     table.set_item("aroon", vec!["float64", "float64"])?;
@@ -52106,6 +53729,7 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("asin", vec!["float64"])?;
     table.set_item("atan", vec!["float64"])?;
     table.set_item("atr", vec!["float64"])?;
+    table.set_item("atr_bands", vec!["float64", "float64"])?;
     table.set_item("avgdev", vec!["float64"])?;
     table.set_item("avgprice", vec!["float64"])?;
     table.set_item("bar_dead_cat_bounce", vec!["int32"])?;
@@ -52273,12 +53897,21 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("dx", vec!["float64"])?;
     table.set_item("efi", vec!["float64"])?;
     table.set_item("ema", vec!["float64"])?;
+    table.set_item("envelope", vec!["float64", "float64", "float64"])?;
     table.set_item("er", vec!["float64"])?;
     table.set_item("eri", vec!["float64", "float64"])?;
     table.set_item("exp", vec!["float64"])?;
     table.set_item("floor", vec!["float64"])?;
     table.set_item("fosc", vec!["float64"])?;
     table.set_item("fractal", vec!["int32", "int32"])?;
+    table.set_item("gator", vec!["float64", "float64"])?;
+    table.set_item(
+        "guppy",
+        vec![
+            "float64", "float64", "float64", "float64", "float64", "float64", "float64", "float64",
+            "float64", "float64", "float64", "float64",
+        ],
+    )?;
     table.set_item("ha", vec!["float64", "float64", "float64", "float64"])?;
     table.set_item("harmonic_abcd_bearish", vec!["int32"])?;
     table.set_item("harmonic_abcd_bullish", vec!["int32"])?;
@@ -52344,6 +53977,7 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
             "float64", "float64", "float64", "float64", "float64", "float64", "float64", "float64",
         ],
     )?;
+    table.set_item("pivots_demark", vec!["float64", "float64", "float64"])?;
     table.set_item(
         "pivots_fibonacci",
         vec![
@@ -52356,6 +53990,10 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
         vec![
             "float64", "float64", "float64", "float64", "float64", "float64", "float64",
         ],
+    )?;
+    table.set_item(
+        "pivots_woodie",
+        vec!["float64", "float64", "float64", "float64", "float64"],
     )?;
     table.set_item("plus_di", vec!["float64"])?;
     table.set_item("plus_dm", vec!["float64"])?;
@@ -52408,6 +54046,7 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("wclprice", vec!["float64"])?;
     table.set_item("willr", vec!["float64"])?;
     table.set_item("wma", vec!["float64"])?;
+    table.set_item("woodies_cci", vec!["float64", "float64"])?;
     table.set_item("zlema", vec!["float64"])?;
     Ok(table)
 }
@@ -52424,6 +54063,7 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("adr", Vec::<&str>::new())?;
     table.set_item("adx", vec!["unstable"])?;
     table.set_item("adxr", vec!["unstable"])?;
+    table.set_item("alligator", vec!["overlap", "unstable"])?;
     table.set_item("ao", Vec::<&str>::new())?;
     table.set_item("apo", Vec::<&str>::new())?;
     table.set_item("aroon", Vec::<&str>::new())?;
@@ -52431,6 +54071,7 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("asin", vec!["nan_inf_output"])?;
     table.set_item("atan", vec!["nan_inf_output"])?;
     table.set_item("atr", vec!["unstable"])?;
+    table.set_item("atr_bands", vec!["overlap", "unstable"])?;
     table.set_item("avgdev", Vec::<&str>::new())?;
     table.set_item("avgprice", vec!["overlap"])?;
     table.set_item("bar_dead_cat_bounce", vec!["chart_pattern"])?;
@@ -52730,12 +54371,15 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("dx", vec!["unstable"])?;
     table.set_item("efi", vec!["unstable", "path_dependent", "nan_inf_output"])?;
     table.set_item("ema", vec!["overlap", "unstable"])?;
+    table.set_item("envelope", vec!["overlap"])?;
     table.set_item("er", Vec::<&str>::new())?;
     table.set_item("eri", vec!["unstable", "path_dependent"])?;
     table.set_item("exp", vec!["nan_inf_output"])?;
     table.set_item("floor", vec!["nan_inf_output"])?;
     table.set_item("fosc", vec!["nan_inf_output"])?;
     table.set_item("fractal", Vec::<&str>::new())?;
+    table.set_item("gator", vec!["unstable"])?;
+    table.set_item("guppy", vec!["overlap", "unstable"])?;
     table.set_item("ha", vec!["overlap", "path_dependent"])?;
     table.set_item(
         "harmonic_abcd_bearish",
@@ -52838,8 +54482,10 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("percentile", Vec::<&str>::new())?;
     table.set_item("percentrank", Vec::<&str>::new())?;
     table.set_item("pivots_camarilla", vec!["overlap"])?;
+    table.set_item("pivots_demark", vec!["overlap"])?;
     table.set_item("pivots_fibonacci", vec!["overlap"])?;
     table.set_item("pivots_traditional", vec!["overlap"])?;
+    table.set_item("pivots_woodie", vec!["overlap"])?;
     table.set_item("plus_di", vec!["unstable"])?;
     table.set_item("plus_dm", vec!["unstable"])?;
     table.set_item("ppo", Vec::<&str>::new())?;
@@ -52902,6 +54548,7 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("wclprice", vec!["overlap"])?;
     table.set_item("willr", Vec::<&str>::new())?;
     table.set_item("wma", vec!["overlap"])?;
+    table.set_item("woodies_cci", Vec::<&str>::new())?;
     table.set_item("zlema", vec!["overlap", "unstable", "path_dependent"])?;
     Ok(table)
 }
@@ -52918,6 +54565,7 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("adr", "volatility")?;
     table.set_item("adx", "momentum")?;
     table.set_item("adxr", "momentum")?;
+    table.set_item("alligator", "overlap")?;
     table.set_item("ao", "momentum")?;
     table.set_item("apo", "momentum")?;
     table.set_item("aroon", "momentum")?;
@@ -52925,6 +54573,7 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("asin", "math")?;
     table.set_item("atan", "math")?;
     table.set_item("atr", "volatility")?;
+    table.set_item("atr_bands", "volatility")?;
     table.set_item("avgdev", "statistic")?;
     table.set_item("avgprice", "price")?;
     table.set_item("bar_dead_cat_bounce", "bars")?;
@@ -53092,12 +54741,15 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("dx", "momentum")?;
     table.set_item("efi", "volume")?;
     table.set_item("ema", "overlap")?;
+    table.set_item("envelope", "overlap")?;
     table.set_item("er", "statistic")?;
     table.set_item("eri", "momentum")?;
     table.set_item("exp", "math")?;
     table.set_item("floor", "math")?;
     table.set_item("fosc", "statistic")?;
     table.set_item("fractal", "levels")?;
+    table.set_item("gator", "momentum")?;
+    table.set_item("guppy", "overlap")?;
     table.set_item("ha", "overlap")?;
     table.set_item("harmonic_abcd_bearish", "harmonic")?;
     table.set_item("harmonic_abcd_bullish", "harmonic")?;
@@ -53158,8 +54810,10 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("percentile", "statistic")?;
     table.set_item("percentrank", "statistic")?;
     table.set_item("pivots_camarilla", "levels")?;
+    table.set_item("pivots_demark", "levels")?;
     table.set_item("pivots_fibonacci", "levels")?;
     table.set_item("pivots_traditional", "levels")?;
+    table.set_item("pivots_woodie", "levels")?;
     table.set_item("plus_di", "momentum")?;
     table.set_item("plus_dm", "momentum")?;
     table.set_item("ppo", "momentum")?;
@@ -53211,6 +54865,7 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("wclprice", "price")?;
     table.set_item("willr", "momentum")?;
     table.set_item("wma", "overlap")?;
+    table.set_item("woodies_cci", "momentum")?;
     table.set_item("zlema", "overlap")?;
     Ok(table)
 }
@@ -53296,6 +54951,33 @@ pub fn lookback_of(
             };
             Ok(<trendlib::indicators::adxr::Adxr as Kernel<3, 1>>::lookback(&trendlib::indicators::adxr::Params { period, }))
         }
+        "alligator" => {
+            let jaw_period = match get("jaw_period")? {
+                Some(value) => int_param("alligator", "jaw_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 13,
+            };
+            let jaw_shift = match get("jaw_shift")? {
+                Some(value) => int_param("alligator", "jaw_shift", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 8,
+            };
+            let teeth_period = match get("teeth_period")? {
+                Some(value) => int_param("alligator", "teeth_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 8,
+            };
+            let teeth_shift = match get("teeth_shift")? {
+                Some(value) => int_param("alligator", "teeth_shift", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let lips_period = match get("lips_period")? {
+                Some(value) => int_param("alligator", "lips_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let lips_shift = match get("lips_shift")? {
+                Some(value) => int_param("alligator", "lips_shift", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 3,
+            };
+            Ok(<trendlib::indicators::alligator::Alligator as Kernel<2, 3>>::lookback(&trendlib::indicators::alligator::Params { jaw_period, jaw_shift, teeth_period, teeth_shift, lips_period, lips_shift, }))
+        }
         "ao" => {
             let fast_period = match get("fast_period")? {
                 Some(value) => int_param("ao", "fast_period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
@@ -53348,6 +55030,14 @@ pub fn lookback_of(
                 None => 14,
             };
             Ok(<trendlib::indicators::atr::Atr as Kernel<3, 1>>::lookback(&trendlib::indicators::atr::Params { period, }))
+        }
+        "atr_bands" => {
+            let period = match get("period")? {
+                Some(value) => int_param("atr_bands", "period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let shift = 3.0;
+            Ok(<trendlib::indicators::atr_bands::AtrBands as Kernel<3, 2>>::lookback(&trendlib::indicators::atr_bands::Params { period, shift, }))
         }
         "avgdev" => {
             let period = match get("period")? {
@@ -54573,6 +56263,14 @@ pub fn lookback_of(
             };
             Ok(<trendlib::indicators::ema::Ema as Kernel<1, 1>>::lookback(&trendlib::indicators::ema::Params { period, }))
         }
+        "envelope" => {
+            let period = match get("period")? {
+                Some(value) => int_param("envelope", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 20,
+            };
+            let percent = 10.0;
+            Ok(<trendlib::indicators::envelope::Envelope as Kernel<1, 3>>::lookback(&trendlib::indicators::envelope::Params { period, percent, }))
+        }
         "er" => {
             let period = match get("period")? {
                 Some(value) => int_param("er", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
@@ -54610,6 +56308,36 @@ pub fn lookback_of(
                 None => 2,
             };
             Ok(<trendlib::indicators::fractal::Fractal as Kernel<2, 2>>::lookback(&trendlib::indicators::fractal::Params { left_bars, right_bars, }))
+        }
+        "gator" => {
+            let jaw_period = match get("jaw_period")? {
+                Some(value) => int_param("gator", "jaw_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 13,
+            };
+            let jaw_shift = match get("jaw_shift")? {
+                Some(value) => int_param("gator", "jaw_shift", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 8,
+            };
+            let teeth_period = match get("teeth_period")? {
+                Some(value) => int_param("gator", "teeth_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 8,
+            };
+            let teeth_shift = match get("teeth_shift")? {
+                Some(value) => int_param("gator", "teeth_shift", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let lips_period = match get("lips_period")? {
+                Some(value) => int_param("gator", "lips_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let lips_shift = match get("lips_shift")? {
+                Some(value) => int_param("gator", "lips_shift", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 3,
+            };
+            Ok(<trendlib::indicators::gator::Gator as Kernel<2, 2>>::lookback(&trendlib::indicators::gator::Params { jaw_period, jaw_shift, teeth_period, teeth_shift, lips_period, lips_shift, }))
+        }
+        "guppy" => {
+            Ok(<trendlib::indicators::guppy::Guppy as Kernel<1, 12>>::lookback(&trendlib::indicators::guppy::Params { }))
         }
         "ha" => {
             Ok(<trendlib::indicators::ha::Ha as Kernel<4, 4>>::lookback(&trendlib::indicators::ha::Params { }))
@@ -55109,11 +56837,17 @@ pub fn lookback_of(
         "pivots_camarilla" => {
             Ok(<trendlib::indicators::pivots_camarilla::PivotsCamarilla as Kernel<3, 8>>::lookback(&trendlib::indicators::pivots_camarilla::Params { }))
         }
+        "pivots_demark" => {
+            Ok(<trendlib::indicators::pivots_demark::PivotsDemark as Kernel<4, 3>>::lookback(&trendlib::indicators::pivots_demark::Params { }))
+        }
         "pivots_fibonacci" => {
             Ok(<trendlib::indicators::pivots_fibonacci::PivotsFibonacci as Kernel<3, 9>>::lookback(&trendlib::indicators::pivots_fibonacci::Params { }))
         }
         "pivots_traditional" => {
             Ok(<trendlib::indicators::pivots_traditional::PivotsTraditional as Kernel<3, 7>>::lookback(&trendlib::indicators::pivots_traditional::Params { }))
+        }
+        "pivots_woodie" => {
+            Ok(<trendlib::indicators::pivots_woodie::PivotsWoodie as Kernel<3, 5>>::lookback(&trendlib::indicators::pivots_woodie::Params { }))
         }
         "plus_di" => {
             let period = match get("period")? {
@@ -55513,6 +57247,17 @@ pub fn lookback_of(
                 None => 30,
             };
             Ok(<trendlib::indicators::wma::Wma as Kernel<1, 1>>::lookback(&trendlib::indicators::wma::Params { period, }))
+        }
+        "woodies_cci" => {
+            let cci_period = match get("cci_period")? {
+                Some(value) => int_param("woodies_cci", "cci_period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 14,
+            };
+            let turbo_period = match get("turbo_period")? {
+                Some(value) => int_param("woodies_cci", "turbo_period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 6,
+            };
+            Ok(<trendlib::indicators::woodies_cci::WoodiesCci as Kernel<3, 2>>::lookback(&trendlib::indicators::woodies_cci::Params { cci_period, turbo_period, }))
         }
         "zlema" => {
             let period = match get("period")? {

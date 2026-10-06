@@ -99,3 +99,6 @@ Before 1.0, minor versions may break the API; every break is listed under
 - Four indicators on oracle F (`finta` 1.3, test-only, `docs/DECISIONS.md`
   D19): `wavetrend`, `ift_rsi`, `vzo` and `pivots_fibonacci`. Their averages
   follow pandas' `ewm(adjust=True)` recursion, as the oracle's do.
+- Eight indicators on oracle A (`docs/INDICATORS.md` § 5.3): `alligator`,
+  `gator`, `envelope`, `guppy`, `woodies_cci`, `atr_bands`, `pivots_woodie` and
+  `pivots_demark`, their golden files evaluated through TA-Lib.

@@ -1,0 +1,62 @@
+name: alligator
+title: Williams Alligator
+group: overlap
+flags: [overlap, unstable]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+params:
+  - name: jaw_period
+    type: int
+    default: 13
+    min: 1
+    max: 100000
+    doc: Bars the jaw's smoothed median spans
+  - name: jaw_shift
+    type: int
+    default: 8
+    min: 1
+    max: 100000
+    doc: Bars the jaw is drawn ahead
+  - name: teeth_period
+    type: int
+    default: 8
+    min: 1
+    max: 100000
+    doc: Bars the teeth's smoothed median spans
+  - name: teeth_shift
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Bars the teeth are drawn ahead
+  - name: lips_period
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Bars the lips' smoothed median spans
+  - name: lips_shift
+    type: int
+    default: 3
+    min: 1
+    max: 100000
+    doc: Bars the lips are drawn ahead
+outputs:
+  - name: alligator_jaw
+    dtype: float64
+    plot: line
+    doc: Jaw, the jaw_period smoothed median drawn jaw_shift bars ahead
+  - name: alligator_teeth
+    dtype: float64
+    plot: line
+    doc: Teeth, the teeth_period smoothed median drawn teeth_shift bars ahead
+  - name: alligator_lips
+    dtype: float64
+    plot: line
+    doc: Lips, the lips_period smoothed median drawn lips_shift bars ahead
+references:
+  - Bill Williams, Trading Chaos, Wiley, 1995
+see_also: [gator, rma, medprice]
