@@ -1,0 +1,45 @@
+name: chart_cup_with_handle
+title: Cup with Handle
+group: chart
+flags: [chart_pattern, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: cup_window
+    type: int
+    default: 65
+    min: 2
+    max: 100000
+    doc: Bars the cup may span
+  - name: handle_window
+    type: int
+    default: 15
+    min: 2
+    max: 100000
+    doc: Bars the handle may span
+  - name: pivot_n
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Bars on each side a swing high must be at least as high as, and a swing low at least as low as
+  - name: max_handle_retrace
+    type: float
+    default: 0.5
+    min: 0.0
+    doc: Deepest the handle may dip, as a fraction of the cup's depth
+outputs:
+  - name: chart_cup_with_handle
+    dtype: int32
+    plot: pattern
+    doc: A close above the rim of a cup, after a handle that stayed near it
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - William J. O'Neil, How to Make Money in Stocks, McGraw-Hill, 1988
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.cup_with_handle (oracle P)
+see_also: [chart_inverted_cup_with_handle, chart_rounding_bottom, chart_double_bottom]

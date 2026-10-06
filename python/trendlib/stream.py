@@ -105,6 +105,7 @@ __all__ = [
     "chart_broadening",
     "chart_bull_flag",
     "chart_bull_pennant",
+    "chart_cup_with_handle",
     "chart_descending_channel",
     "chart_descending_triangle",
     "chart_double_bottom",
@@ -112,6 +113,7 @@ __all__ = [
     "chart_falling_wedge",
     "chart_head_shoulders",
     "chart_inverse_head_shoulders",
+    "chart_inverted_cup_with_handle",
     "chart_rectangle",
     "chart_rising_wedge",
     "chart_symmetrical_triangle",
@@ -148,6 +150,7 @@ __all__ = [
     "ht_sine",
     "ht_trendline",
     "ht_trendmode",
+    "ichimoku",
     "imi",
     "kama",
     "kc",
@@ -1639,6 +1642,21 @@ chart_bull_pennant = Factory(
     ),
     ("chart_bull_pennant",),
 )
+chart_cup_with_handle = Factory(
+    "chart_cup_with_handle",
+    _core.ChartCupWithHandleStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_cup_with_handle",),
+)
 chart_descending_channel = Factory(
     "chart_descending_channel",
     _core.ChartDescendingChannelStream,
@@ -1743,6 +1761,21 @@ chart_inverse_head_shoulders = Factory(
         "close",
     ),
     ("chart_inverse_head_shoulders",),
+)
+chart_inverted_cup_with_handle = Factory(
+    "chart_inverted_cup_with_handle",
+    _core.ChartInvertedCupWithHandleStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_inverted_cup_with_handle",),
 )
 chart_rectangle = Factory(
     "chart_rectangle",
@@ -2038,6 +2071,24 @@ ht_trendline = Factory(
 )
 ht_trendmode = Factory(
     "ht_trendmode", _core.HtTrendmodeStream, ("source",), ("series",), ("ht_trendmode",)
+)
+ichimoku = Factory(
+    "ichimoku",
+    _core.IchimokuStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "ichimoku_tenkan",
+        "ichimoku_kijun",
+        "ichimoku_senkou_a",
+        "ichimoku_senkou_b",
+    ),
 )
 imi = Factory(
     "imi",

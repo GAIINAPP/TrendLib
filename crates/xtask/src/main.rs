@@ -45,15 +45,11 @@ fn python() -> PathBuf {
     PathBuf::from("python3")
 }
 
-fn golden(args: &[String]) -> ExitCode {
-    let Some(name) = args.first() else {
-        eprintln!("xtask golden: name of the indicator folder is required");
-        return ExitCode::FAILURE;
-    };
-
-    let root = repo_root();
-    // The chart patterns are checked against ta-patterns, everything else
-    // against TA-Lib (`docs/TESTING.md` section 2).
+/// The script that runs an indicator's oracle (`docs/TESTING.md` section 2):
+/// ta-patterns for the patterns flagged `chart_pattern`, the formula script
+/// for `INDICATORS.md` section 5.3 (oracle A), finta for section 5.4 (oracle
+/// F), and TA-Lib for everything else.
+fn oracle_script(root: &Path, name: &str) -> &'static str {
     let spec = root
         .join("crates/trendlib/src/indicators")
         .join(name)
@@ -62,11 +58,34 @@ fn golden(args: &[String]) -> ExitCode {
         text.lines()
             .any(|line| line.starts_with("flags:") && line.contains("chart_pattern"))
     });
-    let script = root.join(if chart {
-        "scripts/oracle/chart_golden.py"
+    if chart {
+        return "scripts/oracle/chart_golden.py";
+    }
+    let approved = std::fs::read_to_string(root.join("docs/INDICATORS.md")).unwrap_or_default();
+    let row = format!("| `{name}` |");
+    let in_section = |start: &str, end: &str| {
+        approved
+            .split_once(start)
+            .and_then(|(_, rest)| rest.split_once(end))
+            .is_some_and(|(section, _)| section.lines().any(|line| line.starts_with(&row)))
+    };
+    if in_section("### 5.3 ", "### 5.4 ") {
+        "scripts/oracle/formula_golden.py"
+    } else if in_section("### 5.4 ", "### 5.5 ") {
+        "scripts/oracle/finta_golden.py"
     } else {
         "scripts/oracle/talib_golden.py"
-    });
+    }
+}
+
+fn golden(args: &[String]) -> ExitCode {
+    let Some(name) = args.first() else {
+        eprintln!("xtask golden: name of the indicator folder is required");
+        return ExitCode::FAILURE;
+    };
+
+    let root = repo_root();
+    let script = root.join(oracle_script(&root, name));
     let mut command = Command::new(python());
     command.current_dir(&root).arg(&script).arg(name);
     command.args(&args[1..]);

@@ -5514,6 +5514,100 @@ mod chart_bull_pennant_adapter {
     }
 }
 
+mod chart_cup_with_handle_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::chart_cup_with_handle::ChartCupWithHandle;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "cup_window",
+            default: 65.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "handle_window",
+            default: 15.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "pivot_n",
+            default: 5.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "max_handle_retrace",
+            default: 0.5,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::chart_cup_with_handle::Params {
+        trendlib::indicators::chart_cup_with_handle::Params {
+            cup_window: values[0] as usize,
+            handle_window: values[1] as usize,
+            pivot_n: values[2] as usize,
+            max_handle_retrace: values[3],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "chart_cup_with_handle takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::chart_cup_with_handle::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod chart_descending_channel_adapter {
     use super::*;
 
@@ -6122,6 +6216,101 @@ mod chart_inverse_head_shoulders_adapter {
     pub fn registered() -> Registered {
         Registered {
             name: trendlib::indicators::chart_inverse_head_shoulders::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod chart_inverted_cup_with_handle_adapter {
+    use super::*;
+
+    type Indicated =
+        trendlib::indicators::chart_inverted_cup_with_handle::ChartInvertedCupWithHandle;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "cup_window",
+            default: 65.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "handle_window",
+            default: 15.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "pivot_n",
+            default: 5.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "max_handle_retrace",
+            default: 0.5,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::chart_inverted_cup_with_handle::Params {
+        trendlib::indicators::chart_inverted_cup_with_handle::Params {
+            cup_window: values[0] as usize,
+            handle_window: values[1] as usize,
+            pivot_n: values[2] as usize,
+            max_handle_retrace: values[3],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "chart_inverted_cup_with_handle takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::chart_inverted_cup_with_handle::NAME,
             inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
             outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
             params: PARAMS,
@@ -8375,6 +8564,96 @@ mod ht_trendmode_adapter {
             path_dependent: true,
             absolute_index: false,
             integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod ichimoku_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::ichimoku::Ichimoku;
+    const INPUTS: usize = 2;
+    const OUTPUTS: usize = 4;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "tenkan_period",
+            default: 9.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "kijun_period",
+            default: 26.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "senkou_period",
+            default: 52.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "displacement",
+            default: 26.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::ichimoku::Params {
+        trendlib::indicators::ichimoku::Params {
+            tenkan_period: values[0] as usize,
+            kijun_period: values[1] as usize,
+            senkou_period: values[2] as usize,
+            displacement: values[3] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "ichimoku takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::ichimoku::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false, false, false, false],
             batch,
             lookback,
             open_and_fill,
@@ -14263,6 +14542,7 @@ pub fn registered() -> Vec<Registered> {
         chart_broadening_adapter::registered(),
         chart_bull_flag_adapter::registered(),
         chart_bull_pennant_adapter::registered(),
+        chart_cup_with_handle_adapter::registered(),
         chart_descending_channel_adapter::registered(),
         chart_descending_triangle_adapter::registered(),
         chart_double_bottom_adapter::registered(),
@@ -14270,6 +14550,7 @@ pub fn registered() -> Vec<Registered> {
         chart_falling_wedge_adapter::registered(),
         chart_head_shoulders_adapter::registered(),
         chart_inverse_head_shoulders_adapter::registered(),
+        chart_inverted_cup_with_handle_adapter::registered(),
         chart_rectangle_adapter::registered(),
         chart_rising_wedge_adapter::registered(),
         chart_symmetrical_triangle_adapter::registered(),
@@ -14306,6 +14587,7 @@ pub fn registered() -> Vec<Registered> {
         ht_sine_adapter::registered(),
         ht_trendline_adapter::registered(),
         ht_trendmode_adapter::registered(),
+        ichimoku_adapter::registered(),
         imi_adapter::registered(),
         kama_adapter::registered(),
         kc_adapter::registered(),

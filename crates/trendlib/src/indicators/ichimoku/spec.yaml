@@ -1,0 +1,55 @@
+name: ichimoku
+title: Ichimoku Kinko Hyo
+group: overlap
+flags: [overlap]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+params:
+  - name: tenkan_period
+    type: int
+    default: 9
+    min: 1
+    max: 100000
+    doc: Bars the conversion line's midpoint spans
+  - name: kijun_period
+    type: int
+    default: 26
+    min: 1
+    max: 100000
+    doc: Bars the base line's midpoint spans
+  - name: senkou_period
+    type: int
+    default: 52
+    min: 1
+    max: 100000
+    doc: Bars the second leading span's midpoint spans
+  - name: displacement
+    type: int
+    default: 26
+    min: 1
+    max: 100000
+    doc: Bars the leading spans are drawn ahead
+outputs:
+  - name: ichimoku_tenkan
+    dtype: float64
+    plot: line
+    doc: Conversion line, the midpoint of the highest high and lowest low over tenkan_period bars
+  - name: ichimoku_kijun
+    dtype: float64
+    plot: line
+    doc: Base line, the same midpoint over kijun_period bars
+  - name: ichimoku_senkou_a
+    dtype: float64
+    plot: upper_band
+    doc: Leading span A as drawn at this bar, the mean of the two lines displacement bars ago
+  - name: ichimoku_senkou_b
+    dtype: float64
+    plot: lower_band
+    doc: Leading span B as drawn at this bar, the senkou_period midpoint displacement bars ago
+references:
+  - Goichi Hosoda, Ichimoku Kinko Hyo, 1969
+  - Nicole Elliott, Ichimoku Charts, Harriman House, 2007
+see_also: [midprice, donchian, kc]

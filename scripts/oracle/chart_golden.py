@@ -39,11 +39,19 @@ CHARTS = "charts_2579.csv"
 # TrendLib's names for the oracle's parameters (D12): only `window` differs.
 RENAMED = {"period": "window"}
 
-# The oracle functions that draw no trendline, and so meet neither deviation.
-NO_TRENDLINE = {"double_top", "double_bottom", "triple_top", "triple_bottom", "hs_top", "hs_bottom"}
+# The oracle functions that draw their lines with the sliding least-squares fit,
+# which is where deviation 9 can apply. Every other function draws none.
+TRENDLINE = {
+    "ascending_triangle", "descending_triangle", "symmetrical_triangle",
+    "broadening_top", "broadening_bottom", "rising_wedge", "falling_wedge",
+    "rectangle_top", "rectangle_bottom", "channel_asc", "channel_desc",
+    "flag_bull", "flag_bear", "pennant_bull", "pennant_bear",
+    "broadening_wedge_asc", "broadening_wedge_desc",
+    "right_angle_broadening_asc", "right_angle_broadening_desc",
+}
 POLE = {"flag_bull", "flag_bear", "pennant_bull", "pennant_bear"}
 
-ROW = re.compile(r"^\| `(chart_[a-z0-9_]+)` \| [^|]+ \| ([^|]+) \|")
+ROW = re.compile(r"^\| `((?:chart|bar|harmonic)_[a-z0-9_]+)` \| [^|]+ \| ([^|]+) \|")
 
 # Boundaries the default and minimum cases cannot reach, each pinned with a
 # setting at which the daily walk reaches it.
@@ -70,13 +78,13 @@ EXTRA_CASES = {
 
 
 def oracle_functions(name: str) -> list[str]:
-    """The oracle functions section 5.1 names for `name`, upward one first."""
+    """The oracle functions sections 5.1 and 5.2 name for `name`, upward one first."""
     section = APPROVED.read_text(encoding="utf-8").split("### 5.1 Chart patterns", 1)[1]
     for line in section.splitlines():
         row = ROW.match(line)
         if row and row.group(1) == name:
             return re.findall(r"`([a-z0-9_]+)`", row.group(2))
-    raise SystemExit(f"{name} is not in docs/INDICATORS.md section 5.1")
+    raise SystemExit(f"{name} is not in docs/INDICATORS.md section 5.1 or 5.2")
 
 
 def load_spec(name: str) -> dict:
@@ -129,7 +137,17 @@ def read_columns(filename: str):
 
     with (TESTDATA / filename).open(newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle))
-    return {key: np.array([float(row[key]) for row in rows]) for key in ("high", "low", "close")}
+    return {
+        key: np.array([float(row[key]) for row in rows])
+        for key in ("open", "high", "low", "close")
+    }
+
+
+def takes_mode(detector) -> bool:
+    """Whether an oracle function, or the halves it combines, take `mode`."""
+    import inspect
+
+    return "mode" in inspect.signature(detector).parameters
 
 
 def run_oracle(name: str, columns: dict, params: dict):
@@ -137,14 +155,14 @@ def run_oracle(name: str, columns: dict, params: dict):
     import ta_patterns.chart_patterns as cp
 
     keywords = {RENAMED.get(key, key): value for key, value in params.items()}
-    high, low, close = columns["high"], columns["low"], columns["close"]
-    readings = [
-        getattr(cp, function)(close, high, low, close, mode="confirmed", **keywords).astype(
-            np.int64
-        )
-        * 100
-        for function in oracle_functions(name)
-    ]
+    bars = (columns["open"], columns["high"], columns["low"], columns["close"])
+    readings = []
+    for function in oracle_functions(name):
+        detector = getattr(cp, function)
+        # The bar patterns take no `mode`: they are complete on the bar they
+        # read. Everything else is asked for its confirmed reading.
+        confirmed = {"mode": "confirmed"} if takes_mode(detector) else {}
+        readings.append(detector(*bars, **confirmed, **keywords).astype(np.int64) * 100)
     if len(readings) == 1:
         return readings[0]
     upward, downward = readings
@@ -192,7 +210,7 @@ def excluded_rows(name: str, columns: dict, params: dict) -> str:
         row = params["pole_bars"] + params["period"]
         if row < len(columns["close"]):
             found.append(f"{row}-{row} (Deviation 8)")
-    if not functions & NO_TRENDLINE:
+    if functions & TRENDLINE:
         first = params["period"]
         if functions & POLE:
             first = params["pole_bars"] + params["period"] + 1
@@ -208,6 +226,9 @@ def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
     readings = run_oracle(name, columns, params)
 
     functions = oracle_functions(name)
+    import ta_patterns.chart_patterns as cp
+
+    mode = ", mode=confirmed" if takes_mode(getattr(cp, functions[0])) else ""
     named = " and ".join(f"ta_patterns.chart_patterns.{f}" for f in functions)
     how = (
         f"{named}, the first where it fires and the second elsewhere"
@@ -219,7 +240,7 @@ def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
         f"# indicator: {name}",
         f"# case: {case}",
         f"# params: {rendered}",
-        f"# oracle: ta-patterns {ta_patterns.__version__}, {how}, mode=confirmed, times 100",
+        f"# oracle: ta-patterns {ta_patterns.__version__}, {how}{mode}, times 100",
         f"# produced_by: python scripts/oracle/chart_golden.py {name} --case {case}",
         f"# input: testdata/{dataset} (all rows)",
         f"# tolerance: {TOLERANCE}",

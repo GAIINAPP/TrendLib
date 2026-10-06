@@ -874,6 +874,120 @@ impl crate::core::kernel::Step<3, 1> for ShouldersState {
     }
 }
 
+/// Cup with handle, and the inverted one: a rim and a floor drawn from the swing
+/// points of the cup, the closes of the handle that follows it, and a close
+/// beyond the rim.
+///
+/// The cup is the `cup` bars before the handle's `handle` bars, both ending just
+/// before the current one. Its swing points are filed by the bar that confirmed
+/// them, so a swing confirmed during the handle belongs to the handle.
+#[derive(Clone, Debug)]
+pub struct CupState {
+    inverted: bool,
+    cup: usize,
+    handle: usize,
+    max_retrace: f64,
+    swings: Swings,
+    closes: Box<[f64]>,
+    head: usize,
+    bars: usize,
+}
+
+impl CupState {
+    pub fn new(
+        inverted: bool,
+        cup: usize,
+        handle: usize,
+        pivot_n: usize,
+        max_retrace: f64,
+    ) -> Self {
+        Self {
+            inverted,
+            cup,
+            handle,
+            max_retrace,
+            swings: Swings::new(pivot_n, cup + handle),
+            closes: vec![0.0; handle].into_boxed_slice(),
+            head: 0,
+            bars: 0,
+        }
+    }
+
+    /// The first bar with a whole cup and handle behind it.
+    pub fn lookback(cup: usize, handle: usize) -> usize {
+        cup + handle
+    }
+
+    /// Read before this bar's close joins the handle.
+    fn read(&self, now: usize, close: f64) -> f64 {
+        let start = now - self.cup - self.handle;
+        let end = now - self.handle;
+        let inside = |s: &Swing| s.at >= start && s.at < end;
+        let highest = self
+            .swings
+            .upper
+            .iter()
+            .filter(inside)
+            .map(|s| s.price)
+            .reduce(f64::max);
+        let lowest = self
+            .swings
+            .lower
+            .iter()
+            .filter(inside)
+            .map(|s| s.price)
+            .reduce(f64::min);
+        let (Some(highest), Some(lowest)) = (highest, lowest) else {
+            return 0.0;
+        };
+        let depth = highest - lowest;
+        if self.inverted {
+            let rim = lowest;
+            let handle_low = self.closes.iter().copied().fold(f64::INFINITY, f64::min);
+            let holds = depth / (highest + EPS) >= 0.05
+                && handle_low <= rim * 1.05
+                && (close - handle_low) / (depth + EPS) <= self.max_retrace
+                && close < rim;
+            if holds { -100.0 } else { 0.0 }
+        } else {
+            let rim = highest;
+            let handle_high = self
+                .closes
+                .iter()
+                .copied()
+                .fold(f64::NEG_INFINITY, f64::max);
+            let holds = depth / (rim + EPS) >= 0.05
+                && handle_high >= rim * 0.95
+                && (handle_high - close) / (depth + EPS) <= self.max_retrace
+                && close > rim;
+            if holds { 100.0 } else { 0.0 }
+        }
+    }
+
+    fn advance(&mut self, bar: [f64; 3]) -> Option<f64> {
+        let now = self.bars;
+        self.bars += 1;
+        let confirmed = self.swings.find(now, bar[0], bar[1]);
+        self.swings.file(now, confirmed);
+        let value = (now >= Self::lookback(self.cup, self.handle)).then(|| self.read(now, bar[2]));
+        if !self.closes.is_empty() {
+            self.closes[self.head] = bar[2];
+            self.head = (self.head + 1) % self.closes.len();
+        }
+        value
+    }
+}
+
+impl crate::core::kernel::Step<3, 1> for CupState {
+    fn push(&mut self, bar: [f64; 3]) -> Option<[f64; 1]> {
+        self.advance(bar).map(|value| [value])
+    }
+
+    fn preview(&self, bar: [f64; 3]) -> Option<[f64; 1]> {
+        self.clone().advance(bar).map(|value| [value])
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

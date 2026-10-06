@@ -13421,6 +13421,219 @@ impl PyChartBullPennantStream {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+#[pyo3(name = "chart_cup_with_handle", signature = (high, low, close, *, cup_window, handle_window, pivot_n, max_handle_retrace))]
+pub fn chart_cup_with_handle<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    cup_window: i64,
+    handle_window: i64,
+    pivot_n: i64,
+    max_handle_retrace: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let cup_window = int_param("chart_cup_with_handle", "cup_window", cup_window, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let handle_window = int_param(
+        "chart_cup_with_handle",
+        "handle_window",
+        handle_window,
+        2,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("chart_cup_with_handle", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let max_handle_retrace = float_param(
+        "chart_cup_with_handle",
+        "max_handle_retrace",
+        max_handle_retrace,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_cup_with_handle::Params {
+        cup_window,
+        handle_window,
+        pivot_n,
+        max_handle_retrace,
+    };
+    let out = py
+        .detach(|| <trendlib::indicators::chart_cup_with_handle::ChartCupWithHandle as Kernel<3, 1>>::batch([high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartCupWithHandleStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartCupWithHandleStream {
+    inner: BarStream<trendlib::indicators::chart_cup_with_handle::ChartCupWithHandle, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartCupWithHandleStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, cup_window, handle_window, pivot_n, max_handle_retrace))]
+    #[allow(clippy::too_many_arguments)]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        cup_window: i64,
+        handle_window: i64,
+        pivot_n: i64,
+        max_handle_retrace: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let cup_window = int_param("chart_cup_with_handle", "cup_window", cup_window, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let handle_window = int_param(
+            "chart_cup_with_handle",
+            "handle_window",
+            handle_window,
+            2,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_cup_with_handle", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let max_handle_retrace = float_param(
+            "chart_cup_with_handle",
+            "max_handle_retrace",
+            max_handle_retrace,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_cup_with_handle::Params {
+            cup_window,
+            handle_window,
+            pivot_n,
+            max_handle_retrace,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_cup_with_handle::ChartCupWithHandle, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, cup_window, handle_window, pivot_n, max_handle_retrace))]
+    #[allow(clippy::too_many_arguments)]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        cup_window: i64,
+        handle_window: i64,
+        pivot_n: i64,
+        max_handle_retrace: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let cup_window = int_param("chart_cup_with_handle", "cup_window", cup_window, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let handle_window = int_param(
+            "chart_cup_with_handle",
+            "handle_window",
+            handle_window,
+            2,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_cup_with_handle", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let max_handle_retrace = float_param(
+            "chart_cup_with_handle",
+            "max_handle_retrace",
+            max_handle_retrace,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_cup_with_handle::Params {
+            cup_window,
+            handle_window,
+            pivot_n,
+            max_handle_retrace,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_cup_with_handle::ChartCupWithHandle as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_cup_with_handle"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_cup_with_handle bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
 #[pyfunction]
 #[pyo3(name = "chart_descending_channel", signature = (high, low, close, *, period, pivot_n, parallel_tol))]
 pub fn chart_descending_channel<'py>(
@@ -14808,6 +15021,259 @@ impl PyChartInverseHeadShouldersStream {
     fn __repr__(&self) -> String {
         format!(
             "<trendlib stream chart_inverse_head_shoulders bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+#[pyo3(name = "chart_inverted_cup_with_handle", signature = (high, low, close, *, cup_window, handle_window, pivot_n, max_handle_retrace))]
+pub fn chart_inverted_cup_with_handle<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    cup_window: i64,
+    handle_window: i64,
+    pivot_n: i64,
+    max_handle_retrace: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let cup_window = int_param(
+        "chart_inverted_cup_with_handle",
+        "cup_window",
+        cup_window,
+        2,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let handle_window = int_param(
+        "chart_inverted_cup_with_handle",
+        "handle_window",
+        handle_window,
+        2,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param(
+        "chart_inverted_cup_with_handle",
+        "pivot_n",
+        pivot_n,
+        1,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let max_handle_retrace = float_param(
+        "chart_inverted_cup_with_handle",
+        "max_handle_retrace",
+        max_handle_retrace,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_inverted_cup_with_handle::Params {
+        cup_window,
+        handle_window,
+        pivot_n,
+        max_handle_retrace,
+    };
+    let out = py
+        .detach(|| <trendlib::indicators::chart_inverted_cup_with_handle::ChartInvertedCupWithHandle as Kernel<3, 1>>::batch([high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartInvertedCupWithHandleStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartInvertedCupWithHandleStream {
+    inner: BarStream<
+        trendlib::indicators::chart_inverted_cup_with_handle::ChartInvertedCupWithHandle,
+        3,
+        1,
+    >,
+}
+
+#[pymethods]
+impl PyChartInvertedCupWithHandleStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, cup_window, handle_window, pivot_n, max_handle_retrace))]
+    #[allow(clippy::too_many_arguments)]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        cup_window: i64,
+        handle_window: i64,
+        pivot_n: i64,
+        max_handle_retrace: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let cup_window = int_param(
+            "chart_inverted_cup_with_handle",
+            "cup_window",
+            cup_window,
+            2,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let handle_window = int_param(
+            "chart_inverted_cup_with_handle",
+            "handle_window",
+            handle_window,
+            2,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param(
+            "chart_inverted_cup_with_handle",
+            "pivot_n",
+            pivot_n,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let max_handle_retrace = float_param(
+            "chart_inverted_cup_with_handle",
+            "max_handle_retrace",
+            max_handle_retrace,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_inverted_cup_with_handle::Params {
+            cup_window,
+            handle_window,
+            pivot_n,
+            max_handle_retrace,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_inverted_cup_with_handle::ChartInvertedCupWithHandle, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, cup_window, handle_window, pivot_n, max_handle_retrace))]
+    #[allow(clippy::too_many_arguments)]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        cup_window: i64,
+        handle_window: i64,
+        pivot_n: i64,
+        max_handle_retrace: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let cup_window = int_param(
+            "chart_inverted_cup_with_handle",
+            "cup_window",
+            cup_window,
+            2,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let handle_window = int_param(
+            "chart_inverted_cup_with_handle",
+            "handle_window",
+            handle_window,
+            2,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param(
+            "chart_inverted_cup_with_handle",
+            "pivot_n",
+            pivot_n,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let max_handle_retrace = float_param(
+            "chart_inverted_cup_with_handle",
+            "max_handle_retrace",
+            max_handle_retrace,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_inverted_cup_with_handle::Params {
+            cup_window,
+            handle_window,
+            pivot_n,
+            max_handle_retrace,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_inverted_cup_with_handle::ChartInvertedCupWithHandle as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_inverted_cup_with_handle"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_inverted_cup_with_handle bars_seen={} value={:?}>",
             self.inner.bars_seen(),
             self.inner.value()
         )
@@ -19407,6 +19873,199 @@ impl PyHtTrendmodeStream {
     fn __repr__(&self) -> String {
         format!(
             "<trendlib stream ht_trendmode bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+type IchimokuOutputs<'py> = (
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+);
+
+#[pyfunction]
+#[pyo3(name = "ichimoku", signature = (high, low, *, tenkan_period, kijun_period, senkou_period, displacement))]
+pub fn ichimoku<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    tenkan_period: i64,
+    kijun_period: i64,
+    senkou_period: i64,
+    displacement: i64,
+) -> PyResult<IchimokuOutputs<'py>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let tenkan_period = int_param("ichimoku", "tenkan_period", tenkan_period, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let kijun_period = int_param("ichimoku", "kijun_period", kijun_period, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let senkou_period = int_param("ichimoku", "senkou_period", senkou_period, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let displacement = int_param("ichimoku", "displacement", displacement, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::ichimoku::Params {
+        tenkan_period,
+        kijun_period,
+        senkou_period,
+        displacement,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::ichimoku::Ichimoku as Kernel<2, 4>>::batch([high, low], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok((
+        std::mem::take(&mut out[0]).into_pyarray(py),
+        std::mem::take(&mut out[1]).into_pyarray(py),
+        std::mem::take(&mut out[2]).into_pyarray(py),
+        std::mem::take(&mut out[3]).into_pyarray(py),
+    ))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "IchimokuStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyIchimokuStream {
+    inner: BarStream<trendlib::indicators::ichimoku::Ichimoku, 2, 4>,
+}
+
+#[pymethods]
+impl PyIchimokuStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, tenkan_period, kijun_period, senkou_period, displacement))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        tenkan_period: i64,
+        kijun_period: i64,
+        senkou_period: i64,
+        displacement: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let tenkan_period = int_param("ichimoku", "tenkan_period", tenkan_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let kijun_period = int_param("ichimoku", "kijun_period", kijun_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let senkou_period = int_param("ichimoku", "senkou_period", senkou_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let displacement = int_param("ichimoku", "displacement", displacement, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::ichimoku::Params {
+            tenkan_period,
+            kijun_period,
+            senkou_period,
+            displacement,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<trendlib::indicators::ichimoku::Ichimoku, 2, 4> as Stream>::open(
+                    [high, low],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, tenkan_period, kijun_period, senkou_period, displacement))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        tenkan_period: i64,
+        kijun_period: i64,
+        senkou_period: i64,
+        displacement: i64,
+    ) -> PyResult<(Self, IchimokuOutputs<'py>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let tenkan_period = int_param("ichimoku", "tenkan_period", tenkan_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let kijun_period = int_param("ichimoku", "kijun_period", kijun_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let senkou_period = int_param("ichimoku", "senkou_period", senkou_period, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let displacement = int_param("ichimoku", "displacement", displacement, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::ichimoku::Params {
+            tenkan_period,
+            kijun_period,
+            senkou_period,
+            displacement,
+        };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::ichimoku::Ichimoku as Kernel<2, 4>>::open_and_fill(
+                    [high, low],
+                    &params,
+                )
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            (
+                std::mem::take(&mut out[0]).into_pyarray(py),
+                std::mem::take(&mut out[1]).into_pyarray(py),
+                std::mem::take(&mut out[2]).into_pyarray(py),
+                std::mem::take(&mut out[3]).into_pyarray(py),
+            )
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64) -> PyResult<(f64, f64, f64, f64)> {
+        let row = self
+            .inner
+            .update([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1], row[2], row[3]))
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64) -> PyResult<(f64, f64, f64, f64)> {
+        let row = self
+            .inner
+            .peek([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1], row[2], row[3]))
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64, f64, f64)> {
+        self.inner
+            .value()
+            .map(|row| (row[0], row[1], row[2], row[3]))
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "ichimoku"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream ichimoku bars_seen={} value={:?}>",
             self.inner.bars_seen(),
             self.inner.value()
         )
@@ -31171,6 +31830,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(chart_broadening, m)?)?;
     m.add_function(wrap_pyfunction!(chart_bull_flag, m)?)?;
     m.add_function(wrap_pyfunction!(chart_bull_pennant, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_cup_with_handle, m)?)?;
     m.add_function(wrap_pyfunction!(chart_descending_channel, m)?)?;
     m.add_function(wrap_pyfunction!(chart_descending_triangle, m)?)?;
     m.add_function(wrap_pyfunction!(chart_double_bottom, m)?)?;
@@ -31178,6 +31838,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(chart_falling_wedge, m)?)?;
     m.add_function(wrap_pyfunction!(chart_head_shoulders, m)?)?;
     m.add_function(wrap_pyfunction!(chart_inverse_head_shoulders, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_inverted_cup_with_handle, m)?)?;
     m.add_function(wrap_pyfunction!(chart_rectangle, m)?)?;
     m.add_function(wrap_pyfunction!(chart_rising_wedge, m)?)?;
     m.add_function(wrap_pyfunction!(chart_symmetrical_triangle, m)?)?;
@@ -31214,6 +31875,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(ht_sine, m)?)?;
     m.add_function(wrap_pyfunction!(ht_trendline, m)?)?;
     m.add_function(wrap_pyfunction!(ht_trendmode, m)?)?;
+    m.add_function(wrap_pyfunction!(ichimoku, m)?)?;
     m.add_function(wrap_pyfunction!(imi, m)?)?;
     m.add_function(wrap_pyfunction!(kama, m)?)?;
     m.add_function(wrap_pyfunction!(kc, m)?)?;
@@ -31394,6 +32056,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyChartBroadeningStream>()?;
     m.add_class::<PyChartBullFlagStream>()?;
     m.add_class::<PyChartBullPennantStream>()?;
+    m.add_class::<PyChartCupWithHandleStream>()?;
     m.add_class::<PyChartDescendingChannelStream>()?;
     m.add_class::<PyChartDescendingTriangleStream>()?;
     m.add_class::<PyChartDoubleBottomStream>()?;
@@ -31401,6 +32064,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyChartFallingWedgeStream>()?;
     m.add_class::<PyChartHeadShouldersStream>()?;
     m.add_class::<PyChartInverseHeadShouldersStream>()?;
+    m.add_class::<PyChartInvertedCupWithHandleStream>()?;
     m.add_class::<PyChartRectangleStream>()?;
     m.add_class::<PyChartRisingWedgeStream>()?;
     m.add_class::<PyChartSymmetricalTriangleStream>()?;
@@ -31437,6 +32101,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyHtSineStream>()?;
     m.add_class::<PyHtTrendlineStream>()?;
     m.add_class::<PyHtTrendmodeStream>()?;
+    m.add_class::<PyIchimokuStream>()?;
     m.add_class::<PyImiStream>()?;
     m.add_class::<PyKamaStream>()?;
     m.add_class::<PyKcStream>()?;
@@ -32375,6 +33040,42 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
         let params = PyDict::new(py);
         {
             let entry = PyDict::new(py);
+            entry.set_item("default", 65)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("cup_window", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 15)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("handle_window", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.5)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("max_handle_retrace", entry)?;
+        }
+        table.set_item("chart_cup_with_handle", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
             entry.set_item("default", 80)?;
             entry.set_item("min", 2)?;
             entry.set_item("max", 100000)?;
@@ -32590,6 +33291,42 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
             params.set_item("min_separation", entry)?;
         }
         table.set_item("chart_inverse_head_shoulders", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 65)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("cup_window", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 15)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("handle_window", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.5)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("max_handle_retrace", entry)?;
+        }
+        table.set_item("chart_inverted_cup_with_handle", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -33022,6 +33759,42 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     {
         let params = PyDict::new(py);
         table.set_item("ht_trendmode", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 9)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("tenkan_period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 26)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("kijun_period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 52)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("senkou_period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 26)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("displacement", entry)?;
+        }
+        table.set_item("ichimoku", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -34512,6 +35285,7 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("chart_broadening", vec!["high", "low", "close"])?;
     table.set_item("chart_bull_flag", vec!["high", "low", "close"])?;
     table.set_item("chart_bull_pennant", vec!["high", "low", "close"])?;
+    table.set_item("chart_cup_with_handle", vec!["high", "low", "close"])?;
     table.set_item("chart_descending_channel", vec!["high", "low", "close"])?;
     table.set_item("chart_descending_triangle", vec!["high", "low", "close"])?;
     table.set_item("chart_double_bottom", vec!["high", "low", "close"])?;
@@ -34519,6 +35293,10 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("chart_falling_wedge", vec!["high", "low", "close"])?;
     table.set_item("chart_head_shoulders", vec!["high", "low", "close"])?;
     table.set_item("chart_inverse_head_shoulders", vec!["high", "low", "close"])?;
+    table.set_item(
+        "chart_inverted_cup_with_handle",
+        vec!["high", "low", "close"],
+    )?;
     table.set_item("chart_rectangle", vec!["high", "low", "close"])?;
     table.set_item("chart_rising_wedge", vec!["high", "low", "close"])?;
     table.set_item("chart_symmetrical_triangle", vec!["high", "low", "close"])?;
@@ -34555,6 +35333,7 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("ht_sine", vec!["source"])?;
     table.set_item("ht_trendline", vec!["source"])?;
     table.set_item("ht_trendmode", vec!["source"])?;
+    table.set_item("ichimoku", vec!["high", "low"])?;
     table.set_item("imi", vec!["open", "close"])?;
     table.set_item("kama", vec!["source"])?;
     table.set_item("kc", vec!["high", "low", "close"])?;
@@ -34741,6 +35520,7 @@ fn kinds_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("chart_broadening", vec!["high", "low", "close"])?;
     table.set_item("chart_bull_flag", vec!["high", "low", "close"])?;
     table.set_item("chart_bull_pennant", vec!["high", "low", "close"])?;
+    table.set_item("chart_cup_with_handle", vec!["high", "low", "close"])?;
     table.set_item("chart_descending_channel", vec!["high", "low", "close"])?;
     table.set_item("chart_descending_triangle", vec!["high", "low", "close"])?;
     table.set_item("chart_double_bottom", vec!["high", "low", "close"])?;
@@ -34748,6 +35528,10 @@ fn kinds_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("chart_falling_wedge", vec!["high", "low", "close"])?;
     table.set_item("chart_head_shoulders", vec!["high", "low", "close"])?;
     table.set_item("chart_inverse_head_shoulders", vec!["high", "low", "close"])?;
+    table.set_item(
+        "chart_inverted_cup_with_handle",
+        vec!["high", "low", "close"],
+    )?;
     table.set_item("chart_rectangle", vec!["high", "low", "close"])?;
     table.set_item("chart_rising_wedge", vec!["high", "low", "close"])?;
     table.set_item("chart_symmetrical_triangle", vec!["high", "low", "close"])?;
@@ -34784,6 +35568,7 @@ fn kinds_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("ht_sine", vec!["series"])?;
     table.set_item("ht_trendline", vec!["series"])?;
     table.set_item("ht_trendmode", vec!["series"])?;
+    table.set_item("ichimoku", vec!["high", "low"])?;
     table.set_item("imi", vec!["open", "close"])?;
     table.set_item("kama", vec!["series"])?;
     table.set_item("kc", vec!["high", "low", "close"])?;
@@ -34976,6 +35761,7 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("chart_broadening", vec!["chart_broadening"])?;
     table.set_item("chart_bull_flag", vec!["chart_bull_flag"])?;
     table.set_item("chart_bull_pennant", vec!["chart_bull_pennant"])?;
+    table.set_item("chart_cup_with_handle", vec!["chart_cup_with_handle"])?;
     table.set_item("chart_descending_channel", vec!["chart_descending_channel"])?;
     table.set_item(
         "chart_descending_triangle",
@@ -34988,6 +35774,10 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item(
         "chart_inverse_head_shoulders",
         vec!["chart_inverse_head_shoulders"],
+    )?;
+    table.set_item(
+        "chart_inverted_cup_with_handle",
+        vec!["chart_inverted_cup_with_handle"],
     )?;
     table.set_item("chart_rectangle", vec!["chart_rectangle"])?;
     table.set_item("chart_rising_wedge", vec!["chart_rising_wedge"])?;
@@ -35034,6 +35824,15 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("ht_sine", vec!["ht_sine_sine", "ht_sine_lead_sine"])?;
     table.set_item("ht_trendline", vec!["ht_trendline"])?;
     table.set_item("ht_trendmode", vec!["ht_trendmode"])?;
+    table.set_item(
+        "ichimoku",
+        vec![
+            "ichimoku_tenkan",
+            "ichimoku_kijun",
+            "ichimoku_senkou_a",
+            "ichimoku_senkou_b",
+        ],
+    )?;
     table.set_item("imi", vec!["imi"])?;
     table.set_item("kama", vec!["kama"])?;
     table.set_item("kc", vec!["kc_upper", "kc_middle", "kc_lower"])?;
@@ -35252,6 +36051,7 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("chart_broadening", vec!["int32"])?;
     table.set_item("chart_bull_flag", vec!["int32"])?;
     table.set_item("chart_bull_pennant", vec!["int32"])?;
+    table.set_item("chart_cup_with_handle", vec!["int32"])?;
     table.set_item("chart_descending_channel", vec!["int32"])?;
     table.set_item("chart_descending_triangle", vec!["int32"])?;
     table.set_item("chart_double_bottom", vec!["int32"])?;
@@ -35259,6 +36059,7 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("chart_falling_wedge", vec!["int32"])?;
     table.set_item("chart_head_shoulders", vec!["int32"])?;
     table.set_item("chart_inverse_head_shoulders", vec!["int32"])?;
+    table.set_item("chart_inverted_cup_with_handle", vec!["int32"])?;
     table.set_item("chart_rectangle", vec!["int32"])?;
     table.set_item("chart_rising_wedge", vec!["int32"])?;
     table.set_item("chart_symmetrical_triangle", vec!["int32"])?;
@@ -35295,6 +36096,7 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("ht_sine", vec!["float64", "float64"])?;
     table.set_item("ht_trendline", vec!["float64"])?;
     table.set_item("ht_trendmode", vec!["int32"])?;
+    table.set_item("ichimoku", vec!["float64", "float64", "float64", "float64"])?;
     table.set_item("imi", vec!["float64"])?;
     table.set_item("kama", vec!["float64"])?;
     table.set_item("kc", vec!["float64", "float64", "float64"])?;
@@ -35504,6 +36306,10 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
         vec!["chart_pattern", "path_dependent"],
     )?;
     table.set_item(
+        "chart_cup_with_handle",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
         "chart_descending_channel",
         vec!["chart_pattern", "path_dependent"],
     )?;
@@ -35526,6 +36332,10 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     )?;
     table.set_item(
         "chart_inverse_head_shoulders",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "chart_inverted_cup_with_handle",
         vec!["chart_pattern", "path_dependent"],
     )?;
     table.set_item("chart_rectangle", vec!["chart_pattern", "path_dependent"])?;
@@ -35576,6 +36386,7 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
         vec!["overlap", "unstable", "path_dependent"],
     )?;
     table.set_item("ht_trendmode", vec!["unstable", "path_dependent"])?;
+    table.set_item("ichimoku", vec!["overlap"])?;
     table.set_item("imi", Vec::<&str>::new())?;
     table.set_item("kama", vec!["overlap", "unstable", "path_dependent"])?;
     table.set_item("kc", vec!["overlap", "unstable", "path_dependent"])?;
@@ -35770,6 +36581,7 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("chart_broadening", "chart")?;
     table.set_item("chart_bull_flag", "chart")?;
     table.set_item("chart_bull_pennant", "chart")?;
+    table.set_item("chart_cup_with_handle", "chart")?;
     table.set_item("chart_descending_channel", "chart")?;
     table.set_item("chart_descending_triangle", "chart")?;
     table.set_item("chart_double_bottom", "chart")?;
@@ -35777,6 +36589,7 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("chart_falling_wedge", "chart")?;
     table.set_item("chart_head_shoulders", "chart")?;
     table.set_item("chart_inverse_head_shoulders", "chart")?;
+    table.set_item("chart_inverted_cup_with_handle", "chart")?;
     table.set_item("chart_rectangle", "chart")?;
     table.set_item("chart_rising_wedge", "chart")?;
     table.set_item("chart_symmetrical_triangle", "chart")?;
@@ -35813,6 +36626,7 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("ht_sine", "cycle")?;
     table.set_item("ht_trendline", "cycle")?;
     table.set_item("ht_trendmode", "cycle")?;
+    table.set_item("ichimoku", "overlap")?;
     table.set_item("imi", "momentum")?;
     table.set_item("kama", "overlap")?;
     table.set_item("kc", "overlap")?;
@@ -36373,6 +37187,22 @@ pub fn lookback_of(
             let min_pole = 0.05;
             Ok(<trendlib::indicators::chart_bull_pennant::ChartBullPennant as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_bull_pennant::Params { period, pivot_n, pole_bars, min_pole, }))
         }
+        "chart_cup_with_handle" => {
+            let cup_window = match get("cup_window")? {
+                Some(value) => int_param("chart_cup_with_handle", "cup_window", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 65,
+            };
+            let handle_window = match get("handle_window")? {
+                Some(value) => int_param("chart_cup_with_handle", "handle_window", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 15,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_cup_with_handle", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let max_handle_retrace = 0.5;
+            Ok(<trendlib::indicators::chart_cup_with_handle::ChartCupWithHandle as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_cup_with_handle::Params { cup_window, handle_window, pivot_n, max_handle_retrace, }))
+        }
         "chart_descending_channel" => {
             let period = match get("period")? {
                 Some(value) => int_param("chart_descending_channel", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
@@ -36471,6 +37301,22 @@ pub fn lookback_of(
                 None => 8,
             };
             Ok(<trendlib::indicators::chart_inverse_head_shoulders::ChartInverseHeadShoulders as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_inverse_head_shoulders::Params { period, pivot_n, shoulder_tol, min_separation, }))
+        }
+        "chart_inverted_cup_with_handle" => {
+            let cup_window = match get("cup_window")? {
+                Some(value) => int_param("chart_inverted_cup_with_handle", "cup_window", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 65,
+            };
+            let handle_window = match get("handle_window")? {
+                Some(value) => int_param("chart_inverted_cup_with_handle", "handle_window", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 15,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_inverted_cup_with_handle", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let max_handle_retrace = 0.5;
+            Ok(<trendlib::indicators::chart_inverted_cup_with_handle::ChartInvertedCupWithHandle as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_inverted_cup_with_handle::Params { cup_window, handle_window, pivot_n, max_handle_retrace, }))
         }
         "chart_rectangle" => {
             let period = match get("period")? {
@@ -36714,6 +37560,25 @@ pub fn lookback_of(
         }
         "ht_trendmode" => {
             Ok(<trendlib::indicators::ht_trendmode::HtTrendmode as Kernel<1, 1>>::lookback(&trendlib::indicators::ht_trendmode::Params { }))
+        }
+        "ichimoku" => {
+            let tenkan_period = match get("tenkan_period")? {
+                Some(value) => int_param("ichimoku", "tenkan_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 9,
+            };
+            let kijun_period = match get("kijun_period")? {
+                Some(value) => int_param("ichimoku", "kijun_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 26,
+            };
+            let senkou_period = match get("senkou_period")? {
+                Some(value) => int_param("ichimoku", "senkou_period", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 52,
+            };
+            let displacement = match get("displacement")? {
+                Some(value) => int_param("ichimoku", "displacement", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 26,
+            };
+            Ok(<trendlib::indicators::ichimoku::Ichimoku as Kernel<2, 4>>::lookback(&trendlib::indicators::ichimoku::Params { tenkan_period, kijun_period, senkou_period, displacement, }))
         }
         "imi" => {
             let period = match get("period")? {

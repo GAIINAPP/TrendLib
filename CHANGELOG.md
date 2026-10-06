@@ -75,3 +75,6 @@ Before 1.0, minor versions may break the API; every break is listed under
   (oracle P); `testdata/charts_2579.csv` holds shapes that make every one fire
   in each direction it reads. Where TrendLib and that oracle differ is
   `CONVENTIONS.md` deviations 8 and 9.
+- `chart_cup_with_handle`, `chart_inverted_cup_with_handle` (oracle P) and
+  `ichimoku` (oracle A, through TA-Lib's `MIDPRICE`): the first of the 105
+  functions `docs/INDICATORS.md` §§ 5.2 to 5.4 approve.

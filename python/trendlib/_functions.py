@@ -305,6 +305,7 @@ __all__ = [
     "chart_broadening",
     "chart_bull_flag",
     "chart_bull_pennant",
+    "chart_cup_with_handle",
     "chart_descending_channel",
     "chart_descending_triangle",
     "chart_double_bottom",
@@ -312,6 +313,7 @@ __all__ = [
     "chart_falling_wedge",
     "chart_head_shoulders",
     "chart_inverse_head_shoulders",
+    "chart_inverted_cup_with_handle",
     "chart_rectangle",
     "chart_rising_wedge",
     "chart_symmetrical_triangle",
@@ -348,6 +350,7 @@ __all__ = [
     "ht_sine",
     "ht_trendline",
     "ht_trendmode",
+    "ichimoku",
     "imi",
     "kama",
     "kc",
@@ -3319,6 +3322,65 @@ def chart_bull_pennant(
     return _convert.wrap_outputs(out, carrier, ("chart_bull_pennant",))
 
 
+def chart_cup_with_handle(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    cup_window: int = _PARAMS["chart_cup_with_handle"]["cup_window"]["default"],
+    handle_window: int = _PARAMS["chart_cup_with_handle"]["handle_window"]["default"],
+    pivot_n: int = _PARAMS["chart_cup_with_handle"]["pivot_n"]["default"],
+    max_handle_retrace: float = _PARAMS["chart_cup_with_handle"]["max_handle_retrace"]["default"],
+) -> Any:
+    """Cup with Handle.
+
+    Parameters
+    ----------
+    cup_window : int, default 65
+        Bars the cup may span, from 2 to 100000.
+    handle_window : int, default 15
+        Bars the handle may span, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    max_handle_retrace : float, default 0.5
+        Deepest the handle may dip, as a fraction of the cup's depth.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above the rim of a cup, after a handle that stayed near it.
+    """
+    cup_window = _convert.as_int("chart_cup_with_handle", "cup_window", cup_window)
+    handle_window = _convert.as_int("chart_cup_with_handle", "handle_window", handle_window)
+    pivot_n = _convert.as_int("chart_cup_with_handle", "pivot_n", pivot_n)
+    max_handle_retrace = _convert.as_float(
+        "chart_cup_with_handle", "max_handle_retrace", max_handle_retrace
+    )
+    columns, carrier = _convert.bars(
+        "chart_cup_with_handle",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_cup_with_handle(
+        *columns,
+        cup_window=cup_window,
+        handle_window=handle_window,
+        pivot_n=pivot_n,
+        max_handle_retrace=max_handle_retrace,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_cup_with_handle",))
+
+
 def chart_descending_channel(
     high=None,
     low=None,
@@ -3685,6 +3747,69 @@ def chart_inverse_head_shoulders(
         min_separation=min_separation,
     )
     return _convert.wrap_outputs(out, carrier, ("chart_inverse_head_shoulders",))
+
+
+def chart_inverted_cup_with_handle(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    cup_window: int = _PARAMS["chart_inverted_cup_with_handle"]["cup_window"]["default"],
+    handle_window: int = _PARAMS["chart_inverted_cup_with_handle"]["handle_window"]["default"],
+    pivot_n: int = _PARAMS["chart_inverted_cup_with_handle"]["pivot_n"]["default"],
+    max_handle_retrace: float = _PARAMS["chart_inverted_cup_with_handle"]["max_handle_retrace"][
+        "default"
+    ],
+) -> Any:
+    """Inverted Cup with Handle.
+
+    Parameters
+    ----------
+    cup_window : int, default 65
+        Bars the cup may span, from 2 to 100000.
+    handle_window : int, default 15
+        Bars the handle may span, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    max_handle_retrace : float, default 0.5
+        Highest the handle may rise, as a fraction of the cup's height.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below the floor of an inverted cup, after a handle that stayed near it.
+    """
+    cup_window = _convert.as_int("chart_inverted_cup_with_handle", "cup_window", cup_window)
+    handle_window = _convert.as_int(
+        "chart_inverted_cup_with_handle", "handle_window", handle_window
+    )
+    pivot_n = _convert.as_int("chart_inverted_cup_with_handle", "pivot_n", pivot_n)
+    max_handle_retrace = _convert.as_float(
+        "chart_inverted_cup_with_handle", "max_handle_retrace", max_handle_retrace
+    )
+    columns, carrier = _convert.bars(
+        "chart_inverted_cup_with_handle",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_inverted_cup_with_handle(
+        *columns,
+        cup_window=cup_window,
+        handle_window=handle_window,
+        pivot_n=pivot_n,
+        max_handle_retrace=max_handle_retrace,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_inverted_cup_with_handle",))
 
 
 def chart_rectangle(
@@ -4675,6 +4800,74 @@ def ht_trendmode(source=None) -> Any:
     columns, carrier = _convert.bars("ht_trendmode", (source,), ("source",), ("series",))
     out = _core.ht_trendmode(*columns)
     return _convert.wrap_outputs(out, carrier, ("ht_trendmode",))
+
+
+def ichimoku(
+    high=None,
+    low=None,
+    *,
+    tenkan_period: int = _PARAMS["ichimoku"]["tenkan_period"]["default"],
+    kijun_period: int = _PARAMS["ichimoku"]["kijun_period"]["default"],
+    senkou_period: int = _PARAMS["ichimoku"]["senkou_period"]["default"],
+    displacement: int = _PARAMS["ichimoku"]["displacement"]["default"],
+) -> Any:
+    """Ichimoku Kinko Hyo.
+
+    Parameters
+    ----------
+    tenkan_period : int, default 9
+        Bars the conversion line's midpoint spans, from 1 to 100000.
+    kijun_period : int, default 26
+        Bars the base line's midpoint spans, from 1 to 100000.
+    senkou_period : int, default 52
+        Bars the second leading span's midpoint spans, from 1 to 100000.
+    displacement : int, default 26
+        Bars the leading spans are drawn ahead, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        ichimoku_tenkan: Conversion line, the midpoint of the highest high and lowest low over
+        tenkan_period bars.
+        ichimoku_kijun: Base line, the same midpoint over kijun_period bars.
+        ichimoku_senkou_a: Leading span A as drawn at this bar, the mean of the two lines
+        displacement bars ago.
+        ichimoku_senkou_b: Leading span B as drawn at this bar, the senkou_period midpoint
+        displacement bars ago.
+    """
+    tenkan_period = _convert.as_int("ichimoku", "tenkan_period", tenkan_period)
+    kijun_period = _convert.as_int("ichimoku", "kijun_period", kijun_period)
+    senkou_period = _convert.as_int("ichimoku", "senkou_period", senkou_period)
+    displacement = _convert.as_int("ichimoku", "displacement", displacement)
+    columns, carrier = _convert.bars(
+        "ichimoku",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.ichimoku(
+        *columns,
+        tenkan_period=tenkan_period,
+        kijun_period=kijun_period,
+        senkou_period=senkou_period,
+        displacement=displacement,
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "ichimoku_tenkan",
+            "ichimoku_kijun",
+            "ichimoku_senkou_a",
+            "ichimoku_senkou_b",
+        ),
+    )
 
 
 def imi(open=None, close=None, *, period: int = _PARAMS["imi"]["period"]["default"]) -> Any:

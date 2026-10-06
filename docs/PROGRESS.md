@@ -2,8 +2,8 @@
 
 # Progress
 
-**223 of 328 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 105 not started.
+**226 of 328 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 102 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -27,10 +27,10 @@ something is done that is not. CI checks it is current.
 | Math operators | 12 | 12 |
 | Candlestick patterns | 61 | 61 |
 | Levels | 3 | 3 |
-| Chart patterns | 19 | 66 |
+| Chart patterns | 21 | 66 |
 | Bar patterns | 0 | 19 |
 | Harmonic patterns | 0 | 12 |
-| Indicators on oracle A | 0 | 23 |
+| Indicators on oracle A | 1 | 23 |
 | Indicators on oracle F | 0 | 4 |
 
 ## Overlap studies (25 of 25)
@@ -270,7 +270,7 @@ something is done that is not. CI checks it is current.
 - [x] `pivots_camarilla` -- Camarilla Pivot Points *
 - [x] `pivots_traditional` -- Traditional Pivot Points *
 
-## Chart patterns (19 of 66)
+## Chart patterns (21 of 66)
 
 - [ ] `chart_ascending_broadening_wedge` -- Ascending Broadening Wedge
 - [x] `chart_ascending_channel` -- Ascending Channel
@@ -298,7 +298,7 @@ something is done that is not. CI checks it is current.
 - [ ] `chart_busted_triple_top` -- Busted Triple Top
 - [ ] `chart_complex_head_shoulders` -- Complex Head and Shoulders
 - [ ] `chart_complex_inverse_head_shoulders` -- Complex Inverse Head and Shoulders
-- [ ] `chart_cup_with_handle` -- Cup with Handle
+- [x] `chart_cup_with_handle` -- Cup with Handle
 - [ ] `chart_descending_broadening_wedge` -- Descending Broadening Wedge
 - [x] `chart_descending_channel` -- Descending Channel
 - [ ] `chart_descending_right_angle_broadening` -- Descending Right-Angled Broadening
@@ -321,7 +321,7 @@ something is done that is not. CI checks it is current.
 - [ ] `chart_high_tight_flag` -- High and Tight Flag
 - [x] `chart_inverse_head_shoulders` -- Inverse Head and Shoulders
 - [ ] `chart_inverted_ascending_scallop` -- Inverted Ascending Scallop
-- [ ] `chart_inverted_cup_with_handle` -- Inverted Cup with Handle
+- [x] `chart_inverted_cup_with_handle` -- Inverted Cup with Handle
 - [ ] `chart_inverted_descending_scallop` -- Inverted Descending Scallop
 - [ ] `chart_island_bottom` -- Island Bottom
 - [ ] `chart_island_top` -- Island Top
@@ -376,7 +376,7 @@ something is done that is not. CI checks it is current.
 - [ ] `harmonic_wolfe_wave_bearish` -- Bearish Wolfe Wave
 - [ ] `harmonic_wolfe_wave_bullish` -- Bullish Wolfe Wave
 
-## Indicators on oracle A (0 of 23)
+## Indicators on oracle A (1 of 23)
 
 - [ ] `alligator` -- Williams Alligator
 - [ ] `asi` -- Accumulative Swing Index
@@ -390,7 +390,7 @@ something is done that is not. CI checks it is current.
 - [ ] `gapo` -- Gopalakrishnan Range Index
 - [ ] `gator` -- Gator Oscillator
 - [ ] `guppy` -- Guppy Multiple Moving Average
-- [ ] `ichimoku` -- Ichimoku Kinko Hyo
+- [x] `ichimoku` -- Ichimoku Kinko Hyo
 - [ ] `linreg_channel` -- Linear Regression Channel
 - [ ] `pivots_demark` -- DeMark Pivot Points
 - [ ] `pivots_woodie` -- Woodie Pivot Points
