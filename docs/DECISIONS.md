@@ -34,7 +34,7 @@ proceed on a judgment call.
 | Q1 | GitHub org: under GAIIN's org, or a neutral `trendlib` org? The repository already exists at `GAIINAPP/TrendLib` and M0 used it (A1); confirm or move it before M3. | M3 (Trusted Publishing is bound to owner/repo) |
 | Q2 | Add a `compat="tradingview"` mode where TradingView and TA-Lib conventions differ (Supertrend seed and sign, etc.)? | M6 |
 | Q3 | Ship a WASM/JS build for GAIIN's web frontend? | After 0.1.0 |
-| Q4 | Human transcriber and source for CPR / pivot golden values (see `TESTING.md` § Oracles). Not blocking: oracle A ships in the meantime, see A16. | M5 |
+| Q4 | A human transcriber is now needed for **four outputs, not eighteen**: `pivots_traditional`'s `r3`/`s3` and `cpr`'s `bc`/`tc`. The other fourteen are independently confirmed (A19). The `r3`/`s3` transcription has to settle a real split in the field: TradingView's `H + 2(pp − L)` against Sierra Chart's `pp + 2(H − L)`. Not blocking: oracle A ships meanwhile (A16). | M5 |
 | Q5 | Docs domain (e.g. `trendlib.dev`) or GitHub Pages default URL? | M5 |
 | Q6 | Most shared indicators are 15x to 30x TA-Lib because TrendLib re-sums each window instead of carrying a running total, which is what makes it the more accurate of the two. Keep the accuracy and raise or drop M4's 1.5x budget, or add a faster path and accept the oracle's error? Measured in `TESTING.md` § 8 and A18. | M5 |
 
@@ -207,3 +207,30 @@ optimised and no numerics were changed to make the check pass, because trading
 the accuracy back is a product decision; it is Q6. The benchmark, the table and
 the nightly job all ship, so the number is now measured every night instead of
 being unknown.
+
+A19 (M4, 2026-10-06): the three `levels` functions were cross-checked against
+`pandas-ta`'s `pivots`, an implementation independent of both TrendLib and the
+approved formulas, over all 1,999 valid rows of `daily_2000.csv`. Fourteen of
+the eighteen outputs are confirmed:
+
+- `pivots_traditional`: `pp`, `r1`, `r2`, `s1`, `s2` agree **bitwise** on every
+  row.
+- `pivots_camarilla`: all eight levels agree, `r3`, `r4`, `s3`, `s4` bitwise and
+  `r1`, `r2`, `s1`, `s2` to one unit in the last place, which is the order the
+  two libraries associate `1.1 * range / n` in.
+- `cpr`: `cpr_pivot` agrees bitwise with the same pivot.
+
+Not confirmed, and still Q4's job:
+
+- `pivots_traditional`'s `r3`/`s3`. The disagreement is a different formula, not
+  a rounding difference: no row matches, and the gap reaches 3 percent.
+  `pandas-ta` computes `pp ± 2(H − L)` (its cited source is Sierra Chart) where
+  `INDICATORS.md` § 3.3 approves TradingView's `H + 2(pp − L)` and
+  `L − 2(H − pp)`. Both conventions ship under the name "traditional". Nothing
+  was changed: § 3.3 says to stop and ask if an outside source disagrees, not to
+  fit the formula to it.
+- `cpr`'s `bc` and `tc`. No runnable implementation of the Central Pivot Range
+  was found, so these stay on oracle A alone.
+
+`pandas-ta` was not adopted as an oracle and is not a dependency: that is a
+D18-shaped decision for the owner, and this was a check, not a commitment.

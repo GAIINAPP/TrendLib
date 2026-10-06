@@ -72,6 +72,14 @@ values for either.
 **Upgrading an oracle version** regenerates every golden from that oracle in one
 PR whose description summarises any value changes.
 
+Oracle A's three functions have since been cross-checked against `pandas-ta`'s
+`pivots`, which is independent of both TrendLib and the approved formulas:
+fourteen of their eighteen outputs agree over all 1,999 valid rows, most of them
+bitwise. The four that do not are `pivots_traditional`'s `r3`/`s3`, where the two
+libraries follow different published conventions, and `cpr`'s `bc`/`tc`, which no
+runnable implementation was found for. `DECISIONS.md` A19 has the numbers, and
+those four are what Q4 still needs a human for.
+
 ## 3. Test data
 
 `scripts/testdata/make_synthetic.py` writes, with a fixed seed:
