@@ -52,7 +52,21 @@ fn golden(args: &[String]) -> ExitCode {
     };
 
     let root = repo_root();
-    let script = root.join("scripts/oracle/talib_golden.py");
+    // The chart patterns are checked against ta-patterns, everything else
+    // against TA-Lib (`docs/TESTING.md` section 2).
+    let spec = root
+        .join("crates/trendlib/src/indicators")
+        .join(name)
+        .join("spec.yaml");
+    let chart = std::fs::read_to_string(&spec).is_ok_and(|text| {
+        text.lines()
+            .any(|line| line.starts_with("flags:") && line.contains("chart_pattern"))
+    });
+    let script = root.join(if chart {
+        "scripts/oracle/chart_golden.py"
+    } else {
+        "scripts/oracle/talib_golden.py"
+    });
     let mut command = Command::new(python());
     command.current_dir(&root).arg(&script).arg(name);
     command.args(&args[1..]);

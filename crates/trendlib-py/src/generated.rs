@@ -12065,6 +12065,3622 @@ impl PyCeilStream {
 }
 
 #[pyfunction]
+#[pyo3(name = "chart_ascending_channel", signature = (high, low, close, *, period, pivot_n, parallel_tol))]
+pub fn chart_ascending_channel<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    parallel_tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("chart_ascending_channel", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("chart_ascending_channel", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let parallel_tol = float_param(
+        "chart_ascending_channel",
+        "parallel_tol",
+        parallel_tol,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_ascending_channel::Params {
+        period,
+        pivot_n,
+        parallel_tol,
+    };
+    let out = py
+        .detach(|| <trendlib::indicators::chart_ascending_channel::ChartAscendingChannel as Kernel<3, 1>>::batch([high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartAscendingChannelStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartAscendingChannelStream {
+    inner: BarStream<trendlib::indicators::chart_ascending_channel::ChartAscendingChannel, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartAscendingChannelStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, parallel_tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        parallel_tol: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_ascending_channel", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_ascending_channel", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let parallel_tol = float_param(
+            "chart_ascending_channel",
+            "parallel_tol",
+            parallel_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_ascending_channel::Params {
+            period,
+            pivot_n,
+            parallel_tol,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<
+                    trendlib::indicators::chart_ascending_channel::ChartAscendingChannel,
+                    3,
+                    1,
+                > as Stream>::open([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, parallel_tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        parallel_tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_ascending_channel", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_ascending_channel", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let parallel_tol = float_param(
+            "chart_ascending_channel",
+            "parallel_tol",
+            parallel_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_ascending_channel::Params {
+            period,
+            pivot_n,
+            parallel_tol,
+        };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::chart_ascending_channel::ChartAscendingChannel as Kernel<
+                    3,
+                    1,
+                >>::open_and_fill([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_ascending_channel"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_ascending_channel bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "chart_ascending_triangle", signature = (high, low, close, *, period, pivot_n, flat_tol))]
+pub fn chart_ascending_triangle<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    flat_tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("chart_ascending_triangle", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("chart_ascending_triangle", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let flat_tol = float_param(
+        "chart_ascending_triangle",
+        "flat_tol",
+        flat_tol,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_ascending_triangle::Params {
+        period,
+        pivot_n,
+        flat_tol,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::chart_ascending_triangle::ChartAscendingTriangle as Kernel<
+                3,
+                1,
+            >>::batch([high, low, close], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartAscendingTriangleStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartAscendingTriangleStream {
+    inner: BarStream<trendlib::indicators::chart_ascending_triangle::ChartAscendingTriangle, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartAscendingTriangleStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, flat_tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        flat_tol: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_ascending_triangle", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_ascending_triangle", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let flat_tol = float_param(
+            "chart_ascending_triangle",
+            "flat_tol",
+            flat_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_ascending_triangle::Params {
+            period,
+            pivot_n,
+            flat_tol,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<
+                    trendlib::indicators::chart_ascending_triangle::ChartAscendingTriangle,
+                    3,
+                    1,
+                > as Stream>::open([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, flat_tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        flat_tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_ascending_triangle", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_ascending_triangle", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let flat_tol = float_param(
+            "chart_ascending_triangle",
+            "flat_tol",
+            flat_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_ascending_triangle::Params {
+            period,
+            pivot_n,
+            flat_tol,
+        };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::chart_ascending_triangle::ChartAscendingTriangle as Kernel<
+                    3,
+                    1,
+                >>::open_and_fill([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_ascending_triangle"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_ascending_triangle bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+#[pyo3(name = "chart_bear_flag", signature = (high, low, close, *, period, pivot_n, pole_bars, min_pole, max_retrace))]
+pub fn chart_bear_flag<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    pole_bars: i64,
+    min_pole: f64,
+    max_retrace: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period =
+        int_param("chart_bear_flag", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("chart_bear_flag", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pole_bars = int_param("chart_bear_flag", "pole_bars", pole_bars, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let min_pole = float_param("chart_bear_flag", "min_pole", min_pole, 0.0, f64::INFINITY)
+        .map_err(|e| to_py_err(py, &e))?;
+    let max_retrace = float_param(
+        "chart_bear_flag",
+        "max_retrace",
+        max_retrace,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_bear_flag::Params {
+        period,
+        pivot_n,
+        pole_bars,
+        min_pole,
+        max_retrace,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::chart_bear_flag::ChartBearFlag as Kernel<3, 1>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartBearFlagStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartBearFlagStream {
+    inner: BarStream<trendlib::indicators::chart_bear_flag::ChartBearFlag, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartBearFlagStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, pole_bars, min_pole, max_retrace))]
+    #[allow(clippy::too_many_arguments)]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        pole_bars: i64,
+        min_pole: f64,
+        max_retrace: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_bear_flag", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_bear_flag", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pole_bars = int_param("chart_bear_flag", "pole_bars", pole_bars, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let min_pole = float_param("chart_bear_flag", "min_pole", min_pole, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let max_retrace = float_param(
+            "chart_bear_flag",
+            "max_retrace",
+            max_retrace,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_bear_flag::Params {
+            period,
+            pivot_n,
+            pole_bars,
+            min_pole,
+            max_retrace,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_bear_flag::ChartBearFlag, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, pole_bars, min_pole, max_retrace))]
+    #[allow(clippy::too_many_arguments)]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        pole_bars: i64,
+        min_pole: f64,
+        max_retrace: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_bear_flag", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_bear_flag", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pole_bars = int_param("chart_bear_flag", "pole_bars", pole_bars, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let min_pole = float_param("chart_bear_flag", "min_pole", min_pole, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let max_retrace = float_param(
+            "chart_bear_flag",
+            "max_retrace",
+            max_retrace,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_bear_flag::Params {
+            period,
+            pivot_n,
+            pole_bars,
+            min_pole,
+            max_retrace,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_bear_flag::ChartBearFlag as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_bear_flag"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_bear_flag bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+#[pyo3(name = "chart_bear_pennant", signature = (high, low, close, *, period, pivot_n, pole_bars, min_pole))]
+pub fn chart_bear_pennant<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    pole_bars: i64,
+    min_pole: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("chart_bear_pennant", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("chart_bear_pennant", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pole_bars = int_param("chart_bear_pennant", "pole_bars", pole_bars, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let min_pole = float_param(
+        "chart_bear_pennant",
+        "min_pole",
+        min_pole,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_bear_pennant::Params {
+        period,
+        pivot_n,
+        pole_bars,
+        min_pole,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::chart_bear_pennant::ChartBearPennant as Kernel<3, 1>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartBearPennantStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartBearPennantStream {
+    inner: BarStream<trendlib::indicators::chart_bear_pennant::ChartBearPennant, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartBearPennantStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, pole_bars, min_pole))]
+    #[allow(clippy::too_many_arguments)]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        pole_bars: i64,
+        min_pole: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_bear_pennant", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_bear_pennant", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pole_bars = int_param("chart_bear_pennant", "pole_bars", pole_bars, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let min_pole = float_param(
+            "chart_bear_pennant",
+            "min_pole",
+            min_pole,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_bear_pennant::Params {
+            period,
+            pivot_n,
+            pole_bars,
+            min_pole,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_bear_pennant::ChartBearPennant, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, pole_bars, min_pole))]
+    #[allow(clippy::too_many_arguments)]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        pole_bars: i64,
+        min_pole: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_bear_pennant", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_bear_pennant", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pole_bars = int_param("chart_bear_pennant", "pole_bars", pole_bars, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let min_pole = float_param(
+            "chart_bear_pennant",
+            "min_pole",
+            min_pole,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_bear_pennant::Params {
+            period,
+            pivot_n,
+            pole_bars,
+            min_pole,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_bear_pennant::ChartBearPennant as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_bear_pennant"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_bear_pennant bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "chart_broadening", signature = (high, low, close, *, period, pivot_n))]
+pub fn chart_broadening<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("chart_broadening", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("chart_broadening", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_broadening::Params { period, pivot_n };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::chart_broadening::ChartBroadening as Kernel<3, 1>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartBroadeningStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartBroadeningStream {
+    inner: BarStream<trendlib::indicators::chart_broadening::ChartBroadening, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartBroadeningStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_broadening", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_broadening", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_broadening::Params { period, pivot_n };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_broadening::ChartBroadening, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_broadening", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_broadening", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_broadening::Params { period, pivot_n };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_broadening::ChartBroadening as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_broadening"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_broadening bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+#[pyo3(name = "chart_bull_flag", signature = (high, low, close, *, period, pivot_n, pole_bars, min_pole, max_retrace))]
+pub fn chart_bull_flag<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    pole_bars: i64,
+    min_pole: f64,
+    max_retrace: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period =
+        int_param("chart_bull_flag", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("chart_bull_flag", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pole_bars = int_param("chart_bull_flag", "pole_bars", pole_bars, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let min_pole = float_param("chart_bull_flag", "min_pole", min_pole, 0.0, f64::INFINITY)
+        .map_err(|e| to_py_err(py, &e))?;
+    let max_retrace = float_param(
+        "chart_bull_flag",
+        "max_retrace",
+        max_retrace,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_bull_flag::Params {
+        period,
+        pivot_n,
+        pole_bars,
+        min_pole,
+        max_retrace,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::chart_bull_flag::ChartBullFlag as Kernel<3, 1>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartBullFlagStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartBullFlagStream {
+    inner: BarStream<trendlib::indicators::chart_bull_flag::ChartBullFlag, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartBullFlagStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, pole_bars, min_pole, max_retrace))]
+    #[allow(clippy::too_many_arguments)]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        pole_bars: i64,
+        min_pole: f64,
+        max_retrace: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_bull_flag", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_bull_flag", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pole_bars = int_param("chart_bull_flag", "pole_bars", pole_bars, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let min_pole = float_param("chart_bull_flag", "min_pole", min_pole, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let max_retrace = float_param(
+            "chart_bull_flag",
+            "max_retrace",
+            max_retrace,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_bull_flag::Params {
+            period,
+            pivot_n,
+            pole_bars,
+            min_pole,
+            max_retrace,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_bull_flag::ChartBullFlag, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, pole_bars, min_pole, max_retrace))]
+    #[allow(clippy::too_many_arguments)]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        pole_bars: i64,
+        min_pole: f64,
+        max_retrace: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_bull_flag", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_bull_flag", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pole_bars = int_param("chart_bull_flag", "pole_bars", pole_bars, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let min_pole = float_param("chart_bull_flag", "min_pole", min_pole, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let max_retrace = float_param(
+            "chart_bull_flag",
+            "max_retrace",
+            max_retrace,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_bull_flag::Params {
+            period,
+            pivot_n,
+            pole_bars,
+            min_pole,
+            max_retrace,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_bull_flag::ChartBullFlag as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_bull_flag"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_bull_flag bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+#[pyo3(name = "chart_bull_pennant", signature = (high, low, close, *, period, pivot_n, pole_bars, min_pole))]
+pub fn chart_bull_pennant<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    pole_bars: i64,
+    min_pole: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("chart_bull_pennant", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("chart_bull_pennant", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pole_bars = int_param("chart_bull_pennant", "pole_bars", pole_bars, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let min_pole = float_param(
+        "chart_bull_pennant",
+        "min_pole",
+        min_pole,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_bull_pennant::Params {
+        period,
+        pivot_n,
+        pole_bars,
+        min_pole,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::chart_bull_pennant::ChartBullPennant as Kernel<3, 1>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartBullPennantStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartBullPennantStream {
+    inner: BarStream<trendlib::indicators::chart_bull_pennant::ChartBullPennant, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartBullPennantStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, pole_bars, min_pole))]
+    #[allow(clippy::too_many_arguments)]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        pole_bars: i64,
+        min_pole: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_bull_pennant", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_bull_pennant", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pole_bars = int_param("chart_bull_pennant", "pole_bars", pole_bars, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let min_pole = float_param(
+            "chart_bull_pennant",
+            "min_pole",
+            min_pole,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_bull_pennant::Params {
+            period,
+            pivot_n,
+            pole_bars,
+            min_pole,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_bull_pennant::ChartBullPennant, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, pole_bars, min_pole))]
+    #[allow(clippy::too_many_arguments)]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        pole_bars: i64,
+        min_pole: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_bull_pennant", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_bull_pennant", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pole_bars = int_param("chart_bull_pennant", "pole_bars", pole_bars, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let min_pole = float_param(
+            "chart_bull_pennant",
+            "min_pole",
+            min_pole,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_bull_pennant::Params {
+            period,
+            pivot_n,
+            pole_bars,
+            min_pole,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_bull_pennant::ChartBullPennant as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_bull_pennant"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_bull_pennant bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "chart_descending_channel", signature = (high, low, close, *, period, pivot_n, parallel_tol))]
+pub fn chart_descending_channel<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    parallel_tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("chart_descending_channel", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("chart_descending_channel", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let parallel_tol = float_param(
+        "chart_descending_channel",
+        "parallel_tol",
+        parallel_tol,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_descending_channel::Params {
+        period,
+        pivot_n,
+        parallel_tol,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::chart_descending_channel::ChartDescendingChannel as Kernel<
+                3,
+                1,
+            >>::batch([high, low, close], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartDescendingChannelStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartDescendingChannelStream {
+    inner: BarStream<trendlib::indicators::chart_descending_channel::ChartDescendingChannel, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartDescendingChannelStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, parallel_tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        parallel_tol: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_descending_channel", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_descending_channel", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let parallel_tol = float_param(
+            "chart_descending_channel",
+            "parallel_tol",
+            parallel_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_descending_channel::Params {
+            period,
+            pivot_n,
+            parallel_tol,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<
+                    trendlib::indicators::chart_descending_channel::ChartDescendingChannel,
+                    3,
+                    1,
+                > as Stream>::open([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, parallel_tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        parallel_tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_descending_channel", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_descending_channel", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let parallel_tol = float_param(
+            "chart_descending_channel",
+            "parallel_tol",
+            parallel_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_descending_channel::Params {
+            period,
+            pivot_n,
+            parallel_tol,
+        };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::chart_descending_channel::ChartDescendingChannel as Kernel<
+                    3,
+                    1,
+                >>::open_and_fill([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_descending_channel"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_descending_channel bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "chart_descending_triangle", signature = (high, low, close, *, period, pivot_n, flat_tol))]
+pub fn chart_descending_triangle<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    flat_tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("chart_descending_triangle", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("chart_descending_triangle", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let flat_tol = float_param(
+        "chart_descending_triangle",
+        "flat_tol",
+        flat_tol,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_descending_triangle::Params {
+        period,
+        pivot_n,
+        flat_tol,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::chart_descending_triangle::ChartDescendingTriangle as Kernel<
+                3,
+                1,
+            >>::batch([high, low, close], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartDescendingTriangleStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartDescendingTriangleStream {
+    inner:
+        BarStream<trendlib::indicators::chart_descending_triangle::ChartDescendingTriangle, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartDescendingTriangleStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, flat_tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        flat_tol: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_descending_triangle", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_descending_triangle", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let flat_tol = float_param(
+            "chart_descending_triangle",
+            "flat_tol",
+            flat_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_descending_triangle::Params {
+            period,
+            pivot_n,
+            flat_tol,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<
+                    trendlib::indicators::chart_descending_triangle::ChartDescendingTriangle,
+                    3,
+                    1,
+                > as Stream>::open([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, flat_tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        flat_tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_descending_triangle", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_descending_triangle", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let flat_tol = float_param(
+            "chart_descending_triangle",
+            "flat_tol",
+            flat_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_descending_triangle::Params {
+            period,
+            pivot_n,
+            flat_tol,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_descending_triangle::ChartDescendingTriangle as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_descending_triangle"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_descending_triangle bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+#[pyo3(name = "chart_double_bottom", signature = (high, low, close, *, period, pivot_n, tol, min_separation))]
+pub fn chart_double_bottom<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    tol: f64,
+    min_separation: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("chart_double_bottom", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("chart_double_bottom", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let tol = float_param("chart_double_bottom", "tol", tol, 0.0, f64::INFINITY)
+        .map_err(|e| to_py_err(py, &e))?;
+    let min_separation = int_param(
+        "chart_double_bottom",
+        "min_separation",
+        min_separation,
+        1,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_double_bottom::Params {
+        period,
+        pivot_n,
+        tol,
+        min_separation,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::chart_double_bottom::ChartDoubleBottom as Kernel<3, 1>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartDoubleBottomStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartDoubleBottomStream {
+    inner: BarStream<trendlib::indicators::chart_double_bottom::ChartDoubleBottom, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartDoubleBottomStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, tol, min_separation))]
+    #[allow(clippy::too_many_arguments)]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        tol: f64,
+        min_separation: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_double_bottom", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_double_bottom", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let tol = float_param("chart_double_bottom", "tol", tol, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let min_separation = int_param(
+            "chart_double_bottom",
+            "min_separation",
+            min_separation,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_double_bottom::Params {
+            period,
+            pivot_n,
+            tol,
+            min_separation,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_double_bottom::ChartDoubleBottom, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, tol, min_separation))]
+    #[allow(clippy::too_many_arguments)]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        tol: f64,
+        min_separation: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_double_bottom", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_double_bottom", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let tol = float_param("chart_double_bottom", "tol", tol, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let min_separation = int_param(
+            "chart_double_bottom",
+            "min_separation",
+            min_separation,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_double_bottom::Params {
+            period,
+            pivot_n,
+            tol,
+            min_separation,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_double_bottom::ChartDoubleBottom as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_double_bottom"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_double_bottom bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+#[pyo3(name = "chart_double_top", signature = (high, low, close, *, period, pivot_n, tol, min_separation))]
+pub fn chart_double_top<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    tol: f64,
+    min_separation: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("chart_double_top", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("chart_double_top", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let tol = float_param("chart_double_top", "tol", tol, 0.0, f64::INFINITY)
+        .map_err(|e| to_py_err(py, &e))?;
+    let min_separation = int_param(
+        "chart_double_top",
+        "min_separation",
+        min_separation,
+        1,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_double_top::Params {
+        period,
+        pivot_n,
+        tol,
+        min_separation,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::chart_double_top::ChartDoubleTop as Kernel<3, 1>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartDoubleTopStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartDoubleTopStream {
+    inner: BarStream<trendlib::indicators::chart_double_top::ChartDoubleTop, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartDoubleTopStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, tol, min_separation))]
+    #[allow(clippy::too_many_arguments)]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        tol: f64,
+        min_separation: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_double_top", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_double_top", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let tol = float_param("chart_double_top", "tol", tol, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let min_separation = int_param(
+            "chart_double_top",
+            "min_separation",
+            min_separation,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_double_top::Params {
+            period,
+            pivot_n,
+            tol,
+            min_separation,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_double_top::ChartDoubleTop, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, tol, min_separation))]
+    #[allow(clippy::too_many_arguments)]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        tol: f64,
+        min_separation: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_double_top", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_double_top", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let tol = float_param("chart_double_top", "tol", tol, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let min_separation = int_param(
+            "chart_double_top",
+            "min_separation",
+            min_separation,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_double_top::Params {
+            period,
+            pivot_n,
+            tol,
+            min_separation,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_double_top::ChartDoubleTop as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_double_top"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_double_top bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "chart_falling_wedge", signature = (high, low, close, *, period, pivot_n))]
+pub fn chart_falling_wedge<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("chart_falling_wedge", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("chart_falling_wedge", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_falling_wedge::Params { period, pivot_n };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::chart_falling_wedge::ChartFallingWedge as Kernel<3, 1>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartFallingWedgeStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartFallingWedgeStream {
+    inner: BarStream<trendlib::indicators::chart_falling_wedge::ChartFallingWedge, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartFallingWedgeStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_falling_wedge", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_falling_wedge", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_falling_wedge::Params { period, pivot_n };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_falling_wedge::ChartFallingWedge, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_falling_wedge", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_falling_wedge", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_falling_wedge::Params { period, pivot_n };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_falling_wedge::ChartFallingWedge as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_falling_wedge"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_falling_wedge bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+#[pyo3(name = "chart_head_shoulders", signature = (high, low, close, *, period, pivot_n, shoulder_tol, min_separation))]
+pub fn chart_head_shoulders<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    shoulder_tol: f64,
+    min_separation: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("chart_head_shoulders", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("chart_head_shoulders", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let shoulder_tol = float_param(
+        "chart_head_shoulders",
+        "shoulder_tol",
+        shoulder_tol,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let min_separation = int_param(
+        "chart_head_shoulders",
+        "min_separation",
+        min_separation,
+        1,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_head_shoulders::Params {
+        period,
+        pivot_n,
+        shoulder_tol,
+        min_separation,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::chart_head_shoulders::ChartHeadShoulders as Kernel<3, 1>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartHeadShouldersStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartHeadShouldersStream {
+    inner: BarStream<trendlib::indicators::chart_head_shoulders::ChartHeadShoulders, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartHeadShouldersStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, shoulder_tol, min_separation))]
+    #[allow(clippy::too_many_arguments)]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        shoulder_tol: f64,
+        min_separation: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_head_shoulders", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_head_shoulders", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let shoulder_tol = float_param(
+            "chart_head_shoulders",
+            "shoulder_tol",
+            shoulder_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let min_separation = int_param(
+            "chart_head_shoulders",
+            "min_separation",
+            min_separation,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_head_shoulders::Params {
+            period,
+            pivot_n,
+            shoulder_tol,
+            min_separation,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_head_shoulders::ChartHeadShoulders, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, shoulder_tol, min_separation))]
+    #[allow(clippy::too_many_arguments)]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        shoulder_tol: f64,
+        min_separation: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_head_shoulders", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_head_shoulders", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let shoulder_tol = float_param(
+            "chart_head_shoulders",
+            "shoulder_tol",
+            shoulder_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let min_separation = int_param(
+            "chart_head_shoulders",
+            "min_separation",
+            min_separation,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_head_shoulders::Params {
+            period,
+            pivot_n,
+            shoulder_tol,
+            min_separation,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_head_shoulders::ChartHeadShoulders as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_head_shoulders"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_head_shoulders bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+#[pyo3(name = "chart_inverse_head_shoulders", signature = (high, low, close, *, period, pivot_n, shoulder_tol, min_separation))]
+pub fn chart_inverse_head_shoulders<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    shoulder_tol: f64,
+    min_separation: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("chart_inverse_head_shoulders", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param(
+        "chart_inverse_head_shoulders",
+        "pivot_n",
+        pivot_n,
+        1,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let shoulder_tol = float_param(
+        "chart_inverse_head_shoulders",
+        "shoulder_tol",
+        shoulder_tol,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let min_separation = int_param(
+        "chart_inverse_head_shoulders",
+        "min_separation",
+        min_separation,
+        1,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_inverse_head_shoulders::Params {
+        period,
+        pivot_n,
+        shoulder_tol,
+        min_separation,
+    };
+    let out = py
+        .detach(|| <trendlib::indicators::chart_inverse_head_shoulders::ChartInverseHeadShoulders as Kernel<3, 1>>::batch([high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartInverseHeadShouldersStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartInverseHeadShouldersStream {
+    inner: BarStream<
+        trendlib::indicators::chart_inverse_head_shoulders::ChartInverseHeadShoulders,
+        3,
+        1,
+    >,
+}
+
+#[pymethods]
+impl PyChartInverseHeadShouldersStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, shoulder_tol, min_separation))]
+    #[allow(clippy::too_many_arguments)]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        shoulder_tol: f64,
+        min_separation: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_inverse_head_shoulders", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param(
+            "chart_inverse_head_shoulders",
+            "pivot_n",
+            pivot_n,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let shoulder_tol = float_param(
+            "chart_inverse_head_shoulders",
+            "shoulder_tol",
+            shoulder_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let min_separation = int_param(
+            "chart_inverse_head_shoulders",
+            "min_separation",
+            min_separation,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_inverse_head_shoulders::Params {
+            period,
+            pivot_n,
+            shoulder_tol,
+            min_separation,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<
+                    trendlib::indicators::chart_inverse_head_shoulders::ChartInverseHeadShoulders,
+                    3,
+                    1,
+                > as Stream>::open([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, shoulder_tol, min_separation))]
+    #[allow(clippy::too_many_arguments)]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        shoulder_tol: f64,
+        min_separation: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_inverse_head_shoulders", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param(
+            "chart_inverse_head_shoulders",
+            "pivot_n",
+            pivot_n,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let shoulder_tol = float_param(
+            "chart_inverse_head_shoulders",
+            "shoulder_tol",
+            shoulder_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let min_separation = int_param(
+            "chart_inverse_head_shoulders",
+            "min_separation",
+            min_separation,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_inverse_head_shoulders::Params {
+            period,
+            pivot_n,
+            shoulder_tol,
+            min_separation,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_inverse_head_shoulders::ChartInverseHeadShoulders as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_inverse_head_shoulders"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_inverse_head_shoulders bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "chart_rectangle", signature = (high, low, close, *, period, pivot_n, flat_tol))]
+pub fn chart_rectangle<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    flat_tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period =
+        int_param("chart_rectangle", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("chart_rectangle", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let flat_tol = float_param("chart_rectangle", "flat_tol", flat_tol, 0.0, f64::INFINITY)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_rectangle::Params {
+        period,
+        pivot_n,
+        flat_tol,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::chart_rectangle::ChartRectangle as Kernel<3, 1>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartRectangleStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartRectangleStream {
+    inner: BarStream<trendlib::indicators::chart_rectangle::ChartRectangle, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartRectangleStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, flat_tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        flat_tol: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_rectangle", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_rectangle", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let flat_tol = float_param("chart_rectangle", "flat_tol", flat_tol, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_rectangle::Params {
+            period,
+            pivot_n,
+            flat_tol,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_rectangle::ChartRectangle, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, flat_tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        flat_tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_rectangle", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_rectangle", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let flat_tol = float_param("chart_rectangle", "flat_tol", flat_tol, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_rectangle::Params {
+            period,
+            pivot_n,
+            flat_tol,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_rectangle::ChartRectangle as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_rectangle"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_rectangle bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "chart_rising_wedge", signature = (high, low, close, *, period, pivot_n))]
+pub fn chart_rising_wedge<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("chart_rising_wedge", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("chart_rising_wedge", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_rising_wedge::Params { period, pivot_n };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::chart_rising_wedge::ChartRisingWedge as Kernel<3, 1>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartRisingWedgeStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartRisingWedgeStream {
+    inner: BarStream<trendlib::indicators::chart_rising_wedge::ChartRisingWedge, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartRisingWedgeStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_rising_wedge", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_rising_wedge", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_rising_wedge::Params { period, pivot_n };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_rising_wedge::ChartRisingWedge, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_rising_wedge", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_rising_wedge", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_rising_wedge::Params { period, pivot_n };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_rising_wedge::ChartRisingWedge as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_rising_wedge"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_rising_wedge bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "chart_symmetrical_triangle", signature = (high, low, close, *, period, pivot_n))]
+pub fn chart_symmetrical_triangle<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("chart_symmetrical_triangle", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("chart_symmetrical_triangle", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_symmetrical_triangle::Params { period, pivot_n };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::chart_symmetrical_triangle::ChartSymmetricalTriangle as Kernel<
+                3,
+                1,
+            >>::batch([high, low, close], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartSymmetricalTriangleStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartSymmetricalTriangleStream {
+    inner:
+        BarStream<trendlib::indicators::chart_symmetrical_triangle::ChartSymmetricalTriangle, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartSymmetricalTriangleStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_symmetrical_triangle", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_symmetrical_triangle", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_symmetrical_triangle::Params { period, pivot_n };
+        let inner = py
+            .detach(|| {
+                <BarStream<
+                    trendlib::indicators::chart_symmetrical_triangle::ChartSymmetricalTriangle,
+                    3,
+                    1,
+                > as Stream>::open([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_symmetrical_triangle", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_symmetrical_triangle", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_symmetrical_triangle::Params { period, pivot_n };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_symmetrical_triangle::ChartSymmetricalTriangle as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_symmetrical_triangle"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_symmetrical_triangle bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+#[pyo3(name = "chart_triple_bottom", signature = (high, low, close, *, period, pivot_n, tol, min_separation))]
+pub fn chart_triple_bottom<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    tol: f64,
+    min_separation: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("chart_triple_bottom", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("chart_triple_bottom", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let tol = float_param("chart_triple_bottom", "tol", tol, 0.0, f64::INFINITY)
+        .map_err(|e| to_py_err(py, &e))?;
+    let min_separation = int_param(
+        "chart_triple_bottom",
+        "min_separation",
+        min_separation,
+        1,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_triple_bottom::Params {
+        period,
+        pivot_n,
+        tol,
+        min_separation,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::chart_triple_bottom::ChartTripleBottom as Kernel<3, 1>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartTripleBottomStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartTripleBottomStream {
+    inner: BarStream<trendlib::indicators::chart_triple_bottom::ChartTripleBottom, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartTripleBottomStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, tol, min_separation))]
+    #[allow(clippy::too_many_arguments)]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        tol: f64,
+        min_separation: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_triple_bottom", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_triple_bottom", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let tol = float_param("chart_triple_bottom", "tol", tol, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let min_separation = int_param(
+            "chart_triple_bottom",
+            "min_separation",
+            min_separation,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_triple_bottom::Params {
+            period,
+            pivot_n,
+            tol,
+            min_separation,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_triple_bottom::ChartTripleBottom, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, tol, min_separation))]
+    #[allow(clippy::too_many_arguments)]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        tol: f64,
+        min_separation: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_triple_bottom", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_triple_bottom", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let tol = float_param("chart_triple_bottom", "tol", tol, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let min_separation = int_param(
+            "chart_triple_bottom",
+            "min_separation",
+            min_separation,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_triple_bottom::Params {
+            period,
+            pivot_n,
+            tol,
+            min_separation,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_triple_bottom::ChartTripleBottom as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_triple_bottom"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_triple_bottom bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+#[pyo3(name = "chart_triple_top", signature = (high, low, close, *, period, pivot_n, tol, min_separation))]
+pub fn chart_triple_top<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    tol: f64,
+    min_separation: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("chart_triple_top", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("chart_triple_top", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let tol = float_param("chart_triple_top", "tol", tol, 0.0, f64::INFINITY)
+        .map_err(|e| to_py_err(py, &e))?;
+    let min_separation = int_param(
+        "chart_triple_top",
+        "min_separation",
+        min_separation,
+        1,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_triple_top::Params {
+        period,
+        pivot_n,
+        tol,
+        min_separation,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::chart_triple_top::ChartTripleTop as Kernel<3, 1>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartTripleTopStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartTripleTopStream {
+    inner: BarStream<trendlib::indicators::chart_triple_top::ChartTripleTop, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartTripleTopStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, tol, min_separation))]
+    #[allow(clippy::too_many_arguments)]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        tol: f64,
+        min_separation: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_triple_top", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_triple_top", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let tol = float_param("chart_triple_top", "tol", tol, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let min_separation = int_param(
+            "chart_triple_top",
+            "min_separation",
+            min_separation,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_triple_top::Params {
+            period,
+            pivot_n,
+            tol,
+            min_separation,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_triple_top::ChartTripleTop, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, tol, min_separation))]
+    #[allow(clippy::too_many_arguments)]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        tol: f64,
+        min_separation: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("chart_triple_top", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("chart_triple_top", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let tol = float_param("chart_triple_top", "tol", tol, 0.0, f64::INFINITY)
+            .map_err(|e| to_py_err(py, &e))?;
+        let min_separation = int_param(
+            "chart_triple_top",
+            "min_separation",
+            min_separation,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_triple_top::Params {
+            period,
+            pivot_n,
+            tol,
+            min_separation,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_triple_top::ChartTripleTop as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_triple_top"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_triple_top bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
 #[pyo3(name = "cmf", signature = (high, low, close, volume, *, period))]
 pub fn cmf<'py>(
     py: Python<'py>,
@@ -27548,6 +31164,25 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(cdl_upsidegap2crows, m)?)?;
     m.add_function(wrap_pyfunction!(cdl_xsidegap3methods, m)?)?;
     m.add_function(wrap_pyfunction!(ceil, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_ascending_channel, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_ascending_triangle, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_bear_flag, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_bear_pennant, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_broadening, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_bull_flag, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_bull_pennant, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_descending_channel, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_descending_triangle, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_double_bottom, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_double_top, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_falling_wedge, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_head_shoulders, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_inverse_head_shoulders, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_rectangle, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_rising_wedge, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_symmetrical_triangle, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_triple_bottom, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_triple_top, m)?)?;
     m.add_function(wrap_pyfunction!(cmf, m)?)?;
     m.add_function(wrap_pyfunction!(cmo, m)?)?;
     m.add_function(wrap_pyfunction!(cmou, m)?)?;
@@ -27752,6 +31387,25 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyCdlUpsidegap2crowsStream>()?;
     m.add_class::<PyCdlXsidegap3methodsStream>()?;
     m.add_class::<PyCeilStream>()?;
+    m.add_class::<PyChartAscendingChannelStream>()?;
+    m.add_class::<PyChartAscendingTriangleStream>()?;
+    m.add_class::<PyChartBearFlagStream>()?;
+    m.add_class::<PyChartBearPennantStream>()?;
+    m.add_class::<PyChartBroadeningStream>()?;
+    m.add_class::<PyChartBullFlagStream>()?;
+    m.add_class::<PyChartBullPennantStream>()?;
+    m.add_class::<PyChartDescendingChannelStream>()?;
+    m.add_class::<PyChartDescendingTriangleStream>()?;
+    m.add_class::<PyChartDoubleBottomStream>()?;
+    m.add_class::<PyChartDoubleTopStream>()?;
+    m.add_class::<PyChartFallingWedgeStream>()?;
+    m.add_class::<PyChartHeadShouldersStream>()?;
+    m.add_class::<PyChartInverseHeadShouldersStream>()?;
+    m.add_class::<PyChartRectangleStream>()?;
+    m.add_class::<PyChartRisingWedgeStream>()?;
+    m.add_class::<PyChartSymmetricalTriangleStream>()?;
+    m.add_class::<PyChartTripleBottomStream>()?;
+    m.add_class::<PyChartTripleTopStream>()?;
     m.add_class::<PyCmfStream>()?;
     m.add_class::<PyCmoStream>()?;
     m.add_class::<PyCmouStream>()?;
@@ -28480,6 +32134,602 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     {
         let params = PyDict::new(py);
         table.set_item("ceil", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 80)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 4)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.25)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("parallel_tol", entry)?;
+        }
+        table.set_item("chart_ascending_channel", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 100)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.02)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("flat_tol", entry)?;
+        }
+        table.set_item("chart_ascending_triangle", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 30)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 3)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 10)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pole_bars", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("min_pole", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.5)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("max_retrace", entry)?;
+        }
+        table.set_item("chart_bear_flag", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 15)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 3)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 10)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pole_bars", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("min_pole", entry)?;
+        }
+        table.set_item("chart_bear_pennant", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 80)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        table.set_item("chart_broadening", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 30)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 3)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 10)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pole_bars", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("min_pole", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.5)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("max_retrace", entry)?;
+        }
+        table.set_item("chart_bull_flag", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 15)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 3)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 10)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pole_bars", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("min_pole", entry)?;
+        }
+        table.set_item("chart_bull_pennant", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 80)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 4)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.25)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("parallel_tol", entry)?;
+        }
+        table.set_item("chart_descending_channel", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 100)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.02)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("flat_tol", entry)?;
+        }
+        table.set_item("chart_descending_triangle", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 60)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.03)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("tol", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("min_separation", entry)?;
+        }
+        table.set_item("chart_double_bottom", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 60)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.03)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("tol", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("min_separation", entry)?;
+        }
+        table.set_item("chart_double_top", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 80)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        table.set_item("chart_falling_wedge", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 150)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("shoulder_tol", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 8)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("min_separation", entry)?;
+        }
+        table.set_item("chart_head_shoulders", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 150)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("shoulder_tol", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 8)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("min_separation", entry)?;
+        }
+        table.set_item("chart_inverse_head_shoulders", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 80)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 4)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.025)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("flat_tol", entry)?;
+        }
+        table.set_item("chart_rectangle", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 80)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        table.set_item("chart_rising_wedge", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 100)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        table.set_item("chart_symmetrical_triangle", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 100)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.03)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("tol", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("min_separation", entry)?;
+        }
+        table.set_item("chart_triple_bottom", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 100)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.03)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("tol", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("min_separation", entry)?;
+        }
+        table.set_item("chart_triple_top", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -30255,6 +34505,25 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("cdl_upsidegap2crows", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_xsidegap3methods", vec!["open", "high", "low", "close"])?;
     table.set_item("ceil", vec!["source"])?;
+    table.set_item("chart_ascending_channel", vec!["high", "low", "close"])?;
+    table.set_item("chart_ascending_triangle", vec!["high", "low", "close"])?;
+    table.set_item("chart_bear_flag", vec!["high", "low", "close"])?;
+    table.set_item("chart_bear_pennant", vec!["high", "low", "close"])?;
+    table.set_item("chart_broadening", vec!["high", "low", "close"])?;
+    table.set_item("chart_bull_flag", vec!["high", "low", "close"])?;
+    table.set_item("chart_bull_pennant", vec!["high", "low", "close"])?;
+    table.set_item("chart_descending_channel", vec!["high", "low", "close"])?;
+    table.set_item("chart_descending_triangle", vec!["high", "low", "close"])?;
+    table.set_item("chart_double_bottom", vec!["high", "low", "close"])?;
+    table.set_item("chart_double_top", vec!["high", "low", "close"])?;
+    table.set_item("chart_falling_wedge", vec!["high", "low", "close"])?;
+    table.set_item("chart_head_shoulders", vec!["high", "low", "close"])?;
+    table.set_item("chart_inverse_head_shoulders", vec!["high", "low", "close"])?;
+    table.set_item("chart_rectangle", vec!["high", "low", "close"])?;
+    table.set_item("chart_rising_wedge", vec!["high", "low", "close"])?;
+    table.set_item("chart_symmetrical_triangle", vec!["high", "low", "close"])?;
+    table.set_item("chart_triple_bottom", vec!["high", "low", "close"])?;
+    table.set_item("chart_triple_top", vec!["high", "low", "close"])?;
     table.set_item("cmf", vec!["high", "low", "close", "volume"])?;
     table.set_item("cmo", vec!["source"])?;
     table.set_item("cmou", vec!["source"])?;
@@ -30465,6 +34734,25 @@ fn kinds_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("cdl_upsidegap2crows", vec!["open", "high", "low", "close"])?;
     table.set_item("cdl_xsidegap3methods", vec!["open", "high", "low", "close"])?;
     table.set_item("ceil", vec!["series"])?;
+    table.set_item("chart_ascending_channel", vec!["high", "low", "close"])?;
+    table.set_item("chart_ascending_triangle", vec!["high", "low", "close"])?;
+    table.set_item("chart_bear_flag", vec!["high", "low", "close"])?;
+    table.set_item("chart_bear_pennant", vec!["high", "low", "close"])?;
+    table.set_item("chart_broadening", vec!["high", "low", "close"])?;
+    table.set_item("chart_bull_flag", vec!["high", "low", "close"])?;
+    table.set_item("chart_bull_pennant", vec!["high", "low", "close"])?;
+    table.set_item("chart_descending_channel", vec!["high", "low", "close"])?;
+    table.set_item("chart_descending_triangle", vec!["high", "low", "close"])?;
+    table.set_item("chart_double_bottom", vec!["high", "low", "close"])?;
+    table.set_item("chart_double_top", vec!["high", "low", "close"])?;
+    table.set_item("chart_falling_wedge", vec!["high", "low", "close"])?;
+    table.set_item("chart_head_shoulders", vec!["high", "low", "close"])?;
+    table.set_item("chart_inverse_head_shoulders", vec!["high", "low", "close"])?;
+    table.set_item("chart_rectangle", vec!["high", "low", "close"])?;
+    table.set_item("chart_rising_wedge", vec!["high", "low", "close"])?;
+    table.set_item("chart_symmetrical_triangle", vec!["high", "low", "close"])?;
+    table.set_item("chart_triple_bottom", vec!["high", "low", "close"])?;
+    table.set_item("chart_triple_top", vec!["high", "low", "close"])?;
     table.set_item("cmf", vec!["high", "low", "close", "volume"])?;
     table.set_item("cmo", vec!["series"])?;
     table.set_item("cmou", vec!["series"])?;
@@ -30681,6 +34969,34 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("cdl_upsidegap2crows", vec!["cdl_upsidegap2crows"])?;
     table.set_item("cdl_xsidegap3methods", vec!["cdl_xsidegap3methods"])?;
     table.set_item("ceil", vec!["ceil"])?;
+    table.set_item("chart_ascending_channel", vec!["chart_ascending_channel"])?;
+    table.set_item("chart_ascending_triangle", vec!["chart_ascending_triangle"])?;
+    table.set_item("chart_bear_flag", vec!["chart_bear_flag"])?;
+    table.set_item("chart_bear_pennant", vec!["chart_bear_pennant"])?;
+    table.set_item("chart_broadening", vec!["chart_broadening"])?;
+    table.set_item("chart_bull_flag", vec!["chart_bull_flag"])?;
+    table.set_item("chart_bull_pennant", vec!["chart_bull_pennant"])?;
+    table.set_item("chart_descending_channel", vec!["chart_descending_channel"])?;
+    table.set_item(
+        "chart_descending_triangle",
+        vec!["chart_descending_triangle"],
+    )?;
+    table.set_item("chart_double_bottom", vec!["chart_double_bottom"])?;
+    table.set_item("chart_double_top", vec!["chart_double_top"])?;
+    table.set_item("chart_falling_wedge", vec!["chart_falling_wedge"])?;
+    table.set_item("chart_head_shoulders", vec!["chart_head_shoulders"])?;
+    table.set_item(
+        "chart_inverse_head_shoulders",
+        vec!["chart_inverse_head_shoulders"],
+    )?;
+    table.set_item("chart_rectangle", vec!["chart_rectangle"])?;
+    table.set_item("chart_rising_wedge", vec!["chart_rising_wedge"])?;
+    table.set_item(
+        "chart_symmetrical_triangle",
+        vec!["chart_symmetrical_triangle"],
+    )?;
+    table.set_item("chart_triple_bottom", vec!["chart_triple_bottom"])?;
+    table.set_item("chart_triple_top", vec!["chart_triple_top"])?;
     table.set_item("cmf", vec!["cmf"])?;
     table.set_item("cmo", vec!["cmo"])?;
     table.set_item("cmou", vec!["cmou"])?;
@@ -30929,6 +35245,25 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("cdl_upsidegap2crows", vec!["int32"])?;
     table.set_item("cdl_xsidegap3methods", vec!["int32"])?;
     table.set_item("ceil", vec!["float64"])?;
+    table.set_item("chart_ascending_channel", vec!["int32"])?;
+    table.set_item("chart_ascending_triangle", vec!["int32"])?;
+    table.set_item("chart_bear_flag", vec!["int32"])?;
+    table.set_item("chart_bear_pennant", vec!["int32"])?;
+    table.set_item("chart_broadening", vec!["int32"])?;
+    table.set_item("chart_bull_flag", vec!["int32"])?;
+    table.set_item("chart_bull_pennant", vec!["int32"])?;
+    table.set_item("chart_descending_channel", vec!["int32"])?;
+    table.set_item("chart_descending_triangle", vec!["int32"])?;
+    table.set_item("chart_double_bottom", vec!["int32"])?;
+    table.set_item("chart_double_top", vec!["int32"])?;
+    table.set_item("chart_falling_wedge", vec!["int32"])?;
+    table.set_item("chart_head_shoulders", vec!["int32"])?;
+    table.set_item("chart_inverse_head_shoulders", vec!["int32"])?;
+    table.set_item("chart_rectangle", vec!["int32"])?;
+    table.set_item("chart_rising_wedge", vec!["int32"])?;
+    table.set_item("chart_symmetrical_triangle", vec!["int32"])?;
+    table.set_item("chart_triple_bottom", vec!["int32"])?;
+    table.set_item("chart_triple_top", vec!["int32"])?;
     table.set_item("cmf", vec!["float64"])?;
     table.set_item("cmo", vec!["float64"])?;
     table.set_item("cmou", vec!["float64"])?;
@@ -31149,6 +35484,64 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("cdl_upsidegap2crows", vec!["pattern"])?;
     table.set_item("cdl_xsidegap3methods", vec!["pattern"])?;
     table.set_item("ceil", vec!["nan_inf_output"])?;
+    table.set_item(
+        "chart_ascending_channel",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "chart_ascending_triangle",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item("chart_bear_flag", vec!["chart_pattern", "path_dependent"])?;
+    table.set_item(
+        "chart_bear_pennant",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item("chart_broadening", vec!["chart_pattern", "path_dependent"])?;
+    table.set_item("chart_bull_flag", vec!["chart_pattern", "path_dependent"])?;
+    table.set_item(
+        "chart_bull_pennant",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "chart_descending_channel",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "chart_descending_triangle",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "chart_double_bottom",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item("chart_double_top", vec!["chart_pattern", "path_dependent"])?;
+    table.set_item(
+        "chart_falling_wedge",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "chart_head_shoulders",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "chart_inverse_head_shoulders",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item("chart_rectangle", vec!["chart_pattern", "path_dependent"])?;
+    table.set_item(
+        "chart_rising_wedge",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "chart_symmetrical_triangle",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "chart_triple_bottom",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item("chart_triple_top", vec!["chart_pattern", "path_dependent"])?;
     table.set_item("cmf", vec!["nan_inf_output"])?;
     table.set_item("cmo", vec!["unstable"])?;
     table.set_item("cmou", Vec::<&str>::new())?;
@@ -31370,6 +35763,25 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("cdl_upsidegap2crows", "patterns")?;
     table.set_item("cdl_xsidegap3methods", "patterns")?;
     table.set_item("ceil", "math")?;
+    table.set_item("chart_ascending_channel", "chart")?;
+    table.set_item("chart_ascending_triangle", "chart")?;
+    table.set_item("chart_bear_flag", "chart")?;
+    table.set_item("chart_bear_pennant", "chart")?;
+    table.set_item("chart_broadening", "chart")?;
+    table.set_item("chart_bull_flag", "chart")?;
+    table.set_item("chart_bull_pennant", "chart")?;
+    table.set_item("chart_descending_channel", "chart")?;
+    table.set_item("chart_descending_triangle", "chart")?;
+    table.set_item("chart_double_bottom", "chart")?;
+    table.set_item("chart_double_top", "chart")?;
+    table.set_item("chart_falling_wedge", "chart")?;
+    table.set_item("chart_head_shoulders", "chart")?;
+    table.set_item("chart_inverse_head_shoulders", "chart")?;
+    table.set_item("chart_rectangle", "chart")?;
+    table.set_item("chart_rising_wedge", "chart")?;
+    table.set_item("chart_symmetrical_triangle", "chart")?;
+    table.set_item("chart_triple_bottom", "chart")?;
+    table.set_item("chart_triple_top", "chart")?;
     table.set_item("cmf", "volume")?;
     table.set_item("cmo", "momentum")?;
     table.set_item("cmou", "momentum")?;
@@ -31859,6 +36271,272 @@ pub fn lookback_of(
         }
         "ceil" => {
             Ok(<trendlib::indicators::ceil::Ceil as Kernel<1, 1>>::lookback(&trendlib::indicators::ceil::Params { }))
+        }
+        "chart_ascending_channel" => {
+            let period = match get("period")? {
+                Some(value) => int_param("chart_ascending_channel", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 80,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_ascending_channel", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 4,
+            };
+            let parallel_tol = 0.25;
+            Ok(<trendlib::indicators::chart_ascending_channel::ChartAscendingChannel as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_ascending_channel::Params { period, pivot_n, parallel_tol, }))
+        }
+        "chart_ascending_triangle" => {
+            let period = match get("period")? {
+                Some(value) => int_param("chart_ascending_triangle", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 100,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_ascending_triangle", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let flat_tol = 0.02;
+            Ok(<trendlib::indicators::chart_ascending_triangle::ChartAscendingTriangle as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_ascending_triangle::Params { period, pivot_n, flat_tol, }))
+        }
+        "chart_bear_flag" => {
+            let period = match get("period")? {
+                Some(value) => int_param("chart_bear_flag", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 30,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_bear_flag", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 3,
+            };
+            let pole_bars = match get("pole_bars")? {
+                Some(value) => int_param("chart_bear_flag", "pole_bars", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 10,
+            };
+            let min_pole = 0.05;
+            let max_retrace = 0.5;
+            Ok(<trendlib::indicators::chart_bear_flag::ChartBearFlag as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_bear_flag::Params { period, pivot_n, pole_bars, min_pole, max_retrace, }))
+        }
+        "chart_bear_pennant" => {
+            let period = match get("period")? {
+                Some(value) => int_param("chart_bear_pennant", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 15,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_bear_pennant", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 3,
+            };
+            let pole_bars = match get("pole_bars")? {
+                Some(value) => int_param("chart_bear_pennant", "pole_bars", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 10,
+            };
+            let min_pole = 0.05;
+            Ok(<trendlib::indicators::chart_bear_pennant::ChartBearPennant as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_bear_pennant::Params { period, pivot_n, pole_bars, min_pole, }))
+        }
+        "chart_broadening" => {
+            let period = match get("period")? {
+                Some(value) => int_param("chart_broadening", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 80,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_broadening", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            Ok(<trendlib::indicators::chart_broadening::ChartBroadening as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_broadening::Params { period, pivot_n, }))
+        }
+        "chart_bull_flag" => {
+            let period = match get("period")? {
+                Some(value) => int_param("chart_bull_flag", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 30,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_bull_flag", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 3,
+            };
+            let pole_bars = match get("pole_bars")? {
+                Some(value) => int_param("chart_bull_flag", "pole_bars", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 10,
+            };
+            let min_pole = 0.05;
+            let max_retrace = 0.5;
+            Ok(<trendlib::indicators::chart_bull_flag::ChartBullFlag as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_bull_flag::Params { period, pivot_n, pole_bars, min_pole, max_retrace, }))
+        }
+        "chart_bull_pennant" => {
+            let period = match get("period")? {
+                Some(value) => int_param("chart_bull_pennant", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 15,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_bull_pennant", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 3,
+            };
+            let pole_bars = match get("pole_bars")? {
+                Some(value) => int_param("chart_bull_pennant", "pole_bars", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 10,
+            };
+            let min_pole = 0.05;
+            Ok(<trendlib::indicators::chart_bull_pennant::ChartBullPennant as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_bull_pennant::Params { period, pivot_n, pole_bars, min_pole, }))
+        }
+        "chart_descending_channel" => {
+            let period = match get("period")? {
+                Some(value) => int_param("chart_descending_channel", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 80,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_descending_channel", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 4,
+            };
+            let parallel_tol = 0.25;
+            Ok(<trendlib::indicators::chart_descending_channel::ChartDescendingChannel as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_descending_channel::Params { period, pivot_n, parallel_tol, }))
+        }
+        "chart_descending_triangle" => {
+            let period = match get("period")? {
+                Some(value) => int_param("chart_descending_triangle", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 100,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_descending_triangle", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let flat_tol = 0.02;
+            Ok(<trendlib::indicators::chart_descending_triangle::ChartDescendingTriangle as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_descending_triangle::Params { period, pivot_n, flat_tol, }))
+        }
+        "chart_double_bottom" => {
+            let period = match get("period")? {
+                Some(value) => int_param("chart_double_bottom", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 60,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_double_bottom", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let tol = 0.03;
+            let min_separation = match get("min_separation")? {
+                Some(value) => int_param("chart_double_bottom", "min_separation", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            Ok(<trendlib::indicators::chart_double_bottom::ChartDoubleBottom as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_double_bottom::Params { period, pivot_n, tol, min_separation, }))
+        }
+        "chart_double_top" => {
+            let period = match get("period")? {
+                Some(value) => int_param("chart_double_top", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 60,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_double_top", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let tol = 0.03;
+            let min_separation = match get("min_separation")? {
+                Some(value) => int_param("chart_double_top", "min_separation", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            Ok(<trendlib::indicators::chart_double_top::ChartDoubleTop as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_double_top::Params { period, pivot_n, tol, min_separation, }))
+        }
+        "chart_falling_wedge" => {
+            let period = match get("period")? {
+                Some(value) => int_param("chart_falling_wedge", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 80,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_falling_wedge", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            Ok(<trendlib::indicators::chart_falling_wedge::ChartFallingWedge as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_falling_wedge::Params { period, pivot_n, }))
+        }
+        "chart_head_shoulders" => {
+            let period = match get("period")? {
+                Some(value) => int_param("chart_head_shoulders", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 150,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_head_shoulders", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let shoulder_tol = 0.05;
+            let min_separation = match get("min_separation")? {
+                Some(value) => int_param("chart_head_shoulders", "min_separation", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 8,
+            };
+            Ok(<trendlib::indicators::chart_head_shoulders::ChartHeadShoulders as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_head_shoulders::Params { period, pivot_n, shoulder_tol, min_separation, }))
+        }
+        "chart_inverse_head_shoulders" => {
+            let period = match get("period")? {
+                Some(value) => int_param("chart_inverse_head_shoulders", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 150,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_inverse_head_shoulders", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let shoulder_tol = 0.05;
+            let min_separation = match get("min_separation")? {
+                Some(value) => int_param("chart_inverse_head_shoulders", "min_separation", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 8,
+            };
+            Ok(<trendlib::indicators::chart_inverse_head_shoulders::ChartInverseHeadShoulders as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_inverse_head_shoulders::Params { period, pivot_n, shoulder_tol, min_separation, }))
+        }
+        "chart_rectangle" => {
+            let period = match get("period")? {
+                Some(value) => int_param("chart_rectangle", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 80,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_rectangle", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 4,
+            };
+            let flat_tol = 0.025;
+            Ok(<trendlib::indicators::chart_rectangle::ChartRectangle as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_rectangle::Params { period, pivot_n, flat_tol, }))
+        }
+        "chart_rising_wedge" => {
+            let period = match get("period")? {
+                Some(value) => int_param("chart_rising_wedge", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 80,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_rising_wedge", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            Ok(<trendlib::indicators::chart_rising_wedge::ChartRisingWedge as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_rising_wedge::Params { period, pivot_n, }))
+        }
+        "chart_symmetrical_triangle" => {
+            let period = match get("period")? {
+                Some(value) => int_param("chart_symmetrical_triangle", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 100,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_symmetrical_triangle", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            Ok(<trendlib::indicators::chart_symmetrical_triangle::ChartSymmetricalTriangle as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_symmetrical_triangle::Params { period, pivot_n, }))
+        }
+        "chart_triple_bottom" => {
+            let period = match get("period")? {
+                Some(value) => int_param("chart_triple_bottom", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 100,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_triple_bottom", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let tol = 0.03;
+            let min_separation = match get("min_separation")? {
+                Some(value) => int_param("chart_triple_bottom", "min_separation", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            Ok(<trendlib::indicators::chart_triple_bottom::ChartTripleBottom as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_triple_bottom::Params { period, pivot_n, tol, min_separation, }))
+        }
+        "chart_triple_top" => {
+            let period = match get("period")? {
+                Some(value) => int_param("chart_triple_top", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 100,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("chart_triple_top", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let tol = 0.03;
+            let min_separation = match get("min_separation")? {
+                Some(value) => int_param("chart_triple_top", "min_separation", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            Ok(<trendlib::indicators::chart_triple_top::ChartTripleTop as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_triple_top::Params { period, pivot_n, tol, min_separation, }))
         }
         "cmf" => {
             let period = match get("period")? {

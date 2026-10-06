@@ -98,6 +98,25 @@ __all__ = [
     "cdl_upsidegap2crows",
     "cdl_xsidegap3methods",
     "ceil",
+    "chart_ascending_channel",
+    "chart_ascending_triangle",
+    "chart_bear_flag",
+    "chart_bear_pennant",
+    "chart_broadening",
+    "chart_bull_flag",
+    "chart_bull_pennant",
+    "chart_descending_channel",
+    "chart_descending_triangle",
+    "chart_double_bottom",
+    "chart_double_top",
+    "chart_falling_wedge",
+    "chart_head_shoulders",
+    "chart_inverse_head_shoulders",
+    "chart_rectangle",
+    "chart_rising_wedge",
+    "chart_symmetrical_triangle",
+    "chart_triple_bottom",
+    "chart_triple_top",
     "cmf",
     "cmo",
     "cmou",
@@ -1515,6 +1534,291 @@ cdl_xsidegap3methods = Factory(
     ("cdl_xsidegap3methods",),
 )
 ceil = Factory("ceil", _core.CeilStream, ("source",), ("series",), ("ceil",))
+chart_ascending_channel = Factory(
+    "chart_ascending_channel",
+    _core.ChartAscendingChannelStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_ascending_channel",),
+)
+chart_ascending_triangle = Factory(
+    "chart_ascending_triangle",
+    _core.ChartAscendingTriangleStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_ascending_triangle",),
+)
+chart_bear_flag = Factory(
+    "chart_bear_flag",
+    _core.ChartBearFlagStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_bear_flag",),
+)
+chart_bear_pennant = Factory(
+    "chart_bear_pennant",
+    _core.ChartBearPennantStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_bear_pennant",),
+)
+chart_broadening = Factory(
+    "chart_broadening",
+    _core.ChartBroadeningStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_broadening",),
+)
+chart_bull_flag = Factory(
+    "chart_bull_flag",
+    _core.ChartBullFlagStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_bull_flag",),
+)
+chart_bull_pennant = Factory(
+    "chart_bull_pennant",
+    _core.ChartBullPennantStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_bull_pennant",),
+)
+chart_descending_channel = Factory(
+    "chart_descending_channel",
+    _core.ChartDescendingChannelStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_descending_channel",),
+)
+chart_descending_triangle = Factory(
+    "chart_descending_triangle",
+    _core.ChartDescendingTriangleStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_descending_triangle",),
+)
+chart_double_bottom = Factory(
+    "chart_double_bottom",
+    _core.ChartDoubleBottomStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_bottom",),
+)
+chart_double_top = Factory(
+    "chart_double_top",
+    _core.ChartDoubleTopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_top",),
+)
+chart_falling_wedge = Factory(
+    "chart_falling_wedge",
+    _core.ChartFallingWedgeStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_falling_wedge",),
+)
+chart_head_shoulders = Factory(
+    "chart_head_shoulders",
+    _core.ChartHeadShouldersStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_head_shoulders",),
+)
+chart_inverse_head_shoulders = Factory(
+    "chart_inverse_head_shoulders",
+    _core.ChartInverseHeadShouldersStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_inverse_head_shoulders",),
+)
+chart_rectangle = Factory(
+    "chart_rectangle",
+    _core.ChartRectangleStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_rectangle",),
+)
+chart_rising_wedge = Factory(
+    "chart_rising_wedge",
+    _core.ChartRisingWedgeStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_rising_wedge",),
+)
+chart_symmetrical_triangle = Factory(
+    "chart_symmetrical_triangle",
+    _core.ChartSymmetricalTriangleStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_symmetrical_triangle",),
+)
+chart_triple_bottom = Factory(
+    "chart_triple_bottom",
+    _core.ChartTripleBottomStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_triple_bottom",),
+)
+chart_triple_top = Factory(
+    "chart_triple_top",
+    _core.ChartTripleTopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_triple_top",),
+)
 cmf = Factory(
     "cmf",
     _core.CmfStream,

@@ -1,4 +1,5 @@
 pub mod candles;
+pub mod chart;
 pub mod error;
 pub mod hilbert;
 pub mod input;

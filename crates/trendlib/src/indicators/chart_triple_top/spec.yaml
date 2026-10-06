@@ -1,0 +1,45 @@
+name: chart_triple_top
+title: Triple Top
+group: chart
+flags: [chart_pattern, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 100
+    min: 2
+    max: 100000
+    doc: Bars back the first top may have been confirmed
+  - name: pivot_n
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Bars on each side a swing high must be at least as high as, and a swing low at least as low as
+  - name: tol
+    type: float
+    default: 0.03
+    min: 0.0
+    doc: How far apart the tops may be, as a fraction of the larger
+  - name: min_separation
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Fewest bars between one top's confirmation and the next
+outputs:
+  - name: chart_triple_top
+    dtype: int32
+    plot: pattern
+    doc: A close below the lower of the two swing lows between three tops at about the same price
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - Robert D. Edwards and John Magee, Technical Analysis of Stock Trends, 9th edition, CRC Press, 2007
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.triple_top (oracle P)
+see_also: [chart_triple_bottom, chart_double_top, chart_head_shoulders]

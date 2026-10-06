@@ -298,6 +298,25 @@ __all__ = [
     "cdl_upsidegap2crows",
     "cdl_xsidegap3methods",
     "ceil",
+    "chart_ascending_channel",
+    "chart_ascending_triangle",
+    "chart_bear_flag",
+    "chart_bear_pennant",
+    "chart_broadening",
+    "chart_bull_flag",
+    "chart_bull_pennant",
+    "chart_descending_channel",
+    "chart_descending_triangle",
+    "chart_double_bottom",
+    "chart_double_top",
+    "chart_falling_wedge",
+    "chart_head_shoulders",
+    "chart_inverse_head_shoulders",
+    "chart_rectangle",
+    "chart_rising_wedge",
+    "chart_symmetrical_triangle",
+    "chart_triple_bottom",
+    "chart_triple_top",
     "cmf",
     "cmo",
     "cmou",
@@ -2925,6 +2944,990 @@ def ceil(source=None) -> Any:
     columns, carrier = _convert.bars("ceil", (source,), ("source",), ("series",))
     out = _core.ceil(*columns)
     return _convert.wrap_outputs(out, carrier, ("ceil",))
+
+
+def chart_ascending_channel(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_ascending_channel"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_ascending_channel"]["pivot_n"]["default"],
+    parallel_tol: float = _PARAMS["chart_ascending_channel"]["parallel_tol"]["default"],
+) -> Any:
+    """Ascending Channel.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 4
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    parallel_tol : float, default 0.25
+        How far the two slopes may differ, as a fraction of the lower line's.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below the lower of two rising lines of about the same slope.
+    """
+    period = _convert.as_int("chart_ascending_channel", "period", period)
+    pivot_n = _convert.as_int("chart_ascending_channel", "pivot_n", pivot_n)
+    parallel_tol = _convert.as_float("chart_ascending_channel", "parallel_tol", parallel_tol)
+    columns, carrier = _convert.bars(
+        "chart_ascending_channel",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_ascending_channel(
+        *columns, period=period, pivot_n=pivot_n, parallel_tol=parallel_tol
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_ascending_channel",))
+
+
+def chart_ascending_triangle(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_ascending_triangle"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_ascending_triangle"]["pivot_n"]["default"],
+    flat_tol: float = _PARAMS["chart_ascending_triangle"]["flat_tol"]["default"],
+) -> Any:
+    """Ascending Triangle.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    flat_tol : float, default 0.02
+        Steepest the upper line may be and still count as flat, in price per bar.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above a flat line over the swing highs that a rising line under the swing lows is
+        closing in on.
+    """
+    period = _convert.as_int("chart_ascending_triangle", "period", period)
+    pivot_n = _convert.as_int("chart_ascending_triangle", "pivot_n", pivot_n)
+    flat_tol = _convert.as_float("chart_ascending_triangle", "flat_tol", flat_tol)
+    columns, carrier = _convert.bars(
+        "chart_ascending_triangle",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_ascending_triangle(
+        *columns, period=period, pivot_n=pivot_n, flat_tol=flat_tol
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_ascending_triangle",))
+
+
+def chart_bear_flag(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_bear_flag"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_bear_flag"]["pivot_n"]["default"],
+    pole_bars: int = _PARAMS["chart_bear_flag"]["pole_bars"]["default"],
+    min_pole: float = _PARAMS["chart_bear_flag"]["min_pole"]["default"],
+    max_retrace: float = _PARAMS["chart_bear_flag"]["max_retrace"]["default"],
+) -> Any:
+    """Bear Flag.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Bars the flag spans after its pole, from 2 to 100000.
+    pivot_n : int, default 3
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    pole_bars : int, default 10
+        Bars the pole is measured over, from 1 to 100000.
+    min_pole : float, default 0.05
+        Smallest fall the pole must make, as a fraction of its first close.
+    max_retrace : float, default 0.5
+        Furthest the flag may run back over the pole, as a fraction of the pole.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below a rising flag that follows a sharp fall.
+    """
+    period = _convert.as_int("chart_bear_flag", "period", period)
+    pivot_n = _convert.as_int("chart_bear_flag", "pivot_n", pivot_n)
+    pole_bars = _convert.as_int("chart_bear_flag", "pole_bars", pole_bars)
+    min_pole = _convert.as_float("chart_bear_flag", "min_pole", min_pole)
+    max_retrace = _convert.as_float("chart_bear_flag", "max_retrace", max_retrace)
+    columns, carrier = _convert.bars(
+        "chart_bear_flag",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_bear_flag(
+        *columns,
+        period=period,
+        pivot_n=pivot_n,
+        pole_bars=pole_bars,
+        min_pole=min_pole,
+        max_retrace=max_retrace,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_bear_flag",))
+
+
+def chart_bear_pennant(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_bear_pennant"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_bear_pennant"]["pivot_n"]["default"],
+    pole_bars: int = _PARAMS["chart_bear_pennant"]["pole_bars"]["default"],
+    min_pole: float = _PARAMS["chart_bear_pennant"]["min_pole"]["default"],
+) -> Any:
+    """Bear Pennant.
+
+    Parameters
+    ----------
+    period : int, default 15
+        Bars the pennant spans after its pole, from 2 to 100000.
+    pivot_n : int, default 3
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    pole_bars : int, default 10
+        Bars the pole is measured over, from 1 to 100000.
+    min_pole : float, default 0.05
+        Smallest fall the pole must make, as a fraction of its first close.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below a narrowing pennant that follows a sharp fall.
+    """
+    period = _convert.as_int("chart_bear_pennant", "period", period)
+    pivot_n = _convert.as_int("chart_bear_pennant", "pivot_n", pivot_n)
+    pole_bars = _convert.as_int("chart_bear_pennant", "pole_bars", pole_bars)
+    min_pole = _convert.as_float("chart_bear_pennant", "min_pole", min_pole)
+    columns, carrier = _convert.bars(
+        "chart_bear_pennant",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_bear_pennant(
+        *columns, period=period, pivot_n=pivot_n, pole_bars=pole_bars, min_pole=min_pole
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_bear_pennant",))
+
+
+def chart_broadening(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_broadening"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_broadening"]["pivot_n"]["default"],
+) -> Any:
+    """Broadening Formation.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close through a rising line over the swing highs or a falling line under the swing lows,
+        the two spreading apart.
+    """
+    period = _convert.as_int("chart_broadening", "period", period)
+    pivot_n = _convert.as_int("chart_broadening", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_broadening",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_broadening(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("chart_broadening",))
+
+
+def chart_bull_flag(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_bull_flag"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_bull_flag"]["pivot_n"]["default"],
+    pole_bars: int = _PARAMS["chart_bull_flag"]["pole_bars"]["default"],
+    min_pole: float = _PARAMS["chart_bull_flag"]["min_pole"]["default"],
+    max_retrace: float = _PARAMS["chart_bull_flag"]["max_retrace"]["default"],
+) -> Any:
+    """Bull Flag.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Bars the flag spans after its pole, from 2 to 100000.
+    pivot_n : int, default 3
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    pole_bars : int, default 10
+        Bars the pole is measured over, from 1 to 100000.
+    min_pole : float, default 0.05
+        Smallest rise the pole must make, as a fraction of its first close.
+    max_retrace : float, default 0.5
+        Furthest the flag may run back over the pole, as a fraction of the pole.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above a falling flag that follows a sharp rise.
+    """
+    period = _convert.as_int("chart_bull_flag", "period", period)
+    pivot_n = _convert.as_int("chart_bull_flag", "pivot_n", pivot_n)
+    pole_bars = _convert.as_int("chart_bull_flag", "pole_bars", pole_bars)
+    min_pole = _convert.as_float("chart_bull_flag", "min_pole", min_pole)
+    max_retrace = _convert.as_float("chart_bull_flag", "max_retrace", max_retrace)
+    columns, carrier = _convert.bars(
+        "chart_bull_flag",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_bull_flag(
+        *columns,
+        period=period,
+        pivot_n=pivot_n,
+        pole_bars=pole_bars,
+        min_pole=min_pole,
+        max_retrace=max_retrace,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_bull_flag",))
+
+
+def chart_bull_pennant(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_bull_pennant"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_bull_pennant"]["pivot_n"]["default"],
+    pole_bars: int = _PARAMS["chart_bull_pennant"]["pole_bars"]["default"],
+    min_pole: float = _PARAMS["chart_bull_pennant"]["min_pole"]["default"],
+) -> Any:
+    """Bull Pennant.
+
+    Parameters
+    ----------
+    period : int, default 15
+        Bars the pennant spans after its pole, from 2 to 100000.
+    pivot_n : int, default 3
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    pole_bars : int, default 10
+        Bars the pole is measured over, from 1 to 100000.
+    min_pole : float, default 0.05
+        Smallest rise the pole must make, as a fraction of its first close.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above a narrowing pennant that follows a sharp rise.
+    """
+    period = _convert.as_int("chart_bull_pennant", "period", period)
+    pivot_n = _convert.as_int("chart_bull_pennant", "pivot_n", pivot_n)
+    pole_bars = _convert.as_int("chart_bull_pennant", "pole_bars", pole_bars)
+    min_pole = _convert.as_float("chart_bull_pennant", "min_pole", min_pole)
+    columns, carrier = _convert.bars(
+        "chart_bull_pennant",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_bull_pennant(
+        *columns, period=period, pivot_n=pivot_n, pole_bars=pole_bars, min_pole=min_pole
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_bull_pennant",))
+
+
+def chart_descending_channel(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_descending_channel"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_descending_channel"]["pivot_n"]["default"],
+    parallel_tol: float = _PARAMS["chart_descending_channel"]["parallel_tol"]["default"],
+) -> Any:
+    """Descending Channel.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 4
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    parallel_tol : float, default 0.25
+        How far the two slopes may differ, as a fraction of the lower line's.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above the upper of two falling lines of about the same slope.
+    """
+    period = _convert.as_int("chart_descending_channel", "period", period)
+    pivot_n = _convert.as_int("chart_descending_channel", "pivot_n", pivot_n)
+    parallel_tol = _convert.as_float("chart_descending_channel", "parallel_tol", parallel_tol)
+    columns, carrier = _convert.bars(
+        "chart_descending_channel",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_descending_channel(
+        *columns, period=period, pivot_n=pivot_n, parallel_tol=parallel_tol
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_descending_channel",))
+
+
+def chart_descending_triangle(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_descending_triangle"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_descending_triangle"]["pivot_n"]["default"],
+    flat_tol: float = _PARAMS["chart_descending_triangle"]["flat_tol"]["default"],
+) -> Any:
+    """Descending Triangle.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    flat_tol : float, default 0.02
+        Steepest the lower line may be and still count as flat, in price per bar.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below a flat line under the swing lows that a falling line over the swing highs is
+        closing in on.
+    """
+    period = _convert.as_int("chart_descending_triangle", "period", period)
+    pivot_n = _convert.as_int("chart_descending_triangle", "pivot_n", pivot_n)
+    flat_tol = _convert.as_float("chart_descending_triangle", "flat_tol", flat_tol)
+    columns, carrier = _convert.bars(
+        "chart_descending_triangle",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_descending_triangle(
+        *columns, period=period, pivot_n=pivot_n, flat_tol=flat_tol
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_descending_triangle",))
+
+
+def chart_double_bottom(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_bottom"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_bottom"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_bottom"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_bottom"]["min_separation"]["default"],
+) -> Any:
+    """Double Bottom.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first bottom may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    tol : float, default 0.03
+        How far apart the bottoms may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one bottom's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above the swing high between two bottoms at about the same price.
+    """
+    period = _convert.as_int("chart_double_bottom", "period", period)
+    pivot_n = _convert.as_int("chart_double_bottom", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_bottom", "tol", tol)
+    min_separation = _convert.as_int("chart_double_bottom", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_double_bottom",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_bottom(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_bottom",))
+
+
+def chart_double_top(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_top"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_top"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_top"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_top"]["min_separation"]["default"],
+) -> Any:
+    """Double Top.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first top may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    tol : float, default 0.03
+        How far apart the tops may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one top's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below the swing low between two tops at about the same price.
+    """
+    period = _convert.as_int("chart_double_top", "period", period)
+    pivot_n = _convert.as_int("chart_double_top", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_top", "tol", tol)
+    min_separation = _convert.as_int("chart_double_top", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_double_top",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_top(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_top",))
+
+
+def chart_falling_wedge(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_falling_wedge"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_falling_wedge"]["pivot_n"]["default"],
+) -> Any:
+    """Falling Wedge.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above a falling line over the swing highs that drops faster than the falling line
+        under the swing lows.
+    """
+    period = _convert.as_int("chart_falling_wedge", "period", period)
+    pivot_n = _convert.as_int("chart_falling_wedge", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_falling_wedge",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_falling_wedge(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("chart_falling_wedge",))
+
+
+def chart_head_shoulders(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_head_shoulders"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_head_shoulders"]["pivot_n"]["default"],
+    shoulder_tol: float = _PARAMS["chart_head_shoulders"]["shoulder_tol"]["default"],
+    min_separation: int = _PARAMS["chart_head_shoulders"]["min_separation"]["default"],
+) -> Any:
+    """Head and Shoulders.
+
+    Parameters
+    ----------
+    period : int, default 150
+        Bars back the shoulders and head may have been confirmed, and bars the neckline waits for a
+        close through it, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    shoulder_tol : float, default 0.05
+        How far apart the shoulders may be, as a fraction of the larger.
+    min_separation : int, default 8
+        Fewest bars between the confirmations of a shoulder and the head, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        The first close below the neckline after a head above two shoulders of about the same
+        height.
+    """
+    period = _convert.as_int("chart_head_shoulders", "period", period)
+    pivot_n = _convert.as_int("chart_head_shoulders", "pivot_n", pivot_n)
+    shoulder_tol = _convert.as_float("chart_head_shoulders", "shoulder_tol", shoulder_tol)
+    min_separation = _convert.as_int("chart_head_shoulders", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_head_shoulders",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_head_shoulders(
+        *columns,
+        period=period,
+        pivot_n=pivot_n,
+        shoulder_tol=shoulder_tol,
+        min_separation=min_separation,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_head_shoulders",))
+
+
+def chart_inverse_head_shoulders(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_inverse_head_shoulders"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_inverse_head_shoulders"]["pivot_n"]["default"],
+    shoulder_tol: float = _PARAMS["chart_inverse_head_shoulders"]["shoulder_tol"]["default"],
+    min_separation: int = _PARAMS["chart_inverse_head_shoulders"]["min_separation"]["default"],
+) -> Any:
+    """Inverse Head and Shoulders.
+
+    Parameters
+    ----------
+    period : int, default 150
+        Bars back the shoulders and head may have been confirmed, and bars the neckline waits for a
+        close through it, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    shoulder_tol : float, default 0.05
+        How far apart the shoulders may be, as a fraction of the larger.
+    min_separation : int, default 8
+        Fewest bars between the confirmations of a shoulder and the head, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        The first close above the neckline after a head below two shoulders of about the same depth.
+    """
+    period = _convert.as_int("chart_inverse_head_shoulders", "period", period)
+    pivot_n = _convert.as_int("chart_inverse_head_shoulders", "pivot_n", pivot_n)
+    shoulder_tol = _convert.as_float("chart_inverse_head_shoulders", "shoulder_tol", shoulder_tol)
+    min_separation = _convert.as_int(
+        "chart_inverse_head_shoulders", "min_separation", min_separation
+    )
+    columns, carrier = _convert.bars(
+        "chart_inverse_head_shoulders",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_inverse_head_shoulders(
+        *columns,
+        period=period,
+        pivot_n=pivot_n,
+        shoulder_tol=shoulder_tol,
+        min_separation=min_separation,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_inverse_head_shoulders",))
+
+
+def chart_rectangle(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_rectangle"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_rectangle"]["pivot_n"]["default"],
+    flat_tol: float = _PARAMS["chart_rectangle"]["flat_tol"]["default"],
+) -> Any:
+    """Rectangle.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 4
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    flat_tol : float, default 0.025
+        Steepest either line may be and still count as flat, in price per bar.
+
+    Returns
+    -------
+    ndarray or Series
+        A close through either of two flat lines, one over the swing highs and one under the swing
+        lows.
+    """
+    period = _convert.as_int("chart_rectangle", "period", period)
+    pivot_n = _convert.as_int("chart_rectangle", "pivot_n", pivot_n)
+    flat_tol = _convert.as_float("chart_rectangle", "flat_tol", flat_tol)
+    columns, carrier = _convert.bars(
+        "chart_rectangle",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_rectangle(*columns, period=period, pivot_n=pivot_n, flat_tol=flat_tol)
+    return _convert.wrap_outputs(out, carrier, ("chart_rectangle",))
+
+
+def chart_rising_wedge(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_rising_wedge"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_rising_wedge"]["pivot_n"]["default"],
+) -> Any:
+    """Rising Wedge.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below a rising line under the swing lows that climbs faster than the rising line
+        over the swing highs.
+    """
+    period = _convert.as_int("chart_rising_wedge", "period", period)
+    pivot_n = _convert.as_int("chart_rising_wedge", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_rising_wedge",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_rising_wedge(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("chart_rising_wedge",))
+
+
+def chart_symmetrical_triangle(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_symmetrical_triangle"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_symmetrical_triangle"]["pivot_n"]["default"],
+) -> Any:
+    """Symmetrical Triangle.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close through a falling line over the swing highs or a rising line under the swing lows,
+        the two closing in on each other.
+    """
+    period = _convert.as_int("chart_symmetrical_triangle", "period", period)
+    pivot_n = _convert.as_int("chart_symmetrical_triangle", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_symmetrical_triangle",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_symmetrical_triangle(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("chart_symmetrical_triangle",))
+
+
+def chart_triple_bottom(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_triple_bottom"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_triple_bottom"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_triple_bottom"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_triple_bottom"]["min_separation"]["default"],
+) -> Any:
+    """Triple Bottom.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the first bottom may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    tol : float, default 0.03
+        How far apart the bottoms may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one bottom's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above the higher of the two swing highs between three bottoms at about the same
+        price.
+    """
+    period = _convert.as_int("chart_triple_bottom", "period", period)
+    pivot_n = _convert.as_int("chart_triple_bottom", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_triple_bottom", "tol", tol)
+    min_separation = _convert.as_int("chart_triple_bottom", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_triple_bottom",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_triple_bottom(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_triple_bottom",))
+
+
+def chart_triple_top(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_triple_top"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_triple_top"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_triple_top"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_triple_top"]["min_separation"]["default"],
+) -> Any:
+    """Triple Top.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the first top may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    tol : float, default 0.03
+        How far apart the tops may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one top's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below the lower of the two swing lows between three tops at about the same price.
+    """
+    period = _convert.as_int("chart_triple_top", "period", period)
+    pivot_n = _convert.as_int("chart_triple_top", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_triple_top", "tol", tol)
+    min_separation = _convert.as_int("chart_triple_top", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_triple_top",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_triple_top(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_triple_top",))
 
 
 def cmf(
