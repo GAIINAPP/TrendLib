@@ -1,0 +1,27 @@
+name: asi
+title: Accumulative Swing Index
+group: momentum
+flags: [path_dependent, nan_inf_output]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: limit_move
+    type: float
+    default: 0.5
+    min: 0.0
+    doc: The largest move allowed in one bar, in price units
+outputs:
+  - name: asi
+    dtype: float64
+    plot: line
+    doc: Running total of the swing index
+references:
+  - J. Welles Wilder, New Concepts in Technical Trading Systems, Trend Research, 1978
+see_also: [swing_index, obv, cumsum]

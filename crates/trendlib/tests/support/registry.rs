@@ -954,6 +954,67 @@ mod aroonosc_adapter {
     }
 }
 
+mod asi_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::asi::Asi;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "limit_move",
+        default: 0.5,
+        min: 0.0,
+        max: f64::INFINITY,
+        integral: false,
+        choices: &[],
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::asi::Params {
+        trendlib::indicators::asi::Params {
+            limit_move: values[0],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "asi takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::asi::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: true,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod asin_adapter {
     use super::*;
 
@@ -12285,6 +12346,67 @@ mod cvi_adapter {
     }
 }
 
+mod darvas_box_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::darvas_box::DarvasBox;
+    const INPUTS: usize = 2;
+    const OUTPUTS: usize = 2;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "confirm_bars",
+        default: 3.0,
+        min: 1.0,
+        max: 100000.0,
+        integral: true,
+        choices: &[],
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::darvas_box::Params {
+        trendlib::indicators::darvas_box::Params {
+            confirm_bars: values[0] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "darvas_box takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::darvas_box::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: true,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[false, false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod dema_adapter {
     use super::*;
 
@@ -13220,6 +13342,143 @@ mod fractal_adapter {
             path_dependent: false,
             absolute_index: false,
             integer_outputs: &[true, true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod fractal_chaos_bands_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::fractal_chaos_bands::FractalChaosBands;
+    const INPUTS: usize = 2;
+    const OUTPUTS: usize = 2;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "left_bars",
+            default: 2.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "right_bars",
+            default: 2.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::fractal_chaos_bands::Params {
+        trendlib::indicators::fractal_chaos_bands::Params {
+            left_bars: values[0] as usize,
+            right_bars: values[1] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "fractal_chaos_bands takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::fractal_chaos_bands::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: true,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[false, false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod frama_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::frama::Frama;
+    const INPUTS: usize = 2;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "period",
+        default: 16.0,
+        min: 2.0,
+        max: 100000.0,
+        integral: true,
+        choices: &[],
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::frama::Params {
+        trendlib::indicators::frama::Params {
+            period: values[0] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "frama takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::frama::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -18892,6 +19151,87 @@ mod rwi_adapter {
     }
 }
 
+mod safezone_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::safezone::Safezone;
+    const INPUTS: usize = 2;
+    const OUTPUTS: usize = 2;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "period",
+            default: 10.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "coefficient",
+            default: 2.0,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "hold",
+            default: 3.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::safezone::Params {
+        trendlib::indicators::safezone::Params {
+            period: values[0] as usize,
+            coefficient: values[1],
+            hold: values[2] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "safezone takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::safezone::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false, false],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod sar_adapter {
     use super::*;
 
@@ -19921,6 +20261,67 @@ mod supertrend_adapter {
             path_dependent: true,
             absolute_index: false,
             integer_outputs: &[false, true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod swing_index_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::swing_index::SwingIndex;
+    const INPUTS: usize = 4;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[ParamSpec {
+        name: "limit_move",
+        default: 0.5,
+        min: 0.0,
+        max: f64::INFINITY,
+        integral: false,
+        choices: &[],
+    }];
+
+    fn params(values: &[f64]) -> trendlib::indicators::swing_index::Params {
+        trendlib::indicators::swing_index::Params {
+            limit_move: values[0],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(inputs.len(), INPUTS, "swing_index takes {INPUTS} inputs");
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::swing_index::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: true,
+            path_dependent: false,
+            absolute_index: false,
+            integer_outputs: &[false],
             batch,
             lookback,
             open_and_fill,
@@ -21225,6 +21626,82 @@ mod wclprice_adapter {
     }
 }
 
+mod wilder_volatility_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::wilder_volatility::WilderVolatility;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 2;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "period",
+            default: 7.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "multiplier",
+            default: 3.0,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::wilder_volatility::Params {
+        trendlib::indicators::wilder_volatility::Params {
+            period: values[0] as usize,
+            multiplier: values[1],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "wilder_volatility takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::wilder_volatility::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[false, true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod willr_adapter {
     use super::*;
 
@@ -21496,6 +21973,7 @@ pub fn registered() -> Vec<Registered> {
         apo_adapter::registered(),
         aroon_adapter::registered(),
         aroonosc_adapter::registered(),
+        asi_adapter::registered(),
         asin_adapter::registered(),
         atan_adapter::registered(),
         atr_adapter::registered(),
@@ -21661,6 +22139,7 @@ pub fn registered() -> Vec<Registered> {
         cpr_adapter::registered(),
         cumsum_adapter::registered(),
         cvi_adapter::registered(),
+        darvas_box_adapter::registered(),
         dema_adapter::registered(),
         div_adapter::registered(),
         donchian_adapter::registered(),
@@ -21676,6 +22155,8 @@ pub fn registered() -> Vec<Registered> {
         floor_adapter::registered(),
         fosc_adapter::registered(),
         fractal_adapter::registered(),
+        fractal_chaos_bands_adapter::registered(),
+        frama_adapter::registered(),
         gapo_adapter::registered(),
         gator_adapter::registered(),
         guppy_adapter::registered(),
@@ -21761,6 +22242,7 @@ pub fn registered() -> Vec<Registered> {
         rvi_adapter::registered(),
         rvol_adapter::registered(),
         rwi_adapter::registered(),
+        safezone_adapter::registered(),
         sar_adapter::registered(),
         sarext_adapter::registered(),
         sin_adapter::registered(),
@@ -21775,6 +22257,7 @@ pub fn registered() -> Vec<Registered> {
         sub_adapter::registered(),
         sum_adapter::registered(),
         supertrend_adapter::registered(),
+        swing_index_adapter::registered(),
         t3_adapter::registered(),
         tan_adapter::registered(),
         tanh_adapter::registered(),
@@ -21796,6 +22279,7 @@ pub fn registered() -> Vec<Registered> {
         wad_adapter::registered(),
         wavetrend_adapter::registered(),
         wclprice_adapter::registered(),
+        wilder_volatility_adapter::registered(),
         willr_adapter::registered(),
         wma_adapter::registered(),
         woodies_cci_adapter::registered(),

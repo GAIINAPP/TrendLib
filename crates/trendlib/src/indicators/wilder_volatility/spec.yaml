@@ -1,0 +1,35 @@
+name: wilder_volatility
+title: Wilder Volatility System
+group: overlap
+flags: [overlap, unstable, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 7
+    min: 1
+    max: 100000
+    doc: Bars of the average true range
+  - name: multiplier
+    type: float
+    default: 3.0
+    min: 0.0
+    doc: Multiple of the average true range the level sits from the extreme close
+outputs:
+  - name: wilder_volatility
+    dtype: float64
+    plot: line
+    doc: The extreme close of the current swing less (or plus) multiplier average true ranges
+  - name: wilder_volatility_direction
+    dtype: int32
+    plot: direction
+    doc: 1 while the level sits below the closes, -1 while above
+references:
+  - J. Welles Wilder, New Concepts in Technical Trading Systems, Trend Research, 1978
+see_also: [sar, supertrend, atr]

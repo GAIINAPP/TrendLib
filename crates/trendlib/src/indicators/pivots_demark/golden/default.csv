@@ -1,7 +1,7 @@
 # indicator: pivots_demark
 # case: default
 # params: none
-# oracle: oracle A, the formula of INDICATORS.md section 5.3 evaluated through ta-lib-python 0.8.1 nothing: NumPy arithmetic, as no TA-Lib function computes a step
+# oracle: oracle A, the formula of INDICATORS.md section 5.3 evaluated as NumPy arithmetic; no ta-lib-python 0.8.1 function computes a step
 # produced_by: python scripts/oracle/formula_golden.py pivots_demark --case default
 # input: testdata/daily_2000.csv (all rows)
 # tolerance: rel=1e-10 abs=1e-12

@@ -1,0 +1,34 @@
+name: fractal_chaos_bands
+title: Fractal Chaos Bands
+group: overlap
+flags: [overlap, path_dependent, nan_inf_output]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+params:
+  - name: left_bars
+    type: int
+    default: 2
+    min: 1
+    max: 100000
+    doc: Bars before a fractal it must beat
+  - name: right_bars
+    type: int
+    default: 2
+    min: 1
+    max: 100000
+    doc: Bars after a fractal it must beat
+outputs:
+  - name: fractal_chaos_upper
+    dtype: float64
+    plot: upper_band
+    doc: High of the latest confirmed swing high
+  - name: fractal_chaos_lower
+    dtype: float64
+    plot: lower_band
+    doc: Low of the latest confirmed swing low
+references:
+  - Bill Williams, Trading Chaos, Wiley, 1995
+see_also: [fractal, donchian, alligator]

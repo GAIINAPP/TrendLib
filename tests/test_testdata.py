@@ -46,6 +46,11 @@ def shapes(testdata):
     return read_rows(testdata / "shapes_1640.csv")
 
 
+@pytest.fixture(scope="module")
+def locked(testdata):
+    return read_rows(testdata / "locked_558.csv")
+
+
 def test_daily_shape(daily):
     assert len(daily) == 2000
     assert list(daily[0]) == ["date", "open", "high", "low", "close", "volume"]
@@ -157,6 +162,25 @@ def test_shapes_bars_are_well_formed(shapes):
         assert h >= max(o, c)
         assert low <= min(o, c)
         assert low > 0.0
+        assert row["date"] > previous
+        previous = row["date"]
+
+
+def test_locked_bars_are_well_formed_and_open_flat(locked):
+    assert len(locked) == 558
+    flat = [row["high"] == row["low"] for row in locked]
+    assert all(flat[:30]), "the file opens on a 30-bar locked run"
+    assert sum(flat) == 123
+    assert all(row["volume"] == "0" for row in locked[:30]), "the opening run is untraded"
+    assert all(int(row["volume"]) > 0 for row in locked[30:]), "later locked runs trade"
+    previous = ""
+    for row in locked:
+        o, h, low, c = (float(row[k]) for k in ("open", "high", "low", "close"))
+        assert h >= max(o, c)
+        assert low <= min(o, c)
+        assert low > 0.0
+        if h == low:
+            assert o == c == h
         assert row["date"] > previous
         previous = row["date"]
 

@@ -291,3 +291,28 @@ Each is a guess at what the source meant; none adds a parameter.
 - The regression channel's deviation is of the residuals about the fitted
   line, divided by `n - 1`, as TradingView's Linear Regression Channel
   computes it.
+- SafeZone's row `t` is Elder's level for bar `t`: the prior bar's low (high)
+  less (plus) `coefficient` times the mean penetration up to the prior bar,
+  counting only bars that penetrated (0 when none did). `hold` keeps the lower
+  level from falling, and the upper from rising, over that many bars.
+- Wilder's volatility system starts rising when the close on the first bar
+  with an average true range is at least the first close, and falling if not;
+  Wilder does not say. A close equal to the level does not change the side.
+- The Swing Index reads 0 when its range term `R` is 0, which happens only
+  when neither the bar nor the one before it moved. A `limit_move` of 0 is
+  accepted and divides by zero.
+- FRAMA accepts an odd `period`: each half is `floor(n / 2)` bars. The
+  parameter-range tests draw any whole number in the range, and rejecting odd
+  ones would fail them without an approved range change. Its step is written
+  `F + alpha (M - F)`, Ehlers' formula rearranged so a flat price stays flat.
+- Fractal Chaos Bands use `fractal`'s strict swing points and are `NaN` until
+  the first of each side.
+- A Darvas box's top is the highest high since the box began and its bottom
+  the lowest low after the top, each confirmed when `confirm_bars` bars pass
+  without a higher high or a lower low; ties do not reset the count. A box is
+  reported until the next one is confirmed. Darvas's volume and annual-high
+  filters are left out.
+
+`testdata/locked_558.csv` was added for these: locked bars with no range are
+the only way to reach several of the branches above, and no other dataset has
+one.

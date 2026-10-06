@@ -490,7 +490,16 @@ SHAPES: dict[str, tuple[float, list[tuple[int, float]]]] = {
     # The two above, mirrored for three valleys.
     "three_valleys_span": (
         110.0,
-        [(10, 100.0), (5, 110.0), (8, 102.0), (4, 107.5), (4, 104.0), (8, 108.0), (3, 109.0), (6, 111.0)],
+        [
+            (10, 100.0),
+            (5, 110.0),
+            (8, 102.0),
+            (4, 107.5),
+            (4, 104.0),
+            (8, 108.0),
+            (3, 109.0),
+            (6, 111.0),
+        ],
     ),
     "three_valleys_level": (
         110.0,
@@ -500,9 +509,7 @@ SHAPES: dict[str, tuple[float, list[tuple[int, float]]]] = {
     # turned back sharply within a few bars: busted patterns.
     "busted_ascending_triangle": (
         90.0,
-        _zigzag(
-            [100.0, 100.04, 100.08, 100.12, 100.16], [92.0, 94.0, 95.8, 97.4, 98.6], 8, "high"
-        )
+        _zigzag([100.0, 100.04, 100.08, 100.12, 100.16], [92.0, 94.0, 95.8, 97.4, 98.6], 8, "high")
         + [(10, 104.0), (6, 96.0)],
     ),
     "busted_rectangle_up": (
@@ -545,6 +552,31 @@ SHAPES_LOWS: dict[str, dict[int, float]] = {
     "three_peaks_span": {14: 88.0},
     "three_valleys_level": {22: 101.7, 30: 101.7},
 }
+
+
+LOCKED_SEED = 20261008
+LOCKED_START = date(2014, 1, 1)
+LOCKED_FIRST_CLOSE = 250.0
+# (bars traded, bars locked) in turn. A locked bar opens, reaches and closes at
+# the previous close. The file opens with an untraded run, no volume at all, so
+# averages start on a flat, empty window; the later runs trade a little at the
+# one price, as a stock held at its circuit limit does, and the longer ones
+# flatten a whole 16- or 21-bar window mid-series.
+LOCKED_RUNS = [
+    (0, 30),
+    (40, 1),
+    (30, 2),
+    (35, 3),
+    (40, 9),
+    (50, 20),
+    (35, 5),
+    (60, 40),
+    (45, 1),
+    (40, 12),
+    (60, 0),
+]
+LOCKED_BARS = sum(traded + locked for traded, locked in LOCKED_RUNS)
+LOCKED_FILE = f"locked_{LOCKED_BARS}.csv"
 
 
 def normalish(rng: random.Random) -> float:
@@ -752,6 +784,37 @@ def make_shapes() -> str:
     return _bars_from_closes(closes, SHAPES_START, lows, highs)
 
 
+def make_locked() -> str:
+    rng = random.Random(LOCKED_SEED)
+    rows = ["date,open,high,low,close,volume"]
+    days = iter(_weekdays(LOCKED_START, LOCKED_BARS))
+    close = LOCKED_FIRST_CLOSE
+    for run, (traded, locked) in enumerate(LOCKED_RUNS):
+        for _ in range(traded):
+            open_, high, low, close = _bar(rng, close, 0.0015, 0.0002, 0.011, 0.004)
+            volume = 200_000 + rng.randrange(800_000)
+            rows.append(f"{next(days).isoformat()},{open_!r},{high!r},{low!r},{close!r},{volume}")
+        for _ in range(locked):
+            volume = 0 if run == 0 else 1_000 + rng.randrange(50_000)
+            rows.append(
+                f"{next(days).isoformat()},{close!r},{close!r},{close!r},{close!r},{volume}"
+            )
+    return "\n".join(rows) + "\n"
+
+
+def _check_locked(text: str) -> None:
+    lines = text.splitlines()
+    assert len(lines) == LOCKED_BARS + 1, len(lines)
+    flat = 0
+    for line in lines[1:]:
+        _, open_, high, low, close, volume = line.split(",")
+        o, h, low_, c = float(open_), float(high), float(low), float(close)
+        assert h >= max(o, c) and low_ <= min(o, c), line
+        assert low_ > 0.0, line
+        flat += h == low_
+    assert flat == sum(locked for _, locked in LOCKED_RUNS), flat
+
+
 def _check_shapes(text: str) -> None:
     lines = text.splitlines()
     bars = sum(CHARTS_RAMP + sum(count for count, _ in legs) for _, legs in SHAPES.values())
@@ -862,11 +925,13 @@ def main() -> int:
     daily, intraday, patterns = make_daily(), make_intraday(), make_patterns()
     charts = make_charts()
     shapes = make_shapes()
+    locked = make_locked()
     _check_daily(daily)
     _check_intraday(intraday)
     _check_patterns(patterns)
     _check_charts(charts)
     _check_shapes(shapes)
+    _check_locked(locked)
 
     failures = 0
     for name, text in (
@@ -875,6 +940,7 @@ def main() -> int:
         (PATTERNS_FILE, patterns),
         (CHARTS_FILE, charts),
         (SHAPES_FILE, shapes),
+        (LOCKED_FILE, locked),
     ):
         path = TESTDATA / name
         if args.check:

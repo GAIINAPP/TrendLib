@@ -1,0 +1,28 @@
+name: darvas_box
+title: Darvas Box
+group: overlap
+flags: [overlap, path_dependent, nan_inf_output]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+params:
+  - name: confirm_bars
+    type: int
+    default: 3
+    min: 1
+    max: 100000
+    doc: Bars a box edge must hold before it is set
+outputs:
+  - name: darvas_top
+    dtype: float64
+    plot: upper_band
+    doc: Top of the latest confirmed box
+  - name: darvas_bottom
+    dtype: float64
+    plot: lower_band
+    doc: Bottom of the latest confirmed box
+references:
+  - Nicolas Darvas, How I Made $2,000,000 in the Stock Market, 1960
+see_also: [donchian, fractal_chaos_bands, max]

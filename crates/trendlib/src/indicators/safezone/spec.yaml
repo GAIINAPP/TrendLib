@@ -1,0 +1,39 @@
+name: safezone
+title: Elder SafeZone
+group: overlap
+flags: [overlap]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+params:
+  - name: period
+    type: int
+    default: 10
+    min: 1
+    max: 100000
+    doc: Bars the average penetration is taken over
+  - name: coefficient
+    type: float
+    default: 2.0
+    min: 0.0
+    doc: Multiple of the average penetration the level sits beyond the prior bar
+  - name: hold
+    type: int
+    default: 3
+    min: 1
+    max: 100000
+    doc: Bars a level may not move against the trend
+outputs:
+  - name: safezone_lower
+    dtype: float64
+    plot: lower_band
+    doc: Prior low less coefficient average downside penetrations, held from falling
+  - name: safezone_upper
+    dtype: float64
+    plot: upper_band
+    doc: Prior high plus coefficient average upside penetrations, held from rising
+references:
+  - Alexander Elder, Come Into My Trading Room, Wiley, 2002
+see_also: [kc, atr, supertrend]

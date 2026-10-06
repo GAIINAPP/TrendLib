@@ -28,6 +28,7 @@ __all__ = [
     "apo",
     "aroon",
     "aroonosc",
+    "asi",
     "asin",
     "atan",
     "atr",
@@ -193,6 +194,7 @@ __all__ = [
     "cpr",
     "cumsum",
     "cvi",
+    "darvas_box",
     "dema",
     "div",
     "donchian",
@@ -208,6 +210,8 @@ __all__ = [
     "floor",
     "fosc",
     "fractal",
+    "fractal_chaos_bands",
+    "frama",
     "gapo",
     "gator",
     "guppy",
@@ -293,6 +297,7 @@ __all__ = [
     "rvi",
     "rvol",
     "rwi",
+    "safezone",
     "sar",
     "sarext",
     "sin",
@@ -307,6 +312,7 @@ __all__ = [
     "sub",
     "sum",
     "supertrend",
+    "swing_index",
     "t3",
     "tan",
     "tanh",
@@ -328,6 +334,7 @@ __all__ = [
     "wad",
     "wavetrend",
     "wclprice",
+    "wilder_volatility",
     "willr",
     "wma",
     "woodies_cci",
@@ -516,6 +523,23 @@ aroonosc = Factory(
         "low",
     ),
     ("aroonosc",),
+)
+asi = Factory(
+    "asi",
+    _core.AsiStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("asi",),
 )
 asin = Factory("asin", _core.AsinStream, ("source",), ("series",), ("asin",))
 atan = Factory("atan", _core.AtanStream, ("source",), ("series",), ("atan",))
@@ -3003,6 +3027,22 @@ cvi = Factory(
     ),
     ("cvi",),
 )
+darvas_box = Factory(
+    "darvas_box",
+    _core.DarvasBoxStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "darvas_top",
+        "darvas_bottom",
+    ),
+)
 dema = Factory("dema", _core.DemaStream, ("source",), ("series",), ("dema",))
 div = Factory(
     "div",
@@ -3115,6 +3155,35 @@ fractal = Factory(
         "fractal_swing_high",
         "fractal_swing_low",
     ),
+)
+fractal_chaos_bands = Factory(
+    "fractal_chaos_bands",
+    _core.FractalChaosBandsStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "fractal_chaos_upper",
+        "fractal_chaos_lower",
+    ),
+)
+frama = Factory(
+    "frama",
+    _core.FramaStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("frama",),
 )
 gapo = Factory(
     "gapo",
@@ -3957,6 +4026,22 @@ rwi = Factory(
         "rwi_low",
     ),
 )
+safezone = Factory(
+    "safezone",
+    _core.SafezoneStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "safezone_lower",
+        "safezone_upper",
+    ),
+)
 sar = Factory(
     "sar",
     _core.SarStream,
@@ -4083,6 +4168,23 @@ supertrend = Factory(
         "supertrend",
         "supertrend_direction",
     ),
+)
+swing_index = Factory(
+    "swing_index",
+    _core.SwingIndexStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("swing_index",),
 )
 t3 = Factory("t3", _core.T3Stream, ("source",), ("series",), ("t3",))
 tan = Factory("tan", _core.TanStream, ("source",), ("series",), ("tan",))
@@ -4266,6 +4368,24 @@ wclprice = Factory(
         "close",
     ),
     ("wclprice",),
+)
+wilder_volatility = Factory(
+    "wilder_volatility",
+    _core.WilderVolatilityStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "wilder_volatility",
+        "wilder_volatility_direction",
+    ),
 )
 willr = Factory(
     "willr",

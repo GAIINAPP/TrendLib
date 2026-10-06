@@ -74,8 +74,10 @@ in the header. For a step that is control flow rather than arithmetic - a
 streak count, a box that holds until it is broken - the oracle is only as
 independent as that transcription of the rule, and the header says that too.
 Where the daily walk never reaches a branch of a formula, a case at the
-defaults runs on another committed dataset: `pivots_demark`'s `patterns` case
-reads `patterns_1080.csv`, whose doji bars close exactly at their open.
+defaults runs on another committed dataset: a `patterns` case reads
+`patterns_1080.csv`, whose doji bars close exactly at their open and whose quiet
+bars tie each other's highs and lows, and a `locked` case reads
+`locked_558.csv`, whose locked bars have no range and no volume.
 
 H is still the stronger evidence for those three and open question Q4 still
 asks for it; A is what ships until then. Do not substitute self-computed
@@ -109,6 +111,7 @@ those four are what Q4 still needs a human for.
 | `testdata/patterns_1080.csv` | 1,080 daily OHLCV bars | 31 hand-built shapes, one per pattern a walk does not reach, each after 12 quiet bars; then a 600-bar walk through ten regimes |
 | `testdata/charts_2579.csv` | 2,579 daily OHLCV bars | 22 hand-built chart shapes, each direction of each `INDICATORS.md` § 5.1 pattern at least once, each after a 40-bar straight ramp; a head and shoulders whose right shoulder is an outside bar; then a top seen twice `pivot_n` bars apart, set bar by bar |
 | `testdata/shapes_1640.csv` | 1,640 daily OHLCV bars | Shapes of `INDICATORS.md` § 5.2 that neither a walk nor the charts dataset draws, built the same way: two high and tight flags, three peaks and valleys whose edges only an exact price reaches, busted triangles and rectangles, and the four XABCD harmonic shapes both ways |
+| `testdata/locked_558.csv` | 558 daily OHLCV bars | A walk interrupted by 123 locked bars, whose open, high, low and close all equal the previous close: it opens with 30 untraded ones (volume 0), and the later runs trade a little at the one price, as a stock held at its circuit limit does. Runs of 1 to 40 reach the zero-range, zero-volume and tie branches of `INDICATORS.md` § 5.3 that no walk does |
 
 A pattern fires on a handful of bars or on none at all. Over `daily_2000.csv` 31 of
 the 61 patterns fire fewer than five times and 12 never fire, so their golden files

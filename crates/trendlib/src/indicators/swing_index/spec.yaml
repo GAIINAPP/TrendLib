@@ -1,0 +1,27 @@
+name: swing_index
+title: Swing Index
+group: momentum
+flags: [nan_inf_output]
+inputs:
+  - name: open
+    kind: open
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: limit_move
+    type: float
+    default: 0.5
+    min: 0.0
+    doc: The largest move allowed in one bar, in price units
+outputs:
+  - name: swing_index
+    dtype: float64
+    plot: line
+    doc: Wilder's swing index of the bar against the one before it
+references:
+  - J. Welles Wilder, New Concepts in Technical Trading Systems, Trend Research, 1978
+see_also: [asi, mom, bop]

@@ -30,9 +30,23 @@ TOLERANCE = "rel=1e-10 abs=1e-12"
 DAILY = "daily_2000.csv"
 
 # Cases run at the defaults on another dataset, for a branch of the formula the
-# daily walk never reaches. patterns_1080.csv has bars that close at their open.
+# daily walk never reaches. patterns_1080.csv has bars that close at their open
+# and quiet bars that tie; locked_558.csv has bars with no range and no volume.
+PATTERNS = "patterns_1080.csv"
+LOCKED = "locked_558.csv"
 OTHER_DATA = {
-    "pivots_demark": {"patterns": "patterns_1080.csv"},
+    "pivots_demark": {"patterns": PATTERNS},
+    "connors_rsi": {"locked": LOCKED},
+    "elder_impulse": {"locked": LOCKED},
+    "twiggs_mf": {"locked": LOCKED},
+    "rwi": {"locked": LOCKED},
+    "safezone": {"locked": LOCKED},
+    "wilder_volatility": {"locked": LOCKED},
+    "swing_index": {"locked": LOCKED},
+    "asi": {"locked": LOCKED},
+    "frama": {"locked": LOCKED},
+    "fractal_chaos_bands": {"patterns": PATTERNS, "locked": LOCKED},
+    "darvas_box": {"patterns": PATTERNS, "locked": LOCKED},
 }
 
 
@@ -229,7 +243,7 @@ def pivots_demark(cols, p):
         np.where(close > opened, 2.0 * high + low + close, high + low + 2.0 * close),
     )
     outputs = [total / 4.0, total / 2.0 - low, total / 2.0 - high]
-    return outputs, 1, "nothing: NumPy arithmetic, as no TA-Lib function computes a step"
+    return outputs, 1, "NumPy arithmetic"
 
 
 def one_bar_change(close):
@@ -381,6 +395,196 @@ def linreg_channel(cols, p):
     )
 
 
+def window_extreme(values, period: int, highest: bool):
+    """TA-Lib's MAX or MIN, or the series itself for the one-bar window they refuse."""
+    import talib
+
+    if period == 1:
+        return values.copy()
+    return (talib.MAX if highest else talib.MIN)(values, timeperiod=period)
+
+
+def window_sum(values, period: int):
+    import talib
+
+    return values.copy() if period == 1 else talib.SUM(values, timeperiod=period)
+
+
+def safezone(cols, p):
+    import numpy as np
+
+    high, low = cols["high"], cols["low"]
+    n, k, hold = p["period"], p["coefficient"], p["hold"]
+
+    def mean_penetration(depth):
+        hits = np.where(depth > 0.0, 1.0, 0.0)
+        hits[0] = np.nan
+        total, count = window_sum(depth, n), window_sum(hits, n)
+        mean = np.where(count > 0.0, total / np.where(count > 0.0, count, 1.0), 0.0)
+        return np.where(np.isnan(count), np.nan, mean)
+
+    was_high, was_low = shifted(high, 1), shifted(low, 1)
+    down = np.where(low < was_low, was_low - low, 0.0)
+    up = np.where(high > was_high, high - was_high, 0.0)
+    down[0] = up[0] = np.nan
+    raw_lower = shifted(low - k * mean_penetration(down), 1)
+    raw_upper = shifted(high + k * mean_penetration(up), 1)
+    outputs = [window_extreme(raw_lower, hold, True), window_extreme(raw_upper, hold, False)]
+    return outputs, n + hold, "talib.SUM, MAX and MIN, the penetrations and their mean in NumPy"
+
+
+def wilder_volatility(cols, p):
+    import numpy as np
+    import talib
+
+    close = cols["close"]
+    n = p["period"]
+    average = talib.ATR(cols["high"], cols["low"], close, timeperiod=n)
+    reach = talib.MULT(average, constant(average, p["multiplier"]))
+    level = np.full_like(close, np.nan)
+    side = np.full_like(close, np.nan)
+    rising = close[n] >= close[0]
+    extreme = close[n]
+    for t in range(n, len(close)):
+        if t > n:
+            if rising and close[t] < level[t - 1]:
+                rising, extreme = False, close[t]
+            elif not rising and close[t] > level[t - 1]:
+                rising, extreme = True, close[t]
+            else:
+                extreme = max(extreme, close[t]) if rising else min(extreme, close[t])
+        level[t] = extreme - reach[t] if rising else extreme + reach[t]
+        side[t] = 1.0 if rising else -1.0
+    return (
+        [level, side],
+        n,
+        "talib.ATR and MULT, the swing followed bar by bar in NumPy (a transcription of the rule)",
+    )
+
+
+def swing_index_values(cols, limit: float):
+    import numpy as np
+
+    o, h, low, c = cols["open"], cols["high"], cols["low"], cols["close"]
+    was_open, was_close = shifted(o, 1), shifted(c, 1)
+    up = np.abs(h - was_close)
+    down = np.abs(low - was_close)
+    span = np.abs(h - low)
+    body = np.abs(was_close - was_open)
+    reach = np.where(
+        (up >= down) & (up >= span),
+        up - 0.5 * down + 0.25 * body,
+        np.where((down >= up) & (down >= span), down - 0.5 * up + 0.25 * body, span + 0.25 * body),
+    )
+    moved = (c - was_close) + 0.5 * (c - o) + 0.25 * (was_close - was_open)
+    safe = np.where(reach == 0.0, 1.0, reach)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        swing = 50.0 * (moved / safe) * (np.maximum(up, down) / limit)
+    swing = np.where(reach == 0.0, 0.0, swing)
+    swing[0] = np.nan
+    return swing
+
+
+def swing_index(cols, p):
+    swing = swing_index_values(cols, p["limit_move"])
+    return [swing], 1, "NumPy arithmetic"
+
+
+def asi(cols, p):
+    import numpy as np
+
+    swing = swing_index_values(cols, p["limit_move"])
+    total = np.full_like(swing, np.nan)
+    total[1:] = np.cumsum(swing[1:])
+    return (
+        [total],
+        1,
+        "NumPy arithmetic and a running sum",
+    )
+
+
+def frama(cols, p):
+    import numpy as np
+    import talib
+
+    high, low = cols["high"], cols["low"]
+    n = p["period"]
+    h = n // 2
+
+    def span(hi, lo, k):
+        return window_extreme(hi, k, True) - window_extreme(lo, k, False)
+
+    n1 = span(high, low, h) / h
+    n2 = span(shifted(high, h), shifted(low, h), h) / h
+    n3 = span(high, low, n) / n
+    price = talib.MEDPRICE(high, low)
+    out = np.full_like(price, np.nan)
+    dimension = 0.0
+    for t in range(n - 1, len(price)):
+        if n1[t] > 0.0 and n2[t] > 0.0 and n3[t] > 0.0:
+            dimension = (np.log(n1[t] + n2[t]) - np.log(n3[t])) / np.log(2.0)
+        alpha = min(max(np.exp(-4.6 * (dimension - 1.0)), 0.01), 1.0)
+        out[t] = price[t] if t == n - 1 else out[t - 1] + alpha * (price[t] - out[t - 1])
+    return [out], n - 1, "talib.MAX, MIN and MEDPRICE, the dimension and the step in NumPy"
+
+
+def fractal_chaos_bands(cols, p):
+    import numpy as np
+
+    left, right = p["left_bars"], p["right_bars"]
+    bands = []
+    for values, highest in ((cols["high"], True), (cols["low"], False)):
+        middle = shifted(values, right)
+        before = shifted(window_extreme(values, left, highest), right + 1)
+        after = window_extreme(values, right, highest)
+        if highest:
+            swing = (middle > before) & (middle > after)
+        else:
+            swing = (middle < before) & (middle < after)
+        band = np.full_like(values, np.nan)
+        held = np.nan
+        for t in range(len(values)):
+            if swing[t]:
+                held = middle[t]
+            band[t] = held
+        bands.append(band)
+    return (
+        bands,
+        left + right,
+        "talib.MAX and MIN (the swing tests), the bands carried forward in NumPy",
+    )
+
+
+def darvas_box(cols, p):
+    import numpy as np
+
+    high, low = cols["high"], cols["low"]
+    c = p["confirm_bars"]
+    top_edge = np.full_like(high, np.nan)
+    bottom_edge = np.full_like(high, np.nan)
+    phase = "forming"
+    top, bottom, bottom_bar = -np.inf, None, None
+    shown = (np.nan, np.nan)
+    for t in range(len(high)):
+        if phase == "boxed":
+            if high[t] > top or low[t] < bottom:
+                phase, top, bottom, bottom_bar = "forming", high[t], None, None
+        else:
+            if high[t] > top:
+                top, bottom, bottom_bar = high[t], None, None
+            elif bottom is None or low[t] < bottom:
+                bottom, bottom_bar = low[t], t
+            if bottom is not None and t - bottom_bar >= c:
+                phase = "boxed"
+                shown = (top, bottom)
+        top_edge[t], bottom_edge[t] = shown
+    return (
+        [top_edge, bottom_edge],
+        c + 1,
+        "the rule followed bar by bar in NumPy (a transcription)",
+    )
+
+
 FORMULAS = {
     "ichimoku": ichimoku,
     "alligator": alligator,
@@ -398,6 +602,13 @@ FORMULAS = {
     "gapo": gapo,
     "rwi": rwi,
     "linreg_channel": linreg_channel,
+    "safezone": safezone,
+    "wilder_volatility": wilder_volatility,
+    "swing_index": swing_index,
+    "asi": asi,
+    "frama": frama,
+    "fractal_chaos_bands": fractal_chaos_bands,
+    "darvas_box": darvas_box,
 }
 
 
@@ -418,8 +629,18 @@ def cell(value: float, dtype: str) -> str:
     return str(int(value)) if dtype == "int32" else repr(float(value))
 
 
-def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
+def evaluated(functions: str) -> str:
+    """Name the TA-Lib functions that produced the numbers, or say that none did."""
     import talib
+
+    if functions.startswith("talib."):
+        return f"evaluated through ta-lib-python {talib.__version__} {functions}"
+    return (
+        f"evaluated as {functions}; no ta-lib-python {talib.__version__} function computes a step"
+    )
+
+
+def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
 
     dataset = dataset_for(name, case)
     columns = read_columns(dataset)
@@ -436,8 +657,7 @@ def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
         f"# indicator: {name}",
         f"# case: {case}",
         f"# params: {rendered}",
-        f"# oracle: oracle A, the formula of INDICATORS.md section 5.3 evaluated through "
-        f"ta-lib-python {talib.__version__} {functions}",
+        f"# oracle: oracle A, the formula of INDICATORS.md section 5.3 {evaluated(functions)}",
         f"# produced_by: python scripts/oracle/formula_golden.py {name} --case {case}",
         f"# input: testdata/{dataset} (all rows)",
         f"# tolerance: {TOLERANCE}",

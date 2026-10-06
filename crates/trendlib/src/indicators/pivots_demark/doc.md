@@ -27,7 +27,7 @@ $$
 - These are TradingView's "Pivot Points Standard" with type **DM**.
 - Not path dependent: each row reads the bar before it and nothing else.
 - Oracle A (`DECISIONS.md` D20): the golden files evaluate this formula through
-  NumPy arithmetic; no TA-Lib function computes a step.
+  NumPy arithmetic alone; no TA-Lib function computes a step of it.
 
 ## Example
 

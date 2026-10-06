@@ -228,6 +228,7 @@ __all__ = [
     "apo",
     "aroon",
     "aroonosc",
+    "asi",
     "asin",
     "atan",
     "atr",
@@ -393,6 +394,7 @@ __all__ = [
     "cpr",
     "cumsum",
     "cvi",
+    "darvas_box",
     "dema",
     "div",
     "donchian",
@@ -408,6 +410,8 @@ __all__ = [
     "floor",
     "fosc",
     "fractal",
+    "fractal_chaos_bands",
+    "frama",
     "gapo",
     "gator",
     "guppy",
@@ -494,6 +498,7 @@ __all__ = [
     "rvi",
     "rvol",
     "rwi",
+    "safezone",
     "sar",
     "sarext",
     "sin",
@@ -508,6 +513,7 @@ __all__ = [
     "sub",
     "sum",
     "supertrend",
+    "swing_index",
     "t3",
     "tan",
     "tanh",
@@ -529,6 +535,7 @@ __all__ = [
     "wad",
     "wavetrend",
     "wclprice",
+    "wilder_volatility",
     "willr",
     "wma",
     "woodies_cci",
@@ -1044,6 +1051,47 @@ def aroonosc(high=None, low=None, *, period: int = _PARAMS["aroonosc"]["period"]
     )
     out = _core.aroonosc(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("aroonosc",))
+
+
+def asi(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    limit_move: float = _PARAMS["asi"]["limit_move"]["default"],
+) -> Any:
+    """Accumulative Swing Index.
+
+    Parameters
+    ----------
+    limit_move : float, default 0.5
+        The largest move allowed in one bar, in price units.
+
+    Returns
+    -------
+    ndarray or Series
+        Running total of the swing index.
+    """
+    limit_move = _convert.as_float("asi", "limit_move", limit_move)
+    columns, carrier = _convert.bars(
+        "asi",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.asi(*columns, limit_move=limit_move)
+    return _convert.wrap_outputs(out, carrier, ("asi",))
 
 
 def asin(source=None) -> Any:
@@ -7277,6 +7325,46 @@ def cvi(
     return _convert.wrap_outputs(out, carrier, ("cvi",))
 
 
+def darvas_box(
+    high=None, low=None, *, confirm_bars: int = _PARAMS["darvas_box"]["confirm_bars"]["default"]
+) -> Any:
+    """Darvas Box.
+
+    Parameters
+    ----------
+    confirm_bars : int, default 3
+        Bars a box edge must hold before it is set, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        darvas_top: Top of the latest confirmed box.
+        darvas_bottom: Bottom of the latest confirmed box.
+    """
+    confirm_bars = _convert.as_int("darvas_box", "confirm_bars", confirm_bars)
+    columns, carrier = _convert.bars(
+        "darvas_box",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.darvas_box(*columns, confirm_bars=confirm_bars)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "darvas_top",
+            "darvas_bottom",
+        ),
+    )
+
+
 def dema(source=None, *, period: int = _PARAMS["dema"]["period"]["default"]) -> Any:
     """Double Exponential Moving Average.
 
@@ -7689,6 +7777,83 @@ def fractal(
             "fractal_swing_low",
         ),
     )
+
+
+def fractal_chaos_bands(
+    high=None,
+    low=None,
+    *,
+    left_bars: int = _PARAMS["fractal_chaos_bands"]["left_bars"]["default"],
+    right_bars: int = _PARAMS["fractal_chaos_bands"]["right_bars"]["default"],
+) -> Any:
+    """Fractal Chaos Bands.
+
+    Parameters
+    ----------
+    left_bars : int, default 2
+        Bars before a fractal it must beat, from 1 to 100000.
+    right_bars : int, default 2
+        Bars after a fractal it must beat, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        fractal_chaos_upper: High of the latest confirmed swing high.
+        fractal_chaos_lower: Low of the latest confirmed swing low.
+    """
+    left_bars = _convert.as_int("fractal_chaos_bands", "left_bars", left_bars)
+    right_bars = _convert.as_int("fractal_chaos_bands", "right_bars", right_bars)
+    columns, carrier = _convert.bars(
+        "fractal_chaos_bands",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.fractal_chaos_bands(*columns, left_bars=left_bars, right_bars=right_bars)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "fractal_chaos_upper",
+            "fractal_chaos_lower",
+        ),
+    )
+
+
+def frama(high=None, low=None, *, period: int = _PARAMS["frama"]["period"]["default"]) -> Any:
+    """Fractal Adaptive Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 16
+        Bars the fractal dimension is measured over, split into two halves, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Exponential average whose step follows the fractal dimension.
+    """
+    period = _convert.as_int("frama", "period", period)
+    columns, carrier = _convert.bars(
+        "frama",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.frama(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("frama",))
 
 
 def gapo(high=None, low=None, *, period: int = _PARAMS["gapo"]["period"]["default"]) -> Any:
@@ -10412,6 +10577,57 @@ def rwi(
     )
 
 
+def safezone(
+    high=None,
+    low=None,
+    *,
+    period: int = _PARAMS["safezone"]["period"]["default"],
+    coefficient: float = _PARAMS["safezone"]["coefficient"]["default"],
+    hold: int = _PARAMS["safezone"]["hold"]["default"],
+) -> Any:
+    """Elder SafeZone.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Bars the average penetration is taken over, from 1 to 100000.
+    coefficient : float, default 2.0
+        Multiple of the average penetration the level sits beyond the prior bar.
+    hold : int, default 3
+        Bars a level may not move against the trend, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        safezone_lower: Prior low less coefficient average downside penetrations, held from falling.
+        safezone_upper: Prior high plus coefficient average upside penetrations, held from rising.
+    """
+    period = _convert.as_int("safezone", "period", period)
+    coefficient = _convert.as_float("safezone", "coefficient", coefficient)
+    hold = _convert.as_int("safezone", "hold", hold)
+    columns, carrier = _convert.bars(
+        "safezone",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.safezone(*columns, period=period, coefficient=coefficient, hold=hold)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "safezone_lower",
+            "safezone_upper",
+        ),
+    )
+
+
 def sar(
     high=None,
     low=None,
@@ -10947,6 +11163,47 @@ def supertrend(
             "supertrend_direction",
         ),
     )
+
+
+def swing_index(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    limit_move: float = _PARAMS["swing_index"]["limit_move"]["default"],
+) -> Any:
+    """Swing Index.
+
+    Parameters
+    ----------
+    limit_move : float, default 0.5
+        The largest move allowed in one bar, in price units.
+
+    Returns
+    -------
+    ndarray or Series
+        Wilder's swing index of the bar against the one before it.
+    """
+    limit_move = _convert.as_float("swing_index", "limit_move", limit_move)
+    columns, carrier = _convert.bars(
+        "swing_index",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.swing_index(*columns, limit_move=limit_move)
+    return _convert.wrap_outputs(out, carrier, ("swing_index",))
 
 
 def t3(
@@ -11536,6 +11793,57 @@ def wclprice(high=None, low=None, close=None) -> Any:
     )
     out = _core.wclprice(*columns)
     return _convert.wrap_outputs(out, carrier, ("wclprice",))
+
+
+def wilder_volatility(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["wilder_volatility"]["period"]["default"],
+    multiplier: float = _PARAMS["wilder_volatility"]["multiplier"]["default"],
+) -> Any:
+    """Wilder Volatility System.
+
+    Parameters
+    ----------
+    period : int, default 7
+        Bars of the average true range, from 1 to 100000.
+    multiplier : float, default 3.0
+        Multiple of the average true range the level sits from the extreme close.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        wilder_volatility: The extreme close of the current swing less (or plus) multiplier average
+        true ranges.
+        wilder_volatility_direction: 1 while the level sits below the closes, -1 while above.
+    """
+    period = _convert.as_int("wilder_volatility", "period", period)
+    multiplier = _convert.as_float("wilder_volatility", "multiplier", multiplier)
+    columns, carrier = _convert.bars(
+        "wilder_volatility",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.wilder_volatility(*columns, period=period, multiplier=multiplier)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "wilder_volatility",
+            "wilder_volatility_direction",
+        ),
+    )
 
 
 def willr(
