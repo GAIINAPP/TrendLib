@@ -167,12 +167,36 @@ lookback + 1`:
 
 ## 8. Benchmarks
 
-- Rust: criterion, 1,000,000 bars per indicator, default params.
-- Python: `pytest-benchmark`, `tl.<name>` vs `talib.<NAME>` on the same 1,000,000-bar
-  NumPy arrays.
-- Nightly job posts a table to the job summary. The release checklist
-  (`RELEASE.md`) blocks a release if any shared indicator's median is more than 1.5×
-  TA-Lib's.
+- Rust: criterion, 1,000,000 bars per indicator, default params
+  (`crates/trendlib/benches/indicators.rs`, over the generated registry, so a new
+  indicator is benchmarked the moment its folder exists).
+- Python: `tl.<name>` vs `talib.<NAME>` on the same 1,000,000-bar NumPy arrays.
+  `scripts/bench/compare.py` produces the table; `tests/bench/test_vs_talib.py`
+  runs the same calls through `pytest-benchmark` for profiling one indicator at
+  a time, marked `bench` and deselected by the default options.
+
+```bash
+cargo xtask bench                        # the table, 1,000,000 bars
+cargo xtask bench --bars 100000          # quicker, same shape
+cargo xtask bench --rust                 # criterion as well
+cargo xtask bench --enforce              # non-zero exit if over budget
+pytest tests/bench -m bench --bench-bars 50000 -k rsi
+```
+
+- The nightly workflow posts the table to the job summary. It does not fail on a
+  slow indicator; the release checklist (`RELEASE.md`) is where the 1.5× budget is
+  enforced, with `--enforce`.
+
+**Where TrendLib stands against that budget.** Most shared indicators are over
+it, and the reason is a decision this project made on purpose rather than a
+defect: where TA-Lib carries a running total across the whole series, TrendLib
+re-sums the window (`CONVENTIONS.md` § 1). That costs a pass over the window
+every bar and buys accuracy — measured on `sum` at period 30 over
+`daily_2000.csv`, against 60-digit exact arithmetic, the worst relative error is
+5.4e-16 re-summed against 1.9e-15 running, and the two disagree on 1,884 of
+1,971 rows. Indicators that carry a running value instead sit near 2×; those
+that walk a window sit at 15× to 30×. Trading that accuracy back for speed is
+an open question (`DECISIONS.md` Q6), not something a benchmark run decides.
 
 ## 9. CI matrix (`ci.yml`)
 

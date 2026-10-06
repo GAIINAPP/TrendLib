@@ -1,0 +1,59 @@
+# The benchmark table docs/TESTING.md section 8 asks for, posted to the job
+# summary every night. It does not gate a push: the release checklist is where
+# the 1.5x budget is enforced, with `--enforce`.
+name: nightly
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+    inputs:
+      bars:
+        description: Bars per indicator
+        default: "1000000"
+      rust:
+        description: Also run the criterion benchmarks
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  bench:
+    name: benchmarks
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: create virtualenv
+        run: |
+          python -m venv .venv
+          echo "VIRTUAL_ENV=$PWD/.venv" >> "$GITHUB_ENV"
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+
+      - name: install dependencies
+        run: pip install maturin pytest pytest-benchmark "PyYAML>=6.0" "TA-Lib==0.8.1"
+
+      - name: maturin develop
+        run: maturin develop --release
+
+      - name: python vs TA-Lib
+        run: |
+          python scripts/bench/compare.py \
+            --bars "${{ inputs.bars || '1000000' }}" \
+            --json bench.json | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: criterion
+        if: inputs.rust
+        run: cargo bench --bench indicators
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bench
+          path: bench.json

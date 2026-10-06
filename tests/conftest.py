@@ -155,3 +155,12 @@ def indicator(request) -> Indicator:
 @pytest.fixture(scope="session")
 def every_indicator() -> list[Indicator]:
     return [Indicator(name) for name in _names()]
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--bench-bars",
+        type=int,
+        default=1_000_000,
+        help="bars the benchmarks in tests/bench run on (docs/TESTING.md section 8)",
+    )

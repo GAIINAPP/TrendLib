@@ -140,7 +140,7 @@ Tasks:
       one PR-sized commit series each, using the `new-indicator` skill.
 - [ ] `time/` support for `vwap` (`CONVENTIONS.md` § 7), timestamp conversion in
       `_convert.py`.
-- [ ] Benchmarks (`TESTING.md` § 8) and the nightly workflow.
+- [x] Benchmarks (`TESTING.md` § 8) and the nightly workflow.
 
 Acceptance:
 
@@ -149,7 +149,11 @@ Acceptance:
       listed in the report.
 - [ ] TA-Lib parity property tests pass for all T-oracle functions.
 - [ ] No shared indicator slower than 1.5× TA-Lib in the benchmark table, or each
-      exception listed with a reason.
+      exception listed with a reason. **Fails: 24 of 201 are inside the budget.**
+      One reason covers the rest, measured not assumed (`TESTING.md` § 8, A18):
+      the kernels re-sum each window where TA-Lib carries a running total, which
+      is what makes them the more accurate of the two. Whether to trade that back
+      is Q6.
 - [ ] Adding one of the 174 remaining functions needs no change outside its own
       folder and the generated files. Demonstrate on one function from a group
       M4 did not touch, in a scratch branch.

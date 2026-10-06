@@ -116,7 +116,11 @@ No API tokens. GitHub Actions proves its identity to PyPI with OIDC.
 1. `CHANGELOG.md`: move "Unreleased" to the new version with today's date.
 2. Bump `[workspace.package] version`.
 3. `cargo xtask regen-check` clean; `api/public_api.txt` changes reviewed.
-4. Nightly benchmark table: no shared indicator slower than 1.5× TA-Lib.
+4. Benchmark budget: `cargo xtask bench --enforce` exits zero. It does not
+   today (`DECISIONS.md` A18): most shared indicators are 15× to 30× TA-Lib
+   because they re-sum each window rather than carry a running total, which is
+   what makes them the more accurate of the two. Q6 has to be answered before
+   0.1.0 — either the budget moves or the numerics do.
 5. All golden tests active, or each `#[ignore]` listed in the release notes.
 6. Merge to `main`, tag `vX.Y.Z`, push the tag.
 7. Approve the `pypi` deployment after the TestPyPI smoke test passes.

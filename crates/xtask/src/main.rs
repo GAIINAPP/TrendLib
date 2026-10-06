@@ -14,11 +14,11 @@ Commands:
   generate        Specs -> registry, bindings, wrappers, stubs, docs pages   (M2)
   regen-check     Run generate, then fail if the working tree is dirty       (M2)
   golden <name>   Re-produce the golden CSVs of one indicator from its oracle
-  bench           Criterion benchmarks and the Python vs TA-Lib comparison   (M4)
-";
+  bench           Python vs TA-Lib comparison; --rust adds criterion         (M4)
 
-/// The milestone that is going to implement each command, per docs/MILESTONES.md.
-const PENDING: &[(&str, &str)] = &[("bench", "M4")];
+`bench` passes any other arguments to scripts/bench/compare.py, so
+`cargo xtask bench --bars 100000 --enforce` works.
+";
 
 fn repo_root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -82,6 +82,50 @@ fn golden(args: &[String]) -> ExitCode {
                 "xtask golden: could not run {}: {error}",
                 python().display()
             );
+            ExitCode::FAILURE
+        }
+    }
+}
+
+/// Runs the comparison `docs/TESTING.md` section 8 specifies, and with
+/// `--rust` the criterion benchmarks of the core crate as well.
+fn bench(args: &[String]) -> ExitCode {
+    let root = repo_root();
+    let rust = args.iter().any(|arg| arg == "--rust");
+
+    if rust {
+        let cargo = std::env::var("CARGO").unwrap_or_else(|_| "cargo".into());
+        let status = Command::new(cargo)
+            .current_dir(&root)
+            .args(["bench", "--bench", "indicators"])
+            .status();
+        match status {
+            Ok(status) if status.success() => {}
+            Ok(status) => {
+                eprintln!("xtask bench: cargo bench exited with {status}");
+                return ExitCode::FAILURE;
+            }
+            Err(error) => {
+                eprintln!("xtask bench: could not run cargo bench: {error}");
+                return ExitCode::FAILURE;
+            }
+        }
+    }
+
+    let mut command = Command::new(python());
+    command
+        .current_dir(&root)
+        .arg(root.join("scripts/bench/compare.py"))
+        .args(args.iter().filter(|arg| *arg != "--rust"));
+
+    match command.status() {
+        Ok(status) if status.success() => ExitCode::SUCCESS,
+        Ok(status) => {
+            eprintln!("xtask bench: the comparison exited with {status}");
+            ExitCode::FAILURE
+        }
+        Err(error) => {
+            eprintln!("xtask bench: could not run {}: {error}", python().display());
             ExitCode::FAILURE
         }
     }
@@ -182,6 +226,10 @@ fn main() -> ExitCode {
         return golden(&args[1..]);
     }
 
+    if command == "bench" {
+        return bench(&args[1..]);
+    }
+
     if command == "generate" {
         return run_generate(false);
     }
@@ -190,15 +238,7 @@ fn main() -> ExitCode {
         return run_generate(true);
     }
 
-    match PENDING.iter().find(|(name, _)| name == command) {
-        Some((name, milestone)) => {
-            eprintln!("xtask {name}: not implemented until {milestone}");
-            ExitCode::FAILURE
-        }
-        None => {
-            eprintln!("xtask: unknown command `{command}`\n");
-            eprint!("{USAGE}");
-            ExitCode::FAILURE
-        }
-    }
+    eprintln!("xtask: unknown command `{command}`\n");
+    eprint!("{USAGE}");
+    ExitCode::FAILURE
 }

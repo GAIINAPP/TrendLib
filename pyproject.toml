@@ -60,7 +60,8 @@ known-first-party = ["trendlib"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q --strict-markers"
+addopts = "-q --strict-markers -m 'not bench'"
 markers = [
   "talib: compares against ta-lib-python, skipped when TA-Lib is not installed",
+  "bench: times an indicator against TA-Lib; deselected unless asked for by name",
 ]

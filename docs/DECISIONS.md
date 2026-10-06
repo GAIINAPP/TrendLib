@@ -36,6 +36,7 @@ proceed on a judgment call.
 | Q3 | Ship a WASM/JS build for GAIIN's web frontend? | After 0.1.0 |
 | Q4 | Human transcriber and source for CPR / pivot golden values (see `TESTING.md` § Oracles). Not blocking: oracle A ships in the meantime, see A16. | M5 |
 | Q5 | Docs domain (e.g. `trendlib.dev`) or GitHub Pages default URL? | M5 |
+| Q6 | Most shared indicators are 15x to 30x TA-Lib because TrendLib re-sums each window instead of carrying a running total, which is what makes it the more accurate of the two. Keep the accuracy and raise or drop M4's 1.5x budget, or add a faster path and accept the oracle's error? Measured in `TESTING.md` § 8 and A18. | M5 |
 
 ## Assumptions pending review
 
@@ -192,3 +193,17 @@ loosening: `tests/test_spec_drift.py` accepts `ta-patterns` as a golden file's
 oracle beside `ta-lib-python` and `manual`, and
 `tests/test_catalogue.py` counts the section 5.1 list in the approved total that
 `docs/PROGRESS.md` must cover. Confirmed by the owner on 2026-10-06.
+
+A18 (M4, 2026-10-06): `cargo xtask bench` is implemented and M4's acceptance
+check "no shared indicator slower than 1.5x TA-Lib" **fails as the library
+stands**: at 1,000,000 bars, 24 of 201 shared indicators are inside the budget.
+The cause was measured rather than assumed. Timing the Rust core directly with
+criterion gives the same figures as timing it through Python (`sum` 48.6 ms in
+Rust against 46.9 ms through the bindings, TA-Lib 2.2 ms), so this is not
+binding overhead: the kernels walk their window every bar where TA-Lib carries a
+running total. That is `CONVENTIONS.md` § 1 working as intended, and on `sum` it
+is 3.5x more accurate than the oracle against exact arithmetic. Nothing was
+optimised and no numerics were changed to make the check pass, because trading
+the accuracy back is a product decision; it is Q6. The benchmark, the table and
+the nightly job all ship, so the number is now measured every night instead of
+being unknown.
