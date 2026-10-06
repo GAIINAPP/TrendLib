@@ -185,6 +185,7 @@ __all__ = [
     "cmf",
     "cmo",
     "cmou",
+    "connors_rsi",
     "coppock",
     "correl",
     "cos",
@@ -198,6 +199,7 @@ __all__ = [
     "dpo",
     "dx",
     "efi",
+    "elder_impulse",
     "ema",
     "envelope",
     "er",
@@ -206,6 +208,7 @@ __all__ = [
     "floor",
     "fosc",
     "fractal",
+    "gapo",
     "gator",
     "guppy",
     "ha",
@@ -238,6 +241,7 @@ __all__ = [
     "linearreg_angle",
     "linearreg_intercept",
     "linearreg_slope",
+    "linreg_channel",
     "ln",
     "log10",
     "ma",
@@ -274,6 +278,7 @@ __all__ = [
     "pivots_woodie",
     "plus_di",
     "plus_dm",
+    "pmo",
     "ppo",
     "pvi",
     "pvo",
@@ -287,6 +292,7 @@ __all__ = [
     "rsi",
     "rvi",
     "rvol",
+    "rwi",
     "sar",
     "sarext",
     "sin",
@@ -310,6 +316,7 @@ __all__ = [
     "trix",
     "tsf",
     "tsi",
+    "twiggs_mf",
     "typprice",
     "ultosc",
     "var",
@@ -2944,6 +2951,9 @@ cmf = Factory(
 )
 cmo = Factory("cmo", _core.CmoStream, ("source",), ("series",), ("cmo",))
 cmou = Factory("cmou", _core.CmouStream, ("source",), ("series",), ("cmou",))
+connors_rsi = Factory(
+    "connors_rsi", _core.ConnorsRsiStream, ("source",), ("series",), ("connors_rsi",)
+)
 coppock = Factory("coppock", _core.CoppockStream, ("source",), ("series",), ("coppock",))
 correl = Factory(
     "correl",
@@ -3053,6 +3063,9 @@ efi = Factory(
     ),
     ("efi",),
 )
+elder_impulse = Factory(
+    "elder_impulse", _core.ElderImpulseStream, ("source",), ("series",), ("elder_impulse",)
+)
 ema = Factory("ema", _core.EmaStream, ("source",), ("series",), ("ema",))
 envelope = Factory(
     "envelope",
@@ -3102,6 +3115,19 @@ fractal = Factory(
         "fractal_swing_high",
         "fractal_swing_low",
     ),
+)
+gapo = Factory(
+    "gapo",
+    _core.GapoStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("gapo",),
 )
 gator = Factory(
     "gator",
@@ -3456,6 +3482,17 @@ linearreg_intercept = Factory(
 )
 linearreg_slope = Factory(
     "linearreg_slope", _core.LinearregSlopeStream, ("source",), ("series",), ("linearreg_slope",)
+)
+linreg_channel = Factory(
+    "linreg_channel",
+    _core.LinregChannelStream,
+    ("source",),
+    ("series",),
+    (
+        "linreg_channel_upper",
+        "linreg_channel_middle",
+        "linreg_channel_lower",
+    ),
 )
 ln = Factory("ln", _core.LnStream, ("source",), ("series",), ("ln",))
 log10 = Factory("log10", _core.Log10Stream, ("source",), ("series",), ("log10",))
@@ -3843,6 +3880,16 @@ plus_dm = Factory(
     ),
     ("plus_dm",),
 )
+pmo = Factory(
+    "pmo",
+    _core.PmoStream,
+    ("source",),
+    ("series",),
+    (
+        "pmo",
+        "pmo_signal",
+    ),
+)
 ppo = Factory("ppo", _core.PpoStream, ("source",), ("series",), ("ppo",))
 pvi = Factory(
     "pvi",
@@ -3892,6 +3939,24 @@ rocr100 = Factory("rocr100", _core.Rocr100Stream, ("source",), ("series",), ("ro
 rsi = Factory("rsi", _core.RsiStream, ("source",), ("series",), ("rsi",))
 rvi = Factory("rvi", _core.RviStream, ("source",), ("series",), ("rvi",))
 rvol = Factory("rvol", _core.RvolStream, ("volume",), ("volume",), ("rvol",))
+rwi = Factory(
+    "rwi",
+    _core.RwiStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "rwi_high",
+        "rwi_low",
+    ),
+)
 sar = Factory(
     "sar",
     _core.SarStream,
@@ -4042,6 +4107,23 @@ trima = Factory("trima", _core.TrimaStream, ("source",), ("series",), ("trima",)
 trix = Factory("trix", _core.TrixStream, ("source",), ("series",), ("trix",))
 tsf = Factory("tsf", _core.TsfStream, ("source",), ("series",), ("tsf",))
 tsi = Factory("tsi", _core.TsiStream, ("source",), ("series",), ("tsi",))
+twiggs_mf = Factory(
+    "twiggs_mf",
+    _core.TwiggsMfStream,
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    ("twiggs_mf",),
+)
 typprice = Factory(
     "typprice",
     _core.TyppriceStream,

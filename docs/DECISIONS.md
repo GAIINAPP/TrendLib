@@ -274,3 +274,20 @@ Each is a guess at what the source meant; none adds a parameter.
 - Woodie pivots take the previous bar's close, Wood's own formula and the
   inputs the table lists. TradingView's Woodie type uses the current period's
   open instead.
+- The one-bar change inside Connors RSI and the PMO is TA-Lib's `ROC`
+  arithmetic, `(C / C[-1] - 1) * 100`, which is also how DecisionPoint writes
+  it; `roc`'s `100 (C - C[-1]) / C[-1]` rounds up to 1e-10 apart, which the PMO
+  would carry to its zero crossings.
+- Connors' streak starts at bar 1, so its RSI does too.
+- The PMO's custom smoothing (multiplier `2/n`) is seeded as an exponential
+  average of period `n - 1`, with the mean of its first `n - 1` values.
+  DecisionPoint publishes no seed.
+- Twiggs Money Flow smooths with Wilder's average from bar 1, the first with a
+  previous close. A zero true range contributes 0, and a zero smoothed volume
+  reads 0 rather than 0/0.
+- The Random Walk Index uses one length, `period`, as TradingView's does, not
+  the largest reading over a range of lengths. A zero average true range reads
+  0.
+- The regression channel's deviation is of the residuals about the fitted
+  line, divided by `n - 1`, as TradingView's Linear Regression Channel
+  computes it.

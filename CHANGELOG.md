@@ -102,3 +102,5 @@ Before 1.0, minor versions may break the API; every break is listed under
 - Eight indicators on oracle A (`docs/INDICATORS.md` § 5.3): `alligator`,
   `gator`, `envelope`, `guppy`, `woodies_cci`, `atr_bands`, `pivots_woodie` and
   `pivots_demark`, their golden files evaluated through TA-Lib.
+- Seven more on oracle A: `connors_rsi`, `pmo`, `elder_impulse`, `twiggs_mf`,
+  `gapo`, `rwi` and `linreg_channel`.

@@ -232,6 +232,155 @@ def pivots_demark(cols, p):
     return outputs, 1, "nothing: NumPy arithmetic, as no TA-Lib function computes a step"
 
 
+def one_bar_change(close):
+    import talib
+
+    return talib.ROC(close, timeperiod=1)
+
+
+def connors_rsi(cols, p):
+    import numpy as np
+    import talib
+
+    close = cols["source"]
+    streak = np.full_like(close, np.nan)
+    run = 0.0
+    for t in range(1, len(close)):
+        if close[t] > close[t - 1]:
+            run = max(run, 0.0) + 1.0
+        elif close[t] < close[t - 1]:
+            run = min(run, 0.0) - 1.0
+        else:
+            run = 0.0
+        streak[t] = run
+    change = one_bar_change(close)
+    m = p["rank_period"]
+    ranked = np.full_like(close, np.nan)
+    for t in range(1 + m, len(close)):
+        ranked[t] = 100.0 * np.count_nonzero(change[t - m : t] < change[t]) / m
+    price = talib.RSI(close, timeperiod=p["rsi_period"])
+    streaked = talib.RSI(streak, timeperiod=p["streak_period"])
+    lookback = max(p["rsi_period"], 1 + p["streak_period"], 1 + m)
+    return (
+        [(price + streaked + ranked) / 3.0],
+        lookback,
+        "talib.RSI and ROC, the streak and the percent rank counted in NumPy",
+    )
+
+
+def pmo(cols, p):
+    import talib
+
+    first = talib.EMA(one_bar_change(cols["source"]), timeperiod=p["first_period"] - 1)
+    scaled = talib.MULT(first, constant(first, 10.0))
+    line = talib.EMA(scaled, timeperiod=p["second_period"] - 1)
+    signal = talib.EMA(line, timeperiod=p["signal_period"])
+    lookback = p["first_period"] + p["second_period"] + p["signal_period"] - 4
+    return [line, signal], lookback, "talib.ROC, EMA and MULT"
+
+
+def elder_impulse(cols, p):
+    import numpy as np
+    import talib
+
+    close = cols["source"]
+    trend = talib.EMA(close, timeperiod=p["ema_period"])
+    _, _, histogram = talib.MACD(
+        close,
+        fastperiod=p["fast_period"],
+        slowperiod=p["slow_period"],
+        signalperiod=p["signal_period"],
+    )
+    rising = (trend[1:] > trend[:-1]) & (histogram[1:] > histogram[:-1])
+    falling = (trend[1:] < trend[:-1]) & (histogram[1:] < histogram[:-1])
+    reading = np.full_like(close, np.nan)
+    reading[1:] = np.where(rising, 1.0, np.where(falling, -1.0, 0.0))
+    macd_lookback = max(p["fast_period"], p["slow_period"]) - 1 + p["signal_period"] - 1
+    lookback = max(p["ema_period"] - 1, macd_lookback) + 1
+    return [reading], lookback, "talib.EMA and MACD, the comparisons in NumPy"
+
+
+def wilder(values, period: int):
+    """Wilder's smoothing: TA-Lib's SMA of the first `period`, then
+    `prev * (n - 1) / n + x / n`."""
+    import numpy as np
+    import talib
+
+    out = talib.SMA(values, timeperiod=period)
+    start = int(np.flatnonzero(~np.isnan(out))[0])
+    for t in range(start + 1, len(values)):
+        out[t] = out[t - 1] * (period - 1) / period + values[t] / period
+    return out
+
+
+def twiggs_mf(cols, p):
+    import numpy as np
+
+    high, low, close = cols["high"], cols["low"], cols["close"]
+    before = shifted(close, 1)
+    top = np.maximum(high, before)
+    bottom = np.minimum(low, before)
+    span = top - bottom
+    safe = np.where(span == 0.0, 1.0, span)
+    flow = np.where(span == 0.0, 0.0, ((close - bottom) - (top - close)) / safe * cols["volume"])
+    volume = cols["volume"].copy()
+    volume[0] = np.nan
+    flow_average = wilder(flow, p["period"])
+    volume_average = wilder(volume, p["period"])
+    divisor = np.where(volume_average == 0.0, 1.0, volume_average)
+    ratio = np.where(volume_average == 0.0, 0.0, flow_average / divisor)
+    return [ratio], p["period"], "talib.SMA (the seeds), Wilder's step and the ratio in NumPy"
+
+
+def gapo(cols, p):
+    import talib
+
+    n = p["period"]
+    span = talib.SUB(talib.MAX(cols["high"], timeperiod=n), talib.MIN(cols["low"], timeperiod=n))
+    scale = talib.LN(constant(span, float(n)))
+    return [talib.DIV(talib.LN(span), scale)], n - 1, "talib.MAX, MIN, SUB, LN and DIV"
+
+
+def rwi(cols, p):
+    import math
+
+    import numpy as np
+    import talib
+
+    n = p["period"]
+    high, low = cols["high"], cols["low"]
+    average = talib.ATR(high, low, cols["close"], timeperiod=n)
+    scale = talib.MULT(average, constant(average, math.sqrt(n)))
+    safe = np.where(average == 0.0, 1.0, scale)
+    rise = talib.SUB(high, shifted(low, n))
+    fall = talib.SUB(shifted(high, n), low)
+    outputs = [np.where(average == 0.0, 0.0, moved / safe) for moved in (rise, fall)]
+    return outputs, n, "talib.ATR, SUB and MULT, the division in NumPy"
+
+
+def linreg_channel(cols, p):
+    import numpy as np
+    import talib
+
+    source, n = cols["source"], p["period"]
+    middle = talib.LINEARREG(source, timeperiod=n)
+    slope = talib.LINEARREG_SLOPE(source, timeperiod=n)
+    intercept = talib.LINEARREG_INTERCEPT(source, timeperiod=n)
+    sigma = np.full_like(source, np.nan)
+    steps = np.arange(n, dtype=np.float64)
+    for t in range(n - 1, len(source)):
+        residuals = source[t - n + 1 : t + 1] - (intercept[t] + slope[t] * steps)
+        sigma[t] = np.sqrt(np.sum(residuals * residuals) / (n - 1))
+    spread = talib.MULT(sigma, constant(sigma, p["deviation"]))
+    outputs = [talib.ADD(middle, spread), middle, talib.SUB(middle, spread)]
+    return (
+        outputs,
+        n - 1,
+        "talib.LINEARREG, LINEARREG_SLOPE, LINEARREG_INTERCEPT, MULT, ADD and SUB, "
+        "the residuals in NumPy",
+    )
+
+
 FORMULAS = {
     "ichimoku": ichimoku,
     "alligator": alligator,
@@ -242,19 +391,31 @@ FORMULAS = {
     "atr_bands": atr_bands,
     "pivots_woodie": pivots_woodie,
     "pivots_demark": pivots_demark,
+    "connors_rsi": connors_rsi,
+    "pmo": pmo,
+    "elder_impulse": elder_impulse,
+    "twiggs_mf": twiggs_mf,
+    "gapo": gapo,
+    "rwi": rwi,
+    "linreg_channel": linreg_channel,
 }
 
 
-def warm_up(outputs, lookback: int):
-    """Every output is warm-up before `lookback`, as TrendLib aligns a multi-output row."""
+def warm_up(outputs, lookback: int, dtypes: list[str]):
+    """Every output is warm-up before `lookback`, as TrendLib aligns a multi-output row:
+    `NaN`, or `0` in an `int32` column (CONVENTIONS.md section 2)."""
     import numpy as np
 
     blanked = []
-    for values in outputs:
+    for values, dtype in zip(outputs, dtypes, strict=True):
         values = np.array(values, dtype=np.float64)
-        values[:lookback] = np.nan
+        values[:lookback] = 0.0 if dtype == "int32" else np.nan
         blanked.append(values)
     return blanked
+
+
+def cell(value: float, dtype: str) -> str:
+    return str(int(value)) if dtype == "int32" else repr(float(value))
 
 
 def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
@@ -263,11 +424,12 @@ def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
     dataset = dataset_for(name, case)
     columns = read_columns(dataset)
     outputs, lookback, functions = FORMULAS[name](columns, params)
-    outputs = warm_up(outputs, lookback)
     if len(outputs) != len(spec["outputs"]):
         raise SystemExit(
             f"{name}: formula returned {len(outputs)} outputs, spec has {len(spec['outputs'])}"
         )
+    dtypes = [o["dtype"] for o in spec["outputs"]]
+    outputs = warm_up(outputs, lookback, dtypes)
 
     rendered = ", ".join(f"{key}={value}" for key, value in params.items()) or "none"
     header = [
@@ -287,7 +449,7 @@ def write_case(name: str, case: str, spec: dict, params: dict) -> Path:
     lines = [*header, ",".join(names)]
     for row in range(len(columns["close"])):
         cells = [repr(float(columns[i["name"]][row])) for i in spec["inputs"]]
-        cells += [repr(float(values[row])) for values in outputs]
+        cells += [cell(values[row], dtype) for values, dtype in zip(outputs, dtypes, strict=True)]
         lines.append(",".join(cells))
 
     path = INDICATORS / name / "golden" / f"{case}.csv"

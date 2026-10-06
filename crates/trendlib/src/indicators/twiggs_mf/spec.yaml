@@ -1,0 +1,28 @@
+name: twiggs_mf
+title: Twiggs Money Flow
+group: volume
+flags: [unstable]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+  - name: volume
+    kind: volume
+params:
+  - name: period
+    type: int
+    default: 21
+    min: 1
+    max: 100000
+    doc: Bars of the Wilder smoothing
+outputs:
+  - name: twiggs_mf
+    dtype: float64
+    plot: line
+    doc: Smoothed volume-weighted close location as a share of smoothed volume
+references:
+  - Colin Twiggs, Twiggs Money Flow, Incredible Charts
+see_also: [cmf, adosc, mfi]

@@ -1,0 +1,31 @@
+name: rwi
+title: Random Walk Index
+group: momentum
+flags: [unstable]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 14
+    min: 1
+    max: 100000
+    doc: Bars the move is measured over and the true range averaged over
+outputs:
+  - name: rwi_high
+    dtype: float64
+    plot: line
+    doc: Rise from the low period bars ago, in random-walk units
+  - name: rwi_low
+    dtype: float64
+    plot: line
+    doc: Fall from the high period bars ago, in random-walk units
+references:
+  - Michael Poulos, Of Trends and Random Walks, Technical Analysis of Stocks & Commodities, February 1991
+  - TradingView, Random Walk Index
+see_also: [atr, vhf, adx]

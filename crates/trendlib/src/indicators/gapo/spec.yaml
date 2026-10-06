@@ -1,0 +1,24 @@
+name: gapo
+title: Gopalakrishnan Range Index
+group: volatility
+flags: [nan_inf_output]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+params:
+  - name: period
+    type: int
+    default: 5
+    min: 2
+    max: 100000
+    doc: Bars the range is taken over
+outputs:
+  - name: gapo
+    dtype: float64
+    plot: line
+    doc: Logarithm of the window's range over the logarithm of its length
+references:
+  - Jayanthi Gopalakrishnan, Technical Analysis of Stocks & Commodities, January 2001
+see_also: [vhf, natr, donchian]

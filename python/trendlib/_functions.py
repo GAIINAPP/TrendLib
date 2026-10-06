@@ -385,6 +385,7 @@ __all__ = [
     "cmf",
     "cmo",
     "cmou",
+    "connors_rsi",
     "coppock",
     "correl",
     "cos",
@@ -398,6 +399,7 @@ __all__ = [
     "dpo",
     "dx",
     "efi",
+    "elder_impulse",
     "ema",
     "envelope",
     "er",
@@ -406,6 +408,7 @@ __all__ = [
     "floor",
     "fosc",
     "fractal",
+    "gapo",
     "gator",
     "guppy",
     "ha",
@@ -438,6 +441,7 @@ __all__ = [
     "linearreg_angle",
     "linearreg_intercept",
     "linearreg_slope",
+    "linreg_channel",
     "ln",
     "log10",
     "lookback",
@@ -475,6 +479,7 @@ __all__ = [
     "pivots_woodie",
     "plus_di",
     "plus_dm",
+    "pmo",
     "ppo",
     "pvi",
     "pvo",
@@ -488,6 +493,7 @@ __all__ = [
     "rsi",
     "rvi",
     "rvol",
+    "rwi",
     "sar",
     "sarext",
     "sin",
@@ -511,6 +517,7 @@ __all__ = [
     "trix",
     "tsf",
     "tsi",
+    "twiggs_mf",
     "typprice",
     "ultosc",
     "var",
@@ -7058,6 +7065,39 @@ def cmou(source=None, *, period: int = _PARAMS["cmou"]["period"]["default"]) -> 
     return _convert.wrap_outputs(out, carrier, ("cmou",))
 
 
+def connors_rsi(
+    source=None,
+    *,
+    rsi_period: int = _PARAMS["connors_rsi"]["rsi_period"]["default"],
+    streak_period: int = _PARAMS["connors_rsi"]["streak_period"]["default"],
+    rank_period: int = _PARAMS["connors_rsi"]["rank_period"]["default"],
+) -> Any:
+    """Connors RSI.
+
+    Parameters
+    ----------
+    rsi_period : int, default 3
+        Bars of the price RSI, from 2 to 100000.
+    streak_period : int, default 2
+        Bars of the streak RSI, from 2 to 100000.
+    rank_period : int, default 100
+        Bars the one-bar change is ranked against, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Mean of the price RSI, the streak RSI and the change's percent rank.
+    """
+    rsi_period = _convert.as_int("connors_rsi", "rsi_period", rsi_period)
+    streak_period = _convert.as_int("connors_rsi", "streak_period", streak_period)
+    rank_period = _convert.as_int("connors_rsi", "rank_period", rank_period)
+    columns, carrier = _convert.bars("connors_rsi", (source,), ("source",), ("series",))
+    out = _core.connors_rsi(
+        *columns, rsi_period=rsi_period, streak_period=streak_period, rank_period=rank_period
+    )
+    return _convert.wrap_outputs(out, carrier, ("connors_rsi",))
+
+
 def coppock(
     source=None,
     *,
@@ -7401,6 +7441,47 @@ def efi(close=None, volume=None, *, period: int = _PARAMS["efi"]["period"]["defa
     return _convert.wrap_outputs(out, carrier, ("efi",))
 
 
+def elder_impulse(
+    source=None,
+    *,
+    ema_period: int = _PARAMS["elder_impulse"]["ema_period"]["default"],
+    fast_period: int = _PARAMS["elder_impulse"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["elder_impulse"]["slow_period"]["default"],
+    signal_period: int = _PARAMS["elder_impulse"]["signal_period"]["default"],
+) -> Any:
+    """Elder Impulse System.
+
+    Parameters
+    ----------
+    ema_period : int, default 13
+        Bars of the trend average, from 2 to 100000.
+    fast_period : int, default 12
+        Bars of MACD's fast average, from 2 to 100000.
+    slow_period : int, default 26
+        Bars of MACD's slow average, from 2 to 100000.
+    signal_period : int, default 9
+        Bars of MACD's signal average, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        1 when the average and the MACD histogram both rose, -1 when both fell, else 0.
+    """
+    ema_period = _convert.as_int("elder_impulse", "ema_period", ema_period)
+    fast_period = _convert.as_int("elder_impulse", "fast_period", fast_period)
+    slow_period = _convert.as_int("elder_impulse", "slow_period", slow_period)
+    signal_period = _convert.as_int("elder_impulse", "signal_period", signal_period)
+    columns, carrier = _convert.bars("elder_impulse", (source,), ("source",), ("series",))
+    out = _core.elder_impulse(
+        *columns,
+        ema_period=ema_period,
+        fast_period=fast_period,
+        slow_period=slow_period,
+        signal_period=signal_period,
+    )
+    return _convert.wrap_outputs(out, carrier, ("elder_impulse",))
+
+
 def ema(source=None, *, period: int = _PARAMS["ema"]["period"]["default"]) -> Any:
     """Exponential Moving Average.
 
@@ -7608,6 +7689,36 @@ def fractal(
             "fractal_swing_low",
         ),
     )
+
+
+def gapo(high=None, low=None, *, period: int = _PARAMS["gapo"]["period"]["default"]) -> Any:
+    """Gopalakrishnan Range Index.
+
+    Parameters
+    ----------
+    period : int, default 5
+        Bars the range is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Logarithm of the window's range over the logarithm of its length.
+    """
+    period = _convert.as_int("gapo", "period", period)
+    columns, carrier = _convert.bars(
+        "gapo",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.gapo(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("gapo",))
 
 
 def gator(
@@ -8788,6 +8899,43 @@ def linearreg_slope(
     return _convert.wrap_outputs(out, carrier, ("linearreg_slope",))
 
 
+def linreg_channel(
+    source=None,
+    *,
+    period: int = _PARAMS["linreg_channel"]["period"]["default"],
+    deviation: float = _PARAMS["linreg_channel"]["deviation"]["default"],
+) -> Any:
+    """Linear Regression Channel.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars the line is fitted over, from 2 to 100000.
+    deviation : float, default 2.0
+        Standard deviations of the residuals each band sits from the line.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        linreg_channel_upper: The line's end plus deviation residual standard deviations.
+        linreg_channel_middle: The least-squares line's value at the newest bar.
+        linreg_channel_lower: The line's end minus deviation residual standard deviations.
+    """
+    period = _convert.as_int("linreg_channel", "period", period)
+    deviation = _convert.as_float("linreg_channel", "deviation", deviation)
+    columns, carrier = _convert.bars("linreg_channel", (source,), ("source",), ("series",))
+    out = _core.linreg_channel(*columns, period=period, deviation=deviation)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "linreg_channel_upper",
+            "linreg_channel_middle",
+            "linreg_channel_lower",
+        ),
+    )
+
+
 def ln(source=None) -> Any:
     """Vector Natural Logarithm.
 
@@ -9878,6 +10026,50 @@ def plus_dm(high=None, low=None, *, period: int = _PARAMS["plus_dm"]["period"]["
     return _convert.wrap_outputs(out, carrier, ("plus_dm",))
 
 
+def pmo(
+    source=None,
+    *,
+    first_period: int = _PARAMS["pmo"]["first_period"]["default"],
+    second_period: int = _PARAMS["pmo"]["second_period"]["default"],
+    signal_period: int = _PARAMS["pmo"]["signal_period"]["default"],
+) -> Any:
+    """Price Momentum Oscillator.
+
+    Parameters
+    ----------
+    first_period : int, default 35
+        Bars of the first custom smoothing, from 2 to 100000.
+    second_period : int, default 20
+        Bars of the second custom smoothing, from 2 to 100000.
+    signal_period : int, default 10
+        Bars of the signal line's average, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        pmo: The twice-smoothed one-bar change, times ten.
+        pmo_signal: Exponential average of the oscillator.
+    """
+    first_period = _convert.as_int("pmo", "first_period", first_period)
+    second_period = _convert.as_int("pmo", "second_period", second_period)
+    signal_period = _convert.as_int("pmo", "signal_period", signal_period)
+    columns, carrier = _convert.bars("pmo", (source,), ("source",), ("series",))
+    out = _core.pmo(
+        *columns,
+        first_period=first_period,
+        second_period=second_period,
+        signal_period=signal_period,
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "pmo",
+            "pmo_signal",
+        ),
+    )
+
+
 def ppo(
     source=None,
     *,
@@ -10176,6 +10368,48 @@ def rvol(volume=None, *, period: int = _PARAMS["rvol"]["period"]["default"]) -> 
     columns, carrier = _convert.bars("rvol", (volume,), ("volume",), ("volume",))
     out = _core.rvol(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("rvol",))
+
+
+def rwi(
+    high=None, low=None, close=None, *, period: int = _PARAMS["rwi"]["period"]["default"]
+) -> Any:
+    """Random Walk Index.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Bars the move is measured over and the true range averaged over, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        rwi_high: Rise from the low period bars ago, in random-walk units.
+        rwi_low: Fall from the high period bars ago, in random-walk units.
+    """
+    period = _convert.as_int("rwi", "period", period)
+    columns, carrier = _convert.bars(
+        "rwi",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.rwi(*columns, period=period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "rwi_high",
+            "rwi_low",
+        ),
+    )
 
 
 def sar(
@@ -10895,6 +11129,47 @@ def tsi(
     columns, carrier = _convert.bars("tsi", (source,), ("source",), ("series",))
     out = _core.tsi(*columns, first_period=first_period, second_period=second_period)
     return _convert.wrap_outputs(out, carrier, ("tsi",))
+
+
+def twiggs_mf(
+    high=None,
+    low=None,
+    close=None,
+    volume=None,
+    *,
+    period: int = _PARAMS["twiggs_mf"]["period"]["default"],
+) -> Any:
+    """Twiggs Money Flow.
+
+    Parameters
+    ----------
+    period : int, default 21
+        Bars of the Wilder smoothing, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Smoothed volume-weighted close location as a share of smoothed volume.
+    """
+    period = _convert.as_int("twiggs_mf", "period", period)
+    columns, carrier = _convert.bars(
+        "twiggs_mf",
+        (high, low, close, volume),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.twiggs_mf(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("twiggs_mf",))
 
 
 def typprice(high=None, low=None, close=None) -> Any:

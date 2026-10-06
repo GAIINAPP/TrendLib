@@ -2,8 +2,8 @@
 
 # Progress
 
-**311 of 325 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 14 not started.
+**318 of 325 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 7 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -30,7 +30,7 @@ something is done that is not. CI checks it is current.
 | Chart patterns | 63 | 63 |
 | Bar patterns | 19 | 19 |
 | Harmonic patterns | 12 | 12 |
-| Indicators on oracle A | 9 | 23 |
+| Indicators on oracle A | 16 | 23 |
 | Indicators on oracle F | 4 | 4 |
 
 ## Overlap studies (25 of 25)
@@ -373,29 +373,29 @@ something is done that is not. CI checks it is current.
 - [x] `harmonic_wolfe_wave_bearish` -- Bearish Wolfe Wave
 - [x] `harmonic_wolfe_wave_bullish` -- Bullish Wolfe Wave
 
-## Indicators on oracle A (9 of 23)
+## Indicators on oracle A (16 of 23)
 
 - [x] `alligator` -- Williams Alligator
 - [ ] `asi` -- Accumulative Swing Index
 - [x] `atr_bands` -- ATR Bands
-- [ ] `connors_rsi` -- Connors RSI
+- [x] `connors_rsi` -- Connors RSI
 - [ ] `darvas_box` -- Darvas Box
-- [ ] `elder_impulse` -- Elder Impulse System
+- [x] `elder_impulse` -- Elder Impulse System
 - [x] `envelope` -- Moving Average Envelope
 - [ ] `fractal_chaos_bands` -- Fractal Chaos Bands
 - [ ] `frama` -- Fractal Adaptive Moving Average
-- [ ] `gapo` -- Gopalakrishnan Range Index
+- [x] `gapo` -- Gopalakrishnan Range Index
 - [x] `gator` -- Gator Oscillator
 - [x] `guppy` -- Guppy Multiple Moving Average
 - [x] `ichimoku` -- Ichimoku Kinko Hyo
-- [ ] `linreg_channel` -- Linear Regression Channel
+- [x] `linreg_channel` -- Linear Regression Channel
 - [x] `pivots_demark` -- DeMark Pivot Points
 - [x] `pivots_woodie` -- Woodie Pivot Points
-- [ ] `pmo` -- Price Momentum Oscillator
-- [ ] `rwi` -- Random Walk Index
+- [x] `pmo` -- Price Momentum Oscillator
+- [x] `rwi` -- Random Walk Index
 - [ ] `safezone` -- Elder SafeZone
 - [ ] `swing_index` -- Swing Index
-- [ ] `twiggs_mf` -- Twiggs Money Flow
+- [x] `twiggs_mf` -- Twiggs Money Flow
 - [ ] `wilder_volatility` -- Wilder Volatility System
 - [x] `woodies_cci` -- Woodies CCI
 

@@ -1,0 +1,34 @@
+name: connors_rsi
+title: Connors RSI
+group: momentum
+flags: [unstable]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: rsi_period
+    type: int
+    default: 3
+    min: 2
+    max: 100000
+    doc: Bars of the price RSI
+  - name: streak_period
+    type: int
+    default: 2
+    min: 2
+    max: 100000
+    doc: Bars of the streak RSI
+  - name: rank_period
+    type: int
+    default: 100
+    min: 1
+    max: 100000
+    doc: Bars the one-bar change is ranked against
+outputs:
+  - name: connors_rsi
+    dtype: float64
+    plot: line
+    doc: Mean of the price RSI, the streak RSI and the change's percent rank
+references:
+  - Larry Connors, Cesar Alvarez and Matt Radtke, An Introduction to ConnorsRSI, Connors Research, 2012
+see_also: [rsi, percentrank, stochrsi]

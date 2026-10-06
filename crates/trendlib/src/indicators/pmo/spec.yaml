@@ -1,0 +1,39 @@
+name: pmo
+title: Price Momentum Oscillator
+group: momentum
+flags: [unstable]
+inputs:
+  - name: source
+    kind: series
+params:
+  - name: first_period
+    type: int
+    default: 35
+    min: 2
+    max: 100000
+    doc: Bars of the first custom smoothing
+  - name: second_period
+    type: int
+    default: 20
+    min: 2
+    max: 100000
+    doc: Bars of the second custom smoothing
+  - name: signal_period
+    type: int
+    default: 10
+    min: 1
+    max: 100000
+    doc: Bars of the signal line's average
+outputs:
+  - name: pmo
+    dtype: float64
+    plot: line
+    doc: The twice-smoothed one-bar change, times ten
+  - name: pmo_signal
+    dtype: float64
+    plot: line
+    doc: Exponential average of the oscillator
+references:
+  - Carl Swenlin, DecisionPoint Price Momentum Oscillator (PMO), DecisionPoint.com
+  - StockCharts ChartSchool, DecisionPoint Price Momentum Oscillator
+see_also: [roc, macd, trix]
