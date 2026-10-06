@@ -324,6 +324,8 @@ __all__ = [
     "chart_ascending_triangle",
     "chart_bear_flag",
     "chart_bear_pennant",
+    "chart_big_m",
+    "chart_big_w",
     "chart_broadening",
     "chart_bull_flag",
     "chart_bull_pennant",
@@ -340,7 +342,15 @@ __all__ = [
     "chart_diamond_bottom",
     "chart_diamond_top",
     "chart_double_bottom",
+    "chart_double_bottom_adam_adam",
+    "chart_double_bottom_adam_eve",
+    "chart_double_bottom_eve_adam",
+    "chart_double_bottom_eve_eve",
     "chart_double_top",
+    "chart_double_top_adam_adam",
+    "chart_double_top_adam_eve",
+    "chart_double_top_eve_adam",
+    "chart_double_top_eve_eve",
     "chart_falling_wedge",
     "chart_head_shoulders",
     "chart_high_tight_flag",
@@ -355,6 +365,8 @@ __all__ = [
     "chart_rounding_bottom",
     "chart_rounding_top",
     "chart_symmetrical_triangle",
+    "chart_three_peaks",
+    "chart_three_valleys",
     "chart_triple_bottom",
     "chart_triple_top",
     "chart_v_bottom",
@@ -4041,6 +4053,108 @@ def chart_bear_pennant(
     return _convert.wrap_outputs(out, carrier, ("chart_bear_pennant",))
 
 
+def chart_big_m(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_big_m"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_big_m"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_big_m"]["tol"]["default"],
+    min_sep: int = _PARAMS["chart_big_m"]["min_sep"]["default"],
+) -> Any:
+    """Big M.
+
+    Parameters
+    ----------
+    period : int, default 150
+        Bars back the first top may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 7
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    tol : float, default 0.03
+        How far apart the tops may be, as a fraction of the larger.
+    min_sep : int, default 15
+        Fewest bars between the two tops' confirmations, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below the neckline of a wide double top.
+    """
+    period = _convert.as_int("chart_big_m", "period", period)
+    pivot_n = _convert.as_int("chart_big_m", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_big_m", "tol", tol)
+    min_sep = _convert.as_int("chart_big_m", "min_sep", min_sep)
+    columns, carrier = _convert.bars(
+        "chart_big_m",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_big_m(*columns, period=period, pivot_n=pivot_n, tol=tol, min_sep=min_sep)
+    return _convert.wrap_outputs(out, carrier, ("chart_big_m",))
+
+
+def chart_big_w(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_big_w"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_big_w"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_big_w"]["tol"]["default"],
+    min_sep: int = _PARAMS["chart_big_w"]["min_sep"]["default"],
+) -> Any:
+    """Big W.
+
+    Parameters
+    ----------
+    period : int, default 150
+        Bars back the first bottom may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 7
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    tol : float, default 0.03
+        How far apart the bottoms may be, as a fraction of the larger.
+    min_sep : int, default 15
+        Fewest bars between the two bottoms' confirmations, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above the neckline of a wide double bottom.
+    """
+    period = _convert.as_int("chart_big_w", "period", period)
+    pivot_n = _convert.as_int("chart_big_w", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_big_w", "tol", tol)
+    min_sep = _convert.as_int("chart_big_w", "min_sep", min_sep)
+    columns, carrier = _convert.bars(
+        "chart_big_w",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_big_w(*columns, period=period, pivot_n=pivot_n, tol=tol, min_sep=min_sep)
+    return _convert.wrap_outputs(out, carrier, ("chart_big_w",))
+
+
 def chart_broadening(
     high=None,
     low=None,
@@ -4867,6 +4981,226 @@ def chart_double_bottom(
     return _convert.wrap_outputs(out, carrier, ("chart_double_bottom",))
 
 
+def chart_double_bottom_adam_adam(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_bottom_adam_adam"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_bottom_adam_adam"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_bottom_adam_adam"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_bottom_adam_adam"]["min_separation"]["default"],
+) -> Any:
+    """Double Bottom, Adam and Adam.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first bottom may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 3 to 100000.
+    tol : float, default 0.03
+        How far apart the bottoms may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one bottom's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above the neckline of a double bottom whose bottoms are Adam then Adam.
+    """
+    period = _convert.as_int("chart_double_bottom_adam_adam", "period", period)
+    pivot_n = _convert.as_int("chart_double_bottom_adam_adam", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_bottom_adam_adam", "tol", tol)
+    min_separation = _convert.as_int(
+        "chart_double_bottom_adam_adam", "min_separation", min_separation
+    )
+    columns, carrier = _convert.bars(
+        "chart_double_bottom_adam_adam",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_bottom_adam_adam(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_bottom_adam_adam",))
+
+
+def chart_double_bottom_adam_eve(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_bottom_adam_eve"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_bottom_adam_eve"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_bottom_adam_eve"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_bottom_adam_eve"]["min_separation"]["default"],
+) -> Any:
+    """Double Bottom, Adam and Eve.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first bottom may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 3 to 100000.
+    tol : float, default 0.03
+        How far apart the bottoms may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one bottom's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above the neckline of a double bottom whose bottoms are Adam then Eve.
+    """
+    period = _convert.as_int("chart_double_bottom_adam_eve", "period", period)
+    pivot_n = _convert.as_int("chart_double_bottom_adam_eve", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_bottom_adam_eve", "tol", tol)
+    min_separation = _convert.as_int(
+        "chart_double_bottom_adam_eve", "min_separation", min_separation
+    )
+    columns, carrier = _convert.bars(
+        "chart_double_bottom_adam_eve",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_bottom_adam_eve(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_bottom_adam_eve",))
+
+
+def chart_double_bottom_eve_adam(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_bottom_eve_adam"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_bottom_eve_adam"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_bottom_eve_adam"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_bottom_eve_adam"]["min_separation"]["default"],
+) -> Any:
+    """Double Bottom, Eve and Adam.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first bottom may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 3 to 100000.
+    tol : float, default 0.03
+        How far apart the bottoms may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one bottom's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above the neckline of a double bottom whose bottoms are Eve then Adam.
+    """
+    period = _convert.as_int("chart_double_bottom_eve_adam", "period", period)
+    pivot_n = _convert.as_int("chart_double_bottom_eve_adam", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_bottom_eve_adam", "tol", tol)
+    min_separation = _convert.as_int(
+        "chart_double_bottom_eve_adam", "min_separation", min_separation
+    )
+    columns, carrier = _convert.bars(
+        "chart_double_bottom_eve_adam",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_bottom_eve_adam(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_bottom_eve_adam",))
+
+
+def chart_double_bottom_eve_eve(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_bottom_eve_eve"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_bottom_eve_eve"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_bottom_eve_eve"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_bottom_eve_eve"]["min_separation"]["default"],
+) -> Any:
+    """Double Bottom, Eve and Eve.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first bottom may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 3 to 100000.
+    tol : float, default 0.03
+        How far apart the bottoms may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one bottom's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above the neckline of a double bottom whose bottoms are Eve then Eve.
+    """
+    period = _convert.as_int("chart_double_bottom_eve_eve", "period", period)
+    pivot_n = _convert.as_int("chart_double_bottom_eve_eve", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_bottom_eve_eve", "tol", tol)
+    min_separation = _convert.as_int(
+        "chart_double_bottom_eve_eve", "min_separation", min_separation
+    )
+    columns, carrier = _convert.bars(
+        "chart_double_bottom_eve_eve",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_bottom_eve_eve(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_bottom_eve_eve",))
+
+
 def chart_double_top(
     high=None,
     low=None,
@@ -4918,6 +5252,218 @@ def chart_double_top(
         *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
     )
     return _convert.wrap_outputs(out, carrier, ("chart_double_top",))
+
+
+def chart_double_top_adam_adam(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_top_adam_adam"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_top_adam_adam"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_top_adam_adam"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_top_adam_adam"]["min_separation"]["default"],
+) -> Any:
+    """Double Top, Adam and Adam.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first top may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 3 to 100000.
+    tol : float, default 0.03
+        How far apart the tops may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one top's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below the neckline of a double top whose tops are Adam then Adam.
+    """
+    period = _convert.as_int("chart_double_top_adam_adam", "period", period)
+    pivot_n = _convert.as_int("chart_double_top_adam_adam", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_top_adam_adam", "tol", tol)
+    min_separation = _convert.as_int("chart_double_top_adam_adam", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_double_top_adam_adam",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_top_adam_adam(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_top_adam_adam",))
+
+
+def chart_double_top_adam_eve(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_top_adam_eve"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_top_adam_eve"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_top_adam_eve"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_top_adam_eve"]["min_separation"]["default"],
+) -> Any:
+    """Double Top, Adam and Eve.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first top may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 3 to 100000.
+    tol : float, default 0.03
+        How far apart the tops may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one top's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below the neckline of a double top whose tops are Adam then Eve.
+    """
+    period = _convert.as_int("chart_double_top_adam_eve", "period", period)
+    pivot_n = _convert.as_int("chart_double_top_adam_eve", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_top_adam_eve", "tol", tol)
+    min_separation = _convert.as_int("chart_double_top_adam_eve", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_double_top_adam_eve",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_top_adam_eve(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_top_adam_eve",))
+
+
+def chart_double_top_eve_adam(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_top_eve_adam"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_top_eve_adam"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_top_eve_adam"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_top_eve_adam"]["min_separation"]["default"],
+) -> Any:
+    """Double Top, Eve and Adam.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first top may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 3 to 100000.
+    tol : float, default 0.03
+        How far apart the tops may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one top's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below the neckline of a double top whose tops are Eve then Adam.
+    """
+    period = _convert.as_int("chart_double_top_eve_adam", "period", period)
+    pivot_n = _convert.as_int("chart_double_top_eve_adam", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_top_eve_adam", "tol", tol)
+    min_separation = _convert.as_int("chart_double_top_eve_adam", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_double_top_eve_adam",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_top_eve_adam(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_top_eve_adam",))
+
+
+def chart_double_top_eve_eve(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_top_eve_eve"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_top_eve_eve"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_top_eve_eve"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_top_eve_eve"]["min_separation"]["default"],
+) -> Any:
+    """Double Top, Eve and Eve.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first top may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 3 to 100000.
+    tol : float, default 0.03
+        How far apart the tops may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one top's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below the neckline of a double top whose tops are Eve then Eve.
+    """
+    period = _convert.as_int("chart_double_top_eve_eve", "period", period)
+    pivot_n = _convert.as_int("chart_double_top_eve_eve", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_top_eve_eve", "tol", tol)
+    min_separation = _convert.as_int("chart_double_top_eve_eve", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_double_top_eve_eve",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_top_eve_eve(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_top_eve_eve",))
 
 
 def chart_falling_wedge(
@@ -5578,6 +6124,104 @@ def chart_symmetrical_triangle(
     )
     out = _core.chart_symmetrical_triangle(*columns, period=period, pivot_n=pivot_n)
     return _convert.wrap_outputs(out, carrier, ("chart_symmetrical_triangle",))
+
+
+def chart_three_peaks(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_three_peaks"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_three_peaks"]["pivot_n"]["default"],
+    min_separation: int = _PARAMS["chart_three_peaks"]["min_separation"]["default"],
+) -> Any:
+    """Three Peaks.
+
+    Parameters
+    ----------
+    period : int, default 120
+        Bars back the first top may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    min_separation : int, default 8
+        Fewest bars between one top's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Three falling swing highs and a close beyond the span between them.
+    """
+    period = _convert.as_int("chart_three_peaks", "period", period)
+    pivot_n = _convert.as_int("chart_three_peaks", "pivot_n", pivot_n)
+    min_separation = _convert.as_int("chart_three_peaks", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_three_peaks",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_three_peaks(
+        *columns, period=period, pivot_n=pivot_n, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_three_peaks",))
+
+
+def chart_three_valleys(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_three_valleys"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_three_valleys"]["pivot_n"]["default"],
+    min_separation: int = _PARAMS["chart_three_valleys"]["min_separation"]["default"],
+) -> Any:
+    """Three Valleys.
+
+    Parameters
+    ----------
+    period : int, default 120
+        Bars back the first bottom may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    min_separation : int, default 8
+        Fewest bars between one bottom's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Three rising swing lows and a close beyond the span between them.
+    """
+    period = _convert.as_int("chart_three_valleys", "period", period)
+    pivot_n = _convert.as_int("chart_three_valleys", "pivot_n", pivot_n)
+    min_separation = _convert.as_int("chart_three_valleys", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_three_valleys",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_three_valleys(
+        *columns, period=period, pivot_n=pivot_n, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_three_valleys",))
 
 
 def chart_triple_bottom(

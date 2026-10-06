@@ -36,7 +36,8 @@ TOLERANCE = "rel=1e-10 abs=1e-12"
 DAILY = "daily_2000.csv"
 CHARTS = "charts_2579.csv"
 PATTERNS = "patterns_1080.csv"
-SHAPES = "shapes_190.csv"
+SHAPES = "shapes_528.csv"
+INTRADAY = "intraday_5m_20d.csv"
 
 # TrendLib's names for the oracle's parameters (D12): only `window` differs.
 RENAMED = {"period": "window"}
@@ -89,7 +90,10 @@ ON_PATTERNS = {
     "chart_bump_and_run_top",
     "chart_bump_and_run_bottom",
 }
-ON_SHAPES = {"chart_high_tight_flag"}
+ON_SHAPES = {"chart_high_tight_flag", "chart_three_peaks", "chart_three_valleys"}
+# Two rounded tops a few percent apart are what five-minute bars draw and a daily
+# walk does not.
+ON_INTRADAY = {"chart_double_top_eve_eve"}
 
 EXTRA_CASES = {
     "chart_double_top": {"wide_separation": {"min_separation": 10}},
@@ -163,6 +167,8 @@ def cases(spec: dict) -> dict[str, dict]:
         found["patterns"] = defaults(spec)
     if spec["name"] in ON_SHAPES:
         found["shapes"] = defaults(spec)
+    if spec["name"] in ON_INTRADAY:
+        found["intraday"] = defaults(spec)
     for case, overrides in EXTRA_CASES.get(spec["name"], {}).items():
         found[case] = {**defaults(spec), **overrides}
     return found
@@ -173,6 +179,7 @@ def dataset_for(case: str) -> str:
         "charts": CHARTS,
         "patterns": PATTERNS,
         "shapes": SHAPES,
+        "intraday": INTRADAY,
         "near_gap": PATTERNS,
         "odd_period": CHARTS,
     }.get(case, DAILY)

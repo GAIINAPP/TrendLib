@@ -455,7 +455,7 @@ CHARTS_BARS: dict[str, list[tuple[float, float, float, float]]] = {
 }
 
 
-SHAPES_FILE = "shapes_190.csv"
+SHAPES_FILE = "shapes_528.csv"
 SHAPES_START = date(2012, 1, 2)
 SHAPES_FIRST_CLOSE = 60.0
 
@@ -474,6 +474,38 @@ SHAPES: dict[str, tuple[float, list[tuple[int, float]]]] = {
         50.0,
         [(10, 82.0), (3, 83.0), (3, 85.5), (3, 82.5), (3, 85.0), (3, 82.8), (3, 85.2), (6, 92.0)],
     ),
+    # Three falling peaks whose first confirming bar (14 into the shape) holds
+    # the lowest low of the span (SHAPES_LOWS), then closes that stay above it
+    # and below everything after it: the span starts on that bar or not at all.
+    "three_peaks_span": (
+        90.0,
+        [(10, 100.0), (5, 90.0), (8, 98.0), (4, 92.5), (4, 96.0), (8, 92.0), (3, 91.0), (6, 89.0)],
+    ),
+    # Three peaks whose last two highs are exactly equal (SHAPES_HIGHS), so
+    # they are not falling, then a close below every low between them.
+    "three_peaks_level": (
+        90.0,
+        [(10, 100.0), (5, 92.0), (8, 98.0), (4, 93.0), (4, 98.0), (10, 85.0)],
+    ),
+    # The two above, mirrored for three valleys.
+    "three_valleys_span": (
+        110.0,
+        [(10, 100.0), (5, 110.0), (8, 102.0), (4, 107.5), (4, 104.0), (8, 108.0), (3, 109.0), (6, 111.0)],
+    ),
+    "three_valleys_level": (
+        110.0,
+        [(10, 100.0), (5, 108.0), (8, 102.0), (4, 107.0), (4, 102.0), (10, 115.0)],
+    ),
+}
+
+# Highs and lows set by hand, by shape and bar within it (after its ramp).
+SHAPES_HIGHS: dict[str, dict[int, float]] = {
+    "three_peaks_level": {22: 98.3, 30: 98.3},
+    "three_valleys_span": {14: 112.0},
+}
+SHAPES_LOWS: dict[str, dict[int, float]] = {
+    "three_peaks_span": {14: 88.0},
+    "three_valleys_level": {22: 101.7, 30: 101.7},
 }
 
 
@@ -642,10 +674,16 @@ def make_charts() -> str:
     return "\n".join(rows) + "\n"
 
 
-def _bars_from_closes(closes: list[float], start: date, lows: dict[int, float] | None = None) -> str:
+def _bars_from_closes(
+    closes: list[float],
+    start: date,
+    lows: dict[int, float] | None = None,
+    highs: dict[int, float] | None = None,
+) -> str:
     """OHLCV rows from closes: each bar opens at the close before it and its wicks
     reach CHARTS_WICK past the body, plus a hundredth that varies by bar."""
     lows = lows or {}
+    highs = highs or {}
     rows = ["date,open,high,low,close,volume"]
     previous = closes[0]
     days = _weekdays(start, len(closes))
@@ -654,6 +692,7 @@ def _bars_from_closes(closes: list[float], start: date, lows: dict[int, float] |
         high = max(open_, close) + CHARTS_WICK + CHARTS_WICK_STEP * ((index * 37) % 101)
         low = min(open_, close) - CHARTS_WICK - CHARTS_WICK_STEP * ((index * 53) % 97)
         low = lows.get(index, low)
+        high = highs.get(index, high)
         rows.append(f"{day.isoformat()},{open_!r},{high!r},{low!r},{close!r},{CHARTS_VOLUME}")
         previous = close
     return "\n".join(rows) + "\n"
@@ -661,13 +700,18 @@ def _bars_from_closes(closes: list[float], start: date, lows: dict[int, float] |
 
 def make_shapes() -> str:
     closes: list[float] = []
+    highs: dict[int, float] = {}
+    lows: dict[int, float] = {}
     price = SHAPES_FIRST_CLOSE
-    for entry, legs in SHAPES.values():
+    for name, (entry, legs) in SHAPES.items():
         closes.extend(_straight(price, [(CHARTS_RAMP, entry)]))
+        first = len(closes)
         closes.extend(_straight(entry, legs))
+        highs.update({first + k: v for k, v in SHAPES_HIGHS.get(name, {}).items()})
+        lows.update({first + k: v for k, v in SHAPES_LOWS.get(name, {}).items()})
         price = closes[-1]
     closes.extend(_straight(price, [(CHARTS_RAMP, SHAPES_FIRST_CLOSE)]))
-    return _bars_from_closes(closes, SHAPES_START)
+    return _bars_from_closes(closes, SHAPES_START, lows, highs)
 
 
 def _check_shapes(text: str) -> None:

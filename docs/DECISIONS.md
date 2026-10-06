@@ -252,3 +252,10 @@ names that read as a trade instruction were reworded (D11). Every item the
 owner named that TrendLib already had - flags, pennants, triangles, wedges, head
 and shoulders, channels, double and triple tops and bottoms, Supertrend - was
 left as it is.
+
+A26 (M7, 2026-10-06): `crates/trendlib/tests/edge_cases.rs`'s extreme-magnitude
+case sliced every output from its lookback over 120 bars, which panics for an
+indicator whose lookback is longer, as Big M's oracle default of 150 is. It
+now skips the warm-up rows instead of slicing past them: the same assertion
+over the same rows, and none when there are none. A shared test changed
+without loosening anything, recorded here as A22 asks.

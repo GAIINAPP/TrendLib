@@ -1,0 +1,39 @@
+name: chart_three_valleys
+title: Three Valleys
+group: chart
+flags: [chart_pattern, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 120
+    min: 2
+    max: 100000
+    doc: Bars back the first bottom may have been confirmed
+  - name: pivot_n
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Bars on each side a swing high must be at least as high as, and a swing low at least as low as
+  - name: min_separation
+    type: int
+    default: 8
+    min: 1
+    max: 100000
+    doc: Fewest bars between one bottom's confirmation and the next
+outputs:
+  - name: chart_three_valleys
+    dtype: int32
+    plot: pattern
+    doc: Three rising swing lows and a close beyond the span between them
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.three_valleys (oracle P)
+see_also: [chart_three_peaks, chart_triple_bottom]

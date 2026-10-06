@@ -439,3 +439,106 @@ impl Step<3, 1> for MeasuredMoveState {
         self.clone().advance(bar).map(|value| [value])
     }
 }
+
+/// Three peaks (valleys): the last three swing highs (lows) confirmed in the
+/// window, each lower (higher) than the one before and `min_separation` bars
+/// apart, and a close below the lowest low (above the highest high) of the bars
+/// from the first one's confirmation to the third's.
+#[derive(Clone, Debug)]
+pub struct StairState {
+    valleys: bool,
+    period: usize,
+    min_separation: usize,
+    finder: SwingFinder,
+    main: crate::core::chart::ClusteredLog,
+    /// The opposite side's value for each of the last `period + 1` bars.
+    opposite: Box<[f64]>,
+    bars: usize,
+}
+
+impl StairState {
+    pub fn new(valleys: bool, period: usize, pivot_n: usize, min_separation: usize) -> Self {
+        Self {
+            valleys,
+            period,
+            min_separation,
+            finder: if valleys {
+                SwingFinder::lows(pivot_n)
+            } else {
+                SwingFinder::highs(pivot_n)
+            },
+            main: crate::core::chart::ClusteredLog::new(pivot_n, period),
+            opposite: vec![0.0; period + 1].into_boxed_slice(),
+            bars: 0,
+        }
+    }
+
+    fn opposite_at(&self, bar: usize) -> f64 {
+        self.opposite[bar % self.opposite.len()]
+    }
+
+    /// Read before this bar's own swing point is filed.
+    fn read(&self, now: usize, close: f64) -> f64 {
+        let oldest = now - self.period;
+        let inside = self.main.log.iter().filter(|s| s.at >= oldest);
+        let count = inside.clone().count();
+        if count < 3 {
+            return 0.0;
+        }
+        let mut last = inside.skip(count - 3);
+        let (Some(first), Some(second), Some(third)) = (last.next(), last.next(), last.next())
+        else {
+            return 0.0;
+        };
+        if second.at - first.at < self.min_separation || third.at - second.at < self.min_separation
+        {
+            return 0.0;
+        }
+        let span = (first.at..=third.at).map(|bar| self.opposite_at(bar));
+        if self.valleys {
+            let resistance = span.fold(f64::NEG_INFINITY, f64::max);
+            let rising = first.price < second.price && second.price < third.price;
+            if rising && close > resistance {
+                100.0
+            } else {
+                0.0
+            }
+        } else {
+            let support = span.fold(f64::INFINITY, f64::min);
+            let falling = first.price > second.price && second.price > third.price;
+            if falling && close < support {
+                -100.0
+            } else {
+                0.0
+            }
+        }
+    }
+
+    fn advance(&mut self, bar: [f64; 3]) -> Option<f64> {
+        let now = self.bars;
+        self.bars += 1;
+        let value = (now >= self.period).then(|| self.read(now, bar[2]));
+        let (main, opposite) = if self.valleys {
+            (bar[1], bar[0])
+        } else {
+            (bar[0], bar[1])
+        };
+        let len = self.opposite.len();
+        self.opposite[now % len] = opposite;
+        if let Some(price) = self.finder.push(main) {
+            self.main.push(Swing { at: now, price });
+        }
+        self.main.log.trim(now);
+        value
+    }
+}
+
+impl Step<3, 1> for StairState {
+    fn push(&mut self, bar: [f64; 3]) -> Option<[f64; 1]> {
+        self.advance(bar).map(|value| [value])
+    }
+
+    fn preview(&self, bar: [f64; 3]) -> Option<[f64; 1]> {
+        self.clone().advance(bar).map(|value| [value])
+    }
+}

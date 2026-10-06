@@ -290,7 +290,11 @@ row names the oracle function, TrendLib reads its `+1`/`-1` as `+100`/`-100`,
 and its parameters are the oracle's keyword parameters and defaults, with
 `window` called `period` (D12) and `mode="confirmed"`, `pivot_pct` not offered. A
 parameter the oracle accepts but never reads is not offered either: 1-2-3's
-`tol` and the measured moves' `window`.
+`tol`, the measured moves' `window`, Big M and W's `min_depth` and the three
+peaks' and valleys' `tol`. The Adam and Eve double tops and bottoms take
+`pivot_n` from 3: they grade a top by the three bars either side of it, and
+with a smaller `pivot_n` the oracle reads bars the swing's confirmation has not
+reached yet.
 The ranges are TrendLib's: whole numbers from 1 (2 for a span a shape has to
 fit in) to 100000, fractions from 0 with no ceiling.
 
@@ -351,18 +355,18 @@ pattern with no direction, which reads `+100` wherever the shape is.
 | `chart_descending_right_angle_broadening` | Descending Right-Angled Broadening | `right_angle_broadening_desc` | +100 | `period` 80 [2, 100000], `pivot_n` 5 [1, 100000], `flat_tol` 0.015 [0.0, any] |
 | `chart_ascending_scallop` | Ascending Scallop | `scallop_asc` | +100 | `period` 25 [2, 100000] |
 | `chart_descending_scallop` | Descending Scallop | `scallop_desc` | -100 | `period` 25 [2, 100000] |
-| `chart_double_top_adam_adam` | Double Top, Adam and Adam | `double_top_adam_adam` | -100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
-| `chart_double_top_adam_eve` | Double Top, Adam and Eve | `double_top_adam_eve` | -100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
-| `chart_double_top_eve_adam` | Double Top, Eve and Adam | `double_top_eve_adam` | -100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
-| `chart_double_top_eve_eve` | Double Top, Eve and Eve | `double_top_eve_eve` | -100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
-| `chart_double_bottom_adam_adam` | Double Bottom, Adam and Adam | `double_bottom_adam_adam` | +100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
-| `chart_double_bottom_adam_eve` | Double Bottom, Adam and Eve | `double_bottom_adam_eve` | +100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
-| `chart_double_bottom_eve_adam` | Double Bottom, Eve and Adam | `double_bottom_eve_adam` | +100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
-| `chart_double_bottom_eve_eve` | Double Bottom, Eve and Eve | `double_bottom_eve_eve` | +100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
-| `chart_big_m` | Big M | `big_m` | -100 | `period` 150 [2, 100000], `pivot_n` 7 [1, 100000], `tol` 0.03 [0.0, any], `min_sep` 15 [1, 100000], `min_depth` 0.05 [0.0, any] |
-| `chart_big_w` | Big W | `big_w` | +100 | `period` 150 [2, 100000], `pivot_n` 7 [1, 100000], `tol` 0.03 [0.0, any], `min_sep` 15 [1, 100000], `min_depth` 0.05 [0.0, any] |
-| `chart_three_peaks` | Three Peaks | `three_peaks` | -100 | `period` 120 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.04 [0.0, any], `min_separation` 8 [1, 100000] |
-| `chart_three_valleys` | Three Valleys | `three_valleys` | +100 | `period` 120 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.04 [0.0, any], `min_separation` 8 [1, 100000] |
+| `chart_double_top_adam_adam` | Double Top, Adam and Adam | `double_top_adam_adam` | -100 | `period` 60 [2, 100000], `pivot_n` 5 [3, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
+| `chart_double_top_adam_eve` | Double Top, Adam and Eve | `double_top_adam_eve` | -100 | `period` 60 [2, 100000], `pivot_n` 5 [3, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
+| `chart_double_top_eve_adam` | Double Top, Eve and Adam | `double_top_eve_adam` | -100 | `period` 60 [2, 100000], `pivot_n` 5 [3, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
+| `chart_double_top_eve_eve` | Double Top, Eve and Eve | `double_top_eve_eve` | -100 | `period` 60 [2, 100000], `pivot_n` 5 [3, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
+| `chart_double_bottom_adam_adam` | Double Bottom, Adam and Adam | `double_bottom_adam_adam` | +100 | `period` 60 [2, 100000], `pivot_n` 5 [3, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
+| `chart_double_bottom_adam_eve` | Double Bottom, Adam and Eve | `double_bottom_adam_eve` | +100 | `period` 60 [2, 100000], `pivot_n` 5 [3, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
+| `chart_double_bottom_eve_adam` | Double Bottom, Eve and Adam | `double_bottom_eve_adam` | +100 | `period` 60 [2, 100000], `pivot_n` 5 [3, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
+| `chart_double_bottom_eve_eve` | Double Bottom, Eve and Eve | `double_bottom_eve_eve` | +100 | `period` 60 [2, 100000], `pivot_n` 5 [3, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
+| `chart_big_m` | Big M | `big_m` | -100 | `period` 150 [2, 100000], `pivot_n` 7 [1, 100000], `tol` 0.03 [0.0, any], `min_sep` 15 [1, 100000] |
+| `chart_big_w` | Big W | `big_w` | +100 | `period` 150 [2, 100000], `pivot_n` 7 [1, 100000], `tol` 0.03 [0.0, any], `min_sep` 15 [1, 100000] |
+| `chart_three_peaks` | Three Peaks | `three_peaks` | -100 | `period` 120 [2, 100000], `pivot_n` 5 [1, 100000], `min_separation` 8 [1, 100000] |
+| `chart_three_valleys` | Three Valleys | `three_valleys` | +100 | `period` 120 [2, 100000], `pivot_n` 5 [1, 100000], `min_separation` 8 [1, 100000] |
 | `chart_busted_ascending_triangle` | Busted Ascending Triangle | `busted_asc_triangle` | -100 | `reversal_bars` 10 [1, 100000], `reversal_pct` 0.05 [0.0, any] |
 | `chart_busted_descending_triangle` | Busted Descending Triangle | `busted_desc_triangle` | +100 | `reversal_bars` 10 [1, 100000], `reversal_pct` 0.05 [0.0, any] |
 | `chart_busted_double_bottom` | Busted Double Bottom | `busted_double_bottom` | -100 | `reversal_bars` 10 [1, 100000], `reversal_pct` 0.05 [0.0, any] |

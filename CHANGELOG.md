@@ -88,3 +88,6 @@ Before 1.0, minor versions may break the API; every break is listed under
   tight flag, measured moves up and down, the two broadening wedges, the two
   right-angled broadening formations and the two scallops the oracle can
   fire. `testdata/shapes_190.csv` holds the flags no walk draws.
+- Twelve more on oracle P: the Adam and Eve double tops and bottoms (eight,
+  graded the way Bulkowski names them), Big M and Big W, and three falling
+  peaks and three rising valleys.

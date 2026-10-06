@@ -556,7 +556,8 @@ impl ClusteredLog {
         }
     }
 
-    pub fn push(&mut self, swing: Swing) {
+    /// Files a swing point unless it repeats the last one, and says which.
+    pub fn push(&mut self, swing: Swing) -> bool {
         let repeat = self
             .last_raw
             .is_some_and(|last| swing.at - last <= self.pivot_n);
@@ -564,6 +565,7 @@ impl ClusteredLog {
         if !repeat {
             self.log.push(swing);
         }
+        !repeat
     }
 
     /// The newest swing point confirmed before bar `before`.
@@ -586,7 +588,72 @@ pub struct RepeatState {
     lows: SwingFinder,
     main: ClusteredLog,
     other: ClusteredLog,
+    shapes: Option<Shapes>,
     bars: usize,
+}
+
+/// Bulkowski's Adam (a sharp, narrow extreme) and Eve (a rounded, wide one), as
+/// the oracle grades them: over the extreme's bar and the three either side,
+/// how far the mean sits from the extreme, as a share of the window's range.
+/// A grade of at least 0.37 is Adam.
+#[derive(Clone, Debug)]
+struct Shapes {
+    /// The two tops' (bottoms') required shapes, oldest first: `Some(true)` for
+    /// Adam, `Some(false)` for Eve.
+    wanted: [bool; 2],
+    pivot_n: usize,
+    /// The main side's last `pivot_n + 4` prices, newest last.
+    recent: Box<[f64]>,
+    head: usize,
+    seen: usize,
+    /// Each filed main swing's grade, by the bar that confirmed it.
+    adam: VecDeque<(usize, bool)>,
+}
+
+impl Shapes {
+    const ADAM: f64 = 0.37;
+
+    fn push(&mut self, value: f64) {
+        self.recent[self.head] = value;
+        self.head = (self.head + 1) % self.recent.len();
+        self.seen += 1;
+    }
+
+    /// The price `back` bars before the newest.
+    fn back(&self, back: usize) -> f64 {
+        let len = self.recent.len();
+        self.recent[(self.head + len - 1 - back) % len]
+    }
+
+    /// Whether the extreme `pivot_n` bars back is an Adam, read when its swing
+    /// is confirmed. Its three bars on the right are already in, since
+    /// `pivot_n` is at least 3; on the left the window holds the bars there are.
+    fn is_adam(&self, top: bool) -> bool {
+        let newest = self.pivot_n - 3;
+        let oldest = (self.pivot_n + 3).min(self.seen - 1);
+        let window = (newest..=oldest).map(|back| self.back(back));
+        let count = (oldest - newest + 1) as f64;
+        let high = window.clone().fold(f64::NEG_INFINITY, f64::max);
+        let low = window.clone().fold(f64::INFINITY, f64::min);
+        let range = high - low;
+        if range <= 0.0 {
+            return 0.0 >= Self::ADAM;
+        }
+        let mean = window.sum::<f64>() / count;
+        let grade = if top {
+            (high - mean) / range
+        } else {
+            (mean - low) / range
+        };
+        grade.clamp(0.0, 1.0) >= Self::ADAM
+    }
+
+    fn grade_of(&self, at: usize) -> Option<bool> {
+        self.adam
+            .iter()
+            .find(|(when, _)| *when == at)
+            .map(|(_, adam)| *adam)
+    }
 }
 
 impl RepeatState {
@@ -608,8 +675,23 @@ impl RepeatState {
             lows: SwingFinder::lows(pivot_n),
             main: ClusteredLog::new(pivot_n, period),
             other: ClusteredLog::new(pivot_n, period),
+            shapes: None,
             bars: 0,
         }
+    }
+
+    /// A double top (bottom) whose two extremes must be Adam (`true`) or Eve
+    /// (`false`), oldest first. `pivot_n` must be at least 3.
+    pub fn with_shapes(mut self, first: bool, second: bool, pivot_n: usize) -> Self {
+        self.shapes = Some(Shapes {
+            wanted: [first, second],
+            pivot_n,
+            recent: vec![0.0; pivot_n + 4].into_boxed_slice(),
+            head: 0,
+            seen: 0,
+            adam: VecDeque::with_capacity(self.period + 2),
+        });
+        self
     }
 
     /// Read before this bar's own swing points are filed: the oracle counts
@@ -625,6 +707,13 @@ impl RepeatState {
         let peaks = &peaks[..self.count];
         if peaks[0].at < now - self.period {
             return 0.0;
+        }
+        if let Some(shapes) = &self.shapes {
+            for (peak, wanted) in peaks.iter().zip(shapes.wanted) {
+                if shapes.grade_of(peak.at) != Some(wanted) {
+                    return 0.0;
+                }
+            }
         }
         let mut neckline: Option<f64> = None;
         for pair in peaks.windows(2) {
@@ -663,14 +752,27 @@ impl RepeatState {
         let low = self.lows.push(bar[1]).map(|price| Swing { at: now, price });
         let value = (now >= self.period).then(|| self.read(now, bar[2]));
         let (main, other) = if self.top { (high, low) } else { (low, high) };
-        if let Some(swing) = main {
-            self.main.push(swing);
+        if let Some(shapes) = &mut self.shapes {
+            shapes.push(if self.top { bar[0] } else { bar[1] });
+        }
+        if let Some(swing) = main
+            && self.main.push(swing)
+            && let Some(shapes) = &mut self.shapes
+        {
+            let adam = shapes.is_adam(self.top);
+            shapes.adam.push_back((swing.at, adam));
         }
         if let Some(swing) = other {
             self.other.push(swing);
         }
         self.main.log.trim(now);
         self.other.log.trim(now);
+        if let Some(shapes) = &mut self.shapes {
+            let oldest = now.saturating_sub(self.period);
+            while shapes.adam.front().is_some_and(|(at, _)| *at < oldest) {
+                shapes.adam.pop_front();
+            }
+        }
         value
     }
 }

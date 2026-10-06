@@ -179,8 +179,11 @@ fn extreme_magnitudes_do_not_panic() {
                 // An indicator flagged nan_inf_output may legitimately answer
                 // infinity or NaN here; what matters is that it answered at all
                 // rather than panicking or dropping rows.
+                // `skip` rather than a slice: a lookback longer than the 120
+                // bars here (Big M's is 150) leaves nothing to check, not a panic.
                 assert!(
-                    indicator.may_be_non_finite || column[lookback..].iter().all(|v| v.is_finite()),
+                    indicator.may_be_non_finite
+                        || column.iter().skip(lookback).all(|v| v.is_finite()),
                     "{} {} produced a non-finite value at scale {scale}",
                     indicator.name,
                     indicator.outputs[index]

@@ -124,6 +124,8 @@ __all__ = [
     "chart_ascending_triangle",
     "chart_bear_flag",
     "chart_bear_pennant",
+    "chart_big_m",
+    "chart_big_w",
     "chart_broadening",
     "chart_bull_flag",
     "chart_bull_pennant",
@@ -140,7 +142,15 @@ __all__ = [
     "chart_diamond_bottom",
     "chart_diamond_top",
     "chart_double_bottom",
+    "chart_double_bottom_adam_adam",
+    "chart_double_bottom_adam_eve",
+    "chart_double_bottom_eve_adam",
+    "chart_double_bottom_eve_eve",
     "chart_double_top",
+    "chart_double_top_adam_adam",
+    "chart_double_top_adam_eve",
+    "chart_double_top_eve_adam",
+    "chart_double_top_eve_eve",
     "chart_falling_wedge",
     "chart_head_shoulders",
     "chart_high_tight_flag",
@@ -155,6 +165,8 @@ __all__ = [
     "chart_rounding_bottom",
     "chart_rounding_top",
     "chart_symmetrical_triangle",
+    "chart_three_peaks",
+    "chart_three_valleys",
     "chart_triple_bottom",
     "chart_triple_top",
     "chart_v_bottom",
@@ -2005,6 +2017,36 @@ chart_bear_pennant = Factory(
     ),
     ("chart_bear_pennant",),
 )
+chart_big_m = Factory(
+    "chart_big_m",
+    _core.ChartBigMStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_big_m",),
+)
+chart_big_w = Factory(
+    "chart_big_w",
+    _core.ChartBigWStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_big_w",),
+)
 chart_broadening = Factory(
     "chart_broadening",
     _core.ChartBroadeningStream,
@@ -2245,6 +2287,66 @@ chart_double_bottom = Factory(
     ),
     ("chart_double_bottom",),
 )
+chart_double_bottom_adam_adam = Factory(
+    "chart_double_bottom_adam_adam",
+    _core.ChartDoubleBottomAdamAdamStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_bottom_adam_adam",),
+)
+chart_double_bottom_adam_eve = Factory(
+    "chart_double_bottom_adam_eve",
+    _core.ChartDoubleBottomAdamEveStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_bottom_adam_eve",),
+)
+chart_double_bottom_eve_adam = Factory(
+    "chart_double_bottom_eve_adam",
+    _core.ChartDoubleBottomEveAdamStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_bottom_eve_adam",),
+)
+chart_double_bottom_eve_eve = Factory(
+    "chart_double_bottom_eve_eve",
+    _core.ChartDoubleBottomEveEveStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_bottom_eve_eve",),
+)
 chart_double_top = Factory(
     "chart_double_top",
     _core.ChartDoubleTopStream,
@@ -2259,6 +2361,66 @@ chart_double_top = Factory(
         "close",
     ),
     ("chart_double_top",),
+)
+chart_double_top_adam_adam = Factory(
+    "chart_double_top_adam_adam",
+    _core.ChartDoubleTopAdamAdamStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_top_adam_adam",),
+)
+chart_double_top_adam_eve = Factory(
+    "chart_double_top_adam_eve",
+    _core.ChartDoubleTopAdamEveStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_top_adam_eve",),
+)
+chart_double_top_eve_adam = Factory(
+    "chart_double_top_eve_adam",
+    _core.ChartDoubleTopEveAdamStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_top_eve_adam",),
+)
+chart_double_top_eve_eve = Factory(
+    "chart_double_top_eve_eve",
+    _core.ChartDoubleTopEveEveStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_top_eve_eve",),
 )
 chart_falling_wedge = Factory(
     "chart_falling_wedge",
@@ -2469,6 +2631,36 @@ chart_symmetrical_triangle = Factory(
         "close",
     ),
     ("chart_symmetrical_triangle",),
+)
+chart_three_peaks = Factory(
+    "chart_three_peaks",
+    _core.ChartThreePeaksStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_three_peaks",),
+)
+chart_three_valleys = Factory(
+    "chart_three_valleys",
+    _core.ChartThreeValleysStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_three_valleys",),
 )
 chart_triple_bottom = Factory(
     "chart_triple_bottom",
