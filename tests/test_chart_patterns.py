@@ -149,8 +149,21 @@ def oracle(ta_patterns, functions, bars, params):
 
 
 def random_bars(rng, count, scale):
-    """A walk with a slow swing in it, so lines and poles form now and then."""
+    """A walk with a slow swing in it, so lines and poles form now and then.
+
+    Three bursts per series - a run of strong steps one way, a short reversal,
+    then a quiet stretch - draw the poles, V shapes and tight flags a walk alone
+    almost never does.
+    """
     steps = rng.normal(0.0, 0.01, count) + 0.003 * np.sin(np.arange(count) / rng.uniform(4, 30))
+    for start in rng.choice(np.arange(20, count - 60), size=3, replace=False):
+        up = rng.random() < 0.7
+        run = int(rng.integers(5, 13))
+        steps[start : start + run] = (0.045 if up else -0.045) + rng.normal(0.0, 0.004, run)
+        back = int(rng.integers(0, 6))
+        steps[start + run : start + run + back] = -0.03 if up else 0.03
+        quiet = slice(start + run + back, start + run + back + 20)
+        steps[quiet] = rng.normal(0.0, 0.002, len(steps[quiet]))
     close = scale * np.cumprod(1.0 + steps)
     opened = np.concatenate([[close[0]], close[:-1]]) * (1.0 + rng.normal(0.0, 0.004, count))
     spread = np.abs(rng.normal(0.0, 0.006, count)) * close

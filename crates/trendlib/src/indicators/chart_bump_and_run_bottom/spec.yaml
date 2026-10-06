@@ -1,0 +1,45 @@
+name: chart_bump_and_run_bottom
+title: Bump-and-Run Reversal Bottom
+group: chart
+flags: [chart_pattern, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: lead_window
+    type: int
+    default: 30
+    min: 2
+    max: 100000
+    doc: Bars of the lead-in trend
+  - name: bump_window
+    type: int
+    default: 15
+    min: 2
+    max: 100000
+    doc: Bars of the bump
+  - name: bump_factor
+    type: float
+    default: 2.0
+    min: 0.0
+    doc: How many times the lead-in slope the bump must fall
+  - name: pivot_n
+    type: int
+    default: 4
+    min: 1
+    max: 100000
+    doc: Bars on each side a swing high must be at least as high as, and a swing low at least as low as
+outputs:
+  - name: chart_bump_and_run_bottom
+    dtype: int32
+    plot: pattern
+    doc: A close back through a lead-in line after a much steeper bump
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - Thomas N. Bulkowski, Bump-and-Run Reversals, Technical Analysis of Stocks & Commodities, 1997
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.bump_and_run_bottom (oracle P)
+see_also: [chart_bump_and_run_top, linearreg_slope]

@@ -1,0 +1,27 @@
+name: chart_island_bottom
+title: Island Bottom
+group: chart
+flags: [chart_pattern]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: max_island_bars
+    type: int
+    default: 10
+    min: 1
+    max: 100000
+    doc: Most bars the island may hold
+outputs:
+  - name: chart_island_bottom
+    dtype: int32
+    plot: pattern
+    doc: A gap up out of an island that a gap down opened
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.island_bottom (oracle P)
+see_also: [chart_island_top, bar_gap2h]

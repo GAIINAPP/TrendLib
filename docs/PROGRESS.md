@@ -2,8 +2,8 @@
 
 # Progress
 
-**245 of 328 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 83 not started.
+**266 of 326 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 60 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -27,7 +27,7 @@ something is done that is not. CI checks it is current.
 | Math operators | 12 | 12 |
 | Candlestick patterns | 61 | 61 |
 | Levels | 3 | 3 |
-| Chart patterns | 21 | 66 |
+| Chart patterns | 42 | 64 |
 | Bar patterns | 19 | 19 |
 | Harmonic patterns | 0 | 12 |
 | Indicators on oracle A | 1 | 23 |
@@ -270,12 +270,12 @@ something is done that is not. CI checks it is current.
 - [x] `pivots_camarilla` -- Camarilla Pivot Points *
 - [x] `pivots_traditional` -- Traditional Pivot Points *
 
-## Chart patterns (21 of 66)
+## Chart patterns (42 of 64)
 
-- [ ] `chart_ascending_broadening_wedge` -- Ascending Broadening Wedge
+- [x] `chart_ascending_broadening_wedge` -- Ascending Broadening Wedge
 - [x] `chart_ascending_channel` -- Ascending Channel
-- [ ] `chart_ascending_right_angle_broadening` -- Ascending Right-Angled Broadening
-- [ ] `chart_ascending_scallop` -- Ascending Scallop
+- [x] `chart_ascending_right_angle_broadening` -- Ascending Right-Angled Broadening
+- [x] `chart_ascending_scallop` -- Ascending Scallop
 - [x] `chart_ascending_triangle` -- Ascending Triangle
 - [x] `chart_bear_flag` -- Bear Flag
 - [x] `chart_bear_pennant` -- Bear Pennant
@@ -284,8 +284,8 @@ something is done that is not. CI checks it is current.
 - [x] `chart_broadening` -- Broadening Formation
 - [x] `chart_bull_flag` -- Bull Flag
 - [x] `chart_bull_pennant` -- Bull Pennant
-- [ ] `chart_bump_and_run_bottom` -- Bump-and-Run Reversal Bottom
-- [ ] `chart_bump_and_run_top` -- Bump-and-Run Reversal Top
+- [x] `chart_bump_and_run_bottom` -- Bump-and-Run Reversal Bottom
+- [x] `chart_bump_and_run_top` -- Bump-and-Run Reversal Top
 - [ ] `chart_busted_ascending_triangle` -- Busted Ascending Triangle
 - [ ] `chart_busted_descending_triangle` -- Busted Descending Triangle
 - [ ] `chart_busted_double_bottom` -- Busted Double Bottom
@@ -296,16 +296,16 @@ something is done that is not. CI checks it is current.
 - [ ] `chart_busted_symmetrical_triangle` -- Busted Symmetrical Triangle
 - [ ] `chart_busted_triple_bottom` -- Busted Triple Bottom
 - [ ] `chart_busted_triple_top` -- Busted Triple Top
-- [ ] `chart_complex_head_shoulders` -- Complex Head and Shoulders
-- [ ] `chart_complex_inverse_head_shoulders` -- Complex Inverse Head and Shoulders
+- [x] `chart_complex_head_shoulders` -- Complex Head and Shoulders
+- [x] `chart_complex_inverse_head_shoulders` -- Complex Inverse Head and Shoulders
 - [x] `chart_cup_with_handle` -- Cup with Handle
-- [ ] `chart_descending_broadening_wedge` -- Descending Broadening Wedge
+- [x] `chart_descending_broadening_wedge` -- Descending Broadening Wedge
 - [x] `chart_descending_channel` -- Descending Channel
-- [ ] `chart_descending_right_angle_broadening` -- Descending Right-Angled Broadening
-- [ ] `chart_descending_scallop` -- Descending Scallop
+- [x] `chart_descending_right_angle_broadening` -- Descending Right-Angled Broadening
+- [x] `chart_descending_scallop` -- Descending Scallop
 - [x] `chart_descending_triangle` -- Descending Triangle
-- [ ] `chart_diamond_bottom` -- Diamond Bottom
-- [ ] `chart_diamond_top` -- Diamond Top
+- [x] `chart_diamond_bottom` -- Diamond Bottom
+- [x] `chart_diamond_top` -- Diamond Top
 - [x] `chart_double_bottom` -- Double Bottom
 - [ ] `chart_double_bottom_adam_adam` -- Double Bottom, Adam and Adam
 - [ ] `chart_double_bottom_adam_eve` -- Double Bottom, Adam and Eve
@@ -318,26 +318,24 @@ something is done that is not. CI checks it is current.
 - [ ] `chart_double_top_eve_eve` -- Double Top, Eve and Eve
 - [x] `chart_falling_wedge` -- Falling Wedge
 - [x] `chart_head_shoulders` -- Head and Shoulders
-- [ ] `chart_high_tight_flag` -- High and Tight Flag
+- [x] `chart_high_tight_flag` -- High and Tight Flag
 - [x] `chart_inverse_head_shoulders` -- Inverse Head and Shoulders
-- [ ] `chart_inverted_ascending_scallop` -- Inverted Ascending Scallop
 - [x] `chart_inverted_cup_with_handle` -- Inverted Cup with Handle
-- [ ] `chart_inverted_descending_scallop` -- Inverted Descending Scallop
-- [ ] `chart_island_bottom` -- Island Bottom
-- [ ] `chart_island_top` -- Island Top
-- [ ] `chart_measured_move_down` -- Measured Move Down
-- [ ] `chart_measured_move_up` -- Measured Move Up
+- [x] `chart_island_bottom` -- Island Bottom
+- [x] `chart_island_top` -- Island Top
+- [x] `chart_measured_move_down` -- Measured Move Down
+- [x] `chart_measured_move_up` -- Measured Move Up
 - [x] `chart_rectangle` -- Rectangle
 - [x] `chart_rising_wedge` -- Rising Wedge
-- [ ] `chart_rounding_bottom` -- Rounding Bottom
-- [ ] `chart_rounding_top` -- Rounding Top
+- [x] `chart_rounding_bottom` -- Rounding Bottom
+- [x] `chart_rounding_top` -- Rounding Top
 - [x] `chart_symmetrical_triangle` -- Symmetrical Triangle
 - [ ] `chart_three_peaks` -- Three Peaks
 - [ ] `chart_three_valleys` -- Three Valleys
 - [x] `chart_triple_bottom` -- Triple Bottom
 - [x] `chart_triple_top` -- Triple Top
-- [ ] `chart_v_bottom` -- V-Bottom
-- [ ] `chart_v_top` -- V-Top
+- [x] `chart_v_bottom` -- V-Bottom
+- [x] `chart_v_top` -- V-Top
 
 ## Bar patterns (19 of 19)
 

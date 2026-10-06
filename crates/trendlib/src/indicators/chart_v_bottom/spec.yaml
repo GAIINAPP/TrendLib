@@ -1,0 +1,32 @@
+name: chart_v_bottom
+title: V-Bottom
+group: chart
+flags: [chart_pattern]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 10
+    min: 2
+    max: 100000
+    doc: Bars each arm of the V spans
+  - name: min_drop
+    type: float
+    default: 0.05
+    min: 0.0
+    doc: Smallest fall into the V, as a fraction
+outputs:
+  - name: chart_v_bottom
+    dtype: int32
+    plot: pattern
+    doc: A V in the last period closes
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.v_bottom (oracle P)
+see_also: [chart_v_top, chart_rounding_bottom]

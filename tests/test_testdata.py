@@ -41,6 +41,11 @@ def charts(testdata):
     return read_rows(testdata / "charts_2579.csv")
 
 
+@pytest.fixture(scope="module")
+def shapes(testdata):
+    return read_rows(testdata / "shapes_190.csv")
+
+
 def test_daily_shape(daily):
     assert len(daily) == 2000
     assert list(daily[0]) == ["date", "open", "high", "low", "close", "volume"]
@@ -140,6 +145,18 @@ def test_chart_bars_are_well_formed(charts):
         assert low <= min(o, c)
         assert low > 0.0
         assert int(row["volume"]) > 0
+        assert row["date"] > previous
+        previous = row["date"]
+
+
+def test_shapes_bars_are_well_formed(shapes):
+    assert len(shapes) == 190
+    previous = ""
+    for row in shapes:
+        o, h, low, c = (float(row[k]) for k in ("open", "high", "low", "close"))
+        assert h >= max(o, c)
+        assert low <= min(o, c)
+        assert low > 0.0
         assert row["date"] > previous
         previous = row["date"]
 

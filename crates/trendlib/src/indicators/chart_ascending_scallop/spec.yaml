@@ -1,0 +1,27 @@
+name: chart_ascending_scallop
+title: Ascending Scallop
+group: chart
+flags: [chart_pattern]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 25
+    min: 2
+    max: 100000
+    doc: Bars the scallop spans
+outputs:
+  - name: chart_ascending_scallop
+    dtype: int32
+    plot: pattern
+    doc: A close above a J-shaped dip and recovery of the last period closes
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.scallop_asc (oracle P)
+see_also: [chart_descending_scallop, chart_rounding_bottom]

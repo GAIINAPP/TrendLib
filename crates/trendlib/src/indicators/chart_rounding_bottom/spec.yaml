@@ -1,0 +1,32 @@
+name: chart_rounding_bottom
+title: Rounding Bottom
+group: chart
+flags: [chart_pattern]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 40
+    min: 2
+    max: 100000
+    doc: Bars the saucer spans
+  - name: min_depth
+    type: float
+    default: 0.05
+    min: 0.0
+    doc: Shallowest the saucer may be, as a fraction
+outputs:
+  - name: chart_rounding_bottom
+    dtype: int32
+    plot: pattern
+    doc: A close beyond a saucer in the last period closes
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.rounding_bottom (oracle P)
+see_also: [chart_rounding_top, chart_cup_with_handle]

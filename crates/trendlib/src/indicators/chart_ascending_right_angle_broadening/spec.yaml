@@ -1,0 +1,39 @@
+name: chart_ascending_right_angle_broadening
+title: Ascending Right-Angled Broadening
+group: chart
+flags: [chart_pattern, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 80
+    min: 2
+    max: 100000
+    doc: Bars back a swing point may have been placed and still be on a line
+  - name: pivot_n
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Bars on each side a swing high must be at least as high as, and a swing low at least as low as
+  - name: flat_tol
+    type: float
+    default: 0.015
+    min: 0.0
+    doc: Steepest the flat line may be and still count as flat, in price per bar
+outputs:
+  - name: chart_ascending_right_angle_broadening
+    dtype: int32
+    plot: pattern
+    doc: A flat line over the swing highs, a falling one under the lows, and a close below it
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - Robert D. Edwards and John Magee, Technical Analysis of Stock Trends, 9th edition, CRC Press, 2007
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.right_angle_broadening_asc (oracle P)
+see_also: [chart_descending_right_angle_broadening, chart_broadening, chart_descending_triangle]

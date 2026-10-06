@@ -36,6 +36,7 @@ TOLERANCE = "rel=1e-10 abs=1e-12"
 DAILY = "daily_2000.csv"
 CHARTS = "charts_2579.csv"
 PATTERNS = "patterns_1080.csv"
+SHAPES = "shapes_190.csv"
 
 # TrendLib's names for the oracle's parameters (D12): only `window` differs.
 RENAMED = {"period": "window"}
@@ -79,6 +80,17 @@ ROW = re.compile(r"^\| `((?:chart|bar|harmonic)_[a-z0-9_]+)` \| [^|]+ \| ([^|]+)
 # A head and shoulders neckline waits `period` bars; at 150 no close on the
 # daily walk ever crosses one on its last bar. These short windows were found
 # the same way, by moving the wait by one bar.
+# Chart shapes that fire in one direction on no walk: the islands' gaps and the
+# bump-and-run bottom occur among the candle shapes, and the high and tight
+# flag's 40 percent pole only where one was built.
+ON_PATTERNS = {
+    "chart_island_top",
+    "chart_island_bottom",
+    "chart_bump_and_run_top",
+    "chart_bump_and_run_bottom",
+}
+ON_SHAPES = {"chart_high_tight_flag"}
+
 EXTRA_CASES = {
     "chart_double_top": {"wide_separation": {"min_separation": 10}},
     "chart_double_bottom": {"wide_separation": {"min_separation": 13}},
@@ -88,6 +100,13 @@ EXTRA_CASES = {
     "chart_inverse_head_shoulders": {
         "short_neckline": {"period": 15, "pivot_n": 3, "min_separation": 3}
     },
+    # An island search one bar deeper, and V arms split the other way, change
+    # nothing until the nearest gap sits at the far end of a short search and
+    # until the period is odd; these reach both, on the bars dataset_for names.
+    "chart_island_top": {"near_gap": {"max_island_bars": 2}},
+    "chart_island_bottom": {"near_gap": {"max_island_bars": 2}},
+    "chart_v_bottom": {"odd_period": {"period": 15}},
+    "chart_v_top": {"odd_period": {"period": 15}},
 }
 
 
@@ -138,16 +157,25 @@ def cases(spec: dict) -> dict[str, dict]:
         "charts": defaults(spec),
     }
     # A bar pattern reads a few bars at a time, like a candle, so it also gets
-    # the bars built for the candlestick patterns, where the rarer shapes occur.
-    if spec["group"] == "bars":
+    # the bars built for the candlestick patterns, where the rarer shapes occur;
+    # so do the few chart shapes that fire only there or on the shapes dataset.
+    if spec["group"] == "bars" or spec["name"] in ON_PATTERNS:
         found["patterns"] = defaults(spec)
+    if spec["name"] in ON_SHAPES:
+        found["shapes"] = defaults(spec)
     for case, overrides in EXTRA_CASES.get(spec["name"], {}).items():
         found[case] = {**defaults(spec), **overrides}
     return found
 
 
 def dataset_for(case: str) -> str:
-    return {"charts": CHARTS, "patterns": PATTERNS}.get(case, DAILY)
+    return {
+        "charts": CHARTS,
+        "patterns": PATTERNS,
+        "shapes": SHAPES,
+        "near_gap": PATTERNS,
+        "odd_period": CHARTS,
+    }.get(case, DAILY)
 
 
 def read_columns(filename: str):

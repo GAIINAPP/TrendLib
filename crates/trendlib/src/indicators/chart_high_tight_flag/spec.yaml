@@ -1,0 +1,43 @@
+name: chart_high_tight_flag
+title: High and Tight Flag
+group: chart
+flags: [chart_pattern]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 20
+    min: 2
+    max: 100000
+    doc: Bars the flag spans after its pole
+  - name: pole_bars
+    type: int
+    default: 10
+    min: 1
+    max: 100000
+    doc: Bars the pole is measured over
+  - name: min_pole
+    type: float
+    default: 0.4
+    min: 0.0
+    doc: Smallest rise the pole must make, as a fraction
+  - name: max_retrace
+    type: float
+    default: 0.2
+    min: 0.0
+    doc: Widest the flag's range may be, as a fraction of the pole's last close
+outputs:
+  - name: chart_high_tight_flag
+    dtype: int32
+    plot: pattern
+    doc: A close above a tight flag that follows a very sharp rise
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.flag_high_tight (oracle P)
+see_also: [chart_bull_flag, chart_bull_pennant]

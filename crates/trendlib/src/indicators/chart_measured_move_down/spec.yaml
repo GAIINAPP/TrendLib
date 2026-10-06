@@ -1,0 +1,32 @@
+name: chart_measured_move_down
+title: Measured Move Down
+group: chart
+flags: [chart_pattern, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: pivot_n
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Bars on each side a swing high must be at least as high as, and a swing low at least as low as
+  - name: leg_tol
+    type: float
+    default: 0.2
+    min: 0.0
+    doc: How far the two legs' lengths may differ, as a fraction of the first
+outputs:
+  - name: chart_measured_move_down
+    dtype: int32
+    plot: pattern
+    doc: Two falling legs of about equal length, on the bar the second ends
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.measured_move_down (oracle P)
+see_also: [chart_measured_move_up, chart_bear_flag]

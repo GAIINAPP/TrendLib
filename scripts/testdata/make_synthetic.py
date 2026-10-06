@@ -455,6 +455,28 @@ CHARTS_BARS: dict[str, list[tuple[float, float, float, float]]] = {
 }
 
 
+SHAPES_FILE = "shapes_190.csv"
+SHAPES_START = date(2012, 1, 2)
+SHAPES_FIRST_CLOSE = 60.0
+
+# Shapes for the patterns of docs/INDICATORS.md section 5.2 that neither a walk
+# nor the charts dataset draws: as CHARTS_SHAPES, an entry price ramped to from
+# the last shape and straight legs of (bars, target close) after it.
+SHAPES: dict[str, tuple[float, list[tuple[int, float]]]] = {
+    # A pole of 70 percent in twelve bars, a flag holding within 4 of its top
+    # for eighteen bars, then a close above the flag.
+    "high_tight_flag": (
+        50.0,
+        [(12, 85.0), (3, 83.0), (3, 85.5), (3, 82.5), (3, 85.0), (3, 82.8), (3, 85.2), (6, 92.0)],
+    ),
+    # The same with a ten-bar pole.
+    "high_tight_flag_short_pole": (
+        50.0,
+        [(10, 82.0), (3, 83.0), (3, 85.5), (3, 82.5), (3, 85.0), (3, 82.8), (3, 85.2), (6, 92.0)],
+    ),
+}
+
+
 def normalish(rng: random.Random) -> float:
     """A bell-shaped variate on [-6, 6], from addition alone.
 
@@ -620,6 +642,47 @@ def make_charts() -> str:
     return "\n".join(rows) + "\n"
 
 
+def _bars_from_closes(closes: list[float], start: date, lows: dict[int, float] | None = None) -> str:
+    """OHLCV rows from closes: each bar opens at the close before it and its wicks
+    reach CHARTS_WICK past the body, plus a hundredth that varies by bar."""
+    lows = lows or {}
+    rows = ["date,open,high,low,close,volume"]
+    previous = closes[0]
+    days = _weekdays(start, len(closes))
+    for index, (day, close) in enumerate(zip(days, closes, strict=True)):
+        open_ = previous
+        high = max(open_, close) + CHARTS_WICK + CHARTS_WICK_STEP * ((index * 37) % 101)
+        low = min(open_, close) - CHARTS_WICK - CHARTS_WICK_STEP * ((index * 53) % 97)
+        low = lows.get(index, low)
+        rows.append(f"{day.isoformat()},{open_!r},{high!r},{low!r},{close!r},{CHARTS_VOLUME}")
+        previous = close
+    return "\n".join(rows) + "\n"
+
+
+def make_shapes() -> str:
+    closes: list[float] = []
+    price = SHAPES_FIRST_CLOSE
+    for entry, legs in SHAPES.values():
+        closes.extend(_straight(price, [(CHARTS_RAMP, entry)]))
+        closes.extend(_straight(entry, legs))
+        price = closes[-1]
+    closes.extend(_straight(price, [(CHARTS_RAMP, SHAPES_FIRST_CLOSE)]))
+    return _bars_from_closes(closes, SHAPES_START)
+
+
+def _check_shapes(text: str) -> None:
+    lines = text.splitlines()
+    bars = sum(CHARTS_RAMP + sum(count for count, _ in legs) for _, legs in SHAPES.values())
+    bars += CHARTS_RAMP
+    assert len(lines) == bars + 1, len(lines)
+    assert SHAPES_FILE == f"shapes_{bars}.csv", f"name the file after its {bars} bars"
+    for line in lines[1:]:
+        _, open_, high, low, close, _ = line.split(",")
+        o, h, low_, c = float(open_), float(high), float(low), float(close)
+        assert h >= max(o, c) and low_ <= min(o, c), line
+        assert low_ > 0.0, line
+
+
 def _check_daily(text: str) -> None:
     lines = text.splitlines()
     assert len(lines) == DAILY_BARS + 1, len(lines)
@@ -716,10 +779,12 @@ def main() -> int:
 
     daily, intraday, patterns = make_daily(), make_intraday(), make_patterns()
     charts = make_charts()
+    shapes = make_shapes()
     _check_daily(daily)
     _check_intraday(intraday)
     _check_patterns(patterns)
     _check_charts(charts)
+    _check_shapes(shapes)
 
     failures = 0
     for name, text in (
@@ -727,6 +792,7 @@ def main() -> int:
         ("intraday_5m_20d.csv", intraday),
         (PATTERNS_FILE, patterns),
         (CHARTS_FILE, charts),
+        (SHAPES_FILE, shapes),
     ):
         path = TESTDATA / name
         if args.check:

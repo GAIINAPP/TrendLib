@@ -82,3 +82,9 @@ Before 1.0, minor versions may break the API; every break is listed under
   the two-bar gap, key, hook, one-day and pivot-point reversals, outside and
   inside day, fakey, wide-ranging day, NR4, NR7, pipe and horn tops and
   bottoms, and the dead-cat bounce and its inverse.
+- Twenty-one more chart patterns on oracle P: rounding top and bottom,
+  diamond top and bottom, bump-and-run top and bottom, island top and bottom,
+  V-top and V-bottom, the complex head and shoulders both ways, the high and
+  tight flag, measured moves up and down, the two broadening wedges, the two
+  right-angled broadening formations and the two scallops the oracle can
+  fire. `testdata/shapes_190.csv` holds the flags no walk draws.

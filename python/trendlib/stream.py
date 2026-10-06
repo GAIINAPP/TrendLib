@@ -117,27 +117,48 @@ __all__ = [
     "cdl_upsidegap2crows",
     "cdl_xsidegap3methods",
     "ceil",
+    "chart_ascending_broadening_wedge",
     "chart_ascending_channel",
+    "chart_ascending_right_angle_broadening",
+    "chart_ascending_scallop",
     "chart_ascending_triangle",
     "chart_bear_flag",
     "chart_bear_pennant",
     "chart_broadening",
     "chart_bull_flag",
     "chart_bull_pennant",
+    "chart_bump_and_run_bottom",
+    "chart_bump_and_run_top",
+    "chart_complex_head_shoulders",
+    "chart_complex_inverse_head_shoulders",
     "chart_cup_with_handle",
+    "chart_descending_broadening_wedge",
     "chart_descending_channel",
+    "chart_descending_right_angle_broadening",
+    "chart_descending_scallop",
     "chart_descending_triangle",
+    "chart_diamond_bottom",
+    "chart_diamond_top",
     "chart_double_bottom",
     "chart_double_top",
     "chart_falling_wedge",
     "chart_head_shoulders",
+    "chart_high_tight_flag",
     "chart_inverse_head_shoulders",
     "chart_inverted_cup_with_handle",
+    "chart_island_bottom",
+    "chart_island_top",
+    "chart_measured_move_down",
+    "chart_measured_move_up",
     "chart_rectangle",
     "chart_rising_wedge",
+    "chart_rounding_bottom",
+    "chart_rounding_top",
     "chart_symmetrical_triangle",
     "chart_triple_bottom",
     "chart_triple_top",
+    "chart_v_bottom",
+    "chart_v_top",
     "cmf",
     "cmo",
     "cmou",
@@ -1879,6 +1900,21 @@ cdl_xsidegap3methods = Factory(
     ("cdl_xsidegap3methods",),
 )
 ceil = Factory("ceil", _core.CeilStream, ("source",), ("series",), ("ceil",))
+chart_ascending_broadening_wedge = Factory(
+    "chart_ascending_broadening_wedge",
+    _core.ChartAscendingBroadeningWedgeStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_ascending_broadening_wedge",),
+)
 chart_ascending_channel = Factory(
     "chart_ascending_channel",
     _core.ChartAscendingChannelStream,
@@ -1893,6 +1929,36 @@ chart_ascending_channel = Factory(
         "close",
     ),
     ("chart_ascending_channel",),
+)
+chart_ascending_right_angle_broadening = Factory(
+    "chart_ascending_right_angle_broadening",
+    _core.ChartAscendingRightAngleBroadeningStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_ascending_right_angle_broadening",),
+)
+chart_ascending_scallop = Factory(
+    "chart_ascending_scallop",
+    _core.ChartAscendingScallopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_ascending_scallop",),
 )
 chart_ascending_triangle = Factory(
     "chart_ascending_triangle",
@@ -1984,6 +2050,66 @@ chart_bull_pennant = Factory(
     ),
     ("chart_bull_pennant",),
 )
+chart_bump_and_run_bottom = Factory(
+    "chart_bump_and_run_bottom",
+    _core.ChartBumpAndRunBottomStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_bump_and_run_bottom",),
+)
+chart_bump_and_run_top = Factory(
+    "chart_bump_and_run_top",
+    _core.ChartBumpAndRunTopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_bump_and_run_top",),
+)
+chart_complex_head_shoulders = Factory(
+    "chart_complex_head_shoulders",
+    _core.ChartComplexHeadShouldersStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_complex_head_shoulders",),
+)
+chart_complex_inverse_head_shoulders = Factory(
+    "chart_complex_inverse_head_shoulders",
+    _core.ChartComplexInverseHeadShouldersStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_complex_inverse_head_shoulders",),
+)
 chart_cup_with_handle = Factory(
     "chart_cup_with_handle",
     _core.ChartCupWithHandleStream,
@@ -1998,6 +2124,21 @@ chart_cup_with_handle = Factory(
         "close",
     ),
     ("chart_cup_with_handle",),
+)
+chart_descending_broadening_wedge = Factory(
+    "chart_descending_broadening_wedge",
+    _core.ChartDescendingBroadeningWedgeStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_descending_broadening_wedge",),
 )
 chart_descending_channel = Factory(
     "chart_descending_channel",
@@ -2014,6 +2155,36 @@ chart_descending_channel = Factory(
     ),
     ("chart_descending_channel",),
 )
+chart_descending_right_angle_broadening = Factory(
+    "chart_descending_right_angle_broadening",
+    _core.ChartDescendingRightAngleBroadeningStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_descending_right_angle_broadening",),
+)
+chart_descending_scallop = Factory(
+    "chart_descending_scallop",
+    _core.ChartDescendingScallopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_descending_scallop",),
+)
 chart_descending_triangle = Factory(
     "chart_descending_triangle",
     _core.ChartDescendingTriangleStream,
@@ -2028,6 +2199,36 @@ chart_descending_triangle = Factory(
         "close",
     ),
     ("chart_descending_triangle",),
+)
+chart_diamond_bottom = Factory(
+    "chart_diamond_bottom",
+    _core.ChartDiamondBottomStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_diamond_bottom",),
+)
+chart_diamond_top = Factory(
+    "chart_diamond_top",
+    _core.ChartDiamondTopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_diamond_top",),
 )
 chart_double_bottom = Factory(
     "chart_double_bottom",
@@ -2089,6 +2290,21 @@ chart_head_shoulders = Factory(
     ),
     ("chart_head_shoulders",),
 )
+chart_high_tight_flag = Factory(
+    "chart_high_tight_flag",
+    _core.ChartHighTightFlagStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_high_tight_flag",),
+)
 chart_inverse_head_shoulders = Factory(
     "chart_inverse_head_shoulders",
     _core.ChartInverseHeadShouldersStream,
@@ -2119,6 +2335,66 @@ chart_inverted_cup_with_handle = Factory(
     ),
     ("chart_inverted_cup_with_handle",),
 )
+chart_island_bottom = Factory(
+    "chart_island_bottom",
+    _core.ChartIslandBottomStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_island_bottom",),
+)
+chart_island_top = Factory(
+    "chart_island_top",
+    _core.ChartIslandTopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_island_top",),
+)
+chart_measured_move_down = Factory(
+    "chart_measured_move_down",
+    _core.ChartMeasuredMoveDownStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_measured_move_down",),
+)
+chart_measured_move_up = Factory(
+    "chart_measured_move_up",
+    _core.ChartMeasuredMoveUpStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_measured_move_up",),
+)
 chart_rectangle = Factory(
     "chart_rectangle",
     _core.ChartRectangleStream,
@@ -2148,6 +2424,36 @@ chart_rising_wedge = Factory(
         "close",
     ),
     ("chart_rising_wedge",),
+)
+chart_rounding_bottom = Factory(
+    "chart_rounding_bottom",
+    _core.ChartRoundingBottomStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_rounding_bottom",),
+)
+chart_rounding_top = Factory(
+    "chart_rounding_top",
+    _core.ChartRoundingTopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_rounding_top",),
 )
 chart_symmetrical_triangle = Factory(
     "chart_symmetrical_triangle",
@@ -2193,6 +2499,36 @@ chart_triple_top = Factory(
         "close",
     ),
     ("chart_triple_top",),
+)
+chart_v_bottom = Factory(
+    "chart_v_bottom",
+    _core.ChartVBottomStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_v_bottom",),
+)
+chart_v_top = Factory(
+    "chart_v_top",
+    _core.ChartVTopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_v_top",),
 )
 cmf = Factory(
     "cmf",

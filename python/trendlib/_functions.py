@@ -317,27 +317,48 @@ __all__ = [
     "cdl_upsidegap2crows",
     "cdl_xsidegap3methods",
     "ceil",
+    "chart_ascending_broadening_wedge",
     "chart_ascending_channel",
+    "chart_ascending_right_angle_broadening",
+    "chart_ascending_scallop",
     "chart_ascending_triangle",
     "chart_bear_flag",
     "chart_bear_pennant",
     "chart_broadening",
     "chart_bull_flag",
     "chart_bull_pennant",
+    "chart_bump_and_run_bottom",
+    "chart_bump_and_run_top",
+    "chart_complex_head_shoulders",
+    "chart_complex_inverse_head_shoulders",
     "chart_cup_with_handle",
+    "chart_descending_broadening_wedge",
     "chart_descending_channel",
+    "chart_descending_right_angle_broadening",
+    "chart_descending_scallop",
     "chart_descending_triangle",
+    "chart_diamond_bottom",
+    "chart_diamond_top",
     "chart_double_bottom",
     "chart_double_top",
     "chart_falling_wedge",
     "chart_head_shoulders",
+    "chart_high_tight_flag",
     "chart_inverse_head_shoulders",
     "chart_inverted_cup_with_handle",
+    "chart_island_bottom",
+    "chart_island_top",
+    "chart_measured_move_down",
+    "chart_measured_move_up",
     "chart_rectangle",
     "chart_rising_wedge",
+    "chart_rounding_bottom",
+    "chart_rounding_top",
     "chart_symmetrical_triangle",
     "chart_triple_bottom",
     "chart_triple_top",
+    "chart_v_bottom",
+    "chart_v_top",
     "cmf",
     "cmo",
     "cmou",
@@ -3676,6 +3697,49 @@ def ceil(source=None) -> Any:
     return _convert.wrap_outputs(out, carrier, ("ceil",))
 
 
+def chart_ascending_broadening_wedge(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_ascending_broadening_wedge"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_ascending_broadening_wedge"]["pivot_n"]["default"],
+) -> Any:
+    """Ascending Broadening Wedge.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Two rising lines, the lower climbing faster, and a close below the lower one.
+    """
+    period = _convert.as_int("chart_ascending_broadening_wedge", "period", period)
+    pivot_n = _convert.as_int("chart_ascending_broadening_wedge", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_ascending_broadening_wedge",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_ascending_broadening_wedge(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("chart_ascending_broadening_wedge",))
+
+
 def chart_ascending_channel(
     high=None,
     low=None,
@@ -3723,6 +3787,93 @@ def chart_ascending_channel(
         *columns, period=period, pivot_n=pivot_n, parallel_tol=parallel_tol
     )
     return _convert.wrap_outputs(out, carrier, ("chart_ascending_channel",))
+
+
+def chart_ascending_right_angle_broadening(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_ascending_right_angle_broadening"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_ascending_right_angle_broadening"]["pivot_n"]["default"],
+    flat_tol: float = _PARAMS["chart_ascending_right_angle_broadening"]["flat_tol"]["default"],
+) -> Any:
+    """Ascending Right-Angled Broadening.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    flat_tol : float, default 0.015
+        Steepest the flat line may be and still count as flat, in price per bar.
+
+    Returns
+    -------
+    ndarray or Series
+        A flat line over the swing highs, a falling one under the lows, and a close below it.
+    """
+    period = _convert.as_int("chart_ascending_right_angle_broadening", "period", period)
+    pivot_n = _convert.as_int("chart_ascending_right_angle_broadening", "pivot_n", pivot_n)
+    flat_tol = _convert.as_float("chart_ascending_right_angle_broadening", "flat_tol", flat_tol)
+    columns, carrier = _convert.bars(
+        "chart_ascending_right_angle_broadening",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_ascending_right_angle_broadening(
+        *columns, period=period, pivot_n=pivot_n, flat_tol=flat_tol
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_ascending_right_angle_broadening",))
+
+
+def chart_ascending_scallop(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_ascending_scallop"]["period"]["default"],
+) -> Any:
+    """Ascending Scallop.
+
+    Parameters
+    ----------
+    period : int, default 25
+        Bars the scallop spans, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above a J-shaped dip and recovery of the last period closes.
+    """
+    period = _convert.as_int("chart_ascending_scallop", "period", period)
+    columns, carrier = _convert.bars(
+        "chart_ascending_scallop",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_ascending_scallop(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("chart_ascending_scallop",))
 
 
 def chart_ascending_triangle(
@@ -4049,6 +4200,246 @@ def chart_bull_pennant(
     return _convert.wrap_outputs(out, carrier, ("chart_bull_pennant",))
 
 
+def chart_bump_and_run_bottom(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    lead_window: int = _PARAMS["chart_bump_and_run_bottom"]["lead_window"]["default"],
+    bump_window: int = _PARAMS["chart_bump_and_run_bottom"]["bump_window"]["default"],
+    bump_factor: float = _PARAMS["chart_bump_and_run_bottom"]["bump_factor"]["default"],
+    pivot_n: int = _PARAMS["chart_bump_and_run_bottom"]["pivot_n"]["default"],
+) -> Any:
+    """Bump-and-Run Reversal Bottom.
+
+    Parameters
+    ----------
+    lead_window : int, default 30
+        Bars of the lead-in trend, from 2 to 100000.
+    bump_window : int, default 15
+        Bars of the bump, from 2 to 100000.
+    bump_factor : float, default 2.0
+        How many times the lead-in slope the bump must fall.
+    pivot_n : int, default 4
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close back through a lead-in line after a much steeper bump.
+    """
+    lead_window = _convert.as_int("chart_bump_and_run_bottom", "lead_window", lead_window)
+    bump_window = _convert.as_int("chart_bump_and_run_bottom", "bump_window", bump_window)
+    bump_factor = _convert.as_float("chart_bump_and_run_bottom", "bump_factor", bump_factor)
+    pivot_n = _convert.as_int("chart_bump_and_run_bottom", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_bump_and_run_bottom",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_bump_and_run_bottom(
+        *columns,
+        lead_window=lead_window,
+        bump_window=bump_window,
+        bump_factor=bump_factor,
+        pivot_n=pivot_n,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_bump_and_run_bottom",))
+
+
+def chart_bump_and_run_top(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    lead_window: int = _PARAMS["chart_bump_and_run_top"]["lead_window"]["default"],
+    bump_window: int = _PARAMS["chart_bump_and_run_top"]["bump_window"]["default"],
+    bump_factor: float = _PARAMS["chart_bump_and_run_top"]["bump_factor"]["default"],
+    pivot_n: int = _PARAMS["chart_bump_and_run_top"]["pivot_n"]["default"],
+) -> Any:
+    """Bump-and-Run Reversal Top.
+
+    Parameters
+    ----------
+    lead_window : int, default 30
+        Bars of the lead-in trend, from 2 to 100000.
+    bump_window : int, default 15
+        Bars of the bump, from 2 to 100000.
+    bump_factor : float, default 2.0
+        How many times the lead-in slope the bump must climb.
+    pivot_n : int, default 4
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close back through a lead-in line after a much steeper bump.
+    """
+    lead_window = _convert.as_int("chart_bump_and_run_top", "lead_window", lead_window)
+    bump_window = _convert.as_int("chart_bump_and_run_top", "bump_window", bump_window)
+    bump_factor = _convert.as_float("chart_bump_and_run_top", "bump_factor", bump_factor)
+    pivot_n = _convert.as_int("chart_bump_and_run_top", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_bump_and_run_top",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_bump_and_run_top(
+        *columns,
+        lead_window=lead_window,
+        bump_window=bump_window,
+        bump_factor=bump_factor,
+        pivot_n=pivot_n,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_bump_and_run_top",))
+
+
+def chart_complex_head_shoulders(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_complex_head_shoulders"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_complex_head_shoulders"]["pivot_n"]["default"],
+    shoulder_tol: float = _PARAMS["chart_complex_head_shoulders"]["shoulder_tol"]["default"],
+    min_separation: int = _PARAMS["chart_complex_head_shoulders"]["min_separation"]["default"],
+) -> Any:
+    """Complex Head and Shoulders.
+
+    Parameters
+    ----------
+    period : int, default 200
+        Bars back the shoulders and head may have been confirmed, and bars the neckline waits, from
+        2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    shoulder_tol : float, default 0.08
+        How far apart the shoulders may be, as a fraction of the larger.
+    min_separation : int, default 8
+        Fewest bars between the confirmations of a shoulder and the head, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        The first close below the neckline of a head and shoulders with loose shoulders.
+    """
+    period = _convert.as_int("chart_complex_head_shoulders", "period", period)
+    pivot_n = _convert.as_int("chart_complex_head_shoulders", "pivot_n", pivot_n)
+    shoulder_tol = _convert.as_float("chart_complex_head_shoulders", "shoulder_tol", shoulder_tol)
+    min_separation = _convert.as_int(
+        "chart_complex_head_shoulders", "min_separation", min_separation
+    )
+    columns, carrier = _convert.bars(
+        "chart_complex_head_shoulders",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_complex_head_shoulders(
+        *columns,
+        period=period,
+        pivot_n=pivot_n,
+        shoulder_tol=shoulder_tol,
+        min_separation=min_separation,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_complex_head_shoulders",))
+
+
+def chart_complex_inverse_head_shoulders(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_complex_inverse_head_shoulders"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_complex_inverse_head_shoulders"]["pivot_n"]["default"],
+    shoulder_tol: float = _PARAMS["chart_complex_inverse_head_shoulders"]["shoulder_tol"][
+        "default"
+    ],
+    min_separation: int = _PARAMS["chart_complex_inverse_head_shoulders"]["min_separation"][
+        "default"
+    ],
+) -> Any:
+    """Complex Inverse Head and Shoulders.
+
+    Parameters
+    ----------
+    period : int, default 200
+        Bars back the shoulders and head may have been confirmed, and bars the neckline waits, from
+        2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    shoulder_tol : float, default 0.08
+        How far apart the shoulders may be, as a fraction of the larger.
+    min_separation : int, default 8
+        Fewest bars between the confirmations of a shoulder and the head, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        The first close above the neckline of a head and shoulders with loose shoulders.
+    """
+    period = _convert.as_int("chart_complex_inverse_head_shoulders", "period", period)
+    pivot_n = _convert.as_int("chart_complex_inverse_head_shoulders", "pivot_n", pivot_n)
+    shoulder_tol = _convert.as_float(
+        "chart_complex_inverse_head_shoulders", "shoulder_tol", shoulder_tol
+    )
+    min_separation = _convert.as_int(
+        "chart_complex_inverse_head_shoulders", "min_separation", min_separation
+    )
+    columns, carrier = _convert.bars(
+        "chart_complex_inverse_head_shoulders",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_complex_inverse_head_shoulders(
+        *columns,
+        period=period,
+        pivot_n=pivot_n,
+        shoulder_tol=shoulder_tol,
+        min_separation=min_separation,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_complex_inverse_head_shoulders",))
+
+
 def chart_cup_with_handle(
     high=None,
     low=None,
@@ -4108,6 +4499,49 @@ def chart_cup_with_handle(
     return _convert.wrap_outputs(out, carrier, ("chart_cup_with_handle",))
 
 
+def chart_descending_broadening_wedge(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_descending_broadening_wedge"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_descending_broadening_wedge"]["pivot_n"]["default"],
+) -> Any:
+    """Descending Broadening Wedge.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Two falling lines, the upper falling faster, and a close above the upper one.
+    """
+    period = _convert.as_int("chart_descending_broadening_wedge", "period", period)
+    pivot_n = _convert.as_int("chart_descending_broadening_wedge", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_descending_broadening_wedge",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_descending_broadening_wedge(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("chart_descending_broadening_wedge",))
+
+
 def chart_descending_channel(
     high=None,
     low=None,
@@ -4155,6 +4589,93 @@ def chart_descending_channel(
         *columns, period=period, pivot_n=pivot_n, parallel_tol=parallel_tol
     )
     return _convert.wrap_outputs(out, carrier, ("chart_descending_channel",))
+
+
+def chart_descending_right_angle_broadening(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_descending_right_angle_broadening"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_descending_right_angle_broadening"]["pivot_n"]["default"],
+    flat_tol: float = _PARAMS["chart_descending_right_angle_broadening"]["flat_tol"]["default"],
+) -> Any:
+    """Descending Right-Angled Broadening.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    flat_tol : float, default 0.015
+        Steepest the flat line may be and still count as flat, in price per bar.
+
+    Returns
+    -------
+    ndarray or Series
+        A flat line under the swing lows, a rising one over the highs, and a close above it.
+    """
+    period = _convert.as_int("chart_descending_right_angle_broadening", "period", period)
+    pivot_n = _convert.as_int("chart_descending_right_angle_broadening", "pivot_n", pivot_n)
+    flat_tol = _convert.as_float("chart_descending_right_angle_broadening", "flat_tol", flat_tol)
+    columns, carrier = _convert.bars(
+        "chart_descending_right_angle_broadening",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_descending_right_angle_broadening(
+        *columns, period=period, pivot_n=pivot_n, flat_tol=flat_tol
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_descending_right_angle_broadening",))
+
+
+def chart_descending_scallop(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_descending_scallop"]["period"]["default"],
+) -> Any:
+    """Descending Scallop.
+
+    Parameters
+    ----------
+    period : int, default 25
+        Bars the scallop spans, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below a ∩-shaped rise and fall of the last period closes.
+    """
+    period = _convert.as_int("chart_descending_scallop", "period", period)
+    columns, carrier = _convert.bars(
+        "chart_descending_scallop",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_descending_scallop(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("chart_descending_scallop",))
 
 
 def chart_descending_triangle(
@@ -4205,6 +4726,92 @@ def chart_descending_triangle(
         *columns, period=period, pivot_n=pivot_n, flat_tol=flat_tol
     )
     return _convert.wrap_outputs(out, carrier, ("chart_descending_triangle",))
+
+
+def chart_diamond_bottom(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_diamond_bottom"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_diamond_bottom"]["pivot_n"]["default"],
+) -> Any:
+    """Diamond Bottom.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the shape may reach, from 2 to 100000.
+    pivot_n : int, default 4
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above a diamond's upper line after it broadened and narrowed.
+    """
+    period = _convert.as_int("chart_diamond_bottom", "period", period)
+    pivot_n = _convert.as_int("chart_diamond_bottom", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_diamond_bottom",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_diamond_bottom(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("chart_diamond_bottom",))
+
+
+def chart_diamond_top(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_diamond_top"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_diamond_top"]["pivot_n"]["default"],
+) -> Any:
+    """Diamond Top.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the shape may reach, from 2 to 100000.
+    pivot_n : int, default 4
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below a diamond's lower line after it broadened and narrowed.
+    """
+    period = _convert.as_int("chart_diamond_top", "period", period)
+    pivot_n = _convert.as_int("chart_diamond_top", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_diamond_top",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_diamond_top(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("chart_diamond_top",))
 
 
 def chart_double_bottom(
@@ -4416,6 +5023,58 @@ def chart_head_shoulders(
     return _convert.wrap_outputs(out, carrier, ("chart_head_shoulders",))
 
 
+def chart_high_tight_flag(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_high_tight_flag"]["period"]["default"],
+    pole_bars: int = _PARAMS["chart_high_tight_flag"]["pole_bars"]["default"],
+    min_pole: float = _PARAMS["chart_high_tight_flag"]["min_pole"]["default"],
+    max_retrace: float = _PARAMS["chart_high_tight_flag"]["max_retrace"]["default"],
+) -> Any:
+    """High and Tight Flag.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Bars the flag spans after its pole, from 2 to 100000.
+    pole_bars : int, default 10
+        Bars the pole is measured over, from 1 to 100000.
+    min_pole : float, default 0.4
+        Smallest rise the pole must make, as a fraction.
+    max_retrace : float, default 0.2
+        Widest the flag's range may be, as a fraction of the pole's last close.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above a tight flag that follows a very sharp rise.
+    """
+    period = _convert.as_int("chart_high_tight_flag", "period", period)
+    pole_bars = _convert.as_int("chart_high_tight_flag", "pole_bars", pole_bars)
+    min_pole = _convert.as_float("chart_high_tight_flag", "min_pole", min_pole)
+    max_retrace = _convert.as_float("chart_high_tight_flag", "max_retrace", max_retrace)
+    columns, carrier = _convert.bars(
+        "chart_high_tight_flag",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_high_tight_flag(
+        *columns, period=period, pole_bars=pole_bars, min_pole=min_pole, max_retrace=max_retrace
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_high_tight_flag",))
+
+
 def chart_inverse_head_shoulders(
     high=None,
     low=None,
@@ -4539,6 +5198,168 @@ def chart_inverted_cup_with_handle(
     return _convert.wrap_outputs(out, carrier, ("chart_inverted_cup_with_handle",))
 
 
+def chart_island_bottom(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    max_island_bars: int = _PARAMS["chart_island_bottom"]["max_island_bars"]["default"],
+) -> Any:
+    """Island Bottom.
+
+    Parameters
+    ----------
+    max_island_bars : int, default 10
+        Most bars the island may hold, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A gap up out of an island that a gap down opened.
+    """
+    max_island_bars = _convert.as_int("chart_island_bottom", "max_island_bars", max_island_bars)
+    columns, carrier = _convert.bars(
+        "chart_island_bottom",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_island_bottom(*columns, max_island_bars=max_island_bars)
+    return _convert.wrap_outputs(out, carrier, ("chart_island_bottom",))
+
+
+def chart_island_top(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    max_island_bars: int = _PARAMS["chart_island_top"]["max_island_bars"]["default"],
+) -> Any:
+    """Island Top.
+
+    Parameters
+    ----------
+    max_island_bars : int, default 10
+        Most bars the island may hold, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A gap down out of an island that a gap up opened.
+    """
+    max_island_bars = _convert.as_int("chart_island_top", "max_island_bars", max_island_bars)
+    columns, carrier = _convert.bars(
+        "chart_island_top",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_island_top(*columns, max_island_bars=max_island_bars)
+    return _convert.wrap_outputs(out, carrier, ("chart_island_top",))
+
+
+def chart_measured_move_down(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    pivot_n: int = _PARAMS["chart_measured_move_down"]["pivot_n"]["default"],
+    leg_tol: float = _PARAMS["chart_measured_move_down"]["leg_tol"]["default"],
+) -> Any:
+    """Measured Move Down.
+
+    Parameters
+    ----------
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    leg_tol : float, default 0.2
+        How far the two legs' lengths may differ, as a fraction of the first.
+
+    Returns
+    -------
+    ndarray or Series
+        Two falling legs of about equal length, on the bar the second ends.
+    """
+    pivot_n = _convert.as_int("chart_measured_move_down", "pivot_n", pivot_n)
+    leg_tol = _convert.as_float("chart_measured_move_down", "leg_tol", leg_tol)
+    columns, carrier = _convert.bars(
+        "chart_measured_move_down",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_measured_move_down(*columns, pivot_n=pivot_n, leg_tol=leg_tol)
+    return _convert.wrap_outputs(out, carrier, ("chart_measured_move_down",))
+
+
+def chart_measured_move_up(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    pivot_n: int = _PARAMS["chart_measured_move_up"]["pivot_n"]["default"],
+    leg_tol: float = _PARAMS["chart_measured_move_up"]["leg_tol"]["default"],
+) -> Any:
+    """Measured Move Up.
+
+    Parameters
+    ----------
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    leg_tol : float, default 0.2
+        How far the two legs' lengths may differ, as a fraction of the first.
+
+    Returns
+    -------
+    ndarray or Series
+        Two rising legs of about equal length, on the bar the second ends.
+    """
+    pivot_n = _convert.as_int("chart_measured_move_up", "pivot_n", pivot_n)
+    leg_tol = _convert.as_float("chart_measured_move_up", "leg_tol", leg_tol)
+    columns, carrier = _convert.bars(
+        "chart_measured_move_up",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_measured_move_up(*columns, pivot_n=pivot_n, leg_tol=leg_tol)
+    return _convert.wrap_outputs(out, carrier, ("chart_measured_move_up",))
+
+
 def chart_rectangle(
     high=None,
     low=None,
@@ -4629,6 +5450,90 @@ def chart_rising_wedge(
     )
     out = _core.chart_rising_wedge(*columns, period=period, pivot_n=pivot_n)
     return _convert.wrap_outputs(out, carrier, ("chart_rising_wedge",))
+
+
+def chart_rounding_bottom(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_rounding_bottom"]["period"]["default"],
+    min_depth: float = _PARAMS["chart_rounding_bottom"]["min_depth"]["default"],
+) -> Any:
+    """Rounding Bottom.
+
+    Parameters
+    ----------
+    period : int, default 40
+        Bars the saucer spans, from 2 to 100000.
+    min_depth : float, default 0.05
+        Shallowest the saucer may be, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A close beyond a saucer in the last period closes.
+    """
+    period = _convert.as_int("chart_rounding_bottom", "period", period)
+    min_depth = _convert.as_float("chart_rounding_bottom", "min_depth", min_depth)
+    columns, carrier = _convert.bars(
+        "chart_rounding_bottom",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_rounding_bottom(*columns, period=period, min_depth=min_depth)
+    return _convert.wrap_outputs(out, carrier, ("chart_rounding_bottom",))
+
+
+def chart_rounding_top(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_rounding_top"]["period"]["default"],
+    min_depth: float = _PARAMS["chart_rounding_top"]["min_depth"]["default"],
+) -> Any:
+    """Rounding Top.
+
+    Parameters
+    ----------
+    period : int, default 40
+        Bars the dome spans, from 2 to 100000.
+    min_depth : float, default 0.05
+        Lowest the dome may be, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A close beyond a dome in the last period closes.
+    """
+    period = _convert.as_int("chart_rounding_top", "period", period)
+    min_depth = _convert.as_float("chart_rounding_top", "min_depth", min_depth)
+    columns, carrier = _convert.bars(
+        "chart_rounding_top",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_rounding_top(*columns, period=period, min_depth=min_depth)
+    return _convert.wrap_outputs(out, carrier, ("chart_rounding_top",))
 
 
 def chart_symmetrical_triangle(
@@ -4780,6 +5685,90 @@ def chart_triple_top(
         *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
     )
     return _convert.wrap_outputs(out, carrier, ("chart_triple_top",))
+
+
+def chart_v_bottom(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_v_bottom"]["period"]["default"],
+    min_drop: float = _PARAMS["chart_v_bottom"]["min_drop"]["default"],
+) -> Any:
+    """V-Bottom.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Bars each arm of the V spans, from 2 to 100000.
+    min_drop : float, default 0.05
+        Smallest fall into the V, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A V in the last period closes.
+    """
+    period = _convert.as_int("chart_v_bottom", "period", period)
+    min_drop = _convert.as_float("chart_v_bottom", "min_drop", min_drop)
+    columns, carrier = _convert.bars(
+        "chart_v_bottom",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_v_bottom(*columns, period=period, min_drop=min_drop)
+    return _convert.wrap_outputs(out, carrier, ("chart_v_bottom",))
+
+
+def chart_v_top(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_v_top"]["period"]["default"],
+    min_rise: float = _PARAMS["chart_v_top"]["min_rise"]["default"],
+) -> Any:
+    """V-Top.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Bars each arm of the inverted V spans, from 2 to 100000.
+    min_rise : float, default 0.05
+        Smallest rise into the top, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        An inverted V in the last period closes.
+    """
+    period = _convert.as_int("chart_v_top", "period", period)
+    min_rise = _convert.as_float("chart_v_top", "min_rise", min_rise)
+    columns, carrier = _convert.bars(
+        "chart_v_top",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_v_top(*columns, period=period, min_rise=min_rise)
+    return _convert.wrap_outputs(out, carrier, ("chart_v_top",))
 
 
 def cmf(

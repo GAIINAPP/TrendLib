@@ -288,7 +288,9 @@ TrendLib did not have yet, and approved them here (A25). Every one is checked
 against oracle P (`ta-patterns` 1.2.1, D18) exactly as section 5.1's are: each
 row names the oracle function, TrendLib reads its `+1`/`-1` as `+100`/`-100`,
 and its parameters are the oracle's keyword parameters and defaults, with
-`window` called `period` (D12) and `mode="confirmed"`, `pivot_pct` not offered.
+`window` called `period` (D12) and `mode="confirmed"`, `pivot_pct` not offered. A
+parameter the oracle accepts but never reads is not offered either: 1-2-3's
+`tol` and the measured moves' `window`.
 The ranges are TrendLib's: whole numbers from 1 (2 for a span a shape has to
 fit in) to 100000, fractions from 0 with no ceiling.
 
@@ -341,16 +343,14 @@ pattern with no direction, which reads `+100` wherever the shape is.
 | `chart_complex_head_shoulders` | Complex Head and Shoulders | `complex_hs_top` | -100 | `period` 200 [2, 100000], `pivot_n` 5 [1, 100000], `shoulder_tol` 0.08 [0.0, any], `min_separation` 8 [1, 100000] |
 | `chart_complex_inverse_head_shoulders` | Complex Inverse Head and Shoulders | `complex_hs_bottom` | +100 | `period` 200 [2, 100000], `pivot_n` 5 [1, 100000], `shoulder_tol` 0.08 [0.0, any], `min_separation` 8 [1, 100000] |
 | `chart_high_tight_flag` | High and Tight Flag | `flag_high_tight` | +100 | `period` 20 [2, 100000], `pole_bars` 10 [1, 100000], `min_pole` 0.4 [0.0, any], `max_retrace` 0.2 [0.0, any] |
-| `chart_measured_move_up` | Measured Move Up | `measured_move_up` | +100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `leg_tol` 0.2 [0.0, any] |
-| `chart_measured_move_down` | Measured Move Down | `measured_move_down` | -100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `leg_tol` 0.2 [0.0, any] |
+| `chart_measured_move_up` | Measured Move Up | `measured_move_up` | +100 | `pivot_n` 5 [1, 100000], `leg_tol` 0.2 [0.0, any] |
+| `chart_measured_move_down` | Measured Move Down | `measured_move_down` | -100 | `pivot_n` 5 [1, 100000], `leg_tol` 0.2 [0.0, any] |
 | `chart_ascending_broadening_wedge` | Ascending Broadening Wedge | `broadening_wedge_asc` | -100 | `period` 80 [2, 100000], `pivot_n` 5 [1, 100000] |
 | `chart_descending_broadening_wedge` | Descending Broadening Wedge | `broadening_wedge_desc` | +100 | `period` 80 [2, 100000], `pivot_n` 5 [1, 100000] |
 | `chart_ascending_right_angle_broadening` | Ascending Right-Angled Broadening | `right_angle_broadening_asc` | -100 | `period` 80 [2, 100000], `pivot_n` 5 [1, 100000], `flat_tol` 0.015 [0.0, any] |
 | `chart_descending_right_angle_broadening` | Descending Right-Angled Broadening | `right_angle_broadening_desc` | +100 | `period` 80 [2, 100000], `pivot_n` 5 [1, 100000], `flat_tol` 0.015 [0.0, any] |
 | `chart_ascending_scallop` | Ascending Scallop | `scallop_asc` | +100 | `period` 25 [2, 100000] |
-| `chart_inverted_ascending_scallop` | Inverted Ascending Scallop | `scallop_asc_inv` | -100 | `period` 25 [2, 100000] |
 | `chart_descending_scallop` | Descending Scallop | `scallop_desc` | -100 | `period` 25 [2, 100000] |
-| `chart_inverted_descending_scallop` | Inverted Descending Scallop | `scallop_desc_inv` | +100 | `period` 25 [2, 100000] |
 | `chart_double_top_adam_adam` | Double Top, Adam and Adam | `double_top_adam_adam` | -100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
 | `chart_double_top_adam_eve` | Double Top, Adam and Eve | `double_top_adam_eve` | -100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
 | `chart_double_top_eve_adam` | Double Top, Eve and Adam | `double_top_eve_adam` | -100 | `period` 60 [2, 100000], `pivot_n` 5 [1, 100000], `tol` 0.03 [0.0, any], `min_separation` 5 [1, 100000] |
@@ -458,6 +458,11 @@ finta's `TMF` raises `NotImplementedError`, and its `FRAMA` ignores its own
   Archer OBV, Volume Oscillator, volume-weighted MACD, ALMA, VIDYA, McGinley
   Dynamic, Gann HiLo, Super Smoother, TTM Trend and the rolling statistics.
   Adopting that library as an oracle was declined for now.
+- **Not built, never true:** the oracle's `scallop_asc_inv` and
+  `scallop_desc_inv`. In `mode="confirmed"` the first needs the close above the
+  window's first close and below every close in the window, the second the
+  mirror, so neither can fire on any input; a function that always reads 0
+  would only look like coverage.
 - **Blocked, no usable definition:** Half Trend, whose only definition is an
   MPL-2.0 TradingView script, so it cannot be ported into this MIT/Apache crate.
 - **Need a decision first:** Smart Money Concepts (the only implementation

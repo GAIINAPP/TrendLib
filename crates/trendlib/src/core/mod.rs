@@ -7,6 +7,7 @@ pub mod input;
 pub mod kernel;
 pub mod math;
 pub mod output;
+pub mod shapes;
 pub mod traits;
 
 pub use error::TlError;
