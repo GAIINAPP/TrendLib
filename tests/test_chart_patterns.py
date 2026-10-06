@@ -131,8 +131,16 @@ def compare(ta_patterns, name, functions, high, low, close, params):
     differing = np.flatnonzero(mine != theirs)
     if "pole_bars" in params:
         # Deviation 8: on the first row a pole could end on, the oracle reads
-        # the last bar of the input.
-        differing = differing[differing != params["pole_bars"] + params["period"]]
+        # the last bar of the input. Dropping the row outright would hide a
+        # regression that happens to land on it, so what TrendLib does there is
+        # asserted instead: the row is warm-up and reads 0.
+        row = params["pole_bars"] + params["period"]
+        if row < mine.size:
+            assert mine[row] == 0, (
+                f"{name} {params}: row {row} is deviation 8's warm-up row and "
+                f"should read 0, not {mine[row]}"
+            )
+            differing = differing[differing != row]
     assert not differing.size, (
         f"{name} {params}: row {differing[0]} reads {mine[differing[0]]}, "
         f"the oracle reads {theirs[differing[0]]}"
