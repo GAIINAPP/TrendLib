@@ -17853,6 +17853,1741 @@ impl PyChartBumpAndRunTopStream {
     }
 }
 
+#[pyfunction]
+#[pyo3(name = "chart_busted_ascending_triangle", signature = (high, low, close, *, reversal_bars, reversal_pct))]
+pub fn chart_busted_ascending_triangle<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    reversal_bars: i64,
+    reversal_pct: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let reversal_bars = int_param(
+        "chart_busted_ascending_triangle",
+        "reversal_bars",
+        reversal_bars,
+        1,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let reversal_pct = float_param(
+        "chart_busted_ascending_triangle",
+        "reversal_pct",
+        reversal_pct,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_busted_ascending_triangle::Params {
+        reversal_bars,
+        reversal_pct,
+    };
+    let out = py
+        .detach(|| <trendlib::indicators::chart_busted_ascending_triangle::ChartBustedAscendingTriangle as Kernel<3, 1>>::batch([high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartBustedAscendingTriangleStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartBustedAscendingTriangleStream {
+    inner: BarStream<
+        trendlib::indicators::chart_busted_ascending_triangle::ChartBustedAscendingTriangle,
+        3,
+        1,
+    >,
+}
+
+#[pymethods]
+impl PyChartBustedAscendingTriangleStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, reversal_bars, reversal_pct))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        reversal_bars: i64,
+        reversal_pct: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let reversal_bars = int_param(
+            "chart_busted_ascending_triangle",
+            "reversal_bars",
+            reversal_bars,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let reversal_pct = float_param(
+            "chart_busted_ascending_triangle",
+            "reversal_pct",
+            reversal_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_busted_ascending_triangle::Params {
+            reversal_bars,
+            reversal_pct,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_busted_ascending_triangle::ChartBustedAscendingTriangle, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, reversal_bars, reversal_pct))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        reversal_bars: i64,
+        reversal_pct: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let reversal_bars = int_param(
+            "chart_busted_ascending_triangle",
+            "reversal_bars",
+            reversal_bars,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let reversal_pct = float_param(
+            "chart_busted_ascending_triangle",
+            "reversal_pct",
+            reversal_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_busted_ascending_triangle::Params {
+            reversal_bars,
+            reversal_pct,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_busted_ascending_triangle::ChartBustedAscendingTriangle as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_busted_ascending_triangle"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_busted_ascending_triangle bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "chart_busted_descending_triangle", signature = (high, low, close, *, reversal_bars, reversal_pct))]
+pub fn chart_busted_descending_triangle<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    reversal_bars: i64,
+    reversal_pct: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let reversal_bars = int_param(
+        "chart_busted_descending_triangle",
+        "reversal_bars",
+        reversal_bars,
+        1,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let reversal_pct = float_param(
+        "chart_busted_descending_triangle",
+        "reversal_pct",
+        reversal_pct,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_busted_descending_triangle::Params {
+        reversal_bars,
+        reversal_pct,
+    };
+    let out = py
+        .detach(|| <trendlib::indicators::chart_busted_descending_triangle::ChartBustedDescendingTriangle as Kernel<3, 1>>::batch([high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartBustedDescendingTriangleStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartBustedDescendingTriangleStream {
+    inner: BarStream<
+        trendlib::indicators::chart_busted_descending_triangle::ChartBustedDescendingTriangle,
+        3,
+        1,
+    >,
+}
+
+#[pymethods]
+impl PyChartBustedDescendingTriangleStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, reversal_bars, reversal_pct))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        reversal_bars: i64,
+        reversal_pct: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let reversal_bars = int_param(
+            "chart_busted_descending_triangle",
+            "reversal_bars",
+            reversal_bars,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let reversal_pct = float_param(
+            "chart_busted_descending_triangle",
+            "reversal_pct",
+            reversal_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_busted_descending_triangle::Params {
+            reversal_bars,
+            reversal_pct,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_busted_descending_triangle::ChartBustedDescendingTriangle, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, reversal_bars, reversal_pct))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        reversal_bars: i64,
+        reversal_pct: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let reversal_bars = int_param(
+            "chart_busted_descending_triangle",
+            "reversal_bars",
+            reversal_bars,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let reversal_pct = float_param(
+            "chart_busted_descending_triangle",
+            "reversal_pct",
+            reversal_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_busted_descending_triangle::Params {
+            reversal_bars,
+            reversal_pct,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_busted_descending_triangle::ChartBustedDescendingTriangle as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_busted_descending_triangle"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_busted_descending_triangle bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "chart_busted_double_bottom", signature = (high, low, close, *, reversal_bars, reversal_pct))]
+pub fn chart_busted_double_bottom<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    reversal_bars: i64,
+    reversal_pct: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let reversal_bars = int_param(
+        "chart_busted_double_bottom",
+        "reversal_bars",
+        reversal_bars,
+        1,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let reversal_pct = float_param(
+        "chart_busted_double_bottom",
+        "reversal_pct",
+        reversal_pct,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_busted_double_bottom::Params {
+        reversal_bars,
+        reversal_pct,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::chart_busted_double_bottom::ChartBustedDoubleBottom as Kernel<
+                3,
+                1,
+            >>::batch([high, low, close], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartBustedDoubleBottomStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartBustedDoubleBottomStream {
+    inner:
+        BarStream<trendlib::indicators::chart_busted_double_bottom::ChartBustedDoubleBottom, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartBustedDoubleBottomStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, reversal_bars, reversal_pct))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        reversal_bars: i64,
+        reversal_pct: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let reversal_bars = int_param(
+            "chart_busted_double_bottom",
+            "reversal_bars",
+            reversal_bars,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let reversal_pct = float_param(
+            "chart_busted_double_bottom",
+            "reversal_pct",
+            reversal_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_busted_double_bottom::Params {
+            reversal_bars,
+            reversal_pct,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<
+                    trendlib::indicators::chart_busted_double_bottom::ChartBustedDoubleBottom,
+                    3,
+                    1,
+                > as Stream>::open([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, reversal_bars, reversal_pct))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        reversal_bars: i64,
+        reversal_pct: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let reversal_bars = int_param(
+            "chart_busted_double_bottom",
+            "reversal_bars",
+            reversal_bars,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let reversal_pct = float_param(
+            "chart_busted_double_bottom",
+            "reversal_pct",
+            reversal_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_busted_double_bottom::Params {
+            reversal_bars,
+            reversal_pct,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_busted_double_bottom::ChartBustedDoubleBottom as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_busted_double_bottom"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_busted_double_bottom bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "chart_busted_double_top", signature = (high, low, close, *, reversal_bars, reversal_pct))]
+pub fn chart_busted_double_top<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    reversal_bars: i64,
+    reversal_pct: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let reversal_bars = int_param(
+        "chart_busted_double_top",
+        "reversal_bars",
+        reversal_bars,
+        1,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let reversal_pct = float_param(
+        "chart_busted_double_top",
+        "reversal_pct",
+        reversal_pct,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_busted_double_top::Params {
+        reversal_bars,
+        reversal_pct,
+    };
+    let out = py
+        .detach(|| <trendlib::indicators::chart_busted_double_top::ChartBustedDoubleTop as Kernel<3, 1>>::batch([high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartBustedDoubleTopStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartBustedDoubleTopStream {
+    inner: BarStream<trendlib::indicators::chart_busted_double_top::ChartBustedDoubleTop, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartBustedDoubleTopStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, reversal_bars, reversal_pct))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        reversal_bars: i64,
+        reversal_pct: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let reversal_bars = int_param(
+            "chart_busted_double_top",
+            "reversal_bars",
+            reversal_bars,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let reversal_pct = float_param(
+            "chart_busted_double_top",
+            "reversal_pct",
+            reversal_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_busted_double_top::Params {
+            reversal_bars,
+            reversal_pct,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_busted_double_top::ChartBustedDoubleTop, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, reversal_bars, reversal_pct))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        reversal_bars: i64,
+        reversal_pct: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let reversal_bars = int_param(
+            "chart_busted_double_top",
+            "reversal_bars",
+            reversal_bars,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let reversal_pct = float_param(
+            "chart_busted_double_top",
+            "reversal_pct",
+            reversal_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_busted_double_top::Params {
+            reversal_bars,
+            reversal_pct,
+        };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::chart_busted_double_top::ChartBustedDoubleTop as Kernel<
+                    3,
+                    1,
+                >>::open_and_fill([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_busted_double_top"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_busted_double_top bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "chart_busted_head_shoulders", signature = (high, low, close, *, reversal_bars, reversal_pct))]
+pub fn chart_busted_head_shoulders<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    reversal_bars: i64,
+    reversal_pct: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let reversal_bars = int_param(
+        "chart_busted_head_shoulders",
+        "reversal_bars",
+        reversal_bars,
+        1,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let reversal_pct = float_param(
+        "chart_busted_head_shoulders",
+        "reversal_pct",
+        reversal_pct,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_busted_head_shoulders::Params {
+        reversal_bars,
+        reversal_pct,
+    };
+    let out = py
+        .detach(|| <trendlib::indicators::chart_busted_head_shoulders::ChartBustedHeadShoulders as Kernel<3, 1>>::batch([high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartBustedHeadShouldersStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartBustedHeadShouldersStream {
+    inner: BarStream<
+        trendlib::indicators::chart_busted_head_shoulders::ChartBustedHeadShoulders,
+        3,
+        1,
+    >,
+}
+
+#[pymethods]
+impl PyChartBustedHeadShouldersStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, reversal_bars, reversal_pct))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        reversal_bars: i64,
+        reversal_pct: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let reversal_bars = int_param(
+            "chart_busted_head_shoulders",
+            "reversal_bars",
+            reversal_bars,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let reversal_pct = float_param(
+            "chart_busted_head_shoulders",
+            "reversal_pct",
+            reversal_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_busted_head_shoulders::Params {
+            reversal_bars,
+            reversal_pct,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<
+                    trendlib::indicators::chart_busted_head_shoulders::ChartBustedHeadShoulders,
+                    3,
+                    1,
+                > as Stream>::open([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, reversal_bars, reversal_pct))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        reversal_bars: i64,
+        reversal_pct: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let reversal_bars = int_param(
+            "chart_busted_head_shoulders",
+            "reversal_bars",
+            reversal_bars,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let reversal_pct = float_param(
+            "chart_busted_head_shoulders",
+            "reversal_pct",
+            reversal_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_busted_head_shoulders::Params {
+            reversal_bars,
+            reversal_pct,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_busted_head_shoulders::ChartBustedHeadShoulders as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_busted_head_shoulders"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_busted_head_shoulders bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "chart_busted_inverse_head_shoulders", signature = (high, low, close, *, reversal_bars, reversal_pct))]
+pub fn chart_busted_inverse_head_shoulders<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    reversal_bars: i64,
+    reversal_pct: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let reversal_bars = int_param(
+        "chart_busted_inverse_head_shoulders",
+        "reversal_bars",
+        reversal_bars,
+        1,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let reversal_pct = float_param(
+        "chart_busted_inverse_head_shoulders",
+        "reversal_pct",
+        reversal_pct,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_busted_inverse_head_shoulders::Params {
+        reversal_bars,
+        reversal_pct,
+    };
+    let out = py
+        .detach(|| <trendlib::indicators::chart_busted_inverse_head_shoulders::ChartBustedInverseHeadShoulders as Kernel<3, 1>>::batch([high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartBustedInverseHeadShouldersStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartBustedInverseHeadShouldersStream {
+    inner: BarStream<
+        trendlib::indicators::chart_busted_inverse_head_shoulders::ChartBustedInverseHeadShoulders,
+        3,
+        1,
+    >,
+}
+
+#[pymethods]
+impl PyChartBustedInverseHeadShouldersStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, reversal_bars, reversal_pct))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        reversal_bars: i64,
+        reversal_pct: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let reversal_bars = int_param(
+            "chart_busted_inverse_head_shoulders",
+            "reversal_bars",
+            reversal_bars,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let reversal_pct = float_param(
+            "chart_busted_inverse_head_shoulders",
+            "reversal_pct",
+            reversal_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_busted_inverse_head_shoulders::Params {
+            reversal_bars,
+            reversal_pct,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_busted_inverse_head_shoulders::ChartBustedInverseHeadShoulders, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, reversal_bars, reversal_pct))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        reversal_bars: i64,
+        reversal_pct: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let reversal_bars = int_param(
+            "chart_busted_inverse_head_shoulders",
+            "reversal_bars",
+            reversal_bars,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let reversal_pct = float_param(
+            "chart_busted_inverse_head_shoulders",
+            "reversal_pct",
+            reversal_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_busted_inverse_head_shoulders::Params {
+            reversal_bars,
+            reversal_pct,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_busted_inverse_head_shoulders::ChartBustedInverseHeadShoulders as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_busted_inverse_head_shoulders"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_busted_inverse_head_shoulders bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "chart_busted_rectangle", signature = (high, low, close, *, reversal_bars, reversal_pct))]
+pub fn chart_busted_rectangle<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    reversal_bars: i64,
+    reversal_pct: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let reversal_bars = int_param(
+        "chart_busted_rectangle",
+        "reversal_bars",
+        reversal_bars,
+        1,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let reversal_pct = float_param(
+        "chart_busted_rectangle",
+        "reversal_pct",
+        reversal_pct,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_busted_rectangle::Params {
+        reversal_bars,
+        reversal_pct,
+    };
+    let out = py
+        .detach(|| <trendlib::indicators::chart_busted_rectangle::ChartBustedRectangle as Kernel<3, 1>>::batch([high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartBustedRectangleStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartBustedRectangleStream {
+    inner: BarStream<trendlib::indicators::chart_busted_rectangle::ChartBustedRectangle, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartBustedRectangleStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, reversal_bars, reversal_pct))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        reversal_bars: i64,
+        reversal_pct: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let reversal_bars = int_param(
+            "chart_busted_rectangle",
+            "reversal_bars",
+            reversal_bars,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let reversal_pct = float_param(
+            "chart_busted_rectangle",
+            "reversal_pct",
+            reversal_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_busted_rectangle::Params {
+            reversal_bars,
+            reversal_pct,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_busted_rectangle::ChartBustedRectangle, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, reversal_bars, reversal_pct))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        reversal_bars: i64,
+        reversal_pct: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let reversal_bars = int_param(
+            "chart_busted_rectangle",
+            "reversal_bars",
+            reversal_bars,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let reversal_pct = float_param(
+            "chart_busted_rectangle",
+            "reversal_pct",
+            reversal_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_busted_rectangle::Params {
+            reversal_bars,
+            reversal_pct,
+        };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::chart_busted_rectangle::ChartBustedRectangle as Kernel<
+                    3,
+                    1,
+                >>::open_and_fill([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_busted_rectangle"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_busted_rectangle bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "chart_busted_triple_bottom", signature = (high, low, close, *, reversal_bars, reversal_pct))]
+pub fn chart_busted_triple_bottom<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    reversal_bars: i64,
+    reversal_pct: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let reversal_bars = int_param(
+        "chart_busted_triple_bottom",
+        "reversal_bars",
+        reversal_bars,
+        1,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let reversal_pct = float_param(
+        "chart_busted_triple_bottom",
+        "reversal_pct",
+        reversal_pct,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_busted_triple_bottom::Params {
+        reversal_bars,
+        reversal_pct,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::chart_busted_triple_bottom::ChartBustedTripleBottom as Kernel<
+                3,
+                1,
+            >>::batch([high, low, close], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartBustedTripleBottomStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartBustedTripleBottomStream {
+    inner:
+        BarStream<trendlib::indicators::chart_busted_triple_bottom::ChartBustedTripleBottom, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartBustedTripleBottomStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, reversal_bars, reversal_pct))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        reversal_bars: i64,
+        reversal_pct: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let reversal_bars = int_param(
+            "chart_busted_triple_bottom",
+            "reversal_bars",
+            reversal_bars,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let reversal_pct = float_param(
+            "chart_busted_triple_bottom",
+            "reversal_pct",
+            reversal_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_busted_triple_bottom::Params {
+            reversal_bars,
+            reversal_pct,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<
+                    trendlib::indicators::chart_busted_triple_bottom::ChartBustedTripleBottom,
+                    3,
+                    1,
+                > as Stream>::open([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, reversal_bars, reversal_pct))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        reversal_bars: i64,
+        reversal_pct: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let reversal_bars = int_param(
+            "chart_busted_triple_bottom",
+            "reversal_bars",
+            reversal_bars,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let reversal_pct = float_param(
+            "chart_busted_triple_bottom",
+            "reversal_pct",
+            reversal_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_busted_triple_bottom::Params {
+            reversal_bars,
+            reversal_pct,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::chart_busted_triple_bottom::ChartBustedTripleBottom as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_busted_triple_bottom"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_busted_triple_bottom bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "chart_busted_triple_top", signature = (high, low, close, *, reversal_bars, reversal_pct))]
+pub fn chart_busted_triple_top<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    reversal_bars: i64,
+    reversal_pct: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let reversal_bars = int_param(
+        "chart_busted_triple_top",
+        "reversal_bars",
+        reversal_bars,
+        1,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let reversal_pct = float_param(
+        "chart_busted_triple_top",
+        "reversal_pct",
+        reversal_pct,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::chart_busted_triple_top::Params {
+        reversal_bars,
+        reversal_pct,
+    };
+    let out = py
+        .detach(|| <trendlib::indicators::chart_busted_triple_top::ChartBustedTripleTop as Kernel<3, 1>>::batch([high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "ChartBustedTripleTopStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyChartBustedTripleTopStream {
+    inner: BarStream<trendlib::indicators::chart_busted_triple_top::ChartBustedTripleTop, 3, 1>,
+}
+
+#[pymethods]
+impl PyChartBustedTripleTopStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, reversal_bars, reversal_pct))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        reversal_bars: i64,
+        reversal_pct: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let reversal_bars = int_param(
+            "chart_busted_triple_top",
+            "reversal_bars",
+            reversal_bars,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let reversal_pct = float_param(
+            "chart_busted_triple_top",
+            "reversal_pct",
+            reversal_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_busted_triple_top::Params {
+            reversal_bars,
+            reversal_pct,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::chart_busted_triple_top::ChartBustedTripleTop, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, reversal_bars, reversal_pct))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        reversal_bars: i64,
+        reversal_pct: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let reversal_bars = int_param(
+            "chart_busted_triple_top",
+            "reversal_bars",
+            reversal_bars,
+            1,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let reversal_pct = float_param(
+            "chart_busted_triple_top",
+            "reversal_pct",
+            reversal_pct,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::chart_busted_triple_top::Params {
+            reversal_bars,
+            reversal_pct,
+        };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::chart_busted_triple_top::ChartBustedTripleTop as Kernel<
+                    3,
+                    1,
+                >>::open_and_fill([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "chart_busted_triple_top"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream chart_busted_triple_top bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
 #[pyfunction]
 #[pyo3(name = "chart_complex_head_shoulders", signature = (high, low, close, *, period, pivot_n, shoulder_tol, min_separation))]
@@ -41263,6 +42998,15 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(chart_bull_pennant, m)?)?;
     m.add_function(wrap_pyfunction!(chart_bump_and_run_bottom, m)?)?;
     m.add_function(wrap_pyfunction!(chart_bump_and_run_top, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_busted_ascending_triangle, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_busted_descending_triangle, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_busted_double_bottom, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_busted_double_top, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_busted_head_shoulders, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_busted_inverse_head_shoulders, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_busted_rectangle, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_busted_triple_bottom, m)?)?;
+    m.add_function(wrap_pyfunction!(chart_busted_triple_top, m)?)?;
     m.add_function(wrap_pyfunction!(chart_complex_head_shoulders, m)?)?;
     m.add_function(wrap_pyfunction!(chart_complex_inverse_head_shoulders, m)?)?;
     m.add_function(wrap_pyfunction!(chart_cup_with_handle, m)?)?;
@@ -41544,6 +43288,15 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyChartBullPennantStream>()?;
     m.add_class::<PyChartBumpAndRunBottomStream>()?;
     m.add_class::<PyChartBumpAndRunTopStream>()?;
+    m.add_class::<PyChartBustedAscendingTriangleStream>()?;
+    m.add_class::<PyChartBustedDescendingTriangleStream>()?;
+    m.add_class::<PyChartBustedDoubleBottomStream>()?;
+    m.add_class::<PyChartBustedDoubleTopStream>()?;
+    m.add_class::<PyChartBustedHeadShouldersStream>()?;
+    m.add_class::<PyChartBustedInverseHeadShouldersStream>()?;
+    m.add_class::<PyChartBustedRectangleStream>()?;
+    m.add_class::<PyChartBustedTripleBottomStream>()?;
+    m.add_class::<PyChartBustedTripleTopStream>()?;
     m.add_class::<PyChartComplexHeadShouldersStream>()?;
     m.add_class::<PyChartComplexInverseHeadShouldersStream>()?;
     m.add_class::<PyChartCupWithHandleStream>()?;
@@ -42973,6 +44726,186 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
             params.set_item("pivot_n", entry)?;
         }
         table.set_item("chart_bump_and_run_top", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 10)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("reversal_bars", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("reversal_pct", entry)?;
+        }
+        table.set_item("chart_busted_ascending_triangle", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 10)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("reversal_bars", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("reversal_pct", entry)?;
+        }
+        table.set_item("chart_busted_descending_triangle", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 10)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("reversal_bars", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("reversal_pct", entry)?;
+        }
+        table.set_item("chart_busted_double_bottom", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 10)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("reversal_bars", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("reversal_pct", entry)?;
+        }
+        table.set_item("chart_busted_double_top", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 10)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("reversal_bars", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("reversal_pct", entry)?;
+        }
+        table.set_item("chart_busted_head_shoulders", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 10)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("reversal_bars", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("reversal_pct", entry)?;
+        }
+        table.set_item("chart_busted_inverse_head_shoulders", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 10)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("reversal_bars", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("reversal_pct", entry)?;
+        }
+        table.set_item("chart_busted_rectangle", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 10)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("reversal_bars", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("reversal_pct", entry)?;
+        }
+        table.set_item("chart_busted_triple_bottom", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 10)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("reversal_bars", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("reversal_pct", entry)?;
+        }
+        table.set_item("chart_busted_triple_top", params)?;
     }
     {
         let params = PyDict::new(py);
@@ -45957,6 +47890,24 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("chart_bull_pennant", vec!["high", "low", "close"])?;
     table.set_item("chart_bump_and_run_bottom", vec!["high", "low", "close"])?;
     table.set_item("chart_bump_and_run_top", vec!["high", "low", "close"])?;
+    table.set_item(
+        "chart_busted_ascending_triangle",
+        vec!["high", "low", "close"],
+    )?;
+    table.set_item(
+        "chart_busted_descending_triangle",
+        vec!["high", "low", "close"],
+    )?;
+    table.set_item("chart_busted_double_bottom", vec!["high", "low", "close"])?;
+    table.set_item("chart_busted_double_top", vec!["high", "low", "close"])?;
+    table.set_item("chart_busted_head_shoulders", vec!["high", "low", "close"])?;
+    table.set_item(
+        "chart_busted_inverse_head_shoulders",
+        vec!["high", "low", "close"],
+    )?;
+    table.set_item("chart_busted_rectangle", vec!["high", "low", "close"])?;
+    table.set_item("chart_busted_triple_bottom", vec!["high", "low", "close"])?;
+    table.set_item("chart_busted_triple_top", vec!["high", "low", "close"])?;
     table.set_item("chart_complex_head_shoulders", vec!["high", "low", "close"])?;
     table.set_item(
         "chart_complex_inverse_head_shoulders",
@@ -46268,6 +48219,24 @@ fn kinds_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("chart_bull_pennant", vec!["high", "low", "close"])?;
     table.set_item("chart_bump_and_run_bottom", vec!["high", "low", "close"])?;
     table.set_item("chart_bump_and_run_top", vec!["high", "low", "close"])?;
+    table.set_item(
+        "chart_busted_ascending_triangle",
+        vec!["high", "low", "close"],
+    )?;
+    table.set_item(
+        "chart_busted_descending_triangle",
+        vec!["high", "low", "close"],
+    )?;
+    table.set_item("chart_busted_double_bottom", vec!["high", "low", "close"])?;
+    table.set_item("chart_busted_double_top", vec!["high", "low", "close"])?;
+    table.set_item("chart_busted_head_shoulders", vec!["high", "low", "close"])?;
+    table.set_item(
+        "chart_busted_inverse_head_shoulders",
+        vec!["high", "low", "close"],
+    )?;
+    table.set_item("chart_busted_rectangle", vec!["high", "low", "close"])?;
+    table.set_item("chart_busted_triple_bottom", vec!["high", "low", "close"])?;
+    table.set_item("chart_busted_triple_top", vec!["high", "low", "close"])?;
     table.set_item("chart_complex_head_shoulders", vec!["high", "low", "close"])?;
     table.set_item(
         "chart_complex_inverse_head_shoulders",
@@ -46585,6 +48554,33 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
         vec!["chart_bump_and_run_bottom"],
     )?;
     table.set_item("chart_bump_and_run_top", vec!["chart_bump_and_run_top"])?;
+    table.set_item(
+        "chart_busted_ascending_triangle",
+        vec!["chart_busted_ascending_triangle"],
+    )?;
+    table.set_item(
+        "chart_busted_descending_triangle",
+        vec!["chart_busted_descending_triangle"],
+    )?;
+    table.set_item(
+        "chart_busted_double_bottom",
+        vec!["chart_busted_double_bottom"],
+    )?;
+    table.set_item("chart_busted_double_top", vec!["chart_busted_double_top"])?;
+    table.set_item(
+        "chart_busted_head_shoulders",
+        vec!["chart_busted_head_shoulders"],
+    )?;
+    table.set_item(
+        "chart_busted_inverse_head_shoulders",
+        vec!["chart_busted_inverse_head_shoulders"],
+    )?;
+    table.set_item("chart_busted_rectangle", vec!["chart_busted_rectangle"])?;
+    table.set_item(
+        "chart_busted_triple_bottom",
+        vec!["chart_busted_triple_bottom"],
+    )?;
+    table.set_item("chart_busted_triple_top", vec!["chart_busted_triple_top"])?;
     table.set_item(
         "chart_complex_head_shoulders",
         vec!["chart_complex_head_shoulders"],
@@ -46960,6 +48956,15 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("chart_bull_pennant", vec!["int32"])?;
     table.set_item("chart_bump_and_run_bottom", vec!["int32"])?;
     table.set_item("chart_bump_and_run_top", vec!["int32"])?;
+    table.set_item("chart_busted_ascending_triangle", vec!["int32"])?;
+    table.set_item("chart_busted_descending_triangle", vec!["int32"])?;
+    table.set_item("chart_busted_double_bottom", vec!["int32"])?;
+    table.set_item("chart_busted_double_top", vec!["int32"])?;
+    table.set_item("chart_busted_head_shoulders", vec!["int32"])?;
+    table.set_item("chart_busted_inverse_head_shoulders", vec!["int32"])?;
+    table.set_item("chart_busted_rectangle", vec!["int32"])?;
+    table.set_item("chart_busted_triple_bottom", vec!["int32"])?;
+    table.set_item("chart_busted_triple_top", vec!["int32"])?;
     table.set_item("chart_complex_head_shoulders", vec!["int32"])?;
     table.set_item("chart_complex_inverse_head_shoulders", vec!["int32"])?;
     table.set_item("chart_cup_with_handle", vec!["int32"])?;
@@ -47276,6 +49281,42 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     )?;
     table.set_item(
         "chart_bump_and_run_top",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "chart_busted_ascending_triangle",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "chart_busted_descending_triangle",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "chart_busted_double_bottom",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "chart_busted_double_top",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "chart_busted_head_shoulders",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "chart_busted_inverse_head_shoulders",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "chart_busted_rectangle",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "chart_busted_triple_bottom",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "chart_busted_triple_top",
         vec!["chart_pattern", "path_dependent"],
     )?;
     table.set_item(
@@ -47654,6 +49695,15 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("chart_bull_pennant", "chart")?;
     table.set_item("chart_bump_and_run_bottom", "chart")?;
     table.set_item("chart_bump_and_run_top", "chart")?;
+    table.set_item("chart_busted_ascending_triangle", "chart")?;
+    table.set_item("chart_busted_descending_triangle", "chart")?;
+    table.set_item("chart_busted_double_bottom", "chart")?;
+    table.set_item("chart_busted_double_top", "chart")?;
+    table.set_item("chart_busted_head_shoulders", "chart")?;
+    table.set_item("chart_busted_inverse_head_shoulders", "chart")?;
+    table.set_item("chart_busted_rectangle", "chart")?;
+    table.set_item("chart_busted_triple_bottom", "chart")?;
+    table.set_item("chart_busted_triple_top", "chart")?;
     table.set_item("chart_complex_head_shoulders", "chart")?;
     table.set_item("chart_complex_inverse_head_shoulders", "chart")?;
     table.set_item("chart_cup_with_handle", "chart")?;
@@ -48478,6 +50528,78 @@ pub fn lookback_of(
                 None => 4,
             };
             Ok(<trendlib::indicators::chart_bump_and_run_top::ChartBumpAndRunTop as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_bump_and_run_top::Params { lead_window, bump_window, bump_factor, pivot_n, }))
+        }
+        "chart_busted_ascending_triangle" => {
+            let reversal_bars = match get("reversal_bars")? {
+                Some(value) => int_param("chart_busted_ascending_triangle", "reversal_bars", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 10,
+            };
+            let reversal_pct = 0.05;
+            Ok(<trendlib::indicators::chart_busted_ascending_triangle::ChartBustedAscendingTriangle as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_busted_ascending_triangle::Params { reversal_bars, reversal_pct, }))
+        }
+        "chart_busted_descending_triangle" => {
+            let reversal_bars = match get("reversal_bars")? {
+                Some(value) => int_param("chart_busted_descending_triangle", "reversal_bars", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 10,
+            };
+            let reversal_pct = 0.05;
+            Ok(<trendlib::indicators::chart_busted_descending_triangle::ChartBustedDescendingTriangle as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_busted_descending_triangle::Params { reversal_bars, reversal_pct, }))
+        }
+        "chart_busted_double_bottom" => {
+            let reversal_bars = match get("reversal_bars")? {
+                Some(value) => int_param("chart_busted_double_bottom", "reversal_bars", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 10,
+            };
+            let reversal_pct = 0.05;
+            Ok(<trendlib::indicators::chart_busted_double_bottom::ChartBustedDoubleBottom as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_busted_double_bottom::Params { reversal_bars, reversal_pct, }))
+        }
+        "chart_busted_double_top" => {
+            let reversal_bars = match get("reversal_bars")? {
+                Some(value) => int_param("chart_busted_double_top", "reversal_bars", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 10,
+            };
+            let reversal_pct = 0.05;
+            Ok(<trendlib::indicators::chart_busted_double_top::ChartBustedDoubleTop as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_busted_double_top::Params { reversal_bars, reversal_pct, }))
+        }
+        "chart_busted_head_shoulders" => {
+            let reversal_bars = match get("reversal_bars")? {
+                Some(value) => int_param("chart_busted_head_shoulders", "reversal_bars", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 10,
+            };
+            let reversal_pct = 0.05;
+            Ok(<trendlib::indicators::chart_busted_head_shoulders::ChartBustedHeadShoulders as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_busted_head_shoulders::Params { reversal_bars, reversal_pct, }))
+        }
+        "chart_busted_inverse_head_shoulders" => {
+            let reversal_bars = match get("reversal_bars")? {
+                Some(value) => int_param("chart_busted_inverse_head_shoulders", "reversal_bars", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 10,
+            };
+            let reversal_pct = 0.05;
+            Ok(<trendlib::indicators::chart_busted_inverse_head_shoulders::ChartBustedInverseHeadShoulders as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_busted_inverse_head_shoulders::Params { reversal_bars, reversal_pct, }))
+        }
+        "chart_busted_rectangle" => {
+            let reversal_bars = match get("reversal_bars")? {
+                Some(value) => int_param("chart_busted_rectangle", "reversal_bars", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 10,
+            };
+            let reversal_pct = 0.05;
+            Ok(<trendlib::indicators::chart_busted_rectangle::ChartBustedRectangle as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_busted_rectangle::Params { reversal_bars, reversal_pct, }))
+        }
+        "chart_busted_triple_bottom" => {
+            let reversal_bars = match get("reversal_bars")? {
+                Some(value) => int_param("chart_busted_triple_bottom", "reversal_bars", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 10,
+            };
+            let reversal_pct = 0.05;
+            Ok(<trendlib::indicators::chart_busted_triple_bottom::ChartBustedTripleBottom as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_busted_triple_bottom::Params { reversal_bars, reversal_pct, }))
+        }
+        "chart_busted_triple_top" => {
+            let reversal_bars = match get("reversal_bars")? {
+                Some(value) => int_param("chart_busted_triple_top", "reversal_bars", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 10,
+            };
+            let reversal_pct = 0.05;
+            Ok(<trendlib::indicators::chart_busted_triple_top::ChartBustedTripleTop as Kernel<3, 1>>::lookback(&trendlib::indicators::chart_busted_triple_top::Params { reversal_bars, reversal_pct, }))
         }
         "chart_complex_head_shoulders" => {
             let period = match get("period")? {

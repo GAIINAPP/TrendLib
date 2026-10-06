@@ -331,6 +331,15 @@ __all__ = [
     "chart_bull_pennant",
     "chart_bump_and_run_bottom",
     "chart_bump_and_run_top",
+    "chart_busted_ascending_triangle",
+    "chart_busted_descending_triangle",
+    "chart_busted_double_bottom",
+    "chart_busted_double_top",
+    "chart_busted_head_shoulders",
+    "chart_busted_inverse_head_shoulders",
+    "chart_busted_rectangle",
+    "chart_busted_triple_bottom",
+    "chart_busted_triple_top",
     "chart_complex_head_shoulders",
     "chart_complex_inverse_head_shoulders",
     "chart_cup_with_handle",
@@ -4426,6 +4435,414 @@ def chart_bump_and_run_top(
         pivot_n=pivot_n,
     )
     return _convert.wrap_outputs(out, carrier, ("chart_bump_and_run_top",))
+
+
+def chart_busted_ascending_triangle(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    reversal_bars: int = _PARAMS["chart_busted_ascending_triangle"]["reversal_bars"]["default"],
+    reversal_pct: float = _PARAMS["chart_busted_ascending_triangle"]["reversal_pct"]["default"],
+) -> Any:
+    """Busted Ascending Triangle.
+
+    Parameters
+    ----------
+    reversal_bars : int, default 10
+        Bars after the breakout in which the reversal must come, from 1 to 100000.
+    reversal_pct : float, default 0.05
+        How far back through the breakout level the close must go, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A fall of reversal_pct soon after a ascending triangle reads.
+    """
+    reversal_bars = _convert.as_int(
+        "chart_busted_ascending_triangle", "reversal_bars", reversal_bars
+    )
+    reversal_pct = _convert.as_float(
+        "chart_busted_ascending_triangle", "reversal_pct", reversal_pct
+    )
+    columns, carrier = _convert.bars(
+        "chart_busted_ascending_triangle",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_busted_ascending_triangle(
+        *columns, reversal_bars=reversal_bars, reversal_pct=reversal_pct
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_busted_ascending_triangle",))
+
+
+def chart_busted_descending_triangle(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    reversal_bars: int = _PARAMS["chart_busted_descending_triangle"]["reversal_bars"]["default"],
+    reversal_pct: float = _PARAMS["chart_busted_descending_triangle"]["reversal_pct"]["default"],
+) -> Any:
+    """Busted Descending Triangle.
+
+    Parameters
+    ----------
+    reversal_bars : int, default 10
+        Bars after the breakout in which the reversal must come, from 1 to 100000.
+    reversal_pct : float, default 0.05
+        How far back through the breakout level the close must go, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A rise of reversal_pct soon after a descending triangle reads.
+    """
+    reversal_bars = _convert.as_int(
+        "chart_busted_descending_triangle", "reversal_bars", reversal_bars
+    )
+    reversal_pct = _convert.as_float(
+        "chart_busted_descending_triangle", "reversal_pct", reversal_pct
+    )
+    columns, carrier = _convert.bars(
+        "chart_busted_descending_triangle",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_busted_descending_triangle(
+        *columns, reversal_bars=reversal_bars, reversal_pct=reversal_pct
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_busted_descending_triangle",))
+
+
+def chart_busted_double_bottom(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    reversal_bars: int = _PARAMS["chart_busted_double_bottom"]["reversal_bars"]["default"],
+    reversal_pct: float = _PARAMS["chart_busted_double_bottom"]["reversal_pct"]["default"],
+) -> Any:
+    """Busted Double Bottom.
+
+    Parameters
+    ----------
+    reversal_bars : int, default 10
+        Bars after the breakout in which the reversal must come, from 1 to 100000.
+    reversal_pct : float, default 0.05
+        How far back through the breakout level the close must go, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A fall of reversal_pct soon after a double bottom reads.
+    """
+    reversal_bars = _convert.as_int("chart_busted_double_bottom", "reversal_bars", reversal_bars)
+    reversal_pct = _convert.as_float("chart_busted_double_bottom", "reversal_pct", reversal_pct)
+    columns, carrier = _convert.bars(
+        "chart_busted_double_bottom",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_busted_double_bottom(
+        *columns, reversal_bars=reversal_bars, reversal_pct=reversal_pct
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_busted_double_bottom",))
+
+
+def chart_busted_double_top(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    reversal_bars: int = _PARAMS["chart_busted_double_top"]["reversal_bars"]["default"],
+    reversal_pct: float = _PARAMS["chart_busted_double_top"]["reversal_pct"]["default"],
+) -> Any:
+    """Busted Double Top.
+
+    Parameters
+    ----------
+    reversal_bars : int, default 10
+        Bars after the breakout in which the reversal must come, from 1 to 100000.
+    reversal_pct : float, default 0.05
+        How far back through the breakout level the close must go, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A rise of reversal_pct soon after a double top reads.
+    """
+    reversal_bars = _convert.as_int("chart_busted_double_top", "reversal_bars", reversal_bars)
+    reversal_pct = _convert.as_float("chart_busted_double_top", "reversal_pct", reversal_pct)
+    columns, carrier = _convert.bars(
+        "chart_busted_double_top",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_busted_double_top(
+        *columns, reversal_bars=reversal_bars, reversal_pct=reversal_pct
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_busted_double_top",))
+
+
+def chart_busted_head_shoulders(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    reversal_bars: int = _PARAMS["chart_busted_head_shoulders"]["reversal_bars"]["default"],
+    reversal_pct: float = _PARAMS["chart_busted_head_shoulders"]["reversal_pct"]["default"],
+) -> Any:
+    """Busted Head and Shoulders.
+
+    Parameters
+    ----------
+    reversal_bars : int, default 10
+        Bars after the breakout in which the reversal must come, from 1 to 100000.
+    reversal_pct : float, default 0.05
+        How far back through the breakout level the close must go, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A rise of reversal_pct soon after a head and shoulders reads.
+    """
+    reversal_bars = _convert.as_int("chart_busted_head_shoulders", "reversal_bars", reversal_bars)
+    reversal_pct = _convert.as_float("chart_busted_head_shoulders", "reversal_pct", reversal_pct)
+    columns, carrier = _convert.bars(
+        "chart_busted_head_shoulders",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_busted_head_shoulders(
+        *columns, reversal_bars=reversal_bars, reversal_pct=reversal_pct
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_busted_head_shoulders",))
+
+
+def chart_busted_inverse_head_shoulders(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    reversal_bars: int = _PARAMS["chart_busted_inverse_head_shoulders"]["reversal_bars"]["default"],
+    reversal_pct: float = _PARAMS["chart_busted_inverse_head_shoulders"]["reversal_pct"]["default"],
+) -> Any:
+    """Busted Inverse Head and Shoulders.
+
+    Parameters
+    ----------
+    reversal_bars : int, default 10
+        Bars after the breakout in which the reversal must come, from 1 to 100000.
+    reversal_pct : float, default 0.05
+        How far back through the breakout level the close must go, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A fall of reversal_pct soon after a inverse head and shoulders reads.
+    """
+    reversal_bars = _convert.as_int(
+        "chart_busted_inverse_head_shoulders", "reversal_bars", reversal_bars
+    )
+    reversal_pct = _convert.as_float(
+        "chart_busted_inverse_head_shoulders", "reversal_pct", reversal_pct
+    )
+    columns, carrier = _convert.bars(
+        "chart_busted_inverse_head_shoulders",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_busted_inverse_head_shoulders(
+        *columns, reversal_bars=reversal_bars, reversal_pct=reversal_pct
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_busted_inverse_head_shoulders",))
+
+
+def chart_busted_rectangle(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    reversal_bars: int = _PARAMS["chart_busted_rectangle"]["reversal_bars"]["default"],
+    reversal_pct: float = _PARAMS["chart_busted_rectangle"]["reversal_pct"]["default"],
+) -> Any:
+    """Busted Rectangle.
+
+    Parameters
+    ----------
+    reversal_bars : int, default 10
+        Bars after the breakout in which the reversal must come, from 1 to 100000.
+    reversal_pct : float, default 0.05
+        How far back through the breakout level the close must go, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A reversal of reversal_pct soon after a rectangle breakout, in the other direction.
+    """
+    reversal_bars = _convert.as_int("chart_busted_rectangle", "reversal_bars", reversal_bars)
+    reversal_pct = _convert.as_float("chart_busted_rectangle", "reversal_pct", reversal_pct)
+    columns, carrier = _convert.bars(
+        "chart_busted_rectangle",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_busted_rectangle(
+        *columns, reversal_bars=reversal_bars, reversal_pct=reversal_pct
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_busted_rectangle",))
+
+
+def chart_busted_triple_bottom(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    reversal_bars: int = _PARAMS["chart_busted_triple_bottom"]["reversal_bars"]["default"],
+    reversal_pct: float = _PARAMS["chart_busted_triple_bottom"]["reversal_pct"]["default"],
+) -> Any:
+    """Busted Triple Bottom.
+
+    Parameters
+    ----------
+    reversal_bars : int, default 10
+        Bars after the breakout in which the reversal must come, from 1 to 100000.
+    reversal_pct : float, default 0.05
+        How far back through the breakout level the close must go, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A fall of reversal_pct soon after a triple bottom reads.
+    """
+    reversal_bars = _convert.as_int("chart_busted_triple_bottom", "reversal_bars", reversal_bars)
+    reversal_pct = _convert.as_float("chart_busted_triple_bottom", "reversal_pct", reversal_pct)
+    columns, carrier = _convert.bars(
+        "chart_busted_triple_bottom",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_busted_triple_bottom(
+        *columns, reversal_bars=reversal_bars, reversal_pct=reversal_pct
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_busted_triple_bottom",))
+
+
+def chart_busted_triple_top(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    reversal_bars: int = _PARAMS["chart_busted_triple_top"]["reversal_bars"]["default"],
+    reversal_pct: float = _PARAMS["chart_busted_triple_top"]["reversal_pct"]["default"],
+) -> Any:
+    """Busted Triple Top.
+
+    Parameters
+    ----------
+    reversal_bars : int, default 10
+        Bars after the breakout in which the reversal must come, from 1 to 100000.
+    reversal_pct : float, default 0.05
+        How far back through the breakout level the close must go, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A rise of reversal_pct soon after a triple top reads.
+    """
+    reversal_bars = _convert.as_int("chart_busted_triple_top", "reversal_bars", reversal_bars)
+    reversal_pct = _convert.as_float("chart_busted_triple_top", "reversal_pct", reversal_pct)
+    columns, carrier = _convert.bars(
+        "chart_busted_triple_top",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_busted_triple_top(
+        *columns, reversal_bars=reversal_bars, reversal_pct=reversal_pct
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_busted_triple_top",))
 
 
 def chart_complex_head_shoulders(

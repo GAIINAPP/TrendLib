@@ -91,3 +91,6 @@ Before 1.0, minor versions may break the API; every break is listed under
 - Twelve more on oracle P: the Adam and Eve double tops and bottoms (eight,
   graded the way Bulkowski names them), Big M and Big W, and three falling
   peaks and three rising valleys.
+- Nine busted patterns on oracle P: the ascending and descending triangle,
+  double and triple top and bottom, head and shoulders both ways, and the
+  rectangle, each read when price reverses soon after its base pattern does.

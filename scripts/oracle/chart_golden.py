@@ -36,7 +36,7 @@ TOLERANCE = "rel=1e-10 abs=1e-12"
 DAILY = "daily_2000.csv"
 CHARTS = "charts_2579.csv"
 PATTERNS = "patterns_1080.csv"
-SHAPES = "shapes_528.csv"
+SHAPES = "shapes_936.csv"
 INTRADAY = "intraday_5m_20d.csv"
 
 # TrendLib's names for the oracle's parameters (D12): only `window` differs.
@@ -90,7 +90,13 @@ ON_PATTERNS = {
     "chart_bump_and_run_top",
     "chart_bump_and_run_bottom",
 }
-ON_SHAPES = {"chart_high_tight_flag", "chart_three_peaks", "chart_three_valleys"}
+ON_SHAPES = {
+    "chart_high_tight_flag",
+    "chart_three_peaks",
+    "chart_three_valleys",
+    "chart_busted_ascending_triangle",
+    "chart_busted_rectangle",
+}
 # Two rounded tops a few percent apart are what five-minute bars draw and a daily
 # walk does not.
 ON_INTRADAY = {"chart_double_top_eve_eve"}

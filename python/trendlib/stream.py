@@ -131,6 +131,15 @@ __all__ = [
     "chart_bull_pennant",
     "chart_bump_and_run_bottom",
     "chart_bump_and_run_top",
+    "chart_busted_ascending_triangle",
+    "chart_busted_descending_triangle",
+    "chart_busted_double_bottom",
+    "chart_busted_double_top",
+    "chart_busted_head_shoulders",
+    "chart_busted_inverse_head_shoulders",
+    "chart_busted_rectangle",
+    "chart_busted_triple_bottom",
+    "chart_busted_triple_top",
     "chart_complex_head_shoulders",
     "chart_complex_inverse_head_shoulders",
     "chart_cup_with_handle",
@@ -2121,6 +2130,141 @@ chart_bump_and_run_top = Factory(
         "close",
     ),
     ("chart_bump_and_run_top",),
+)
+chart_busted_ascending_triangle = Factory(
+    "chart_busted_ascending_triangle",
+    _core.ChartBustedAscendingTriangleStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_busted_ascending_triangle",),
+)
+chart_busted_descending_triangle = Factory(
+    "chart_busted_descending_triangle",
+    _core.ChartBustedDescendingTriangleStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_busted_descending_triangle",),
+)
+chart_busted_double_bottom = Factory(
+    "chart_busted_double_bottom",
+    _core.ChartBustedDoubleBottomStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_busted_double_bottom",),
+)
+chart_busted_double_top = Factory(
+    "chart_busted_double_top",
+    _core.ChartBustedDoubleTopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_busted_double_top",),
+)
+chart_busted_head_shoulders = Factory(
+    "chart_busted_head_shoulders",
+    _core.ChartBustedHeadShouldersStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_busted_head_shoulders",),
+)
+chart_busted_inverse_head_shoulders = Factory(
+    "chart_busted_inverse_head_shoulders",
+    _core.ChartBustedInverseHeadShouldersStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_busted_inverse_head_shoulders",),
+)
+chart_busted_rectangle = Factory(
+    "chart_busted_rectangle",
+    _core.ChartBustedRectangleStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_busted_rectangle",),
+)
+chart_busted_triple_bottom = Factory(
+    "chart_busted_triple_bottom",
+    _core.ChartBustedTripleBottomStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_busted_triple_bottom",),
+)
+chart_busted_triple_top = Factory(
+    "chart_busted_triple_top",
+    _core.ChartBustedTripleTopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_busted_triple_top",),
 )
 chart_complex_head_shoulders = Factory(
     "chart_complex_head_shoulders",

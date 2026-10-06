@@ -7327,6 +7327,693 @@ mod chart_bump_and_run_top_adapter {
     }
 }
 
+mod chart_busted_ascending_triangle_adapter {
+    use super::*;
+
+    type Indicated =
+        trendlib::indicators::chart_busted_ascending_triangle::ChartBustedAscendingTriangle;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "reversal_bars",
+            default: 10.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "reversal_pct",
+            default: 0.05,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::chart_busted_ascending_triangle::Params {
+        trendlib::indicators::chart_busted_ascending_triangle::Params {
+            reversal_bars: values[0] as usize,
+            reversal_pct: values[1],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "chart_busted_ascending_triangle takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::chart_busted_ascending_triangle::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod chart_busted_descending_triangle_adapter {
+    use super::*;
+
+    type Indicated =
+        trendlib::indicators::chart_busted_descending_triangle::ChartBustedDescendingTriangle;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "reversal_bars",
+            default: 10.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "reversal_pct",
+            default: 0.05,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::chart_busted_descending_triangle::Params {
+        trendlib::indicators::chart_busted_descending_triangle::Params {
+            reversal_bars: values[0] as usize,
+            reversal_pct: values[1],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "chart_busted_descending_triangle takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::chart_busted_descending_triangle::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod chart_busted_double_bottom_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::chart_busted_double_bottom::ChartBustedDoubleBottom;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "reversal_bars",
+            default: 10.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "reversal_pct",
+            default: 0.05,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::chart_busted_double_bottom::Params {
+        trendlib::indicators::chart_busted_double_bottom::Params {
+            reversal_bars: values[0] as usize,
+            reversal_pct: values[1],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "chart_busted_double_bottom takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::chart_busted_double_bottom::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod chart_busted_double_top_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::chart_busted_double_top::ChartBustedDoubleTop;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "reversal_bars",
+            default: 10.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "reversal_pct",
+            default: 0.05,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::chart_busted_double_top::Params {
+        trendlib::indicators::chart_busted_double_top::Params {
+            reversal_bars: values[0] as usize,
+            reversal_pct: values[1],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "chart_busted_double_top takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::chart_busted_double_top::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod chart_busted_head_shoulders_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::chart_busted_head_shoulders::ChartBustedHeadShoulders;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "reversal_bars",
+            default: 10.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "reversal_pct",
+            default: 0.05,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::chart_busted_head_shoulders::Params {
+        trendlib::indicators::chart_busted_head_shoulders::Params {
+            reversal_bars: values[0] as usize,
+            reversal_pct: values[1],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "chart_busted_head_shoulders takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::chart_busted_head_shoulders::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod chart_busted_inverse_head_shoulders_adapter {
+    use super::*;
+
+    type Indicated =
+        trendlib::indicators::chart_busted_inverse_head_shoulders::ChartBustedInverseHeadShoulders;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "reversal_bars",
+            default: 10.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "reversal_pct",
+            default: 0.05,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::chart_busted_inverse_head_shoulders::Params {
+        trendlib::indicators::chart_busted_inverse_head_shoulders::Params {
+            reversal_bars: values[0] as usize,
+            reversal_pct: values[1],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "chart_busted_inverse_head_shoulders takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::chart_busted_inverse_head_shoulders::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod chart_busted_rectangle_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::chart_busted_rectangle::ChartBustedRectangle;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "reversal_bars",
+            default: 10.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "reversal_pct",
+            default: 0.05,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::chart_busted_rectangle::Params {
+        trendlib::indicators::chart_busted_rectangle::Params {
+            reversal_bars: values[0] as usize,
+            reversal_pct: values[1],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "chart_busted_rectangle takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::chart_busted_rectangle::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod chart_busted_triple_bottom_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::chart_busted_triple_bottom::ChartBustedTripleBottom;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "reversal_bars",
+            default: 10.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "reversal_pct",
+            default: 0.05,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::chart_busted_triple_bottom::Params {
+        trendlib::indicators::chart_busted_triple_bottom::Params {
+            reversal_bars: values[0] as usize,
+            reversal_pct: values[1],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "chart_busted_triple_bottom takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::chart_busted_triple_bottom::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod chart_busted_triple_top_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::chart_busted_triple_top::ChartBustedTripleTop;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "reversal_bars",
+            default: 10.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "reversal_pct",
+            default: 0.05,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::chart_busted_triple_top::Params {
+        trendlib::indicators::chart_busted_triple_top::Params {
+            reversal_bars: values[0] as usize,
+            reversal_pct: values[1],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "chart_busted_triple_top takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::chart_busted_triple_top::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod chart_complex_head_shoulders_adapter {
     use super::*;
 
@@ -18546,6 +19233,15 @@ pub fn registered() -> Vec<Registered> {
         chart_bull_pennant_adapter::registered(),
         chart_bump_and_run_bottom_adapter::registered(),
         chart_bump_and_run_top_adapter::registered(),
+        chart_busted_ascending_triangle_adapter::registered(),
+        chart_busted_descending_triangle_adapter::registered(),
+        chart_busted_double_bottom_adapter::registered(),
+        chart_busted_double_top_adapter::registered(),
+        chart_busted_head_shoulders_adapter::registered(),
+        chart_busted_inverse_head_shoulders_adapter::registered(),
+        chart_busted_rectangle_adapter::registered(),
+        chart_busted_triple_bottom_adapter::registered(),
+        chart_busted_triple_top_adapter::registered(),
         chart_complex_head_shoulders_adapter::registered(),
         chart_complex_inverse_head_shoulders_adapter::registered(),
         chart_cup_with_handle_adapter::registered(),

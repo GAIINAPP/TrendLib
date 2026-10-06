@@ -2,8 +2,8 @@
 
 # Progress
 
-**278 of 326 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 48 not started.
+**287 of 325 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 38 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -27,7 +27,7 @@ something is done that is not. CI checks it is current.
 | Math operators | 12 | 12 |
 | Candlestick patterns | 61 | 61 |
 | Levels | 3 | 3 |
-| Chart patterns | 54 | 64 |
+| Chart patterns | 63 | 63 |
 | Bar patterns | 19 | 19 |
 | Harmonic patterns | 0 | 12 |
 | Indicators on oracle A | 1 | 23 |
@@ -270,7 +270,7 @@ something is done that is not. CI checks it is current.
 - [x] `pivots_camarilla` -- Camarilla Pivot Points *
 - [x] `pivots_traditional` -- Traditional Pivot Points *
 
-## Chart patterns (54 of 64)
+## Chart patterns (63 of 63)
 
 - [x] `chart_ascending_broadening_wedge` -- Ascending Broadening Wedge
 - [x] `chart_ascending_channel` -- Ascending Channel
@@ -286,16 +286,15 @@ something is done that is not. CI checks it is current.
 - [x] `chart_bull_pennant` -- Bull Pennant
 - [x] `chart_bump_and_run_bottom` -- Bump-and-Run Reversal Bottom
 - [x] `chart_bump_and_run_top` -- Bump-and-Run Reversal Top
-- [ ] `chart_busted_ascending_triangle` -- Busted Ascending Triangle
-- [ ] `chart_busted_descending_triangle` -- Busted Descending Triangle
-- [ ] `chart_busted_double_bottom` -- Busted Double Bottom
-- [ ] `chart_busted_double_top` -- Busted Double Top
-- [ ] `chart_busted_head_shoulders` -- Busted Head and Shoulders
-- [ ] `chart_busted_inverse_head_shoulders` -- Busted Inverse Head and Shoulders
-- [ ] `chart_busted_rectangle` -- Busted Rectangle
-- [ ] `chart_busted_symmetrical_triangle` -- Busted Symmetrical Triangle
-- [ ] `chart_busted_triple_bottom` -- Busted Triple Bottom
-- [ ] `chart_busted_triple_top` -- Busted Triple Top
+- [x] `chart_busted_ascending_triangle` -- Busted Ascending Triangle
+- [x] `chart_busted_descending_triangle` -- Busted Descending Triangle
+- [x] `chart_busted_double_bottom` -- Busted Double Bottom
+- [x] `chart_busted_double_top` -- Busted Double Top
+- [x] `chart_busted_head_shoulders` -- Busted Head and Shoulders
+- [x] `chart_busted_inverse_head_shoulders` -- Busted Inverse Head and Shoulders
+- [x] `chart_busted_rectangle` -- Busted Rectangle
+- [x] `chart_busted_triple_bottom` -- Busted Triple Bottom
+- [x] `chart_busted_triple_top` -- Busted Triple Top
 - [x] `chart_complex_head_shoulders` -- Complex Head and Shoulders
 - [x] `chart_complex_inverse_head_shoulders` -- Complex Inverse Head and Shoulders
 - [x] `chart_cup_with_handle` -- Cup with Handle

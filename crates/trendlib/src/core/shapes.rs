@@ -8,6 +8,7 @@ use crate::core::bars::BarHistory;
 use crate::core::candles::Candle;
 use crate::core::chart::{Line, Swing, SwingFinder, SwingLog, Swings};
 use crate::core::kernel::Step;
+use std::collections::VecDeque;
 
 /// A chart shape asked of the last bars, read from high, low and close.
 pub type HlcRule<P> = fn(&BarHistory, &P) -> f64;
@@ -540,5 +541,106 @@ impl Step<3, 1> for StairState {
 
     fn preview(&self, bar: [f64; 3]) -> Option<[f64; 1]> {
         self.clone().advance(bar).map(|value| [value])
+    }
+}
+
+/// A busted pattern: every reading of a base pattern starts a watch of the
+/// next `reversal_bars` closes, and the first close that has come back
+/// `reversal_pct` from the best close since the breakout reads in the other
+/// direction. Each watch ends on its first such close or when its bars run out.
+#[derive(Clone, Debug)]
+pub struct BustState<S> {
+    base: S,
+    /// Whether the base pattern reads upward, so a bust is a fall from the
+    /// highest close since.
+    upward: bool,
+    reversal_bars: usize,
+    reversal_pct: f64,
+    /// The bar each live watch started on, and the best close since.
+    watches: VecDeque<(usize, f64)>,
+    lookback: usize,
+    bars: usize,
+}
+
+impl<S: Step<3, 1>> BustState<S> {
+    pub fn new(
+        base: S,
+        upward: bool,
+        reversal_bars: usize,
+        reversal_pct: f64,
+        lookback: usize,
+    ) -> Self {
+        Self {
+            base,
+            upward,
+            reversal_bars,
+            reversal_pct,
+            watches: VecDeque::with_capacity(reversal_bars + 2),
+            lookback,
+            bars: 0,
+        }
+    }
+
+    fn advance(&mut self, bar: [f64; 3]) -> Option<f64> {
+        let now = self.bars;
+        self.bars += 1;
+        let close = bar[2];
+        let (upward, pct, span) = (self.upward, self.reversal_pct, self.reversal_bars);
+        let mut busted = false;
+        self.watches.retain_mut(|(start, best)| {
+            if upward {
+                *best = best.max(close);
+                if (*best - close) / (*best + crate::core::chart::EPS) >= pct {
+                    busted = true;
+                    return false;
+                }
+            } else {
+                *best = best.min(close);
+                if (close - *best) / (best.abs() + crate::core::chart::EPS) >= pct {
+                    busted = true;
+                    return false;
+                }
+            }
+            now < *start + span
+        });
+        if self.base.push(bar).is_some_and(|[value]| value != 0.0) {
+            self.watches.push_back((now, close));
+        }
+        (now >= self.lookback).then_some(if !busted {
+            0.0
+        } else if upward {
+            -100.0
+        } else {
+            100.0
+        })
+    }
+}
+
+impl<S: Step<3, 1>> Step<3, 1> for BustState<S> {
+    fn push(&mut self, bar: [f64; 3]) -> Option<[f64; 1]> {
+        self.advance(bar).map(|value| [value])
+    }
+
+    fn preview(&self, bar: [f64; 3]) -> Option<[f64; 1]> {
+        self.clone().advance(bar).map(|value| [value])
+    }
+}
+
+/// Two busts read as one, the oracle's way: their signs add and clip.
+#[derive(Clone, Debug)]
+pub struct BustPair<A, B> {
+    pub first: BustState<A>,
+    pub second: BustState<B>,
+}
+
+impl<A: Step<3, 1>, B: Step<3, 1>> Step<3, 1> for BustPair<A, B> {
+    fn push(&mut self, bar: [f64; 3]) -> Option<[f64; 1]> {
+        let a = self.first.push(bar);
+        let b = self.second.push(bar);
+        Some([(a?[0] + b?[0]).clamp(-100.0, 100.0)])
+    }
+
+    fn preview(&self, bar: [f64; 3]) -> Option<[f64; 1]> {
+        self.clone().push(bar)
     }
 }

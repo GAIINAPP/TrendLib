@@ -455,7 +455,7 @@ CHARTS_BARS: dict[str, list[tuple[float, float, float, float]]] = {
 }
 
 
-SHAPES_FILE = "shapes_528.csv"
+SHAPES_FILE = "shapes_936.csv"
 SHAPES_START = date(2012, 1, 2)
 SHAPES_FIRST_CLOSE = 60.0
 
@@ -495,6 +495,29 @@ SHAPES: dict[str, tuple[float, list[tuple[int, float]]]] = {
     "three_valleys_level": (
         110.0,
         [(10, 100.0), (5, 108.0), (8, 102.0), (4, 107.0), (4, 102.0), (10, 115.0)],
+    ),
+    # The charts dataset's ascending triangle and rectangles, each breakout
+    # turned back sharply within a few bars: busted patterns.
+    "busted_ascending_triangle": (
+        90.0,
+        _zigzag(
+            [100.0, 100.04, 100.08, 100.12, 100.16], [92.0, 94.0, 95.8, 97.4, 98.6], 8, "high"
+        )
+        + [(10, 104.0), (6, 96.0)],
+    ),
+    "busted_rectangle_up": (
+        94.0,
+        _zigzag(
+            [100.0, 100.08, 100.16, 100.24, 100.32], [95.0, 95.06, 95.12, 95.18, 95.24], 8, "high"
+        )
+        + [(10, 104.0), (6, 96.0)],
+    ),
+    "busted_rectangle_down": (
+        101.0,
+        _zigzag(
+            [100.0, 100.08, 100.16, 100.24, 100.32], [95.0, 95.06, 95.12, 95.18, 95.24], 8, "low"
+        )
+        + [(10, 91.0), (6, 99.0)],
     ),
 }
 

@@ -1,0 +1,33 @@
+name: chart_busted_triple_bottom
+title: Busted Triple Bottom
+group: chart
+flags: [chart_pattern, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: reversal_bars
+    type: int
+    default: 10
+    min: 1
+    max: 100000
+    doc: Bars after the breakout in which the reversal must come
+  - name: reversal_pct
+    type: float
+    default: 0.05
+    min: 0.0
+    doc: How far back through the breakout level the close must go, as a fraction
+outputs:
+  - name: chart_busted_triple_bottom
+    dtype: int32
+    plot: pattern
+    doc: A fall of reversal_pct soon after a triple bottom reads
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - Thomas N. Bulkowski, Trading Classic Chart Patterns, Wiley, 2002
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.busted_triple_bottom (oracle P)
+see_also: [chart_triple_bottom]

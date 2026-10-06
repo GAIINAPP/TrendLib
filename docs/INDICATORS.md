@@ -374,7 +374,6 @@ pattern with no direction, which reads `+100` wherever the shape is.
 | `chart_busted_inverse_head_shoulders` | Busted Inverse Head and Shoulders | `busted_hs_bottom` | -100 | `reversal_bars` 10 [1, 100000], `reversal_pct` 0.05 [0.0, any] |
 | `chart_busted_head_shoulders` | Busted Head and Shoulders | `busted_hs_top` | +100 | `reversal_bars` 10 [1, 100000], `reversal_pct` 0.05 [0.0, any] |
 | `chart_busted_rectangle` | Busted Rectangle | `busted_rectangle` | ±100 | `reversal_bars` 10 [1, 100000], `reversal_pct` 0.05 [0.0, any] |
-| `chart_busted_symmetrical_triangle` | Busted Symmetrical Triangle | `busted_sym_triangle` | ±100 | `reversal_bars` 10 [1, 100000], `reversal_pct` 0.05 [0.0, any] |
 | `chart_busted_triple_bottom` | Busted Triple Bottom | `busted_triple_bottom` | -100 | `reversal_bars` 10 [1, 100000], `reversal_pct` 0.05 [0.0, any] |
 | `chart_busted_triple_top` | Busted Triple Top | `busted_triple_top` | +100 | `reversal_bars` 10 [1, 100000], `reversal_pct` 0.05 [0.0, any] |
 
@@ -467,6 +466,10 @@ finta's `TMF` raises `NotImplementedError`, and its `FRAMA` ignores its own
   window's first close and below every close in the window, the second the
   mirror, so neither can fire on any input; a function that always reads 0
   would only look like coverage.
+- **Not built, reads the future:** the oracle's `busted_sym_triangle`. For each
+  breakout it looks `reversal_bars` ahead, skips a breakout that close to the
+  end of the input, and writes its reading on the bar of the later extreme, so a
+  value depends on bars after it and no stream can reproduce it.
 - **Blocked, no usable definition:** Half Trend, whose only definition is an
   MPL-2.0 TradingView script, so it cannot be ported into this MIT/Apache crate.
 - **Need a decision first:** Smart Money Concepts (the only implementation

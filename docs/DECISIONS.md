@@ -240,8 +240,9 @@ D18-shaped decision for the owner, and this was a check, not a commitment.
 
 A25 (M7, 2026-10-06): the owner asked on 2026-10-06 for the patterns and
 indicators trading platforms offer that TrendLib lacked, from a list of four
-groups. That is read as approving `INDICATORS.md` §§ 5.2 to 5.4: 76 patterns on
-oracle P (two more the oracle can never fire were dropped, § 5.5), 23
+groups. That is read as approving `INDICATORS.md` §§ 5.2 to 5.4: 75 patterns on
+oracle P (two the oracle can never fire, and one that reads bars after its own,
+were dropped, § 5.5), 23
 indicators on oracle A and 4 on oracle F. Pattern names are the
 oracle's function names with a `bar_`, `chart_` or `harmonic_` prefix, and a
 shape the oracle already has a two-sided function for ships as that one

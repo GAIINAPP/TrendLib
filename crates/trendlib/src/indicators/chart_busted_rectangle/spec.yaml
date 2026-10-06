@@ -1,0 +1,32 @@
+name: chart_busted_rectangle
+title: Busted Rectangle
+group: chart
+flags: [chart_pattern, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: reversal_bars
+    type: int
+    default: 10
+    min: 1
+    max: 100000
+    doc: Bars after the breakout in which the reversal must come
+  - name: reversal_pct
+    type: float
+    default: 0.05
+    min: 0.0
+    doc: How far back through the breakout level the close must go, as a fraction
+outputs:
+  - name: chart_busted_rectangle
+    dtype: int32
+    plot: pattern
+    doc: A reversal of reversal_pct soon after a rectangle breakout, in the other direction
+references:
+  - Thomas N. Bulkowski, Encyclopedia of Chart Patterns, 2nd edition, Wiley, 2005
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.busted_rectangle (oracle P)
+see_also: [chart_rectangle]
