@@ -644,3 +644,194 @@ impl<A: Step<3, 1>, B: Step<3, 1>> Step<3, 1> for BustPair<A, B> {
         self.clone().push(bar)
     }
 }
+
+/// Which harmonic shape a `HarmonicState` looks for.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Harmonic {
+    /// AB=CD: the C to D leg as long as A to B, B retracing 0.382 to 0.886 of it.
+    Abcd,
+    /// An XABCD shape: AB about `ab_xa` of XA, BC within `bc_ab` of AB, CD within
+    /// `cd_bc` of BC, and AD about `ad_xa` of XA.
+    Xabcd {
+        ab_xa: f64,
+        bc_ab: (f64, f64),
+        cd_bc: (f64, f64),
+        ad_xa: f64,
+    },
+    /// Wolfe wave: five alternating swings, the fifth beyond the line through
+    /// the first and third.
+    Wolfe,
+}
+
+/// Harmonic patterns: swing points chained back from the newest, each the
+/// latest of the other side confirmed before the one after it and within
+/// `period` bars of it, tested on the bar that confirms the last.
+#[derive(Clone, Debug)]
+pub struct HarmonicState {
+    shape: Harmonic,
+    bullish: bool,
+    period: usize,
+    fib_tol: f64,
+    highs: SwingFinder,
+    lows: SwingFinder,
+    peaks: SwingLog,
+    troughs: SwingLog,
+    bars: usize,
+}
+
+impl HarmonicState {
+    pub fn new(
+        shape: Harmonic,
+        bullish: bool,
+        period: usize,
+        pivot_n: usize,
+        fib_tol: f64,
+    ) -> Self {
+        // Four links back from the last swing at most, each within `period`.
+        let span = 4 * period;
+        Self {
+            shape,
+            bullish,
+            period,
+            fib_tol,
+            highs: SwingFinder::highs(pivot_n),
+            lows: SwingFinder::lows(pivot_n),
+            peaks: SwingLog::new(span),
+            troughs: SwingLog::new(span),
+            bars: 0,
+        }
+    }
+
+    /// The latest swing confirmed before bar `before`, if it is within the
+    /// window of it.
+    fn link(&self, log: &SwingLog, before: usize) -> Option<Swing> {
+        let swing = log.iter().rev().find(|s| s.at < before)?;
+        (before - swing.at < self.period).then_some(swing)
+    }
+
+    /// `|b| / |a|`, the oracle's ratio of one leg to another.
+    fn ratio(a: f64, b: f64) -> f64 {
+        b.abs() / (a.abs() + crate::core::chart::EPS)
+    }
+
+    fn near(value: f64, target: f64, tol: f64) -> bool {
+        (value / (target + crate::core::chart::EPS) - 1.0).abs() <= tol
+    }
+
+    fn within(value: f64, (low, high): (f64, f64)) -> bool {
+        low <= value && value <= high
+    }
+
+    /// The reading for a last swing `d`, read before this bar's swings are
+    /// filed: every earlier link was confirmed before it.
+    fn read(&self, d: Swing, close: f64) -> f64 {
+        let (same, other) = if self.bullish {
+            (&self.troughs, &self.peaks)
+        } else {
+            (&self.peaks, &self.troughs)
+        };
+        // Signs flip for a bearish shape, so every leg below is measured in the
+        // direction it should run and must come out positive.
+        let s = if self.bullish { 1.0 } else { -1.0 };
+        let Some(c) = self.link(other, d.at) else {
+            return 0.0;
+        };
+        let Some(b) = self.link(same, c.at) else {
+            return 0.0;
+        };
+        let Some(a) = self.link(other, b.at) else {
+            return 0.0;
+        };
+        let fires = match self.shape {
+            Harmonic::Abcd => {
+                let ab = s * (a.price - b.price);
+                let cd = s * (c.price - d.price);
+                ab > 0.0
+                    && cd > 0.0
+                    && Self::within(Self::ratio(ab, s * (c.price - b.price)), (0.382, 0.886))
+                    && Self::near(Self::ratio(ab, cd), 1.0, self.fib_tol)
+            }
+            Harmonic::Xabcd {
+                ab_xa,
+                bc_ab,
+                cd_bc,
+                ad_xa,
+            } => {
+                let Some(x) = self.link(same, a.at) else {
+                    return 0.0;
+                };
+                let xa = s * (a.price - x.price);
+                let ab = s * (a.price - b.price);
+                let bc = s * (c.price - b.price);
+                let cd = s * (c.price - d.price);
+                let ad = s * (a.price - d.price);
+                xa > 0.0
+                    && ab > 0.0
+                    && bc > 0.0
+                    && cd > 0.0
+                    && Self::near(Self::ratio(xa, ab), ab_xa, self.fib_tol)
+                    && Self::within(Self::ratio(ab, bc), bc_ab)
+                    && Self::within(Self::ratio(bc, cd), cd_bc)
+                    && Self::near(Self::ratio(xa, ad), ad_xa, self.fib_tol)
+            }
+            Harmonic::Wolfe => {
+                // Points 1 to 5 are x, a, b, c, d here: 1, 3 and 5 on the side
+                // of the last swing.
+                let Some(first) = self.link(same, a.at) else {
+                    return 0.0;
+                };
+                let (one, two, three, four) = (first, a, b, c);
+                let rising_lows = s * (three.price - one.price) > 0.0;
+                let inside = s * (four.price - two.price) < 0.0;
+                let run = three.at as f64 - one.at as f64;
+                let level =
+                    one.price + (three.price - one.price) * (d.at as f64 - one.at as f64) / run;
+                let beyond = s * (d.price - level) < 0.0;
+                return if rising_lows && inside && beyond && s * (close - level) > 0.0 {
+                    100.0 * s
+                } else {
+                    0.0
+                };
+            }
+        };
+        if fires && s * (close - d.price) > 0.0 {
+            100.0 * s
+        } else {
+            0.0
+        }
+    }
+
+    fn advance(&mut self, bar: [f64; 3]) -> Option<f64> {
+        let now = self.bars;
+        self.bars += 1;
+        let high = self
+            .highs
+            .push(bar[0])
+            .map(|price| Swing { at: now, price });
+        let low = self.lows.push(bar[1]).map(|price| Swing { at: now, price });
+        let last = if self.bullish { low } else { high };
+        let value = match last {
+            Some(d) if now >= self.period => self.read(d, bar[2]),
+            _ => 0.0,
+        };
+        if let Some(swing) = high {
+            self.peaks.push(swing);
+        }
+        if let Some(swing) = low {
+            self.troughs.push(swing);
+        }
+        self.peaks.trim(now);
+        self.troughs.trim(now);
+        (now >= self.period).then_some(value)
+    }
+}
+
+impl Step<3, 1> for HarmonicState {
+    fn push(&mut self, bar: [f64; 3]) -> Option<[f64; 1]> {
+        self.advance(bar).map(|value| [value])
+    }
+
+    fn preview(&self, bar: [f64; 3]) -> Option<[f64; 1]> {
+        self.clone().advance(bar).map(|value| [value])
+    }
+}

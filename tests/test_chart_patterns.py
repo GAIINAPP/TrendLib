@@ -175,6 +175,54 @@ def random_bars(rng, count, scale):
     }
 
 
+# The XABCD proportions of each harmonic shape (AB/XA, BC/AB, CD/BC, AD/XA), at
+# or near the middle of the oracle's bands; a walk never lands on them.
+HARMONIC_RATIOS = {
+    "gartley": (0.618, 0.618, 1.45, 0.786),
+    "bat": (0.441, 0.7, 2.1, 0.886),
+    "butterfly": (0.786, 0.7, 1.9, 1.272),
+    "crab": (0.5, 0.875, 3.0, 1.618),
+}
+
+
+def harmonic_bars(rng, count=16):
+    """XABCD swings with every ratio scattered 7 percent either side of its shape's,
+    so some fall inside the oracle's tolerance and some just outside it: the
+    decision is tested at its edges, not only where it is easy."""
+    closes = []
+    for k in range(count):
+        ab, bc, _, ad = HARMONIC_RATIOS[list(HARMONIC_RATIOS)[k % len(HARMONIC_RATIOS)]]
+        bullish = (k // len(HARMONIC_RATIOS)) % 2 == 0
+        xa = rng.uniform(15.0, 25.0)
+
+        def near(ratio):
+            return ratio * (1.0 + rng.uniform(-0.07, 0.07))
+
+        a = 100.0 + xa
+        b = a - near(ab) * xa
+        c = b + near(bc) * (a - b)
+        d = a - near(ad) * xa
+        points = [100.0, a, b, c, d, d + 0.6 * (c - d)]
+        if not bullish:
+            points = [200.0 - point for point in points]
+        price = closes[-1] if closes else points[0] + 8.0
+        legs = [(30, points[0] + (8.0 if bullish else -8.0))]
+        legs += [(int(rng.integers(6, 11)), point) for point in points]
+        for bars, target in legs:
+            step = (target - price) / bars
+            closes += [price + step * j for j in range(1, bars + 1)]
+            price = target
+    close = np.array(closes) * (1.0 + rng.normal(0.0, 0.0005, len(closes)))
+    opened = np.concatenate([[close[0]], close[:-1]])
+    spread = np.abs(rng.normal(0.0, 0.002, len(close))) * close
+    return {
+        "open": opened,
+        "high": np.maximum(opened, close) + spread,
+        "low": np.minimum(opened, close) - spread,
+        "close": close,
+    }
+
+
 def compare(ta_patterns, name, functions, bars, params):
     mine = np.asarray(getattr(tl, name)(*columns_for(name, bars), **params))
     theirs = oracle(ta_patterns, functions, bars, params)
@@ -234,13 +282,23 @@ def test_every_pattern_agrees_with_the_oracle_at_random_parameters(seed, repo_ro
         compare(ta_patterns, name, functions, bars, random_params(rng, name))
 
 
+@pytest.mark.parametrize("seed", range(RANDOM_SERIES))
+def test_harmonic_patterns_agree_with_the_oracle_near_their_ratios(seed, repo_root, ta_patterns):
+    bars = harmonic_bars(np.random.default_rng(20261205 + seed))
+    for name, functions in oracle_functions(repo_root).items():
+        if name.startswith("harmonic_"):
+            compare(ta_patterns, name, functions, bars, defaults(name))
+
+
 def test_the_random_bars_reach_every_pattern(repo_root):
     """Agreement on bars where nothing fires would prove nothing."""
     fired = dict.fromkeys(PATTERNS, 0)
     for seed in range(RANDOM_SERIES):
         rng = np.random.default_rng(20261005 + seed)
-        bars = random_bars(rng, RANDOM_BARS, 1.0 if seed % 2 else 100.0)
+        walk = random_bars(rng, RANDOM_BARS, 1.0 if seed % 2 else 100.0)
+        swings = harmonic_bars(np.random.default_rng(20261205 + seed))
         for name in PATTERNS:
-            fired[name] += int(np.count_nonzero(getattr(tl, name)(*columns_for(name, bars))))
+            for bars in (walk, swings):
+                fired[name] += int(np.count_nonzero(getattr(tl, name)(*columns_for(name, bars))))
     quiet = sorted(name for name, count in fired.items() if count == 0)
     assert not quiet, f"never fired on the random bars: {quiet}"

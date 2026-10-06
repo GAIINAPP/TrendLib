@@ -2,8 +2,8 @@
 
 # Progress
 
-**287 of 325 shipped**, 0 more written in the Rust core and waiting
-for a Python binding, 38 not started.
+**299 of 325 shipped**, 0 more written in the Rust core and waiting
+for a Python binding, 26 not started.
 
 `[x]` shipped: `spec.yaml`, `mod.rs`, `doc.md` and golden data all present,
 and callable from Python. `[~]` written in the core but not yet bound.
@@ -29,7 +29,7 @@ something is done that is not. CI checks it is current.
 | Levels | 3 | 3 |
 | Chart patterns | 63 | 63 |
 | Bar patterns | 19 | 19 |
-| Harmonic patterns | 0 | 12 |
+| Harmonic patterns | 12 | 12 |
 | Indicators on oracle A | 1 | 23 |
 | Indicators on oracle F | 0 | 4 |
 
@@ -358,20 +358,20 @@ something is done that is not. CI checks it is current.
 - [x] `bar_two_b` -- 2B Reversal
 - [x] `bar_wide_ranging_day` -- Wide-Ranging Day
 
-## Harmonic patterns (0 of 12)
+## Harmonic patterns (12 of 12)
 
-- [ ] `harmonic_abcd_bearish` -- Bearish AB=CD
-- [ ] `harmonic_abcd_bullish` -- Bullish AB=CD
-- [ ] `harmonic_bat_bearish` -- Bearish Bat
-- [ ] `harmonic_bat_bullish` -- Bullish Bat
-- [ ] `harmonic_butterfly_bearish` -- Bearish Butterfly
-- [ ] `harmonic_butterfly_bullish` -- Bullish Butterfly
-- [ ] `harmonic_crab_bearish` -- Bearish Crab
-- [ ] `harmonic_crab_bullish` -- Bullish Crab
-- [ ] `harmonic_gartley_bearish` -- Bearish Gartley
-- [ ] `harmonic_gartley_bullish` -- Bullish Gartley
-- [ ] `harmonic_wolfe_wave_bearish` -- Bearish Wolfe Wave
-- [ ] `harmonic_wolfe_wave_bullish` -- Bullish Wolfe Wave
+- [x] `harmonic_abcd_bearish` -- Bearish AB=CD
+- [x] `harmonic_abcd_bullish` -- Bullish AB=CD
+- [x] `harmonic_bat_bearish` -- Bearish Bat
+- [x] `harmonic_bat_bullish` -- Bullish Bat
+- [x] `harmonic_butterfly_bearish` -- Bearish Butterfly
+- [x] `harmonic_butterfly_bullish` -- Bullish Butterfly
+- [x] `harmonic_crab_bearish` -- Bearish Crab
+- [x] `harmonic_crab_bullish` -- Bullish Crab
+- [x] `harmonic_gartley_bearish` -- Bearish Gartley
+- [x] `harmonic_gartley_bullish` -- Bullish Gartley
+- [x] `harmonic_wolfe_wave_bearish` -- Bearish Wolfe Wave
+- [x] `harmonic_wolfe_wave_bullish` -- Bullish Wolfe Wave
 
 ## Indicators on oracle A (1 of 23)
 

@@ -36,7 +36,7 @@ TOLERANCE = "rel=1e-10 abs=1e-12"
 DAILY = "daily_2000.csv"
 CHARTS = "charts_2579.csv"
 PATTERNS = "patterns_1080.csv"
-SHAPES = "shapes_936.csv"
+SHAPES = "shapes_1640.csv"
 INTRADAY = "intraday_5m_20d.csv"
 
 # TrendLib's names for the oracle's parameters (D12): only `window` differs.
@@ -96,6 +96,11 @@ ON_SHAPES = {
     "chart_three_valleys",
     "chart_busted_ascending_triangle",
     "chart_busted_rectangle",
+    *(
+        f"harmonic_{shape}_{side}"
+        for shape in ("gartley", "bat", "butterfly", "crab")
+        for side in ("bullish", "bearish")
+    ),
 }
 # Two rounded tops a few percent apart are what five-minute bars draw and a daily
 # walk does not.

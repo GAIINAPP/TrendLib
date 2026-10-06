@@ -404,6 +404,18 @@ __all__ = [
     "fosc",
     "fractal",
     "ha",
+    "harmonic_abcd_bearish",
+    "harmonic_abcd_bullish",
+    "harmonic_bat_bearish",
+    "harmonic_bat_bullish",
+    "harmonic_butterfly_bearish",
+    "harmonic_butterfly_bullish",
+    "harmonic_crab_bearish",
+    "harmonic_crab_bullish",
+    "harmonic_gartley_bearish",
+    "harmonic_gartley_bullish",
+    "harmonic_wolfe_wave_bearish",
+    "harmonic_wolfe_wave_bullish",
     "hma",
     "ht_dcperiod",
     "ht_dcphase",
@@ -7464,6 +7476,566 @@ def ha(open=None, high=None, low=None, close=None) -> Any:
             "ha_close",
         ),
     )
+
+
+def harmonic_abcd_bearish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_abcd_bearish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_abcd_bearish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_abcd_bearish"]["fib_tol"]["default"],
+) -> Any:
+    """Bearish AB=CD.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.05
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        An AB=CD whose last swing is a high, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_abcd_bearish", "period", period)
+    pivot_n = _convert.as_int("harmonic_abcd_bearish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_abcd_bearish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_abcd_bearish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_abcd_bearish(*columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_abcd_bearish",))
+
+
+def harmonic_abcd_bullish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_abcd_bullish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_abcd_bullish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_abcd_bullish"]["fib_tol"]["default"],
+) -> Any:
+    """Bullish AB=CD.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.05
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        An AB=CD whose last swing is a low, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_abcd_bullish", "period", period)
+    pivot_n = _convert.as_int("harmonic_abcd_bullish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_abcd_bullish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_abcd_bullish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_abcd_bullish(*columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_abcd_bullish",))
+
+
+def harmonic_bat_bearish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_bat_bearish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_bat_bearish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_bat_bearish"]["fib_tol"]["default"],
+) -> Any:
+    """Bearish Bat.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.05
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A Bat whose last swing is a high, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_bat_bearish", "period", period)
+    pivot_n = _convert.as_int("harmonic_bat_bearish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_bat_bearish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_bat_bearish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_bat_bearish(*columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_bat_bearish",))
+
+
+def harmonic_bat_bullish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_bat_bullish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_bat_bullish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_bat_bullish"]["fib_tol"]["default"],
+) -> Any:
+    """Bullish Bat.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.05
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A Bat whose last swing is a low, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_bat_bullish", "period", period)
+    pivot_n = _convert.as_int("harmonic_bat_bullish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_bat_bullish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_bat_bullish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_bat_bullish(*columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_bat_bullish",))
+
+
+def harmonic_butterfly_bearish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_butterfly_bearish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_butterfly_bearish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_butterfly_bearish"]["fib_tol"]["default"],
+) -> Any:
+    """Bearish Butterfly.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.06
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A Butterfly whose last swing is a high, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_butterfly_bearish", "period", period)
+    pivot_n = _convert.as_int("harmonic_butterfly_bearish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_butterfly_bearish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_butterfly_bearish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_butterfly_bearish(
+        *columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol
+    )
+    return _convert.wrap_outputs(out, carrier, ("harmonic_butterfly_bearish",))
+
+
+def harmonic_butterfly_bullish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_butterfly_bullish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_butterfly_bullish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_butterfly_bullish"]["fib_tol"]["default"],
+) -> Any:
+    """Bullish Butterfly.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.06
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A Butterfly whose last swing is a low, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_butterfly_bullish", "period", period)
+    pivot_n = _convert.as_int("harmonic_butterfly_bullish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_butterfly_bullish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_butterfly_bullish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_butterfly_bullish(
+        *columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol
+    )
+    return _convert.wrap_outputs(out, carrier, ("harmonic_butterfly_bullish",))
+
+
+def harmonic_crab_bearish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_crab_bearish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_crab_bearish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_crab_bearish"]["fib_tol"]["default"],
+) -> Any:
+    """Bearish Crab.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.06
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A Crab whose last swing is a high, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_crab_bearish", "period", period)
+    pivot_n = _convert.as_int("harmonic_crab_bearish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_crab_bearish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_crab_bearish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_crab_bearish(*columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_crab_bearish",))
+
+
+def harmonic_crab_bullish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_crab_bullish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_crab_bullish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_crab_bullish"]["fib_tol"]["default"],
+) -> Any:
+    """Bullish Crab.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.06
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A Crab whose last swing is a low, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_crab_bullish", "period", period)
+    pivot_n = _convert.as_int("harmonic_crab_bullish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_crab_bullish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_crab_bullish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_crab_bullish(*columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_crab_bullish",))
+
+
+def harmonic_gartley_bearish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_gartley_bearish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_gartley_bearish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_gartley_bearish"]["fib_tol"]["default"],
+) -> Any:
+    """Bearish Gartley.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.05
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A Gartley whose last swing is a high, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_gartley_bearish", "period", period)
+    pivot_n = _convert.as_int("harmonic_gartley_bearish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_gartley_bearish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_gartley_bearish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_gartley_bearish(*columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_gartley_bearish",))
+
+
+def harmonic_gartley_bullish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_gartley_bullish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_gartley_bullish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_gartley_bullish"]["fib_tol"]["default"],
+) -> Any:
+    """Bullish Gartley.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.05
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A Gartley whose last swing is a low, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_gartley_bullish", "period", period)
+    pivot_n = _convert.as_int("harmonic_gartley_bullish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_gartley_bullish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_gartley_bullish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_gartley_bullish(*columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_gartley_bullish",))
+
+
+def harmonic_wolfe_wave_bearish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_wolfe_wave_bearish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_wolfe_wave_bearish"]["pivot_n"]["default"],
+) -> Any:
+    """Bearish Wolfe Wave.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 4
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A fifth swing high beyond the 1-3 line, and a close back across it.
+    """
+    period = _convert.as_int("harmonic_wolfe_wave_bearish", "period", period)
+    pivot_n = _convert.as_int("harmonic_wolfe_wave_bearish", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "harmonic_wolfe_wave_bearish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_wolfe_wave_bearish(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_wolfe_wave_bearish",))
+
+
+def harmonic_wolfe_wave_bullish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_wolfe_wave_bullish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_wolfe_wave_bullish"]["pivot_n"]["default"],
+) -> Any:
+    """Bullish Wolfe Wave.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 4
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A fifth swing low beyond the 1-3 line, and a close back across it.
+    """
+    period = _convert.as_int("harmonic_wolfe_wave_bullish", "period", period)
+    pivot_n = _convert.as_int("harmonic_wolfe_wave_bullish", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "harmonic_wolfe_wave_bullish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_wolfe_wave_bullish(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_wolfe_wave_bullish",))
 
 
 def hma(source=None, *, period: int = _PARAMS["hma"]["period"]["default"]) -> Any:

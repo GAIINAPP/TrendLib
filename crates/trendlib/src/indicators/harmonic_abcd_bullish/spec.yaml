@@ -1,0 +1,38 @@
+name: harmonic_abcd_bullish
+title: Bullish AB=CD
+group: harmonic
+flags: [chart_pattern, path_dependent]
+inputs:
+  - name: high
+    kind: high
+  - name: low
+    kind: low
+  - name: close
+    kind: close
+params:
+  - name: period
+    type: int
+    default: 100
+    min: 2
+    max: 100000
+    doc: Bars back the pattern's first swing point may have been confirmed
+  - name: pivot_n
+    type: int
+    default: 5
+    min: 1
+    max: 100000
+    doc: Bars on each side a swing high must be at least as high as, and a swing low at least as low as
+  - name: fib_tol
+    type: float
+    default: 0.05
+    min: 0.0
+    doc: How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it
+outputs:
+  - name: harmonic_abcd_bullish
+    dtype: int32
+    plot: pattern
+    doc: An AB=CD whose last swing is a low, closing beyond it
+references:
+  - Scott M. Carney, Harmonic Trading, Volume One, FT Press, 2010
+  - ta-patterns 1.2.1, ta_patterns.chart_patterns.abcd_bull (oracle P)
+see_also: [harmonic_abcd_bearish, harmonic_gartley_bullish]

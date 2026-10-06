@@ -204,6 +204,18 @@ __all__ = [
     "fosc",
     "fractal",
     "ha",
+    "harmonic_abcd_bearish",
+    "harmonic_abcd_bullish",
+    "harmonic_bat_bearish",
+    "harmonic_bat_bullish",
+    "harmonic_butterfly_bearish",
+    "harmonic_butterfly_bullish",
+    "harmonic_crab_bearish",
+    "harmonic_crab_bullish",
+    "harmonic_gartley_bearish",
+    "harmonic_gartley_bullish",
+    "harmonic_wolfe_wave_bearish",
+    "harmonic_wolfe_wave_bullish",
     "hma",
     "ht_dcperiod",
     "ht_dcphase",
@@ -3054,6 +3066,186 @@ ha = Factory(
         "ha_low",
         "ha_close",
     ),
+)
+harmonic_abcd_bearish = Factory(
+    "harmonic_abcd_bearish",
+    _core.HarmonicAbcdBearishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_abcd_bearish",),
+)
+harmonic_abcd_bullish = Factory(
+    "harmonic_abcd_bullish",
+    _core.HarmonicAbcdBullishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_abcd_bullish",),
+)
+harmonic_bat_bearish = Factory(
+    "harmonic_bat_bearish",
+    _core.HarmonicBatBearishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_bat_bearish",),
+)
+harmonic_bat_bullish = Factory(
+    "harmonic_bat_bullish",
+    _core.HarmonicBatBullishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_bat_bullish",),
+)
+harmonic_butterfly_bearish = Factory(
+    "harmonic_butterfly_bearish",
+    _core.HarmonicButterflyBearishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_butterfly_bearish",),
+)
+harmonic_butterfly_bullish = Factory(
+    "harmonic_butterfly_bullish",
+    _core.HarmonicButterflyBullishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_butterfly_bullish",),
+)
+harmonic_crab_bearish = Factory(
+    "harmonic_crab_bearish",
+    _core.HarmonicCrabBearishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_crab_bearish",),
+)
+harmonic_crab_bullish = Factory(
+    "harmonic_crab_bullish",
+    _core.HarmonicCrabBullishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_crab_bullish",),
+)
+harmonic_gartley_bearish = Factory(
+    "harmonic_gartley_bearish",
+    _core.HarmonicGartleyBearishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_gartley_bearish",),
+)
+harmonic_gartley_bullish = Factory(
+    "harmonic_gartley_bullish",
+    _core.HarmonicGartleyBullishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_gartley_bullish",),
+)
+harmonic_wolfe_wave_bearish = Factory(
+    "harmonic_wolfe_wave_bearish",
+    _core.HarmonicWolfeWaveBearishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_wolfe_wave_bearish",),
+)
+harmonic_wolfe_wave_bullish = Factory(
+    "harmonic_wolfe_wave_bullish",
+    _core.HarmonicWolfeWaveBullishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_wolfe_wave_bullish",),
 )
 hma = Factory("hma", _core.HmaStream, ("source",), ("series",), ("hma",))
 ht_dcperiod = Factory(

@@ -455,7 +455,7 @@ CHARTS_BARS: dict[str, list[tuple[float, float, float, float]]] = {
 }
 
 
-SHAPES_FILE = "shapes_936.csv"
+SHAPES_FILE = "shapes_1640.csv"
 SHAPES_START = date(2012, 1, 2)
 SHAPES_FIRST_CLOSE = 60.0
 
@@ -520,6 +520,21 @@ SHAPES: dict[str, tuple[float, list[tuple[int, float]]]] = {
         + [(10, 91.0), (6, 99.0)],
     ),
 }
+
+# The four XABCD harmonic shapes, X to D in legs of eight bars at each one's
+# Fibonacci proportions (XA from 80 to 100), then a rise off D; and each
+# mirrored about 100 for its bearish twin. D is set so AD/XA misses its ratio by
+# about 4 percent: inside the oracle's tolerance and outside half of it, so a
+# tolerance read wrongly shows.
+HARMONIC_LEGS: dict[str, list[tuple[int, float]]] = {
+    "gartley": [(8, 80.0), (8, 100.0), (8, 87.64), (8, 95.28), (8, 83.73), (8, 92.0)],
+    "bat": [(8, 80.0), (8, 100.0), (8, 91.18), (8, 97.35), (8, 81.66), (8, 92.0)],
+    "butterfly": [(8, 80.0), (8, 100.0), (8, 84.28), (8, 95.28), (8, 73.415), (8, 86.0)],
+    "crab": [(8, 80.0), (8, 100.0), (8, 90.0), (8, 98.75), (8, 68.77), (8, 80.0)],
+}
+for _name, _legs in HARMONIC_LEGS.items():
+    SHAPES[f"{_name}_bullish"] = (95.0, _legs)
+    SHAPES[f"{_name}_bearish"] = (105.0, [(bars, 200.0 - price) for bars, price in _legs])
 
 # Highs and lows set by hand, by shape and bar within it (after its ramp).
 SHAPES_HIGHS: dict[str, dict[int, float]] = {

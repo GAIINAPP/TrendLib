@@ -30240,6 +30240,2174 @@ impl PyHaStream {
 }
 
 #[pyfunction]
+#[pyo3(name = "harmonic_abcd_bearish", signature = (high, low, close, *, period, pivot_n, fib_tol))]
+pub fn harmonic_abcd_bearish<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    fib_tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("harmonic_abcd_bearish", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("harmonic_abcd_bearish", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let fib_tol = float_param(
+        "harmonic_abcd_bearish",
+        "fib_tol",
+        fib_tol,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::harmonic_abcd_bearish::Params {
+        period,
+        pivot_n,
+        fib_tol,
+    };
+    let out = py
+        .detach(|| <trendlib::indicators::harmonic_abcd_bearish::HarmonicAbcdBearish as Kernel<3, 1>>::batch([high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "HarmonicAbcdBearishStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyHarmonicAbcdBearishStream {
+    inner: BarStream<trendlib::indicators::harmonic_abcd_bearish::HarmonicAbcdBearish, 3, 1>,
+}
+
+#[pymethods]
+impl PyHarmonicAbcdBearishStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_abcd_bearish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_abcd_bearish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_abcd_bearish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_abcd_bearish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::harmonic_abcd_bearish::HarmonicAbcdBearish, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_abcd_bearish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_abcd_bearish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_abcd_bearish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_abcd_bearish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::harmonic_abcd_bearish::HarmonicAbcdBearish as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "harmonic_abcd_bearish"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream harmonic_abcd_bearish bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "harmonic_abcd_bullish", signature = (high, low, close, *, period, pivot_n, fib_tol))]
+pub fn harmonic_abcd_bullish<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    fib_tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("harmonic_abcd_bullish", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("harmonic_abcd_bullish", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let fib_tol = float_param(
+        "harmonic_abcd_bullish",
+        "fib_tol",
+        fib_tol,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::harmonic_abcd_bullish::Params {
+        period,
+        pivot_n,
+        fib_tol,
+    };
+    let out = py
+        .detach(|| <trendlib::indicators::harmonic_abcd_bullish::HarmonicAbcdBullish as Kernel<3, 1>>::batch([high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "HarmonicAbcdBullishStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyHarmonicAbcdBullishStream {
+    inner: BarStream<trendlib::indicators::harmonic_abcd_bullish::HarmonicAbcdBullish, 3, 1>,
+}
+
+#[pymethods]
+impl PyHarmonicAbcdBullishStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_abcd_bullish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_abcd_bullish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_abcd_bullish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_abcd_bullish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::harmonic_abcd_bullish::HarmonicAbcdBullish, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_abcd_bullish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_abcd_bullish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_abcd_bullish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_abcd_bullish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::harmonic_abcd_bullish::HarmonicAbcdBullish as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "harmonic_abcd_bullish"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream harmonic_abcd_bullish bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "harmonic_bat_bearish", signature = (high, low, close, *, period, pivot_n, fib_tol))]
+pub fn harmonic_bat_bearish<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    fib_tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("harmonic_bat_bearish", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("harmonic_bat_bearish", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let fib_tol = float_param(
+        "harmonic_bat_bearish",
+        "fib_tol",
+        fib_tol,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::harmonic_bat_bearish::Params {
+        period,
+        pivot_n,
+        fib_tol,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::harmonic_bat_bearish::HarmonicBatBearish as Kernel<3, 1>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "HarmonicBatBearishStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyHarmonicBatBearishStream {
+    inner: BarStream<trendlib::indicators::harmonic_bat_bearish::HarmonicBatBearish, 3, 1>,
+}
+
+#[pymethods]
+impl PyHarmonicBatBearishStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_bat_bearish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_bat_bearish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_bat_bearish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_bat_bearish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::harmonic_bat_bearish::HarmonicBatBearish, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_bat_bearish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_bat_bearish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_bat_bearish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_bat_bearish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::harmonic_bat_bearish::HarmonicBatBearish as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "harmonic_bat_bearish"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream harmonic_bat_bearish bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "harmonic_bat_bullish", signature = (high, low, close, *, period, pivot_n, fib_tol))]
+pub fn harmonic_bat_bullish<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    fib_tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("harmonic_bat_bullish", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("harmonic_bat_bullish", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let fib_tol = float_param(
+        "harmonic_bat_bullish",
+        "fib_tol",
+        fib_tol,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::harmonic_bat_bullish::Params {
+        period,
+        pivot_n,
+        fib_tol,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::harmonic_bat_bullish::HarmonicBatBullish as Kernel<3, 1>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "HarmonicBatBullishStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyHarmonicBatBullishStream {
+    inner: BarStream<trendlib::indicators::harmonic_bat_bullish::HarmonicBatBullish, 3, 1>,
+}
+
+#[pymethods]
+impl PyHarmonicBatBullishStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_bat_bullish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_bat_bullish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_bat_bullish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_bat_bullish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::harmonic_bat_bullish::HarmonicBatBullish, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_bat_bullish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_bat_bullish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_bat_bullish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_bat_bullish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::harmonic_bat_bullish::HarmonicBatBullish as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "harmonic_bat_bullish"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream harmonic_bat_bullish bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "harmonic_butterfly_bearish", signature = (high, low, close, *, period, pivot_n, fib_tol))]
+pub fn harmonic_butterfly_bearish<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    fib_tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("harmonic_butterfly_bearish", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("harmonic_butterfly_bearish", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let fib_tol = float_param(
+        "harmonic_butterfly_bearish",
+        "fib_tol",
+        fib_tol,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::harmonic_butterfly_bearish::Params {
+        period,
+        pivot_n,
+        fib_tol,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::harmonic_butterfly_bearish::HarmonicButterflyBearish as Kernel<
+                3,
+                1,
+            >>::batch([high, low, close], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "HarmonicButterflyBearishStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyHarmonicButterflyBearishStream {
+    inner:
+        BarStream<trendlib::indicators::harmonic_butterfly_bearish::HarmonicButterflyBearish, 3, 1>,
+}
+
+#[pymethods]
+impl PyHarmonicButterflyBearishStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_butterfly_bearish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_butterfly_bearish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_butterfly_bearish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_butterfly_bearish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<
+                    trendlib::indicators::harmonic_butterfly_bearish::HarmonicButterflyBearish,
+                    3,
+                    1,
+                > as Stream>::open([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_butterfly_bearish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_butterfly_bearish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_butterfly_bearish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_butterfly_bearish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::harmonic_butterfly_bearish::HarmonicButterflyBearish as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "harmonic_butterfly_bearish"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream harmonic_butterfly_bearish bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "harmonic_butterfly_bullish", signature = (high, low, close, *, period, pivot_n, fib_tol))]
+pub fn harmonic_butterfly_bullish<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    fib_tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("harmonic_butterfly_bullish", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("harmonic_butterfly_bullish", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let fib_tol = float_param(
+        "harmonic_butterfly_bullish",
+        "fib_tol",
+        fib_tol,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::harmonic_butterfly_bullish::Params {
+        period,
+        pivot_n,
+        fib_tol,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::harmonic_butterfly_bullish::HarmonicButterflyBullish as Kernel<
+                3,
+                1,
+            >>::batch([high, low, close], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "HarmonicButterflyBullishStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyHarmonicButterflyBullishStream {
+    inner:
+        BarStream<trendlib::indicators::harmonic_butterfly_bullish::HarmonicButterflyBullish, 3, 1>,
+}
+
+#[pymethods]
+impl PyHarmonicButterflyBullishStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_butterfly_bullish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_butterfly_bullish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_butterfly_bullish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_butterfly_bullish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<
+                    trendlib::indicators::harmonic_butterfly_bullish::HarmonicButterflyBullish,
+                    3,
+                    1,
+                > as Stream>::open([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_butterfly_bullish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_butterfly_bullish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_butterfly_bullish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_butterfly_bullish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::harmonic_butterfly_bullish::HarmonicButterflyBullish as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "harmonic_butterfly_bullish"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream harmonic_butterfly_bullish bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "harmonic_crab_bearish", signature = (high, low, close, *, period, pivot_n, fib_tol))]
+pub fn harmonic_crab_bearish<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    fib_tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("harmonic_crab_bearish", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("harmonic_crab_bearish", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let fib_tol = float_param(
+        "harmonic_crab_bearish",
+        "fib_tol",
+        fib_tol,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::harmonic_crab_bearish::Params {
+        period,
+        pivot_n,
+        fib_tol,
+    };
+    let out = py
+        .detach(|| <trendlib::indicators::harmonic_crab_bearish::HarmonicCrabBearish as Kernel<3, 1>>::batch([high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "HarmonicCrabBearishStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyHarmonicCrabBearishStream {
+    inner: BarStream<trendlib::indicators::harmonic_crab_bearish::HarmonicCrabBearish, 3, 1>,
+}
+
+#[pymethods]
+impl PyHarmonicCrabBearishStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_crab_bearish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_crab_bearish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_crab_bearish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_crab_bearish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::harmonic_crab_bearish::HarmonicCrabBearish, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_crab_bearish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_crab_bearish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_crab_bearish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_crab_bearish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::harmonic_crab_bearish::HarmonicCrabBearish as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "harmonic_crab_bearish"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream harmonic_crab_bearish bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "harmonic_crab_bullish", signature = (high, low, close, *, period, pivot_n, fib_tol))]
+pub fn harmonic_crab_bullish<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    fib_tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("harmonic_crab_bullish", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("harmonic_crab_bullish", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let fib_tol = float_param(
+        "harmonic_crab_bullish",
+        "fib_tol",
+        fib_tol,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::harmonic_crab_bullish::Params {
+        period,
+        pivot_n,
+        fib_tol,
+    };
+    let out = py
+        .detach(|| <trendlib::indicators::harmonic_crab_bullish::HarmonicCrabBullish as Kernel<3, 1>>::batch([high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "HarmonicCrabBullishStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyHarmonicCrabBullishStream {
+    inner: BarStream<trendlib::indicators::harmonic_crab_bullish::HarmonicCrabBullish, 3, 1>,
+}
+
+#[pymethods]
+impl PyHarmonicCrabBullishStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_crab_bullish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_crab_bullish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_crab_bullish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_crab_bullish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::harmonic_crab_bullish::HarmonicCrabBullish, 3, 1> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_crab_bullish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_crab_bullish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_crab_bullish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_crab_bullish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::harmonic_crab_bullish::HarmonicCrabBullish as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "harmonic_crab_bullish"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream harmonic_crab_bullish bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "harmonic_gartley_bearish", signature = (high, low, close, *, period, pivot_n, fib_tol))]
+pub fn harmonic_gartley_bearish<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    fib_tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("harmonic_gartley_bearish", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("harmonic_gartley_bearish", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let fib_tol = float_param(
+        "harmonic_gartley_bearish",
+        "fib_tol",
+        fib_tol,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::harmonic_gartley_bearish::Params {
+        period,
+        pivot_n,
+        fib_tol,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::harmonic_gartley_bearish::HarmonicGartleyBearish as Kernel<
+                3,
+                1,
+            >>::batch([high, low, close], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "HarmonicGartleyBearishStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyHarmonicGartleyBearishStream {
+    inner: BarStream<trendlib::indicators::harmonic_gartley_bearish::HarmonicGartleyBearish, 3, 1>,
+}
+
+#[pymethods]
+impl PyHarmonicGartleyBearishStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_gartley_bearish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_gartley_bearish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_gartley_bearish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_gartley_bearish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<
+                    trendlib::indicators::harmonic_gartley_bearish::HarmonicGartleyBearish,
+                    3,
+                    1,
+                > as Stream>::open([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_gartley_bearish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_gartley_bearish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_gartley_bearish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_gartley_bearish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::harmonic_gartley_bearish::HarmonicGartleyBearish as Kernel<
+                    3,
+                    1,
+                >>::open_and_fill([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "harmonic_gartley_bearish"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream harmonic_gartley_bearish bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "harmonic_gartley_bullish", signature = (high, low, close, *, period, pivot_n, fib_tol))]
+pub fn harmonic_gartley_bullish<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+    fib_tol: f64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("harmonic_gartley_bullish", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("harmonic_gartley_bullish", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let fib_tol = float_param(
+        "harmonic_gartley_bullish",
+        "fib_tol",
+        fib_tol,
+        0.0,
+        f64::INFINITY,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::harmonic_gartley_bullish::Params {
+        period,
+        pivot_n,
+        fib_tol,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::harmonic_gartley_bullish::HarmonicGartleyBullish as Kernel<
+                3,
+                1,
+            >>::batch([high, low, close], &params)
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "HarmonicGartleyBullishStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyHarmonicGartleyBullishStream {
+    inner: BarStream<trendlib::indicators::harmonic_gartley_bullish::HarmonicGartleyBullish, 3, 1>,
+}
+
+#[pymethods]
+impl PyHarmonicGartleyBullishStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_gartley_bullish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_gartley_bullish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_gartley_bullish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_gartley_bullish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let inner = py
+            .detach(|| {
+                <BarStream<
+                    trendlib::indicators::harmonic_gartley_bullish::HarmonicGartleyBullish,
+                    3,
+                    1,
+                > as Stream>::open([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n, fib_tol))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+        fib_tol: f64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_gartley_bullish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_gartley_bullish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let fib_tol = float_param(
+            "harmonic_gartley_bullish",
+            "fib_tol",
+            fib_tol,
+            0.0,
+            f64::INFINITY,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_gartley_bullish::Params {
+            period,
+            pivot_n,
+            fib_tol,
+        };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::harmonic_gartley_bullish::HarmonicGartleyBullish as Kernel<
+                    3,
+                    1,
+                >>::open_and_fill([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "harmonic_gartley_bullish"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream harmonic_gartley_bullish bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "harmonic_wolfe_wave_bearish", signature = (high, low, close, *, period, pivot_n))]
+pub fn harmonic_wolfe_wave_bearish<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("harmonic_wolfe_wave_bearish", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("harmonic_wolfe_wave_bearish", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::harmonic_wolfe_wave_bearish::Params { period, pivot_n };
+    let out = py
+        .detach(|| <trendlib::indicators::harmonic_wolfe_wave_bearish::HarmonicWolfeWaveBearish as Kernel<3, 1>>::batch([high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "HarmonicWolfeWaveBearishStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyHarmonicWolfeWaveBearishStream {
+    inner: BarStream<
+        trendlib::indicators::harmonic_wolfe_wave_bearish::HarmonicWolfeWaveBearish,
+        3,
+        1,
+    >,
+}
+
+#[pymethods]
+impl PyHarmonicWolfeWaveBearishStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_wolfe_wave_bearish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_wolfe_wave_bearish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_wolfe_wave_bearish::Params { period, pivot_n };
+        let inner = py
+            .detach(|| {
+                <BarStream<
+                    trendlib::indicators::harmonic_wolfe_wave_bearish::HarmonicWolfeWaveBearish,
+                    3,
+                    1,
+                > as Stream>::open([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_wolfe_wave_bearish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_wolfe_wave_bearish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_wolfe_wave_bearish::Params { period, pivot_n };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::harmonic_wolfe_wave_bearish::HarmonicWolfeWaveBearish as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "harmonic_wolfe_wave_bearish"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream harmonic_wolfe_wave_bearish bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
+#[pyo3(name = "harmonic_wolfe_wave_bullish", signature = (high, low, close, *, period, pivot_n))]
+pub fn harmonic_wolfe_wave_bullish<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    pivot_n: i64,
+) -> PyResult<Bound<'py, PyArray1<i32>>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period = int_param("harmonic_wolfe_wave_bullish", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let pivot_n = int_param("harmonic_wolfe_wave_bullish", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::harmonic_wolfe_wave_bullish::Params { period, pivot_n };
+    let out = py
+        .detach(|| <trendlib::indicators::harmonic_wolfe_wave_bullish::HarmonicWolfeWaveBullish as Kernel<3, 1>>::batch([high, low, close], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok(out[0]
+        .iter()
+        .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+        .collect::<Vec<i32>>()
+        .into_pyarray(py))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "HarmonicWolfeWaveBullishStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyHarmonicWolfeWaveBullishStream {
+    inner: BarStream<
+        trendlib::indicators::harmonic_wolfe_wave_bullish::HarmonicWolfeWaveBullish,
+        3,
+        1,
+    >,
+}
+
+#[pymethods]
+impl PyHarmonicWolfeWaveBullishStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_wolfe_wave_bullish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_wolfe_wave_bullish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_wolfe_wave_bullish::Params { period, pivot_n };
+        let inner = py
+            .detach(|| {
+                <BarStream<
+                    trendlib::indicators::harmonic_wolfe_wave_bullish::HarmonicWolfeWaveBullish,
+                    3,
+                    1,
+                > as Stream>::open([high, low, close], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, pivot_n))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        pivot_n: i64,
+    ) -> PyResult<(Self, Bound<'py, PyArray1<i32>>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("harmonic_wolfe_wave_bullish", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let pivot_n = int_param("harmonic_wolfe_wave_bullish", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::harmonic_wolfe_wave_bullish::Params { period, pivot_n };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::harmonic_wolfe_wave_bullish::HarmonicWolfeWaveBullish as Kernel<3, 1>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            out[0]
+                .iter()
+                .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                .collect::<Vec<i32>>()
+                .into_pyarray(py)
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<i32> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(row[0] as i32)
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<i32> {
+        self.inner.value().map(|row| row[0] as i32)
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "harmonic_wolfe_wave_bullish"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream harmonic_wolfe_wave_bullish bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+#[pyfunction]
 #[pyo3(name = "hma", signature = (source, *, period))]
 pub fn hma<'py>(
     py: Python<'py>,
@@ -43074,6 +45242,18 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(fosc, m)?)?;
     m.add_function(wrap_pyfunction!(fractal, m)?)?;
     m.add_function(wrap_pyfunction!(ha, m)?)?;
+    m.add_function(wrap_pyfunction!(harmonic_abcd_bearish, m)?)?;
+    m.add_function(wrap_pyfunction!(harmonic_abcd_bullish, m)?)?;
+    m.add_function(wrap_pyfunction!(harmonic_bat_bearish, m)?)?;
+    m.add_function(wrap_pyfunction!(harmonic_bat_bullish, m)?)?;
+    m.add_function(wrap_pyfunction!(harmonic_butterfly_bearish, m)?)?;
+    m.add_function(wrap_pyfunction!(harmonic_butterfly_bullish, m)?)?;
+    m.add_function(wrap_pyfunction!(harmonic_crab_bearish, m)?)?;
+    m.add_function(wrap_pyfunction!(harmonic_crab_bullish, m)?)?;
+    m.add_function(wrap_pyfunction!(harmonic_gartley_bearish, m)?)?;
+    m.add_function(wrap_pyfunction!(harmonic_gartley_bullish, m)?)?;
+    m.add_function(wrap_pyfunction!(harmonic_wolfe_wave_bearish, m)?)?;
+    m.add_function(wrap_pyfunction!(harmonic_wolfe_wave_bullish, m)?)?;
     m.add_function(wrap_pyfunction!(hma, m)?)?;
     m.add_function(wrap_pyfunction!(ht_dcperiod, m)?)?;
     m.add_function(wrap_pyfunction!(ht_dcphase, m)?)?;
@@ -43361,6 +45541,18 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyFoscStream>()?;
     m.add_class::<PyFractalStream>()?;
     m.add_class::<PyHaStream>()?;
+    m.add_class::<PyHarmonicAbcdBearishStream>()?;
+    m.add_class::<PyHarmonicAbcdBullishStream>()?;
+    m.add_class::<PyHarmonicBatBearishStream>()?;
+    m.add_class::<PyHarmonicBatBullishStream>()?;
+    m.add_class::<PyHarmonicButterflyBearishStream>()?;
+    m.add_class::<PyHarmonicButterflyBullishStream>()?;
+    m.add_class::<PyHarmonicCrabBearishStream>()?;
+    m.add_class::<PyHarmonicCrabBullishStream>()?;
+    m.add_class::<PyHarmonicGartleyBearishStream>()?;
+    m.add_class::<PyHarmonicGartleyBullishStream>()?;
+    m.add_class::<PyHarmonicWolfeWaveBearishStream>()?;
+    m.add_class::<PyHarmonicWolfeWaveBullishStream>()?;
     m.add_class::<PyHmaStream>()?;
     m.add_class::<PyHtDcperiodStream>()?;
     m.add_class::<PyHtDcphaseStream>()?;
@@ -46295,6 +48487,326 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
         let params = PyDict::new(py);
         {
             let entry = PyDict::new(py);
+            entry.set_item("default", 100)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("fib_tol", entry)?;
+        }
+        table.set_item("harmonic_abcd_bearish", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 100)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("fib_tol", entry)?;
+        }
+        table.set_item("harmonic_abcd_bullish", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 100)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("fib_tol", entry)?;
+        }
+        table.set_item("harmonic_bat_bearish", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 100)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("fib_tol", entry)?;
+        }
+        table.set_item("harmonic_bat_bullish", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 100)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.06)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("fib_tol", entry)?;
+        }
+        table.set_item("harmonic_butterfly_bearish", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 100)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.06)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("fib_tol", entry)?;
+        }
+        table.set_item("harmonic_butterfly_bullish", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 100)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.06)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("fib_tol", entry)?;
+        }
+        table.set_item("harmonic_crab_bearish", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 100)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.06)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("fib_tol", entry)?;
+        }
+        table.set_item("harmonic_crab_bullish", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 100)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("fib_tol", entry)?;
+        }
+        table.set_item("harmonic_gartley_bearish", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 100)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 0.05)?;
+            entry.set_item("min", 0.0)?;
+            entry.set_item("max", py.None())?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("fib_tol", entry)?;
+        }
+        table.set_item("harmonic_gartley_bullish", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 60)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 4)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        table.set_item("harmonic_wolfe_wave_bearish", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 60)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 4)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        table.set_item("harmonic_wolfe_wave_bullish", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
             entry.set_item("default", 20)?;
             entry.set_item("min", 1)?;
             entry.set_item("max", 100000)?;
@@ -47987,6 +50499,18 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("fosc", vec!["source"])?;
     table.set_item("fractal", vec!["high", "low"])?;
     table.set_item("ha", vec!["open", "high", "low", "close"])?;
+    table.set_item("harmonic_abcd_bearish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_abcd_bullish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_bat_bearish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_bat_bullish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_butterfly_bearish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_butterfly_bullish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_crab_bearish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_crab_bullish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_gartley_bearish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_gartley_bullish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_wolfe_wave_bearish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_wolfe_wave_bullish", vec!["high", "low", "close"])?;
     table.set_item("hma", vec!["source"])?;
     table.set_item("ht_dcperiod", vec!["source"])?;
     table.set_item("ht_dcphase", vec!["source"])?;
@@ -48316,6 +50840,18 @@ fn kinds_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("fosc", vec!["series"])?;
     table.set_item("fractal", vec!["high", "low"])?;
     table.set_item("ha", vec!["open", "high", "low", "close"])?;
+    table.set_item("harmonic_abcd_bearish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_abcd_bullish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_bat_bearish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_bat_bullish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_butterfly_bearish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_butterfly_bullish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_crab_bearish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_crab_bullish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_gartley_bearish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_gartley_bullish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_wolfe_wave_bearish", vec!["high", "low", "close"])?;
+    table.set_item("harmonic_wolfe_wave_bullish", vec!["high", "low", "close"])?;
     table.set_item("hma", vec!["series"])?;
     table.set_item("ht_dcperiod", vec!["series"])?;
     table.set_item("ht_dcphase", vec!["series"])?;
@@ -48693,6 +51229,30 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("fosc", vec!["fosc"])?;
     table.set_item("fractal", vec!["fractal_swing_high", "fractal_swing_low"])?;
     table.set_item("ha", vec!["ha_open", "ha_high", "ha_low", "ha_close"])?;
+    table.set_item("harmonic_abcd_bearish", vec!["harmonic_abcd_bearish"])?;
+    table.set_item("harmonic_abcd_bullish", vec!["harmonic_abcd_bullish"])?;
+    table.set_item("harmonic_bat_bearish", vec!["harmonic_bat_bearish"])?;
+    table.set_item("harmonic_bat_bullish", vec!["harmonic_bat_bullish"])?;
+    table.set_item(
+        "harmonic_butterfly_bearish",
+        vec!["harmonic_butterfly_bearish"],
+    )?;
+    table.set_item(
+        "harmonic_butterfly_bullish",
+        vec!["harmonic_butterfly_bullish"],
+    )?;
+    table.set_item("harmonic_crab_bearish", vec!["harmonic_crab_bearish"])?;
+    table.set_item("harmonic_crab_bullish", vec!["harmonic_crab_bullish"])?;
+    table.set_item("harmonic_gartley_bearish", vec!["harmonic_gartley_bearish"])?;
+    table.set_item("harmonic_gartley_bullish", vec!["harmonic_gartley_bullish"])?;
+    table.set_item(
+        "harmonic_wolfe_wave_bearish",
+        vec!["harmonic_wolfe_wave_bearish"],
+    )?;
+    table.set_item(
+        "harmonic_wolfe_wave_bullish",
+        vec!["harmonic_wolfe_wave_bullish"],
+    )?;
     table.set_item("hma", vec!["hma"])?;
     table.set_item("ht_dcperiod", vec!["ht_dcperiod"])?;
     table.set_item("ht_dcphase", vec!["ht_dcphase"])?;
@@ -49029,6 +51589,18 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("fosc", vec!["float64"])?;
     table.set_item("fractal", vec!["int32", "int32"])?;
     table.set_item("ha", vec!["float64", "float64", "float64", "float64"])?;
+    table.set_item("harmonic_abcd_bearish", vec!["int32"])?;
+    table.set_item("harmonic_abcd_bullish", vec!["int32"])?;
+    table.set_item("harmonic_bat_bearish", vec!["int32"])?;
+    table.set_item("harmonic_bat_bullish", vec!["int32"])?;
+    table.set_item("harmonic_butterfly_bearish", vec!["int32"])?;
+    table.set_item("harmonic_butterfly_bullish", vec!["int32"])?;
+    table.set_item("harmonic_crab_bearish", vec!["int32"])?;
+    table.set_item("harmonic_crab_bullish", vec!["int32"])?;
+    table.set_item("harmonic_gartley_bearish", vec!["int32"])?;
+    table.set_item("harmonic_gartley_bullish", vec!["int32"])?;
+    table.set_item("harmonic_wolfe_wave_bearish", vec!["int32"])?;
+    table.set_item("harmonic_wolfe_wave_bullish", vec!["int32"])?;
     table.set_item("hma", vec!["float64"])?;
     table.set_item("ht_dcperiod", vec!["float64"])?;
     table.set_item("ht_dcphase", vec!["float64"])?;
@@ -49464,6 +52036,54 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("fosc", vec!["nan_inf_output"])?;
     table.set_item("fractal", Vec::<&str>::new())?;
     table.set_item("ha", vec!["overlap", "path_dependent"])?;
+    table.set_item(
+        "harmonic_abcd_bearish",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "harmonic_abcd_bullish",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "harmonic_bat_bearish",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "harmonic_bat_bullish",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "harmonic_butterfly_bearish",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "harmonic_butterfly_bullish",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "harmonic_crab_bearish",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "harmonic_crab_bullish",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "harmonic_gartley_bearish",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "harmonic_gartley_bullish",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "harmonic_wolfe_wave_bearish",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
+    table.set_item(
+        "harmonic_wolfe_wave_bullish",
+        vec!["chart_pattern", "path_dependent"],
+    )?;
     table.set_item("hma", vec!["overlap"])?;
     table.set_item("ht_dcperiod", vec!["unstable", "path_dependent"])?;
     table.set_item("ht_dcphase", vec!["unstable", "path_dependent"])?;
@@ -49768,6 +52388,18 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("fosc", "statistic")?;
     table.set_item("fractal", "levels")?;
     table.set_item("ha", "overlap")?;
+    table.set_item("harmonic_abcd_bearish", "harmonic")?;
+    table.set_item("harmonic_abcd_bullish", "harmonic")?;
+    table.set_item("harmonic_bat_bearish", "harmonic")?;
+    table.set_item("harmonic_bat_bullish", "harmonic")?;
+    table.set_item("harmonic_butterfly_bearish", "harmonic")?;
+    table.set_item("harmonic_butterfly_bullish", "harmonic")?;
+    table.set_item("harmonic_crab_bearish", "harmonic")?;
+    table.set_item("harmonic_crab_bullish", "harmonic")?;
+    table.set_item("harmonic_gartley_bearish", "harmonic")?;
+    table.set_item("harmonic_gartley_bullish", "harmonic")?;
+    table.set_item("harmonic_wolfe_wave_bearish", "harmonic")?;
+    table.set_item("harmonic_wolfe_wave_bullish", "harmonic")?;
     table.set_item("hma", "overlap")?;
     table.set_item("ht_dcperiod", "cycle")?;
     table.set_item("ht_dcphase", "cycle")?;
@@ -51266,6 +53898,148 @@ pub fn lookback_of(
         }
         "ha" => {
             Ok(<trendlib::indicators::ha::Ha as Kernel<4, 4>>::lookback(&trendlib::indicators::ha::Params { }))
+        }
+        "harmonic_abcd_bearish" => {
+            let period = match get("period")? {
+                Some(value) => int_param("harmonic_abcd_bearish", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 100,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("harmonic_abcd_bearish", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let fib_tol = 0.05;
+            Ok(<trendlib::indicators::harmonic_abcd_bearish::HarmonicAbcdBearish as Kernel<3, 1>>::lookback(&trendlib::indicators::harmonic_abcd_bearish::Params { period, pivot_n, fib_tol, }))
+        }
+        "harmonic_abcd_bullish" => {
+            let period = match get("period")? {
+                Some(value) => int_param("harmonic_abcd_bullish", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 100,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("harmonic_abcd_bullish", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let fib_tol = 0.05;
+            Ok(<trendlib::indicators::harmonic_abcd_bullish::HarmonicAbcdBullish as Kernel<3, 1>>::lookback(&trendlib::indicators::harmonic_abcd_bullish::Params { period, pivot_n, fib_tol, }))
+        }
+        "harmonic_bat_bearish" => {
+            let period = match get("period")? {
+                Some(value) => int_param("harmonic_bat_bearish", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 100,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("harmonic_bat_bearish", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let fib_tol = 0.05;
+            Ok(<trendlib::indicators::harmonic_bat_bearish::HarmonicBatBearish as Kernel<3, 1>>::lookback(&trendlib::indicators::harmonic_bat_bearish::Params { period, pivot_n, fib_tol, }))
+        }
+        "harmonic_bat_bullish" => {
+            let period = match get("period")? {
+                Some(value) => int_param("harmonic_bat_bullish", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 100,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("harmonic_bat_bullish", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let fib_tol = 0.05;
+            Ok(<trendlib::indicators::harmonic_bat_bullish::HarmonicBatBullish as Kernel<3, 1>>::lookback(&trendlib::indicators::harmonic_bat_bullish::Params { period, pivot_n, fib_tol, }))
+        }
+        "harmonic_butterfly_bearish" => {
+            let period = match get("period")? {
+                Some(value) => int_param("harmonic_butterfly_bearish", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 100,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("harmonic_butterfly_bearish", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let fib_tol = 0.06;
+            Ok(<trendlib::indicators::harmonic_butterfly_bearish::HarmonicButterflyBearish as Kernel<3, 1>>::lookback(&trendlib::indicators::harmonic_butterfly_bearish::Params { period, pivot_n, fib_tol, }))
+        }
+        "harmonic_butterfly_bullish" => {
+            let period = match get("period")? {
+                Some(value) => int_param("harmonic_butterfly_bullish", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 100,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("harmonic_butterfly_bullish", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let fib_tol = 0.06;
+            Ok(<trendlib::indicators::harmonic_butterfly_bullish::HarmonicButterflyBullish as Kernel<3, 1>>::lookback(&trendlib::indicators::harmonic_butterfly_bullish::Params { period, pivot_n, fib_tol, }))
+        }
+        "harmonic_crab_bearish" => {
+            let period = match get("period")? {
+                Some(value) => int_param("harmonic_crab_bearish", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 100,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("harmonic_crab_bearish", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let fib_tol = 0.06;
+            Ok(<trendlib::indicators::harmonic_crab_bearish::HarmonicCrabBearish as Kernel<3, 1>>::lookback(&trendlib::indicators::harmonic_crab_bearish::Params { period, pivot_n, fib_tol, }))
+        }
+        "harmonic_crab_bullish" => {
+            let period = match get("period")? {
+                Some(value) => int_param("harmonic_crab_bullish", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 100,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("harmonic_crab_bullish", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let fib_tol = 0.06;
+            Ok(<trendlib::indicators::harmonic_crab_bullish::HarmonicCrabBullish as Kernel<3, 1>>::lookback(&trendlib::indicators::harmonic_crab_bullish::Params { period, pivot_n, fib_tol, }))
+        }
+        "harmonic_gartley_bearish" => {
+            let period = match get("period")? {
+                Some(value) => int_param("harmonic_gartley_bearish", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 100,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("harmonic_gartley_bearish", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let fib_tol = 0.05;
+            Ok(<trendlib::indicators::harmonic_gartley_bearish::HarmonicGartleyBearish as Kernel<3, 1>>::lookback(&trendlib::indicators::harmonic_gartley_bearish::Params { period, pivot_n, fib_tol, }))
+        }
+        "harmonic_gartley_bullish" => {
+            let period = match get("period")? {
+                Some(value) => int_param("harmonic_gartley_bullish", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 100,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("harmonic_gartley_bullish", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let fib_tol = 0.05;
+            Ok(<trendlib::indicators::harmonic_gartley_bullish::HarmonicGartleyBullish as Kernel<3, 1>>::lookback(&trendlib::indicators::harmonic_gartley_bullish::Params { period, pivot_n, fib_tol, }))
+        }
+        "harmonic_wolfe_wave_bearish" => {
+            let period = match get("period")? {
+                Some(value) => int_param("harmonic_wolfe_wave_bearish", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 60,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("harmonic_wolfe_wave_bearish", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 4,
+            };
+            Ok(<trendlib::indicators::harmonic_wolfe_wave_bearish::HarmonicWolfeWaveBearish as Kernel<3, 1>>::lookback(&trendlib::indicators::harmonic_wolfe_wave_bearish::Params { period, pivot_n, }))
+        }
+        "harmonic_wolfe_wave_bullish" => {
+            let period = match get("period")? {
+                Some(value) => int_param("harmonic_wolfe_wave_bullish", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 60,
+            };
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("harmonic_wolfe_wave_bullish", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 4,
+            };
+            Ok(<trendlib::indicators::harmonic_wolfe_wave_bullish::HarmonicWolfeWaveBullish as Kernel<3, 1>>::lookback(&trendlib::indicators::harmonic_wolfe_wave_bullish::Params { period, pivot_n, }))
         }
         "hma" => {
             let period = match get("period")? {

@@ -105,7 +105,7 @@ those four are what Q4 still needs a human for.
 | `testdata/intraday_5m_20d.csv` | 20 sessions × 75 bars, 09:15–15:25 IST starts, `timestamp` = epoch ns UTC | Session 3 opens with a zero-volume bar; one mid-session zero-volume bar; one session spans a weekend gap |
 | `testdata/patterns_1080.csv` | 1,080 daily OHLCV bars | 31 hand-built shapes, one per pattern a walk does not reach, each after 12 quiet bars; then a 600-bar walk through ten regimes |
 | `testdata/charts_2579.csv` | 2,579 daily OHLCV bars | 22 hand-built chart shapes, each direction of each `INDICATORS.md` § 5.1 pattern at least once, each after a 40-bar straight ramp; a head and shoulders whose right shoulder is an outside bar; then a top seen twice `pivot_n` bars apart, set bar by bar |
-| `testdata/shapes_936.csv` | 936 daily OHLCV bars | Shapes of `INDICATORS.md` § 5.2 that neither a walk nor the charts dataset draws, built the same way: two high and tight flags, three peaks and valleys whose edges only an exact price reaches, and busted triangles and rectangles |
+| `testdata/shapes_1640.csv` | 1,640 daily OHLCV bars | Shapes of `INDICATORS.md` § 5.2 that neither a walk nor the charts dataset draws, built the same way: two high and tight flags, three peaks and valleys whose edges only an exact price reaches, busted triangles and rectangles, and the four XABCD harmonic shapes both ways |
 
 A pattern fires on a handful of bars or on none at all. Over `daily_2000.csv` 31 of
 the 61 patterns fire fewer than five times and 12 never fire, so their golden files

@@ -12857,6 +12857,1008 @@ mod ha_adapter {
     }
 }
 
+mod harmonic_abcd_bearish_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::harmonic_abcd_bearish::HarmonicAbcdBearish;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "period",
+            default: 100.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "pivot_n",
+            default: 5.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "fib_tol",
+            default: 0.05,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::harmonic_abcd_bearish::Params {
+        trendlib::indicators::harmonic_abcd_bearish::Params {
+            period: values[0] as usize,
+            pivot_n: values[1] as usize,
+            fib_tol: values[2],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "harmonic_abcd_bearish takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::harmonic_abcd_bearish::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod harmonic_abcd_bullish_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::harmonic_abcd_bullish::HarmonicAbcdBullish;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "period",
+            default: 100.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "pivot_n",
+            default: 5.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "fib_tol",
+            default: 0.05,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::harmonic_abcd_bullish::Params {
+        trendlib::indicators::harmonic_abcd_bullish::Params {
+            period: values[0] as usize,
+            pivot_n: values[1] as usize,
+            fib_tol: values[2],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "harmonic_abcd_bullish takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::harmonic_abcd_bullish::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod harmonic_bat_bearish_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::harmonic_bat_bearish::HarmonicBatBearish;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "period",
+            default: 100.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "pivot_n",
+            default: 5.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "fib_tol",
+            default: 0.05,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::harmonic_bat_bearish::Params {
+        trendlib::indicators::harmonic_bat_bearish::Params {
+            period: values[0] as usize,
+            pivot_n: values[1] as usize,
+            fib_tol: values[2],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "harmonic_bat_bearish takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::harmonic_bat_bearish::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod harmonic_bat_bullish_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::harmonic_bat_bullish::HarmonicBatBullish;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "period",
+            default: 100.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "pivot_n",
+            default: 5.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "fib_tol",
+            default: 0.05,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::harmonic_bat_bullish::Params {
+        trendlib::indicators::harmonic_bat_bullish::Params {
+            period: values[0] as usize,
+            pivot_n: values[1] as usize,
+            fib_tol: values[2],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "harmonic_bat_bullish takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::harmonic_bat_bullish::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod harmonic_butterfly_bearish_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::harmonic_butterfly_bearish::HarmonicButterflyBearish;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "period",
+            default: 100.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "pivot_n",
+            default: 5.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "fib_tol",
+            default: 0.06,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::harmonic_butterfly_bearish::Params {
+        trendlib::indicators::harmonic_butterfly_bearish::Params {
+            period: values[0] as usize,
+            pivot_n: values[1] as usize,
+            fib_tol: values[2],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "harmonic_butterfly_bearish takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::harmonic_butterfly_bearish::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod harmonic_butterfly_bullish_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::harmonic_butterfly_bullish::HarmonicButterflyBullish;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "period",
+            default: 100.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "pivot_n",
+            default: 5.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "fib_tol",
+            default: 0.06,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::harmonic_butterfly_bullish::Params {
+        trendlib::indicators::harmonic_butterfly_bullish::Params {
+            period: values[0] as usize,
+            pivot_n: values[1] as usize,
+            fib_tol: values[2],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "harmonic_butterfly_bullish takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::harmonic_butterfly_bullish::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod harmonic_crab_bearish_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::harmonic_crab_bearish::HarmonicCrabBearish;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "period",
+            default: 100.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "pivot_n",
+            default: 5.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "fib_tol",
+            default: 0.06,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::harmonic_crab_bearish::Params {
+        trendlib::indicators::harmonic_crab_bearish::Params {
+            period: values[0] as usize,
+            pivot_n: values[1] as usize,
+            fib_tol: values[2],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "harmonic_crab_bearish takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::harmonic_crab_bearish::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod harmonic_crab_bullish_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::harmonic_crab_bullish::HarmonicCrabBullish;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "period",
+            default: 100.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "pivot_n",
+            default: 5.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "fib_tol",
+            default: 0.06,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::harmonic_crab_bullish::Params {
+        trendlib::indicators::harmonic_crab_bullish::Params {
+            period: values[0] as usize,
+            pivot_n: values[1] as usize,
+            fib_tol: values[2],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "harmonic_crab_bullish takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::harmonic_crab_bullish::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod harmonic_gartley_bearish_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::harmonic_gartley_bearish::HarmonicGartleyBearish;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "period",
+            default: 100.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "pivot_n",
+            default: 5.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "fib_tol",
+            default: 0.05,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::harmonic_gartley_bearish::Params {
+        trendlib::indicators::harmonic_gartley_bearish::Params {
+            period: values[0] as usize,
+            pivot_n: values[1] as usize,
+            fib_tol: values[2],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "harmonic_gartley_bearish takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::harmonic_gartley_bearish::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod harmonic_gartley_bullish_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::harmonic_gartley_bullish::HarmonicGartleyBullish;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "period",
+            default: 100.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "pivot_n",
+            default: 5.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "fib_tol",
+            default: 0.05,
+            min: 0.0,
+            max: f64::INFINITY,
+            integral: false,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::harmonic_gartley_bullish::Params {
+        trendlib::indicators::harmonic_gartley_bullish::Params {
+            period: values[0] as usize,
+            pivot_n: values[1] as usize,
+            fib_tol: values[2],
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "harmonic_gartley_bullish takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::harmonic_gartley_bullish::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod harmonic_wolfe_wave_bearish_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::harmonic_wolfe_wave_bearish::HarmonicWolfeWaveBearish;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "period",
+            default: 60.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "pivot_n",
+            default: 4.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::harmonic_wolfe_wave_bearish::Params {
+        trendlib::indicators::harmonic_wolfe_wave_bearish::Params {
+            period: values[0] as usize,
+            pivot_n: values[1] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "harmonic_wolfe_wave_bearish takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::harmonic_wolfe_wave_bearish::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
+mod harmonic_wolfe_wave_bullish_adapter {
+    use super::*;
+
+    type Indicated = trendlib::indicators::harmonic_wolfe_wave_bullish::HarmonicWolfeWaveBullish;
+    const INPUTS: usize = 3;
+    const OUTPUTS: usize = 1;
+
+    const PARAMS: &[ParamSpec] = &[
+        ParamSpec {
+            name: "period",
+            default: 60.0,
+            min: 2.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+        ParamSpec {
+            name: "pivot_n",
+            default: 4.0,
+            min: 1.0,
+            max: 100000.0,
+            integral: true,
+            choices: &[],
+        },
+    ];
+
+    fn params(values: &[f64]) -> trendlib::indicators::harmonic_wolfe_wave_bullish::Params {
+        trendlib::indicators::harmonic_wolfe_wave_bullish::Params {
+            period: values[0] as usize,
+            pivot_n: values[1] as usize,
+        }
+    }
+
+    fn columns<'a>(inputs: &[&'a [f64]]) -> [&'a [f64]; INPUTS] {
+        assert_eq!(
+            inputs.len(),
+            INPUTS,
+            "harmonic_wolfe_wave_bullish takes {INPUTS} inputs"
+        );
+        std::array::from_fn(|i| inputs[i])
+    }
+
+    fn batch(inputs: &[&[f64]], values: &[f64]) -> Result<Columns, TlError> {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::batch(columns(inputs), &params(values))
+            .map(|out| out.to_vec())
+    }
+
+    fn lookback(values: &[f64]) -> usize {
+        <Indicated as Kernel<INPUTS, OUTPUTS>>::lookback(&params(values))
+    }
+
+    fn open_and_fill(inputs: &[&[f64]], values: &[f64]) -> OpenAndFillResult {
+        let (stream, out) = <Indicated as Kernel<INPUTS, OUTPUTS>>::open_and_fill(
+            columns(inputs),
+            &params(values),
+        )?;
+        Ok((Box::new(stream) as Box<dyn AnyStream>, out.to_vec()))
+    }
+
+    pub fn registered() -> Registered {
+        Registered {
+            name: trendlib::indicators::harmonic_wolfe_wave_bullish::NAME,
+            inputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::INPUTS,
+            outputs: &<Indicated as Kernel<INPUTS, OUTPUTS>>::OUTPUTS,
+            params: PARAMS,
+            may_be_non_finite: false,
+            path_dependent: true,
+            absolute_index: false,
+            integer_outputs: &[true],
+            batch,
+            lookback,
+            open_and_fill,
+        }
+    }
+}
+
 mod hma_adapter {
     use super::*;
 
@@ -19306,6 +20308,18 @@ pub fn registered() -> Vec<Registered> {
         fosc_adapter::registered(),
         fractal_adapter::registered(),
         ha_adapter::registered(),
+        harmonic_abcd_bearish_adapter::registered(),
+        harmonic_abcd_bullish_adapter::registered(),
+        harmonic_bat_bearish_adapter::registered(),
+        harmonic_bat_bullish_adapter::registered(),
+        harmonic_butterfly_bearish_adapter::registered(),
+        harmonic_butterfly_bullish_adapter::registered(),
+        harmonic_crab_bearish_adapter::registered(),
+        harmonic_crab_bullish_adapter::registered(),
+        harmonic_gartley_bearish_adapter::registered(),
+        harmonic_gartley_bullish_adapter::registered(),
+        harmonic_wolfe_wave_bearish_adapter::registered(),
+        harmonic_wolfe_wave_bullish_adapter::registered(),
         hma_adapter::registered(),
         ht_dcperiod_adapter::registered(),
         ht_dcphase_adapter::registered(),
