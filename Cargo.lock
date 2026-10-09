@@ -215,11 +215,11 @@ checksum = "adb6935a6f5c20170eeceb1a3835a49e12e19d792f6dd344ccc76a985ca5a6ca"
 
 [[package]]
 name = "trendlib"
-version = "0.0.0"
+version = "0.1.0-alpha.1"
 
 [[package]]
 name = "trendlib-py"
-version = "0.0.0"
+version = "0.1.0-alpha.1"
 dependencies = [
  "numpy",
  "pyo3",
