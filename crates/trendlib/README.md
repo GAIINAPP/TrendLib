@@ -18,4 +18,4 @@ and 7 pivot-level families.
 
 ## License
 
-Dual-licensed under MIT or Apache-2.0, at your option.
+Apache License 2.0. See the LICENSE file at the repository root.

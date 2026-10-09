@@ -1,4 +1,4 @@
-// @generated — do not edit by hand
+// @generated, do not edit by hand
 
 pub mod ac;
 pub mod accbands;

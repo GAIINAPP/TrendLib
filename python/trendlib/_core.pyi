@@ -1,4 +1,4 @@
-# @generated — do not edit by hand
+# @generated, do not edit by hand
 from typing import Any
 
 import numpy as np

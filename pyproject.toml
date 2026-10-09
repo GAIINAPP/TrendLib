@@ -7,7 +7,7 @@ name = "trendlib"
 description = "Fast, tested technical-analysis indicators with a Rust core"
 readme = "README.md"
 requires-python = ">=3.11"
-license = "MIT OR Apache-2.0"
+license = "Apache-2.0"
 authors = [{ name = "GAIIN Technologies" }]
 keywords = ["technical-analysis", "indicators", "trading", "ta-lib", "finance", "nse"]
 classifiers = [
@@ -37,8 +37,7 @@ manifest-path = "crates/trendlib-py/Cargo.toml"
 # at the repo root are not picked up on their own. PyPI rejects a distribution
 # whose metadata names a License-File it does not contain.
 include = [
-  { path = "LICENSE-APACHE", format = "sdist" },
-  { path = "LICENSE-MIT", format = "sdist" },
+  { path = "LICENSE", format = "sdist" },
   { path = "NOTICE", format = "sdist" },
 ]
 python-source = "python"

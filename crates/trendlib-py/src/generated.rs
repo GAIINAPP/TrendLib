@@ -1,4 +1,4 @@
-// @generated — do not edit by hand
+// @generated, do not edit by hand
 
 //! An indicator with eight outputs returns a tuple of eight floats,
 //! which the complexity lint reads as a type that wants a name. The

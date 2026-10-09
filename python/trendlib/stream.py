@@ -1,4 +1,4 @@
-# @generated — do not edit by hand
+# @generated, do not edit by hand
 """Live indicator values, one factory per indicator.
 
 A stream is a value, not a session: it holds no global state, `copy` is

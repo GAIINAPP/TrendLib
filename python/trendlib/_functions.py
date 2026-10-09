@@ -1,4 +1,4 @@
-# @generated — do not edit by hand
+# @generated, do not edit by hand
 """Batch functions and their TA-Lib aliases.
 
 One wrapper per indicator, generated from its definition. Defaults come

@@ -8,8 +8,8 @@
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-green)](#license)
 
-Every indicator runs two ways — over a whole array, or one bar at a time —
-and the two agree **bitwise**, so what you backtest is what you trade.
+Every indicator runs two ways: over a whole array, or one bar at a time.
+The two agree **bitwise**, so what you backtest is what you trade.
 
 </div>
 
@@ -38,7 +38,7 @@ pip install maturin
 maturin develop --release        # or: maturin build --release
 ```
 
-You need a Rust toolchain (1.95 or later) for that, and nothing else — no system
+You need a Rust toolchain (1.95 or later) for that, and nothing else: no system
 TA-Lib, no C dependencies. The extension is `abi3`, so once wheels are published
 one per platform will cover Python 3.11 and every version after it.
 
@@ -68,15 +68,15 @@ works beside `tl.rsi(close, period=14)` and takes TA-Lib's parameter names.
 
 Three layers, each doing one job.
 
-**A Rust core** holds the arithmetic. It has no runtime dependencies at all —
-`cargo tree` prints one line — and is `#![forbid(unsafe_code)]`.
+**A Rust core** holds the arithmetic. It has no runtime dependencies at all
+(`cargo tree` prints one line) and is `#![forbid(unsafe_code)]`.
 
 **One kernel per indicator**, written once as a step that takes a bar and
 returns the next value. The batch function folds that step over an array and the
 stream calls it per bar, so they cannot drift apart: the bitwise agreement is
 structural, not something a test happens to confirm.
 
-**A thin Python layer** does the conversion — NumPy in, NumPy out, with pandas
+**A thin Python layer** does the conversion: NumPy in, NumPy out, with pandas
 and polars recognised and their index handed back.
 
 ### Streaming
@@ -127,7 +127,7 @@ rather than snapping to the nearest legal value.
 ## Design notes
 
 Measurements, not advice. No function, output or parameter is named for a
-trading action — there is no `buy`, `entry` or `target` anywhere. Pattern
+trading action: there is no `buy`, `entry` or `target` anywhere. Pattern
 functions return `+100`, `-100` or `0`, meaning *this shape is present and
 points up, points down, or is absent*; what to do about it is yours.
 
@@ -147,7 +147,7 @@ arithmetic than the reference libraries they are compared against.
 
 ## License
 
-MIT **or** Apache-2.0, at your option. See [LICENSE-MIT](LICENSE-MIT) and
-[LICENSE-APACHE](LICENSE-APACHE).
+[Apache License 2.0](LICENSE). It grants patent rights explicitly, which a
+permissive licence that is silent on patents does not.
 
 Built by [GAIIN Technologies](https://github.com/GAIINAPP).
