@@ -1,0 +1,64 @@
+use crate::core::candles::{CandleSetting, PatternState};
+use crate::core::error::TlError;
+use crate::core::kernel::{BarStream, Kernel};
+
+pub const NAME: &str = "cdl_harami";
+
+/// Taken from the oracle, which reserves the longest average any of the
+/// settings below uses plus the bars the pattern reads behind the last one.
+pub const LOOKBACK: usize = 11;
+
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct Params;
+
+pub type State = PatternState;
+
+/// A short body sitting entirely inside the long body before it
+fn detect(pattern: &PatternState) -> f64 {
+    let bar = pattern.back(0);
+    let prior = pattern.back(1);
+    if prior.body() <= pattern.average(CandleSetting::BODY_LONG, 1)
+        || bar.body() > pattern.average(CandleSetting::BODY_SHORT, 0)
+    {
+        return 0.0;
+    }
+    let inside = bar.body_top() < prior.body_top() && bar.body_bottom() > prior.body_bottom();
+    // One end of the body may sit exactly where the earlier one's did. A long
+    // bar around a short one still holds it, so it is reported, but at four
+    // fifths: the oracle grades the two cases apart.
+    let touching = bar.body_top() <= prior.body_top() && bar.body_bottom() >= prior.body_bottom();
+    if inside {
+        -prior.colour() * 100.0
+    } else if touching {
+        -prior.colour() * 80.0
+    } else {
+        0.0
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct CdlHarami;
+
+pub type CdlHaramiStream = BarStream<CdlHarami, 4, 1>;
+
+impl Kernel<4, 1> for CdlHarami {
+    const NAME: &'static str = NAME;
+    const INPUTS: [&'static str; 4] = ["open", "high", "low", "close"];
+    const OUTPUTS: [&'static str; 1] = ["cdl_harami"];
+
+    type Params = Params;
+    type State = State;
+
+    fn validate(_params: &Params) -> Result<(), TlError> {
+        Ok(())
+    }
+
+    fn lookback(_params: &Params) -> usize {
+        LOOKBACK
+    }
+
+    fn state(params: &Params) -> State {
+        let _ = params;
+        PatternState::new(LOOKBACK, 0.0, detect)
+    }
+}

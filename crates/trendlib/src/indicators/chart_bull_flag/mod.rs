@@ -1,0 +1,101 @@
+use crate::core::chart::{Pole, PoleState, at_least, whole};
+use crate::core::error::TlError;
+use crate::core::kernel::{BarStream, Kernel};
+
+pub const NAME: &str = "chart_bull_flag";
+
+pub const PERIOD_DEFAULT: usize = 30;
+pub const PERIOD_MIN: usize = 2;
+pub const PERIOD_MAX: usize = 100_000;
+pub const PIVOT_N_DEFAULT: usize = 3;
+pub const PIVOT_N_MIN: usize = 1;
+pub const PIVOT_N_MAX: usize = 100_000;
+pub const POLE_BARS_DEFAULT: usize = 10;
+pub const POLE_BARS_MIN: usize = 1;
+pub const POLE_BARS_MAX: usize = 100_000;
+pub const MIN_POLE_DEFAULT: f64 = 0.05;
+pub const MIN_POLE_MIN: f64 = 0.0;
+pub const MAX_RETRACE_DEFAULT: f64 = 0.5;
+pub const MAX_RETRACE_MIN: f64 = 0.0;
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Params {
+    pub period: usize,
+    pub pivot_n: usize,
+    pub pole_bars: usize,
+    pub min_pole: f64,
+    pub max_retrace: f64,
+}
+
+impl Default for Params {
+    fn default() -> Self {
+        Self {
+            period: PERIOD_DEFAULT,
+            pivot_n: PIVOT_N_DEFAULT,
+            pole_bars: POLE_BARS_DEFAULT,
+            min_pole: MIN_POLE_DEFAULT,
+            max_retrace: MAX_RETRACE_DEFAULT,
+        }
+    }
+}
+
+pub type State = PoleState;
+
+/// A rise, then two falling lines the close has left upward, the flag giving back at most `max_retrace` of the rise.
+fn detect(pole: &Pole, max_retrace: f64) -> f64 {
+    let lines = &pole.lines;
+    if pole.direction > 0
+        && lines.upper.slope < 0.0
+        && lines.lower.slope < 0.0
+        && pole.retrace() <= max_retrace
+        && pole.close > lines.upper.level
+    {
+        100.0
+    } else {
+        0.0
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct ChartBullFlag;
+
+pub type ChartBullFlagStream = BarStream<ChartBullFlag, 3, 1>;
+
+impl Kernel<3, 1> for ChartBullFlag {
+    const NAME: &'static str = NAME;
+    const INPUTS: [&'static str; 3] = ["high", "low", "close"];
+    const OUTPUTS: [&'static str; 1] = ["chart_bull_flag"];
+
+    type Params = Params;
+    type State = State;
+
+    fn validate(params: &Params) -> Result<(), TlError> {
+        whole(NAME, "period", params.period, PERIOD_MIN, PERIOD_MAX)?;
+        whole(NAME, "pivot_n", params.pivot_n, PIVOT_N_MIN, PIVOT_N_MAX)?;
+        whole(
+            NAME,
+            "pole_bars",
+            params.pole_bars,
+            POLE_BARS_MIN,
+            POLE_BARS_MAX,
+        )?;
+        at_least(NAME, "min_pole", params.min_pole, MIN_POLE_MIN)?;
+        at_least(NAME, "max_retrace", params.max_retrace, MAX_RETRACE_MIN)?;
+        Ok(())
+    }
+
+    fn lookback(params: &Params) -> usize {
+        PoleState::lookback(params.period, params.pole_bars)
+    }
+
+    fn state(params: &Params) -> State {
+        PoleState::new(
+            params.pivot_n,
+            params.period,
+            params.pole_bars,
+            params.min_pole,
+            params.max_retrace,
+            detect,
+        )
+    }
+}

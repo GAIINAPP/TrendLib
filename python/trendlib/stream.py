@@ -1,0 +1,4426 @@
+# @generated — do not edit by hand
+"""Live indicator values, one factory per indicator.
+
+A stream is a value, not a session: it holds no global state, `copy` is
+an independent fork, and what it returns is bitwise identical to running
+the batch function over the whole extended series.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+from trendlib import _convert, _core
+from trendlib._stream_base import Factory
+
+__all__ = [
+    "ac",
+    "accbands",
+    "acos",
+    "ad",
+    "add",
+    "adosc",
+    "adr",
+    "adx",
+    "adxr",
+    "alligator",
+    "ao",
+    "apo",
+    "aroon",
+    "aroonosc",
+    "asi",
+    "asin",
+    "atan",
+    "atr",
+    "atr_bands",
+    "avgdev",
+    "avgprice",
+    "bar_dead_cat_bounce",
+    "bar_fakey",
+    "bar_gap2h",
+    "bar_hook_reversal",
+    "bar_horn_bottom",
+    "bar_horn_top",
+    "bar_inside_day",
+    "bar_inverted_dead_cat_bounce",
+    "bar_key_reversal",
+    "bar_narrow_range_4",
+    "bar_narrow_range_7",
+    "bar_one_day_reversal",
+    "bar_one_two_three",
+    "bar_outside_day",
+    "bar_pipe_bottom",
+    "bar_pipe_top",
+    "bar_pivot_point_reversal",
+    "bar_two_b",
+    "bar_wide_ranging_day",
+    "bbands",
+    "beta",
+    "bop",
+    "cci",
+    "cdl_2crows",
+    "cdl_3blackcrows",
+    "cdl_3inside",
+    "cdl_3linestrike",
+    "cdl_3outside",
+    "cdl_3starsinsouth",
+    "cdl_3whitesoldiers",
+    "cdl_abandonedbaby",
+    "cdl_advanceblock",
+    "cdl_belthold",
+    "cdl_breakaway",
+    "cdl_closingmarubozu",
+    "cdl_concealbabyswall",
+    "cdl_counterattack",
+    "cdl_darkcloudcover",
+    "cdl_doji",
+    "cdl_dojistar",
+    "cdl_dragonflydoji",
+    "cdl_engulfing",
+    "cdl_eveningdojistar",
+    "cdl_eveningstar",
+    "cdl_gapsidesidewhite",
+    "cdl_gravestonedoji",
+    "cdl_hammer",
+    "cdl_hangingman",
+    "cdl_harami",
+    "cdl_haramicross",
+    "cdl_highwave",
+    "cdl_hikkake",
+    "cdl_hikkakemod",
+    "cdl_homingpigeon",
+    "cdl_identical3crows",
+    "cdl_inneck",
+    "cdl_invertedhammer",
+    "cdl_kicking",
+    "cdl_kickingbylength",
+    "cdl_ladderbottom",
+    "cdl_longleggeddoji",
+    "cdl_longline",
+    "cdl_marubozu",
+    "cdl_matchinglow",
+    "cdl_mathold",
+    "cdl_morningdojistar",
+    "cdl_morningstar",
+    "cdl_onneck",
+    "cdl_piercing",
+    "cdl_rickshawman",
+    "cdl_risefall3methods",
+    "cdl_separatinglines",
+    "cdl_shootingstar",
+    "cdl_shortline",
+    "cdl_spinningtop",
+    "cdl_stalledpattern",
+    "cdl_sticksandwich",
+    "cdl_takuri",
+    "cdl_tasukigap",
+    "cdl_thrusting",
+    "cdl_tristar",
+    "cdl_unique3river",
+    "cdl_upsidegap2crows",
+    "cdl_xsidegap3methods",
+    "ceil",
+    "chart_ascending_broadening_wedge",
+    "chart_ascending_channel",
+    "chart_ascending_right_angle_broadening",
+    "chart_ascending_scallop",
+    "chart_ascending_triangle",
+    "chart_bear_flag",
+    "chart_bear_pennant",
+    "chart_big_m",
+    "chart_big_w",
+    "chart_broadening",
+    "chart_bull_flag",
+    "chart_bull_pennant",
+    "chart_bump_and_run_bottom",
+    "chart_bump_and_run_top",
+    "chart_busted_ascending_triangle",
+    "chart_busted_descending_triangle",
+    "chart_busted_double_bottom",
+    "chart_busted_double_top",
+    "chart_busted_head_shoulders",
+    "chart_busted_inverse_head_shoulders",
+    "chart_busted_rectangle",
+    "chart_busted_triple_bottom",
+    "chart_busted_triple_top",
+    "chart_complex_head_shoulders",
+    "chart_complex_inverse_head_shoulders",
+    "chart_cup_with_handle",
+    "chart_descending_broadening_wedge",
+    "chart_descending_channel",
+    "chart_descending_right_angle_broadening",
+    "chart_descending_scallop",
+    "chart_descending_triangle",
+    "chart_diamond_bottom",
+    "chart_diamond_top",
+    "chart_double_bottom",
+    "chart_double_bottom_adam_adam",
+    "chart_double_bottom_adam_eve",
+    "chart_double_bottom_eve_adam",
+    "chart_double_bottom_eve_eve",
+    "chart_double_top",
+    "chart_double_top_adam_adam",
+    "chart_double_top_adam_eve",
+    "chart_double_top_eve_adam",
+    "chart_double_top_eve_eve",
+    "chart_falling_wedge",
+    "chart_head_shoulders",
+    "chart_high_tight_flag",
+    "chart_inverse_head_shoulders",
+    "chart_inverted_cup_with_handle",
+    "chart_island_bottom",
+    "chart_island_top",
+    "chart_measured_move_down",
+    "chart_measured_move_up",
+    "chart_rectangle",
+    "chart_rising_wedge",
+    "chart_rounding_bottom",
+    "chart_rounding_top",
+    "chart_symmetrical_triangle",
+    "chart_three_peaks",
+    "chart_three_valleys",
+    "chart_triple_bottom",
+    "chart_triple_top",
+    "chart_v_bottom",
+    "chart_v_top",
+    "cmf",
+    "cmo",
+    "cmou",
+    "connors_rsi",
+    "coppock",
+    "correl",
+    "cos",
+    "cosh",
+    "cpr",
+    "cumsum",
+    "cvi",
+    "darvas_box",
+    "dema",
+    "div",
+    "donchian",
+    "dpo",
+    "dx",
+    "efi",
+    "elder_impulse",
+    "ema",
+    "envelope",
+    "er",
+    "eri",
+    "exp",
+    "floor",
+    "fosc",
+    "fractal",
+    "fractal_chaos_bands",
+    "frama",
+    "gapo",
+    "gator",
+    "guppy",
+    "ha",
+    "harmonic_abcd_bearish",
+    "harmonic_abcd_bullish",
+    "harmonic_bat_bearish",
+    "harmonic_bat_bullish",
+    "harmonic_butterfly_bearish",
+    "harmonic_butterfly_bullish",
+    "harmonic_crab_bearish",
+    "harmonic_crab_bullish",
+    "harmonic_gartley_bearish",
+    "harmonic_gartley_bullish",
+    "harmonic_wolfe_wave_bearish",
+    "harmonic_wolfe_wave_bullish",
+    "hma",
+    "ht_dcperiod",
+    "ht_dcphase",
+    "ht_phasor",
+    "ht_sine",
+    "ht_trendline",
+    "ht_trendmode",
+    "ichimoku",
+    "ift_rsi",
+    "imi",
+    "kama",
+    "kc",
+    "kdj",
+    "linearreg",
+    "linearreg_angle",
+    "linearreg_intercept",
+    "linearreg_slope",
+    "linreg_channel",
+    "ln",
+    "log10",
+    "ma",
+    "macd",
+    "macdext",
+    "macdfix",
+    "mama",
+    "marketfi",
+    "massi",
+    "mavp",
+    "max",
+    "maxindex",
+    "medprice",
+    "mfi",
+    "midpoint",
+    "midprice",
+    "min",
+    "minindex",
+    "minmax",
+    "minmaxindex",
+    "minus_di",
+    "minus_dm",
+    "mom",
+    "mult",
+    "natr",
+    "nvi",
+    "obv",
+    "percentile",
+    "percentrank",
+    "pivots_camarilla",
+    "pivots_demark",
+    "pivots_fibonacci",
+    "pivots_traditional",
+    "pivots_woodie",
+    "plus_di",
+    "plus_dm",
+    "pmo",
+    "ppo",
+    "pvi",
+    "pvo",
+    "pvt",
+    "qstick",
+    "rma",
+    "roc",
+    "rocp",
+    "rocr",
+    "rocr100",
+    "rsi",
+    "rvi",
+    "rvol",
+    "rwi",
+    "safezone",
+    "sar",
+    "sarext",
+    "sin",
+    "sinh",
+    "sma",
+    "smi",
+    "sqrt",
+    "stddev",
+    "stoch",
+    "stochf",
+    "stochrsi",
+    "sub",
+    "sum",
+    "supertrend",
+    "swing_index",
+    "t3",
+    "tan",
+    "tanh",
+    "tema",
+    "trange",
+    "trima",
+    "trix",
+    "tsf",
+    "tsi",
+    "twiggs_mf",
+    "typprice",
+    "ultosc",
+    "var",
+    "vhf",
+    "vortex",
+    "vwap",
+    "vwma",
+    "vzo",
+    "wad",
+    "wavetrend",
+    "wclprice",
+    "wilder_volatility",
+    "willr",
+    "wma",
+    "woodies_cci",
+    "zlema",
+]
+
+ac = Factory(
+    "ac",
+    _core.AcStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("ac",),
+)
+accbands = Factory(
+    "accbands",
+    _core.AccbandsStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "accbands_upper",
+        "accbands_middle",
+        "accbands_lower",
+    ),
+)
+acos = Factory("acos", _core.AcosStream, ("source",), ("series",), ("acos",))
+ad = Factory(
+    "ad",
+    _core.AdStream,
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    ("ad",),
+)
+add = Factory(
+    "add",
+    _core.AddStream,
+    (
+        "source0",
+        "source1",
+    ),
+    (
+        "series",
+        "series",
+    ),
+    ("add",),
+)
+adosc = Factory(
+    "adosc",
+    _core.AdoscStream,
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    ("adosc",),
+)
+adr = Factory(
+    "adr",
+    _core.AdrStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("adr",),
+)
+adx = Factory(
+    "adx",
+    _core.AdxStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("adx",),
+)
+adxr = Factory(
+    "adxr",
+    _core.AdxrStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("adxr",),
+)
+alligator = Factory(
+    "alligator",
+    _core.AlligatorStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "alligator_jaw",
+        "alligator_teeth",
+        "alligator_lips",
+    ),
+)
+ao = Factory(
+    "ao",
+    _core.AoStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("ao",),
+)
+apo = Factory("apo", _core.ApoStream, ("source",), ("series",), ("apo",))
+aroon = Factory(
+    "aroon",
+    _core.AroonStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "aroon_down",
+        "aroon_up",
+    ),
+)
+aroonosc = Factory(
+    "aroonosc",
+    _core.AroonoscStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("aroonosc",),
+)
+asi = Factory(
+    "asi",
+    _core.AsiStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("asi",),
+)
+asin = Factory("asin", _core.AsinStream, ("source",), ("series",), ("asin",))
+atan = Factory("atan", _core.AtanStream, ("source",), ("series",), ("atan",))
+atr = Factory(
+    "atr",
+    _core.AtrStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("atr",),
+)
+atr_bands = Factory(
+    "atr_bands",
+    _core.AtrBandsStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "atr_bands_upper",
+        "atr_bands_lower",
+    ),
+)
+avgdev = Factory("avgdev", _core.AvgdevStream, ("source",), ("series",), ("avgdev",))
+avgprice = Factory(
+    "avgprice",
+    _core.AvgpriceStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("avgprice",),
+)
+bar_dead_cat_bounce = Factory(
+    "bar_dead_cat_bounce",
+    _core.BarDeadCatBounceStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_dead_cat_bounce",),
+)
+bar_fakey = Factory(
+    "bar_fakey",
+    _core.BarFakeyStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_fakey",),
+)
+bar_gap2h = Factory(
+    "bar_gap2h",
+    _core.BarGap2hStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_gap2h",),
+)
+bar_hook_reversal = Factory(
+    "bar_hook_reversal",
+    _core.BarHookReversalStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_hook_reversal",),
+)
+bar_horn_bottom = Factory(
+    "bar_horn_bottom",
+    _core.BarHornBottomStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_horn_bottom",),
+)
+bar_horn_top = Factory(
+    "bar_horn_top",
+    _core.BarHornTopStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_horn_top",),
+)
+bar_inside_day = Factory(
+    "bar_inside_day",
+    _core.BarInsideDayStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_inside_day",),
+)
+bar_inverted_dead_cat_bounce = Factory(
+    "bar_inverted_dead_cat_bounce",
+    _core.BarInvertedDeadCatBounceStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_inverted_dead_cat_bounce",),
+)
+bar_key_reversal = Factory(
+    "bar_key_reversal",
+    _core.BarKeyReversalStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_key_reversal",),
+)
+bar_narrow_range_4 = Factory(
+    "bar_narrow_range_4",
+    _core.BarNarrowRange4Stream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_narrow_range_4",),
+)
+bar_narrow_range_7 = Factory(
+    "bar_narrow_range_7",
+    _core.BarNarrowRange7Stream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_narrow_range_7",),
+)
+bar_one_day_reversal = Factory(
+    "bar_one_day_reversal",
+    _core.BarOneDayReversalStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_one_day_reversal",),
+)
+bar_one_two_three = Factory(
+    "bar_one_two_three",
+    _core.BarOneTwoThreeStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_one_two_three",),
+)
+bar_outside_day = Factory(
+    "bar_outside_day",
+    _core.BarOutsideDayStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_outside_day",),
+)
+bar_pipe_bottom = Factory(
+    "bar_pipe_bottom",
+    _core.BarPipeBottomStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_pipe_bottom",),
+)
+bar_pipe_top = Factory(
+    "bar_pipe_top",
+    _core.BarPipeTopStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_pipe_top",),
+)
+bar_pivot_point_reversal = Factory(
+    "bar_pivot_point_reversal",
+    _core.BarPivotPointReversalStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_pivot_point_reversal",),
+)
+bar_two_b = Factory(
+    "bar_two_b",
+    _core.BarTwoBStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_two_b",),
+)
+bar_wide_ranging_day = Factory(
+    "bar_wide_ranging_day",
+    _core.BarWideRangingDayStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bar_wide_ranging_day",),
+)
+bbands = Factory(
+    "bbands",
+    _core.BbandsStream,
+    ("source",),
+    ("series",),
+    (
+        "bbands_upper",
+        "bbands_middle",
+        "bbands_lower",
+    ),
+)
+beta = Factory(
+    "beta",
+    _core.BetaStream,
+    (
+        "source0",
+        "source1",
+    ),
+    (
+        "series",
+        "series",
+    ),
+    ("beta",),
+)
+bop = Factory(
+    "bop",
+    _core.BopStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("bop",),
+)
+cci = Factory(
+    "cci",
+    _core.CciStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("cci",),
+)
+cdl_2crows = Factory(
+    "cdl_2crows",
+    _core.Cdl2crowsStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_2crows",),
+)
+cdl_3blackcrows = Factory(
+    "cdl_3blackcrows",
+    _core.Cdl3blackcrowsStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_3blackcrows",),
+)
+cdl_3inside = Factory(
+    "cdl_3inside",
+    _core.Cdl3insideStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_3inside",),
+)
+cdl_3linestrike = Factory(
+    "cdl_3linestrike",
+    _core.Cdl3linestrikeStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_3linestrike",),
+)
+cdl_3outside = Factory(
+    "cdl_3outside",
+    _core.Cdl3outsideStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_3outside",),
+)
+cdl_3starsinsouth = Factory(
+    "cdl_3starsinsouth",
+    _core.Cdl3starsinsouthStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_3starsinsouth",),
+)
+cdl_3whitesoldiers = Factory(
+    "cdl_3whitesoldiers",
+    _core.Cdl3whitesoldiersStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_3whitesoldiers",),
+)
+cdl_abandonedbaby = Factory(
+    "cdl_abandonedbaby",
+    _core.CdlAbandonedbabyStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_abandonedbaby",),
+)
+cdl_advanceblock = Factory(
+    "cdl_advanceblock",
+    _core.CdlAdvanceblockStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_advanceblock",),
+)
+cdl_belthold = Factory(
+    "cdl_belthold",
+    _core.CdlBeltholdStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_belthold",),
+)
+cdl_breakaway = Factory(
+    "cdl_breakaway",
+    _core.CdlBreakawayStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_breakaway",),
+)
+cdl_closingmarubozu = Factory(
+    "cdl_closingmarubozu",
+    _core.CdlClosingmarubozuStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_closingmarubozu",),
+)
+cdl_concealbabyswall = Factory(
+    "cdl_concealbabyswall",
+    _core.CdlConcealbabyswallStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_concealbabyswall",),
+)
+cdl_counterattack = Factory(
+    "cdl_counterattack",
+    _core.CdlCounterattackStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_counterattack",),
+)
+cdl_darkcloudcover = Factory(
+    "cdl_darkcloudcover",
+    _core.CdlDarkcloudcoverStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_darkcloudcover",),
+)
+cdl_doji = Factory(
+    "cdl_doji",
+    _core.CdlDojiStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_doji",),
+)
+cdl_dojistar = Factory(
+    "cdl_dojistar",
+    _core.CdlDojistarStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_dojistar",),
+)
+cdl_dragonflydoji = Factory(
+    "cdl_dragonflydoji",
+    _core.CdlDragonflydojiStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_dragonflydoji",),
+)
+cdl_engulfing = Factory(
+    "cdl_engulfing",
+    _core.CdlEngulfingStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_engulfing",),
+)
+cdl_eveningdojistar = Factory(
+    "cdl_eveningdojistar",
+    _core.CdlEveningdojistarStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_eveningdojistar",),
+)
+cdl_eveningstar = Factory(
+    "cdl_eveningstar",
+    _core.CdlEveningstarStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_eveningstar",),
+)
+cdl_gapsidesidewhite = Factory(
+    "cdl_gapsidesidewhite",
+    _core.CdlGapsidesidewhiteStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_gapsidesidewhite",),
+)
+cdl_gravestonedoji = Factory(
+    "cdl_gravestonedoji",
+    _core.CdlGravestonedojiStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_gravestonedoji",),
+)
+cdl_hammer = Factory(
+    "cdl_hammer",
+    _core.CdlHammerStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_hammer",),
+)
+cdl_hangingman = Factory(
+    "cdl_hangingman",
+    _core.CdlHangingmanStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_hangingman",),
+)
+cdl_harami = Factory(
+    "cdl_harami",
+    _core.CdlHaramiStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_harami",),
+)
+cdl_haramicross = Factory(
+    "cdl_haramicross",
+    _core.CdlHaramicrossStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_haramicross",),
+)
+cdl_highwave = Factory(
+    "cdl_highwave",
+    _core.CdlHighwaveStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_highwave",),
+)
+cdl_hikkake = Factory(
+    "cdl_hikkake",
+    _core.CdlHikkakeStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_hikkake",),
+)
+cdl_hikkakemod = Factory(
+    "cdl_hikkakemod",
+    _core.CdlHikkakemodStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_hikkakemod",),
+)
+cdl_homingpigeon = Factory(
+    "cdl_homingpigeon",
+    _core.CdlHomingpigeonStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_homingpigeon",),
+)
+cdl_identical3crows = Factory(
+    "cdl_identical3crows",
+    _core.CdlIdentical3crowsStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_identical3crows",),
+)
+cdl_inneck = Factory(
+    "cdl_inneck",
+    _core.CdlInneckStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_inneck",),
+)
+cdl_invertedhammer = Factory(
+    "cdl_invertedhammer",
+    _core.CdlInvertedhammerStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_invertedhammer",),
+)
+cdl_kicking = Factory(
+    "cdl_kicking",
+    _core.CdlKickingStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_kicking",),
+)
+cdl_kickingbylength = Factory(
+    "cdl_kickingbylength",
+    _core.CdlKickingbylengthStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_kickingbylength",),
+)
+cdl_ladderbottom = Factory(
+    "cdl_ladderbottom",
+    _core.CdlLadderbottomStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_ladderbottom",),
+)
+cdl_longleggeddoji = Factory(
+    "cdl_longleggeddoji",
+    _core.CdlLongleggeddojiStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_longleggeddoji",),
+)
+cdl_longline = Factory(
+    "cdl_longline",
+    _core.CdlLonglineStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_longline",),
+)
+cdl_marubozu = Factory(
+    "cdl_marubozu",
+    _core.CdlMarubozuStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_marubozu",),
+)
+cdl_matchinglow = Factory(
+    "cdl_matchinglow",
+    _core.CdlMatchinglowStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_matchinglow",),
+)
+cdl_mathold = Factory(
+    "cdl_mathold",
+    _core.CdlMatholdStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_mathold",),
+)
+cdl_morningdojistar = Factory(
+    "cdl_morningdojistar",
+    _core.CdlMorningdojistarStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_morningdojistar",),
+)
+cdl_morningstar = Factory(
+    "cdl_morningstar",
+    _core.CdlMorningstarStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_morningstar",),
+)
+cdl_onneck = Factory(
+    "cdl_onneck",
+    _core.CdlOnneckStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_onneck",),
+)
+cdl_piercing = Factory(
+    "cdl_piercing",
+    _core.CdlPiercingStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_piercing",),
+)
+cdl_rickshawman = Factory(
+    "cdl_rickshawman",
+    _core.CdlRickshawmanStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_rickshawman",),
+)
+cdl_risefall3methods = Factory(
+    "cdl_risefall3methods",
+    _core.CdlRisefall3methodsStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_risefall3methods",),
+)
+cdl_separatinglines = Factory(
+    "cdl_separatinglines",
+    _core.CdlSeparatinglinesStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_separatinglines",),
+)
+cdl_shootingstar = Factory(
+    "cdl_shootingstar",
+    _core.CdlShootingstarStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_shootingstar",),
+)
+cdl_shortline = Factory(
+    "cdl_shortline",
+    _core.CdlShortlineStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_shortline",),
+)
+cdl_spinningtop = Factory(
+    "cdl_spinningtop",
+    _core.CdlSpinningtopStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_spinningtop",),
+)
+cdl_stalledpattern = Factory(
+    "cdl_stalledpattern",
+    _core.CdlStalledpatternStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_stalledpattern",),
+)
+cdl_sticksandwich = Factory(
+    "cdl_sticksandwich",
+    _core.CdlSticksandwichStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_sticksandwich",),
+)
+cdl_takuri = Factory(
+    "cdl_takuri",
+    _core.CdlTakuriStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_takuri",),
+)
+cdl_tasukigap = Factory(
+    "cdl_tasukigap",
+    _core.CdlTasukigapStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_tasukigap",),
+)
+cdl_thrusting = Factory(
+    "cdl_thrusting",
+    _core.CdlThrustingStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_thrusting",),
+)
+cdl_tristar = Factory(
+    "cdl_tristar",
+    _core.CdlTristarStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_tristar",),
+)
+cdl_unique3river = Factory(
+    "cdl_unique3river",
+    _core.CdlUnique3riverStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_unique3river",),
+)
+cdl_upsidegap2crows = Factory(
+    "cdl_upsidegap2crows",
+    _core.CdlUpsidegap2crowsStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_upsidegap2crows",),
+)
+cdl_xsidegap3methods = Factory(
+    "cdl_xsidegap3methods",
+    _core.CdlXsidegap3methodsStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("cdl_xsidegap3methods",),
+)
+ceil = Factory("ceil", _core.CeilStream, ("source",), ("series",), ("ceil",))
+chart_ascending_broadening_wedge = Factory(
+    "chart_ascending_broadening_wedge",
+    _core.ChartAscendingBroadeningWedgeStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_ascending_broadening_wedge",),
+)
+chart_ascending_channel = Factory(
+    "chart_ascending_channel",
+    _core.ChartAscendingChannelStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_ascending_channel",),
+)
+chart_ascending_right_angle_broadening = Factory(
+    "chart_ascending_right_angle_broadening",
+    _core.ChartAscendingRightAngleBroadeningStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_ascending_right_angle_broadening",),
+)
+chart_ascending_scallop = Factory(
+    "chart_ascending_scallop",
+    _core.ChartAscendingScallopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_ascending_scallop",),
+)
+chart_ascending_triangle = Factory(
+    "chart_ascending_triangle",
+    _core.ChartAscendingTriangleStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_ascending_triangle",),
+)
+chart_bear_flag = Factory(
+    "chart_bear_flag",
+    _core.ChartBearFlagStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_bear_flag",),
+)
+chart_bear_pennant = Factory(
+    "chart_bear_pennant",
+    _core.ChartBearPennantStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_bear_pennant",),
+)
+chart_big_m = Factory(
+    "chart_big_m",
+    _core.ChartBigMStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_big_m",),
+)
+chart_big_w = Factory(
+    "chart_big_w",
+    _core.ChartBigWStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_big_w",),
+)
+chart_broadening = Factory(
+    "chart_broadening",
+    _core.ChartBroadeningStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_broadening",),
+)
+chart_bull_flag = Factory(
+    "chart_bull_flag",
+    _core.ChartBullFlagStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_bull_flag",),
+)
+chart_bull_pennant = Factory(
+    "chart_bull_pennant",
+    _core.ChartBullPennantStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_bull_pennant",),
+)
+chart_bump_and_run_bottom = Factory(
+    "chart_bump_and_run_bottom",
+    _core.ChartBumpAndRunBottomStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_bump_and_run_bottom",),
+)
+chart_bump_and_run_top = Factory(
+    "chart_bump_and_run_top",
+    _core.ChartBumpAndRunTopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_bump_and_run_top",),
+)
+chart_busted_ascending_triangle = Factory(
+    "chart_busted_ascending_triangle",
+    _core.ChartBustedAscendingTriangleStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_busted_ascending_triangle",),
+)
+chart_busted_descending_triangle = Factory(
+    "chart_busted_descending_triangle",
+    _core.ChartBustedDescendingTriangleStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_busted_descending_triangle",),
+)
+chart_busted_double_bottom = Factory(
+    "chart_busted_double_bottom",
+    _core.ChartBustedDoubleBottomStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_busted_double_bottom",),
+)
+chart_busted_double_top = Factory(
+    "chart_busted_double_top",
+    _core.ChartBustedDoubleTopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_busted_double_top",),
+)
+chart_busted_head_shoulders = Factory(
+    "chart_busted_head_shoulders",
+    _core.ChartBustedHeadShouldersStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_busted_head_shoulders",),
+)
+chart_busted_inverse_head_shoulders = Factory(
+    "chart_busted_inverse_head_shoulders",
+    _core.ChartBustedInverseHeadShouldersStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_busted_inverse_head_shoulders",),
+)
+chart_busted_rectangle = Factory(
+    "chart_busted_rectangle",
+    _core.ChartBustedRectangleStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_busted_rectangle",),
+)
+chart_busted_triple_bottom = Factory(
+    "chart_busted_triple_bottom",
+    _core.ChartBustedTripleBottomStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_busted_triple_bottom",),
+)
+chart_busted_triple_top = Factory(
+    "chart_busted_triple_top",
+    _core.ChartBustedTripleTopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_busted_triple_top",),
+)
+chart_complex_head_shoulders = Factory(
+    "chart_complex_head_shoulders",
+    _core.ChartComplexHeadShouldersStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_complex_head_shoulders",),
+)
+chart_complex_inverse_head_shoulders = Factory(
+    "chart_complex_inverse_head_shoulders",
+    _core.ChartComplexInverseHeadShouldersStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_complex_inverse_head_shoulders",),
+)
+chart_cup_with_handle = Factory(
+    "chart_cup_with_handle",
+    _core.ChartCupWithHandleStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_cup_with_handle",),
+)
+chart_descending_broadening_wedge = Factory(
+    "chart_descending_broadening_wedge",
+    _core.ChartDescendingBroadeningWedgeStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_descending_broadening_wedge",),
+)
+chart_descending_channel = Factory(
+    "chart_descending_channel",
+    _core.ChartDescendingChannelStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_descending_channel",),
+)
+chart_descending_right_angle_broadening = Factory(
+    "chart_descending_right_angle_broadening",
+    _core.ChartDescendingRightAngleBroadeningStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_descending_right_angle_broadening",),
+)
+chart_descending_scallop = Factory(
+    "chart_descending_scallop",
+    _core.ChartDescendingScallopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_descending_scallop",),
+)
+chart_descending_triangle = Factory(
+    "chart_descending_triangle",
+    _core.ChartDescendingTriangleStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_descending_triangle",),
+)
+chart_diamond_bottom = Factory(
+    "chart_diamond_bottom",
+    _core.ChartDiamondBottomStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_diamond_bottom",),
+)
+chart_diamond_top = Factory(
+    "chart_diamond_top",
+    _core.ChartDiamondTopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_diamond_top",),
+)
+chart_double_bottom = Factory(
+    "chart_double_bottom",
+    _core.ChartDoubleBottomStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_bottom",),
+)
+chart_double_bottom_adam_adam = Factory(
+    "chart_double_bottom_adam_adam",
+    _core.ChartDoubleBottomAdamAdamStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_bottom_adam_adam",),
+)
+chart_double_bottom_adam_eve = Factory(
+    "chart_double_bottom_adam_eve",
+    _core.ChartDoubleBottomAdamEveStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_bottom_adam_eve",),
+)
+chart_double_bottom_eve_adam = Factory(
+    "chart_double_bottom_eve_adam",
+    _core.ChartDoubleBottomEveAdamStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_bottom_eve_adam",),
+)
+chart_double_bottom_eve_eve = Factory(
+    "chart_double_bottom_eve_eve",
+    _core.ChartDoubleBottomEveEveStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_bottom_eve_eve",),
+)
+chart_double_top = Factory(
+    "chart_double_top",
+    _core.ChartDoubleTopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_top",),
+)
+chart_double_top_adam_adam = Factory(
+    "chart_double_top_adam_adam",
+    _core.ChartDoubleTopAdamAdamStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_top_adam_adam",),
+)
+chart_double_top_adam_eve = Factory(
+    "chart_double_top_adam_eve",
+    _core.ChartDoubleTopAdamEveStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_top_adam_eve",),
+)
+chart_double_top_eve_adam = Factory(
+    "chart_double_top_eve_adam",
+    _core.ChartDoubleTopEveAdamStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_top_eve_adam",),
+)
+chart_double_top_eve_eve = Factory(
+    "chart_double_top_eve_eve",
+    _core.ChartDoubleTopEveEveStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_double_top_eve_eve",),
+)
+chart_falling_wedge = Factory(
+    "chart_falling_wedge",
+    _core.ChartFallingWedgeStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_falling_wedge",),
+)
+chart_head_shoulders = Factory(
+    "chart_head_shoulders",
+    _core.ChartHeadShouldersStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_head_shoulders",),
+)
+chart_high_tight_flag = Factory(
+    "chart_high_tight_flag",
+    _core.ChartHighTightFlagStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_high_tight_flag",),
+)
+chart_inverse_head_shoulders = Factory(
+    "chart_inverse_head_shoulders",
+    _core.ChartInverseHeadShouldersStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_inverse_head_shoulders",),
+)
+chart_inverted_cup_with_handle = Factory(
+    "chart_inverted_cup_with_handle",
+    _core.ChartInvertedCupWithHandleStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_inverted_cup_with_handle",),
+)
+chart_island_bottom = Factory(
+    "chart_island_bottom",
+    _core.ChartIslandBottomStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_island_bottom",),
+)
+chart_island_top = Factory(
+    "chart_island_top",
+    _core.ChartIslandTopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_island_top",),
+)
+chart_measured_move_down = Factory(
+    "chart_measured_move_down",
+    _core.ChartMeasuredMoveDownStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_measured_move_down",),
+)
+chart_measured_move_up = Factory(
+    "chart_measured_move_up",
+    _core.ChartMeasuredMoveUpStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_measured_move_up",),
+)
+chart_rectangle = Factory(
+    "chart_rectangle",
+    _core.ChartRectangleStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_rectangle",),
+)
+chart_rising_wedge = Factory(
+    "chart_rising_wedge",
+    _core.ChartRisingWedgeStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_rising_wedge",),
+)
+chart_rounding_bottom = Factory(
+    "chart_rounding_bottom",
+    _core.ChartRoundingBottomStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_rounding_bottom",),
+)
+chart_rounding_top = Factory(
+    "chart_rounding_top",
+    _core.ChartRoundingTopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_rounding_top",),
+)
+chart_symmetrical_triangle = Factory(
+    "chart_symmetrical_triangle",
+    _core.ChartSymmetricalTriangleStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_symmetrical_triangle",),
+)
+chart_three_peaks = Factory(
+    "chart_three_peaks",
+    _core.ChartThreePeaksStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_three_peaks",),
+)
+chart_three_valleys = Factory(
+    "chart_three_valleys",
+    _core.ChartThreeValleysStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_three_valleys",),
+)
+chart_triple_bottom = Factory(
+    "chart_triple_bottom",
+    _core.ChartTripleBottomStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_triple_bottom",),
+)
+chart_triple_top = Factory(
+    "chart_triple_top",
+    _core.ChartTripleTopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_triple_top",),
+)
+chart_v_bottom = Factory(
+    "chart_v_bottom",
+    _core.ChartVBottomStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_v_bottom",),
+)
+chart_v_top = Factory(
+    "chart_v_top",
+    _core.ChartVTopStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("chart_v_top",),
+)
+cmf = Factory(
+    "cmf",
+    _core.CmfStream,
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    ("cmf",),
+)
+cmo = Factory("cmo", _core.CmoStream, ("source",), ("series",), ("cmo",))
+cmou = Factory("cmou", _core.CmouStream, ("source",), ("series",), ("cmou",))
+connors_rsi = Factory(
+    "connors_rsi", _core.ConnorsRsiStream, ("source",), ("series",), ("connors_rsi",)
+)
+coppock = Factory("coppock", _core.CoppockStream, ("source",), ("series",), ("coppock",))
+correl = Factory(
+    "correl",
+    _core.CorrelStream,
+    (
+        "source0",
+        "source1",
+    ),
+    (
+        "series",
+        "series",
+    ),
+    ("correl",),
+)
+cos = Factory("cos", _core.CosStream, ("source",), ("series",), ("cos",))
+cosh = Factory("cosh", _core.CoshStream, ("source",), ("series",), ("cosh",))
+cpr = Factory(
+    "cpr",
+    _core.CprStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "cpr_pivot",
+        "cpr_bc",
+        "cpr_tc",
+    ),
+)
+cumsum = Factory("cumsum", _core.CumsumStream, ("source",), ("series",), ("cumsum",))
+cvi = Factory(
+    "cvi",
+    _core.CviStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("cvi",),
+)
+darvas_box = Factory(
+    "darvas_box",
+    _core.DarvasBoxStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "darvas_top",
+        "darvas_bottom",
+    ),
+)
+dema = Factory("dema", _core.DemaStream, ("source",), ("series",), ("dema",))
+div = Factory(
+    "div",
+    _core.DivStream,
+    (
+        "source0",
+        "source1",
+    ),
+    (
+        "series",
+        "series",
+    ),
+    ("div",),
+)
+donchian = Factory(
+    "donchian",
+    _core.DonchianStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "donchian_upper",
+        "donchian_middle",
+        "donchian_lower",
+    ),
+)
+dpo = Factory("dpo", _core.DpoStream, ("source",), ("series",), ("dpo",))
+dx = Factory(
+    "dx",
+    _core.DxStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("dx",),
+)
+efi = Factory(
+    "efi",
+    _core.EfiStream,
+    (
+        "close",
+        "volume",
+    ),
+    (
+        "close",
+        "volume",
+    ),
+    ("efi",),
+)
+elder_impulse = Factory(
+    "elder_impulse", _core.ElderImpulseStream, ("source",), ("series",), ("elder_impulse",)
+)
+ema = Factory("ema", _core.EmaStream, ("source",), ("series",), ("ema",))
+envelope = Factory(
+    "envelope",
+    _core.EnvelopeStream,
+    ("source",),
+    ("series",),
+    (
+        "envelope_upper",
+        "envelope_middle",
+        "envelope_lower",
+    ),
+)
+er = Factory("er", _core.ErStream, ("source",), ("series",), ("er",))
+eri = Factory(
+    "eri",
+    _core.EriStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "eri_bull_power",
+        "eri_bear_power",
+    ),
+)
+exp = Factory("exp", _core.ExpStream, ("source",), ("series",), ("exp",))
+floor = Factory("floor", _core.FloorStream, ("source",), ("series",), ("floor",))
+fosc = Factory("fosc", _core.FoscStream, ("source",), ("series",), ("fosc",))
+fractal = Factory(
+    "fractal",
+    _core.FractalStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "fractal_swing_high",
+        "fractal_swing_low",
+    ),
+)
+fractal_chaos_bands = Factory(
+    "fractal_chaos_bands",
+    _core.FractalChaosBandsStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "fractal_chaos_upper",
+        "fractal_chaos_lower",
+    ),
+)
+frama = Factory(
+    "frama",
+    _core.FramaStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("frama",),
+)
+gapo = Factory(
+    "gapo",
+    _core.GapoStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("gapo",),
+)
+gator = Factory(
+    "gator",
+    _core.GatorStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "gator_upper",
+        "gator_lower",
+    ),
+)
+guppy = Factory(
+    "guppy",
+    _core.GuppyStream,
+    ("source",),
+    ("series",),
+    (
+        "guppy_short_3",
+        "guppy_short_5",
+        "guppy_short_8",
+        "guppy_short_10",
+        "guppy_short_12",
+        "guppy_short_15",
+        "guppy_long_30",
+        "guppy_long_35",
+        "guppy_long_40",
+        "guppy_long_45",
+        "guppy_long_50",
+        "guppy_long_60",
+    ),
+)
+ha = Factory(
+    "ha",
+    _core.HaStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "ha_open",
+        "ha_high",
+        "ha_low",
+        "ha_close",
+    ),
+)
+harmonic_abcd_bearish = Factory(
+    "harmonic_abcd_bearish",
+    _core.HarmonicAbcdBearishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_abcd_bearish",),
+)
+harmonic_abcd_bullish = Factory(
+    "harmonic_abcd_bullish",
+    _core.HarmonicAbcdBullishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_abcd_bullish",),
+)
+harmonic_bat_bearish = Factory(
+    "harmonic_bat_bearish",
+    _core.HarmonicBatBearishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_bat_bearish",),
+)
+harmonic_bat_bullish = Factory(
+    "harmonic_bat_bullish",
+    _core.HarmonicBatBullishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_bat_bullish",),
+)
+harmonic_butterfly_bearish = Factory(
+    "harmonic_butterfly_bearish",
+    _core.HarmonicButterflyBearishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_butterfly_bearish",),
+)
+harmonic_butterfly_bullish = Factory(
+    "harmonic_butterfly_bullish",
+    _core.HarmonicButterflyBullishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_butterfly_bullish",),
+)
+harmonic_crab_bearish = Factory(
+    "harmonic_crab_bearish",
+    _core.HarmonicCrabBearishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_crab_bearish",),
+)
+harmonic_crab_bullish = Factory(
+    "harmonic_crab_bullish",
+    _core.HarmonicCrabBullishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_crab_bullish",),
+)
+harmonic_gartley_bearish = Factory(
+    "harmonic_gartley_bearish",
+    _core.HarmonicGartleyBearishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_gartley_bearish",),
+)
+harmonic_gartley_bullish = Factory(
+    "harmonic_gartley_bullish",
+    _core.HarmonicGartleyBullishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_gartley_bullish",),
+)
+harmonic_wolfe_wave_bearish = Factory(
+    "harmonic_wolfe_wave_bearish",
+    _core.HarmonicWolfeWaveBearishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_wolfe_wave_bearish",),
+)
+harmonic_wolfe_wave_bullish = Factory(
+    "harmonic_wolfe_wave_bullish",
+    _core.HarmonicWolfeWaveBullishStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("harmonic_wolfe_wave_bullish",),
+)
+hma = Factory("hma", _core.HmaStream, ("source",), ("series",), ("hma",))
+ht_dcperiod = Factory(
+    "ht_dcperiod", _core.HtDcperiodStream, ("source",), ("series",), ("ht_dcperiod",)
+)
+ht_dcphase = Factory("ht_dcphase", _core.HtDcphaseStream, ("source",), ("series",), ("ht_dcphase",))
+ht_phasor = Factory(
+    "ht_phasor",
+    _core.HtPhasorStream,
+    ("source",),
+    ("series",),
+    (
+        "ht_phasor_in_phase",
+        "ht_phasor_quadrature",
+    ),
+)
+ht_sine = Factory(
+    "ht_sine",
+    _core.HtSineStream,
+    ("source",),
+    ("series",),
+    (
+        "ht_sine_sine",
+        "ht_sine_lead_sine",
+    ),
+)
+ht_trendline = Factory(
+    "ht_trendline", _core.HtTrendlineStream, ("source",), ("series",), ("ht_trendline",)
+)
+ht_trendmode = Factory(
+    "ht_trendmode", _core.HtTrendmodeStream, ("source",), ("series",), ("ht_trendmode",)
+)
+ichimoku = Factory(
+    "ichimoku",
+    _core.IchimokuStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "ichimoku_tenkan",
+        "ichimoku_kijun",
+        "ichimoku_senkou_a",
+        "ichimoku_senkou_b",
+    ),
+)
+ift_rsi = Factory("ift_rsi", _core.IftRsiStream, ("source",), ("series",), ("ift_rsi",))
+imi = Factory(
+    "imi",
+    _core.ImiStream,
+    (
+        "open",
+        "close",
+    ),
+    (
+        "open",
+        "close",
+    ),
+    ("imi",),
+)
+kama = Factory("kama", _core.KamaStream, ("source",), ("series",), ("kama",))
+kc = Factory(
+    "kc",
+    _core.KcStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "kc_upper",
+        "kc_middle",
+        "kc_lower",
+    ),
+)
+kdj = Factory(
+    "kdj",
+    _core.KdjStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "kdj_k",
+        "kdj_d",
+        "kdj_j",
+    ),
+)
+linearreg = Factory("linearreg", _core.LinearregStream, ("source",), ("series",), ("linearreg",))
+linearreg_angle = Factory(
+    "linearreg_angle", _core.LinearregAngleStream, ("source",), ("series",), ("linearreg_angle",)
+)
+linearreg_intercept = Factory(
+    "linearreg_intercept",
+    _core.LinearregInterceptStream,
+    ("source",),
+    ("series",),
+    ("linearreg_intercept",),
+)
+linearreg_slope = Factory(
+    "linearreg_slope", _core.LinearregSlopeStream, ("source",), ("series",), ("linearreg_slope",)
+)
+linreg_channel = Factory(
+    "linreg_channel",
+    _core.LinregChannelStream,
+    ("source",),
+    ("series",),
+    (
+        "linreg_channel_upper",
+        "linreg_channel_middle",
+        "linreg_channel_lower",
+    ),
+)
+ln = Factory("ln", _core.LnStream, ("source",), ("series",), ("ln",))
+log10 = Factory("log10", _core.Log10Stream, ("source",), ("series",), ("log10",))
+ma = Factory("ma", _core.MaStream, ("source",), ("series",), ("ma",))
+macd = Factory(
+    "macd",
+    _core.MacdStream,
+    ("source",),
+    ("series",),
+    (
+        "macd",
+        "macd_signal",
+        "macd_hist",
+    ),
+)
+macdext = Factory(
+    "macdext",
+    _core.MacdextStream,
+    ("source",),
+    ("series",),
+    (
+        "macdext_macd",
+        "macdext_signal",
+        "macdext_hist",
+    ),
+)
+macdfix = Factory(
+    "macdfix",
+    _core.MacdfixStream,
+    ("source",),
+    ("series",),
+    (
+        "macdfix_macd",
+        "macdfix_signal",
+        "macdfix_hist",
+    ),
+)
+mama = Factory(
+    "mama",
+    _core.MamaStream,
+    ("source",),
+    ("series",),
+    (
+        "mama",
+        "mama_fama",
+    ),
+)
+marketfi = Factory(
+    "marketfi",
+    _core.MarketfiStream,
+    (
+        "high",
+        "low",
+        "volume",
+    ),
+    (
+        "high",
+        "low",
+        "volume",
+    ),
+    ("marketfi",),
+)
+massi = Factory(
+    "massi",
+    _core.MassiStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("massi",),
+)
+mavp = Factory(
+    "mavp",
+    _core.MavpStream,
+    (
+        "close",
+        "periods",
+    ),
+    (
+        "close",
+        "series",
+    ),
+    ("mavp",),
+)
+max = Factory("max", _core.MaxStream, ("source",), ("series",), ("max",))
+maxindex = Factory("maxindex", _core.MaxindexStream, ("source",), ("series",), ("maxindex",))
+medprice = Factory(
+    "medprice",
+    _core.MedpriceStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("medprice",),
+)
+mfi = Factory(
+    "mfi",
+    _core.MfiStream,
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    ("mfi",),
+)
+midpoint = Factory("midpoint", _core.MidpointStream, ("source",), ("series",), ("midpoint",))
+midprice = Factory(
+    "midprice",
+    _core.MidpriceStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("midprice",),
+)
+min = Factory("min", _core.MinStream, ("source",), ("series",), ("min",))
+minindex = Factory("minindex", _core.MinindexStream, ("source",), ("series",), ("minindex",))
+minmax = Factory(
+    "minmax",
+    _core.MinmaxStream,
+    ("source",),
+    ("series",),
+    (
+        "minmax_min",
+        "minmax_max",
+    ),
+)
+minmaxindex = Factory(
+    "minmaxindex",
+    _core.MinmaxindexStream,
+    ("source",),
+    ("series",),
+    (
+        "minmaxindex_min_index",
+        "minmaxindex_max_index",
+    ),
+)
+minus_di = Factory(
+    "minus_di",
+    _core.MinusDiStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("minus_di",),
+)
+minus_dm = Factory(
+    "minus_dm",
+    _core.MinusDmStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("minus_dm",),
+)
+mom = Factory("mom", _core.MomStream, ("source",), ("series",), ("mom",))
+mult = Factory(
+    "mult",
+    _core.MultStream,
+    (
+        "source0",
+        "source1",
+    ),
+    (
+        "series",
+        "series",
+    ),
+    ("mult",),
+)
+natr = Factory(
+    "natr",
+    _core.NatrStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("natr",),
+)
+nvi = Factory(
+    "nvi",
+    _core.NviStream,
+    (
+        "close",
+        "volume",
+    ),
+    (
+        "close",
+        "volume",
+    ),
+    ("nvi",),
+)
+obv = Factory(
+    "obv",
+    _core.ObvStream,
+    (
+        "close",
+        "volume",
+    ),
+    (
+        "close",
+        "volume",
+    ),
+    ("obv",),
+)
+percentile = Factory(
+    "percentile", _core.PercentileStream, ("source",), ("series",), ("percentile",)
+)
+percentrank = Factory(
+    "percentrank", _core.PercentrankStream, ("source",), ("series",), ("percentrank",)
+)
+pivots_camarilla = Factory(
+    "pivots_camarilla",
+    _core.PivotsCamarillaStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "camarilla_r1",
+        "camarilla_r2",
+        "camarilla_r3",
+        "camarilla_r4",
+        "camarilla_s1",
+        "camarilla_s2",
+        "camarilla_s3",
+        "camarilla_s4",
+    ),
+)
+pivots_demark = Factory(
+    "pivots_demark",
+    _core.PivotsDemarkStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "demark_pp",
+        "demark_r1",
+        "demark_s1",
+    ),
+)
+pivots_fibonacci = Factory(
+    "pivots_fibonacci",
+    _core.PivotsFibonacciStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "fibonacci_pp",
+        "fibonacci_s1",
+        "fibonacci_s2",
+        "fibonacci_s3",
+        "fibonacci_s4",
+        "fibonacci_r1",
+        "fibonacci_r2",
+        "fibonacci_r3",
+        "fibonacci_r4",
+    ),
+)
+pivots_traditional = Factory(
+    "pivots_traditional",
+    _core.PivotsTraditionalStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "pivots_traditional_pp",
+        "pivots_traditional_r1",
+        "pivots_traditional_r2",
+        "pivots_traditional_r3",
+        "pivots_traditional_s1",
+        "pivots_traditional_s2",
+        "pivots_traditional_s3",
+    ),
+)
+pivots_woodie = Factory(
+    "pivots_woodie",
+    _core.PivotsWoodieStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "woodie_pp",
+        "woodie_r1",
+        "woodie_s1",
+        "woodie_r2",
+        "woodie_s2",
+    ),
+)
+plus_di = Factory(
+    "plus_di",
+    _core.PlusDiStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("plus_di",),
+)
+plus_dm = Factory(
+    "plus_dm",
+    _core.PlusDmStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("plus_dm",),
+)
+pmo = Factory(
+    "pmo",
+    _core.PmoStream,
+    ("source",),
+    ("series",),
+    (
+        "pmo",
+        "pmo_signal",
+    ),
+)
+ppo = Factory("ppo", _core.PpoStream, ("source",), ("series",), ("ppo",))
+pvi = Factory(
+    "pvi",
+    _core.PviStream,
+    (
+        "close",
+        "volume",
+    ),
+    (
+        "close",
+        "volume",
+    ),
+    ("pvi",),
+)
+pvo = Factory("pvo", _core.PvoStream, ("volume",), ("volume",), ("pvo",))
+pvt = Factory(
+    "pvt",
+    _core.PvtStream,
+    (
+        "close",
+        "volume",
+    ),
+    (
+        "close",
+        "volume",
+    ),
+    ("pvt",),
+)
+qstick = Factory(
+    "qstick",
+    _core.QstickStream,
+    (
+        "open",
+        "close",
+    ),
+    (
+        "open",
+        "close",
+    ),
+    ("qstick",),
+)
+rma = Factory("rma", _core.RmaStream, ("source",), ("series",), ("rma",))
+roc = Factory("roc", _core.RocStream, ("source",), ("series",), ("roc",))
+rocp = Factory("rocp", _core.RocpStream, ("source",), ("series",), ("rocp",))
+rocr = Factory("rocr", _core.RocrStream, ("source",), ("series",), ("rocr",))
+rocr100 = Factory("rocr100", _core.Rocr100Stream, ("source",), ("series",), ("rocr100",))
+rsi = Factory("rsi", _core.RsiStream, ("source",), ("series",), ("rsi",))
+rvi = Factory("rvi", _core.RviStream, ("source",), ("series",), ("rvi",))
+rvol = Factory("rvol", _core.RvolStream, ("volume",), ("volume",), ("rvol",))
+rwi = Factory(
+    "rwi",
+    _core.RwiStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "rwi_high",
+        "rwi_low",
+    ),
+)
+safezone = Factory(
+    "safezone",
+    _core.SafezoneStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "safezone_lower",
+        "safezone_upper",
+    ),
+)
+sar = Factory(
+    "sar",
+    _core.SarStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("sar",),
+)
+sarext = Factory(
+    "sarext",
+    _core.SarextStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    ("sarext",),
+)
+sin = Factory("sin", _core.SinStream, ("source",), ("series",), ("sin",))
+sinh = Factory("sinh", _core.SinhStream, ("source",), ("series",), ("sinh",))
+sma = Factory("sma", _core.SmaStream, ("source",), ("series",), ("sma",))
+smi = Factory(
+    "smi",
+    _core.SmiStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "smi",
+        "smi_smisignal",
+    ),
+)
+sqrt = Factory("sqrt", _core.SqrtStream, ("source",), ("series",), ("sqrt",))
+stddev = Factory("stddev", _core.StddevStream, ("source",), ("series",), ("stddev",))
+stoch = Factory(
+    "stoch",
+    _core.StochStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "stoch_k",
+        "stoch_d",
+    ),
+)
+stochf = Factory(
+    "stochf",
+    _core.StochfStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "stochf_k",
+        "stochf_d",
+    ),
+)
+stochrsi = Factory(
+    "stochrsi",
+    _core.StochrsiStream,
+    ("source",),
+    ("series",),
+    (
+        "stochrsi_k",
+        "stochrsi_d",
+    ),
+)
+sub = Factory(
+    "sub",
+    _core.SubStream,
+    (
+        "source0",
+        "source1",
+    ),
+    (
+        "series",
+        "series",
+    ),
+    ("sub",),
+)
+sum = Factory("sum", _core.SumStream, ("source",), ("series",), ("sum",))
+supertrend = Factory(
+    "supertrend",
+    _core.SupertrendStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "supertrend",
+        "supertrend_direction",
+    ),
+)
+swing_index = Factory(
+    "swing_index",
+    _core.SwingIndexStream,
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "open",
+        "high",
+        "low",
+        "close",
+    ),
+    ("swing_index",),
+)
+t3 = Factory("t3", _core.T3Stream, ("source",), ("series",), ("t3",))
+tan = Factory("tan", _core.TanStream, ("source",), ("series",), ("tan",))
+tanh = Factory("tanh", _core.TanhStream, ("source",), ("series",), ("tanh",))
+tema = Factory("tema", _core.TemaStream, ("source",), ("series",), ("tema",))
+trange = Factory(
+    "trange",
+    _core.TrangeStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("trange",),
+)
+trima = Factory("trima", _core.TrimaStream, ("source",), ("series",), ("trima",))
+trix = Factory("trix", _core.TrixStream, ("source",), ("series",), ("trix",))
+tsf = Factory("tsf", _core.TsfStream, ("source",), ("series",), ("tsf",))
+tsi = Factory("tsi", _core.TsiStream, ("source",), ("series",), ("tsi",))
+twiggs_mf = Factory(
+    "twiggs_mf",
+    _core.TwiggsMfStream,
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+    ),
+    ("twiggs_mf",),
+)
+typprice = Factory(
+    "typprice",
+    _core.TyppriceStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("typprice",),
+)
+ultosc = Factory(
+    "ultosc",
+    _core.UltoscStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("ultosc",),
+)
+var = Factory("var", _core.VarStream, ("source",), ("series",), ("var",))
+vhf = Factory("vhf", _core.VhfStream, ("source",), ("series",), ("vhf",))
+vortex = Factory(
+    "vortex",
+    _core.VortexStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "vortex_plusvi",
+        "vortex_minusvi",
+    ),
+)
+vwap = Factory(
+    "vwap",
+    _core.VwapStream,
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+        "timestamps",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+        "volume",
+        "timestamps",
+    ),
+    ("vwap",),
+)
+vwma = Factory(
+    "vwma",
+    _core.VwmaStream,
+    (
+        "close",
+        "volume",
+    ),
+    (
+        "close",
+        "volume",
+    ),
+    ("vwma",),
+)
+vzo = Factory(
+    "vzo",
+    _core.VzoStream,
+    (
+        "close",
+        "volume",
+    ),
+    (
+        "close",
+        "volume",
+    ),
+    ("vzo",),
+)
+wad = Factory(
+    "wad",
+    _core.WadStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("wad",),
+)
+wavetrend = Factory(
+    "wavetrend",
+    _core.WavetrendStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "wavetrend_1",
+        "wavetrend_2",
+    ),
+)
+wclprice = Factory(
+    "wclprice",
+    _core.WclpriceStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("wclprice",),
+)
+wilder_volatility = Factory(
+    "wilder_volatility",
+    _core.WilderVolatilityStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "wilder_volatility",
+        "wilder_volatility_direction",
+    ),
+)
+willr = Factory(
+    "willr",
+    _core.WillrStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    ("willr",),
+)
+wma = Factory("wma", _core.WmaStream, ("source",), ("series",), ("wma",))
+woodies_cci = Factory(
+    "woodies_cci",
+    _core.WoodiesCciStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "woodies_cci",
+        "woodies_cci_turbo",
+    ),
+)
+zlema = Factory("zlema", _core.ZlemaStream, ("source",), ("series",), ("zlema",))
+
+_ = (Any, _convert)

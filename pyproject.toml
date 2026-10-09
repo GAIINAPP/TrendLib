@@ -1,0 +1,59 @@
+[build-system]
+requires = ["maturin>=1.7,<2"]
+build-backend = "maturin"
+
+[project]
+name = "trendlib"
+description = "Fast, tested technical-analysis indicators with a Rust core"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT OR Apache-2.0"
+authors = [{ name = "GAIIN Technologies" }]
+keywords = ["technical-analysis", "indicators", "trading", "ta-lib", "finance", "nse"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Rust",
+  "Topic :: Office/Business :: Financial :: Investment",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Financial and Insurance Industry",
+]
+dependencies = ["numpy>=1.26"]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+pandas = ["pandas>=2.0"]
+polars = ["polars>=1.0"]
+dev = ["ruff==0.16.10", "pandas>=2.0"]
+docs = ["mkdocs-material"]
+
+[project.urls]
+Homepage = "https://github.com/GAIINAPP/TrendLib"
+Documentation = "https://gaiinapp.github.io/TrendLib/"
+Changelog = "https://github.com/GAIINAPP/TrendLib/blob/main/CHANGELOG.md"
+
+[tool.maturin]
+manifest-path = "crates/trendlib-py/Cargo.toml"
+python-source = "python"
+module-name = "trendlib._core"
+features = ["pyo3/extension-module", "pyo3/abi3-py311"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+# Markdown is prose. Ruff reformats Python blocks inside it, which would
+# destroy the aligned comments the docs use to explain each line.
+extend-exclude = ["testdata", "*.md"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+# These exception names are public API and cannot gain an Error suffix.
+"python/trendlib/errors.py" = ["N818"]
+# The uppercase TA-Lib aliases (D12) are deliberately not snake_case, and this
+# file is generated, so annotating each one is noise rather than information.
+"python/trendlib/_functions.py" = ["N802"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["trendlib"]
+

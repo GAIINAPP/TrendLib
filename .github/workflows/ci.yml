@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  rust:
+    name: rust (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: Swatinem/rust-cache@v2
+
+      - name: format
+        run: cargo fmt --all --check
+
+      - name: clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: build
+        run: cargo build --workspace --release
+
+      - name: the core crate has no runtime dependencies
+        shell: bash
+        run: |
+          tree=$(cargo tree -p trendlib -e normal)
+          echo "$tree"
+          test "$(echo "$tree" | wc -l)" -eq 1
+
+  python:
+    name: python (${{ matrix.os }}, ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.11", "3.14"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: install build dependencies
+        run: pip install maturin numpy
+
+      - name: build the extension
+        run: maturin build --release --out dist
+
+      - name: install and smoke-test the wheel
+        shell: bash
+        run: |
+          pip install --find-links dist trendlib
+          python - <<'PY'
+          import numpy as np
+          import trendlib as tl
+
+          close = 100.0 + np.cumsum(np.random.default_rng(0).normal(0.0, 1.0, 500))
+          high, low = close + 1.0, close - 1.0
+
+          assert np.isfinite(tl.rsi(close)[-1])
+          assert np.isfinite(tl.atr(high, low, close)[-1])
+          assert np.isfinite(tl.macd(close)[0][-1])
+
+          # A stream has to agree with the batch bar for bar, bitwise.
+          live = tl.stream.rsi(close[:100])
+          assert live.update(close[100]) == tl.rsi(close[:101])[-1]
+
+          print(f"trendlib {tl.__version__}: ok")
+          PY

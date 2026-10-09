@@ -1,0 +1,13293 @@
+# @generated — do not edit by hand
+"""Batch functions and their TA-Lib aliases.
+
+One wrapper per indicator, generated from its definition. Defaults come
+from the extension module rather than being repeated here, so there is
+one place they can be wrong.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+from trendlib import _convert, _core
+
+__all__ = [
+    "AC",
+    "ACCBANDS",
+    "ACOS",
+    "AD",
+    "ADD",
+    "ADOSC",
+    "ADR",
+    "ADX",
+    "ADXR",
+    "AO",
+    "APO",
+    "AROON",
+    "AROONOSC",
+    "ASIN",
+    "ATAN",
+    "ATR",
+    "AVGDEV",
+    "AVGPRICE",
+    "BBANDS",
+    "BETA",
+    "BOP",
+    "CCI",
+    "CDL2CROWS",
+    "CDL3BLACKCROWS",
+    "CDL3INSIDE",
+    "CDL3LINESTRIKE",
+    "CDL3OUTSIDE",
+    "CDL3STARSINSOUTH",
+    "CDL3WHITESOLDIERS",
+    "CDLABANDONEDBABY",
+    "CDLADVANCEBLOCK",
+    "CDLBELTHOLD",
+    "CDLBREAKAWAY",
+    "CDLCLOSINGMARUBOZU",
+    "CDLCONCEALBABYSWALL",
+    "CDLCOUNTERATTACK",
+    "CDLDARKCLOUDCOVER",
+    "CDLDOJI",
+    "CDLDOJISTAR",
+    "CDLDRAGONFLYDOJI",
+    "CDLENGULFING",
+    "CDLEVENINGDOJISTAR",
+    "CDLEVENINGSTAR",
+    "CDLGAPSIDESIDEWHITE",
+    "CDLGRAVESTONEDOJI",
+    "CDLHAMMER",
+    "CDLHANGINGMAN",
+    "CDLHARAMI",
+    "CDLHARAMICROSS",
+    "CDLHIGHWAVE",
+    "CDLHIKKAKE",
+    "CDLHIKKAKEMOD",
+    "CDLHOMINGPIGEON",
+    "CDLIDENTICAL3CROWS",
+    "CDLINNECK",
+    "CDLINVERTEDHAMMER",
+    "CDLKICKING",
+    "CDLKICKINGBYLENGTH",
+    "CDLLADDERBOTTOM",
+    "CDLLONGLEGGEDDOJI",
+    "CDLLONGLINE",
+    "CDLMARUBOZU",
+    "CDLMATCHINGLOW",
+    "CDLMATHOLD",
+    "CDLMORNINGDOJISTAR",
+    "CDLMORNINGSTAR",
+    "CDLONNECK",
+    "CDLPIERCING",
+    "CDLRICKSHAWMAN",
+    "CDLRISEFALL3METHODS",
+    "CDLSEPARATINGLINES",
+    "CDLSHOOTINGSTAR",
+    "CDLSHORTLINE",
+    "CDLSPINNINGTOP",
+    "CDLSTALLEDPATTERN",
+    "CDLSTICKSANDWICH",
+    "CDLTAKURI",
+    "CDLTASUKIGAP",
+    "CDLTHRUSTING",
+    "CDLTRISTAR",
+    "CDLUNIQUE3RIVER",
+    "CDLUPSIDEGAP2CROWS",
+    "CDLXSIDEGAP3METHODS",
+    "CEIL",
+    "CMF",
+    "CMO",
+    "CMOU",
+    "COPPOCK",
+    "CORREL",
+    "COS",
+    "COSH",
+    "CUMSUM",
+    "CVI",
+    "DEMA",
+    "DIV",
+    "DONCHIAN",
+    "DPO",
+    "DX",
+    "EFI",
+    "EMA",
+    "ER",
+    "ERI",
+    "EXP",
+    "FLOOR",
+    "FOSC",
+    "FRACTAL",
+    "HA",
+    "HMA",
+    "HT_DCPERIOD",
+    "HT_DCPHASE",
+    "HT_PHASOR",
+    "HT_SINE",
+    "HT_TRENDLINE",
+    "HT_TRENDMODE",
+    "IMI",
+    "KAMA",
+    "KC",
+    "KDJ",
+    "LINEARREG",
+    "LINEARREG_ANGLE",
+    "LINEARREG_INTERCEPT",
+    "LINEARREG_SLOPE",
+    "LN",
+    "LOG10",
+    "MA",
+    "MACD",
+    "MACDEXT",
+    "MACDFIX",
+    "MAMA",
+    "MARKETFI",
+    "MASSI",
+    "MAVP",
+    "MAX",
+    "MAXINDEX",
+    "MEDPRICE",
+    "MFI",
+    "MIDPOINT",
+    "MIDPRICE",
+    "MIN",
+    "MININDEX",
+    "MINMAX",
+    "MINMAXINDEX",
+    "MINUS_DI",
+    "MINUS_DM",
+    "MOM",
+    "MULT",
+    "NATR",
+    "NVI",
+    "OBV",
+    "PERCENTILE",
+    "PERCENTRANK",
+    "PLUS_DI",
+    "PLUS_DM",
+    "PPO",
+    "PVI",
+    "PVO",
+    "PVT",
+    "QSTICK",
+    "RMA",
+    "ROC",
+    "ROCP",
+    "ROCR",
+    "ROCR100",
+    "RSI",
+    "RVI",
+    "RVOL",
+    "SAR",
+    "SAREXT",
+    "SIN",
+    "SINH",
+    "SMA",
+    "SMI",
+    "SQRT",
+    "STDDEV",
+    "STOCH",
+    "STOCHF",
+    "STOCHRSI",
+    "SUB",
+    "SUM",
+    "SUPERTREND",
+    "T3",
+    "TAN",
+    "TANH",
+    "TEMA",
+    "TRANGE",
+    "TRIMA",
+    "TRIX",
+    "TSF",
+    "TSI",
+    "TYPPRICE",
+    "ULTOSC",
+    "VAR",
+    "VHF",
+    "VORTEX",
+    "VWAP",
+    "VWMA",
+    "WAD",
+    "WCLPRICE",
+    "WILLR",
+    "WMA",
+    "ZLEMA",
+    "ac",
+    "accbands",
+    "acos",
+    "ad",
+    "add",
+    "adosc",
+    "adr",
+    "adx",
+    "adxr",
+    "alligator",
+    "ao",
+    "apo",
+    "aroon",
+    "aroonosc",
+    "asi",
+    "asin",
+    "atan",
+    "atr",
+    "atr_bands",
+    "avgdev",
+    "avgprice",
+    "bar_dead_cat_bounce",
+    "bar_fakey",
+    "bar_gap2h",
+    "bar_hook_reversal",
+    "bar_horn_bottom",
+    "bar_horn_top",
+    "bar_inside_day",
+    "bar_inverted_dead_cat_bounce",
+    "bar_key_reversal",
+    "bar_narrow_range_4",
+    "bar_narrow_range_7",
+    "bar_one_day_reversal",
+    "bar_one_two_three",
+    "bar_outside_day",
+    "bar_pipe_bottom",
+    "bar_pipe_top",
+    "bar_pivot_point_reversal",
+    "bar_two_b",
+    "bar_wide_ranging_day",
+    "bbands",
+    "beta",
+    "bop",
+    "cci",
+    "cdl_2crows",
+    "cdl_3blackcrows",
+    "cdl_3inside",
+    "cdl_3linestrike",
+    "cdl_3outside",
+    "cdl_3starsinsouth",
+    "cdl_3whitesoldiers",
+    "cdl_abandonedbaby",
+    "cdl_advanceblock",
+    "cdl_belthold",
+    "cdl_breakaway",
+    "cdl_closingmarubozu",
+    "cdl_concealbabyswall",
+    "cdl_counterattack",
+    "cdl_darkcloudcover",
+    "cdl_doji",
+    "cdl_dojistar",
+    "cdl_dragonflydoji",
+    "cdl_engulfing",
+    "cdl_eveningdojistar",
+    "cdl_eveningstar",
+    "cdl_gapsidesidewhite",
+    "cdl_gravestonedoji",
+    "cdl_hammer",
+    "cdl_hangingman",
+    "cdl_harami",
+    "cdl_haramicross",
+    "cdl_highwave",
+    "cdl_hikkake",
+    "cdl_hikkakemod",
+    "cdl_homingpigeon",
+    "cdl_identical3crows",
+    "cdl_inneck",
+    "cdl_invertedhammer",
+    "cdl_kicking",
+    "cdl_kickingbylength",
+    "cdl_ladderbottom",
+    "cdl_longleggeddoji",
+    "cdl_longline",
+    "cdl_marubozu",
+    "cdl_matchinglow",
+    "cdl_mathold",
+    "cdl_morningdojistar",
+    "cdl_morningstar",
+    "cdl_onneck",
+    "cdl_piercing",
+    "cdl_rickshawman",
+    "cdl_risefall3methods",
+    "cdl_separatinglines",
+    "cdl_shootingstar",
+    "cdl_shortline",
+    "cdl_spinningtop",
+    "cdl_stalledpattern",
+    "cdl_sticksandwich",
+    "cdl_takuri",
+    "cdl_tasukigap",
+    "cdl_thrusting",
+    "cdl_tristar",
+    "cdl_unique3river",
+    "cdl_upsidegap2crows",
+    "cdl_xsidegap3methods",
+    "ceil",
+    "chart_ascending_broadening_wedge",
+    "chart_ascending_channel",
+    "chart_ascending_right_angle_broadening",
+    "chart_ascending_scallop",
+    "chart_ascending_triangle",
+    "chart_bear_flag",
+    "chart_bear_pennant",
+    "chart_big_m",
+    "chart_big_w",
+    "chart_broadening",
+    "chart_bull_flag",
+    "chart_bull_pennant",
+    "chart_bump_and_run_bottom",
+    "chart_bump_and_run_top",
+    "chart_busted_ascending_triangle",
+    "chart_busted_descending_triangle",
+    "chart_busted_double_bottom",
+    "chart_busted_double_top",
+    "chart_busted_head_shoulders",
+    "chart_busted_inverse_head_shoulders",
+    "chart_busted_rectangle",
+    "chart_busted_triple_bottom",
+    "chart_busted_triple_top",
+    "chart_complex_head_shoulders",
+    "chart_complex_inverse_head_shoulders",
+    "chart_cup_with_handle",
+    "chart_descending_broadening_wedge",
+    "chart_descending_channel",
+    "chart_descending_right_angle_broadening",
+    "chart_descending_scallop",
+    "chart_descending_triangle",
+    "chart_diamond_bottom",
+    "chart_diamond_top",
+    "chart_double_bottom",
+    "chart_double_bottom_adam_adam",
+    "chart_double_bottom_adam_eve",
+    "chart_double_bottom_eve_adam",
+    "chart_double_bottom_eve_eve",
+    "chart_double_top",
+    "chart_double_top_adam_adam",
+    "chart_double_top_adam_eve",
+    "chart_double_top_eve_adam",
+    "chart_double_top_eve_eve",
+    "chart_falling_wedge",
+    "chart_head_shoulders",
+    "chart_high_tight_flag",
+    "chart_inverse_head_shoulders",
+    "chart_inverted_cup_with_handle",
+    "chart_island_bottom",
+    "chart_island_top",
+    "chart_measured_move_down",
+    "chart_measured_move_up",
+    "chart_rectangle",
+    "chart_rising_wedge",
+    "chart_rounding_bottom",
+    "chart_rounding_top",
+    "chart_symmetrical_triangle",
+    "chart_three_peaks",
+    "chart_three_valleys",
+    "chart_triple_bottom",
+    "chart_triple_top",
+    "chart_v_bottom",
+    "chart_v_top",
+    "cmf",
+    "cmo",
+    "cmou",
+    "connors_rsi",
+    "coppock",
+    "correl",
+    "cos",
+    "cosh",
+    "cpr",
+    "cumsum",
+    "cvi",
+    "darvas_box",
+    "dema",
+    "div",
+    "donchian",
+    "dpo",
+    "dx",
+    "efi",
+    "elder_impulse",
+    "ema",
+    "envelope",
+    "er",
+    "eri",
+    "exp",
+    "floor",
+    "fosc",
+    "fractal",
+    "fractal_chaos_bands",
+    "frama",
+    "gapo",
+    "gator",
+    "guppy",
+    "ha",
+    "harmonic_abcd_bearish",
+    "harmonic_abcd_bullish",
+    "harmonic_bat_bearish",
+    "harmonic_bat_bullish",
+    "harmonic_butterfly_bearish",
+    "harmonic_butterfly_bullish",
+    "harmonic_crab_bearish",
+    "harmonic_crab_bullish",
+    "harmonic_gartley_bearish",
+    "harmonic_gartley_bullish",
+    "harmonic_wolfe_wave_bearish",
+    "harmonic_wolfe_wave_bullish",
+    "hma",
+    "ht_dcperiod",
+    "ht_dcphase",
+    "ht_phasor",
+    "ht_sine",
+    "ht_trendline",
+    "ht_trendmode",
+    "ichimoku",
+    "ift_rsi",
+    "imi",
+    "kama",
+    "kc",
+    "kdj",
+    "linearreg",
+    "linearreg_angle",
+    "linearreg_intercept",
+    "linearreg_slope",
+    "linreg_channel",
+    "ln",
+    "log10",
+    "lookback",
+    "ma",
+    "macd",
+    "macdext",
+    "macdfix",
+    "mama",
+    "marketfi",
+    "massi",
+    "mavp",
+    "max",
+    "maxindex",
+    "medprice",
+    "mfi",
+    "midpoint",
+    "midprice",
+    "min",
+    "minindex",
+    "minmax",
+    "minmaxindex",
+    "minus_di",
+    "minus_dm",
+    "mom",
+    "mult",
+    "natr",
+    "nvi",
+    "obv",
+    "percentile",
+    "percentrank",
+    "pivots_camarilla",
+    "pivots_demark",
+    "pivots_fibonacci",
+    "pivots_traditional",
+    "pivots_woodie",
+    "plus_di",
+    "plus_dm",
+    "pmo",
+    "ppo",
+    "pvi",
+    "pvo",
+    "pvt",
+    "qstick",
+    "rma",
+    "roc",
+    "rocp",
+    "rocr",
+    "rocr100",
+    "rsi",
+    "rvi",
+    "rvol",
+    "rwi",
+    "safezone",
+    "sar",
+    "sarext",
+    "sin",
+    "sinh",
+    "sma",
+    "smi",
+    "sqrt",
+    "stddev",
+    "stoch",
+    "stochf",
+    "stochrsi",
+    "sub",
+    "sum",
+    "supertrend",
+    "swing_index",
+    "t3",
+    "tan",
+    "tanh",
+    "tema",
+    "trange",
+    "trima",
+    "trix",
+    "tsf",
+    "tsi",
+    "twiggs_mf",
+    "typprice",
+    "ultosc",
+    "var",
+    "vhf",
+    "vortex",
+    "vwap",
+    "vwma",
+    "vzo",
+    "wad",
+    "wavetrend",
+    "wclprice",
+    "wilder_volatility",
+    "willr",
+    "wma",
+    "woodies_cci",
+    "zlema",
+]
+
+_PARAMS = _core.PARAMS
+
+
+def ac(
+    high=None,
+    low=None,
+    *,
+    fast_period: int = _PARAMS["ac"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["ac"]["slow_period"]["default"],
+    signal_period: int = _PARAMS["ac"]["signal_period"]["default"],
+) -> Any:
+    """Accelerator Oscillator.
+
+    Parameters
+    ----------
+    fast_period : int, default 5
+        Number of bars in the shorter average, from 2 to 100000.
+    slow_period : int, default 34
+        Number of bars in the longer average, from 2 to 100000.
+    signal_period : int, default 5
+        Number of bars the oscillator is smoothed over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Awesome oscillator minus its own short average.
+    """
+    fast_period = _convert.as_int("ac", "fast_period", fast_period)
+    slow_period = _convert.as_int("ac", "slow_period", slow_period)
+    signal_period = _convert.as_int("ac", "signal_period", signal_period)
+    columns, carrier = _convert.bars(
+        "ac",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.ac(
+        *columns, fast_period=fast_period, slow_period=slow_period, signal_period=signal_period
+    )
+    return _convert.wrap_outputs(out, carrier, ("ac",))
+
+
+def accbands(
+    high=None, low=None, close=None, *, period: int = _PARAMS["accbands"]["period"]["default"]
+) -> Any:
+    """Acceleration Bands.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Number of bars each band is averaged over, from 2 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        accbands_upper: Average of the high widened by the bar's own range.
+        accbands_middle: Average close.
+        accbands_lower: Average of the low narrowed by the bar's own range.
+    """
+    period = _convert.as_int("accbands", "period", period)
+    columns, carrier = _convert.bars(
+        "accbands",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.accbands(*columns, period=period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "accbands_upper",
+            "accbands_middle",
+            "accbands_lower",
+        ),
+    )
+
+
+def acos(source=None) -> Any:
+    """Vector Arc Cosine.
+
+    Returns
+    -------
+    ndarray or Series
+        Arc Cosine of source, element by element.
+    """
+    columns, carrier = _convert.bars("acos", (source,), ("source",), ("series",))
+    out = _core.acos(*columns)
+    return _convert.wrap_outputs(out, carrier, ("acos",))
+
+
+def ad(high=None, low=None, close=None, volume=None) -> Any:
+    """Chaikin Accumulation Distribution Line.
+
+    Returns
+    -------
+    ndarray or Series
+        Running total of volume weighted by where each close sat in its own bar.
+    """
+    columns, carrier = _convert.bars(
+        "ad",
+        (high, low, close, volume),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.ad(*columns)
+    return _convert.wrap_outputs(out, carrier, ("ad",))
+
+
+def add(source0=None, source1=None) -> Any:
+    """Vector Addition.
+
+    Returns
+    -------
+    ndarray or Series
+        Addition of the two inputs.
+    """
+    columns, carrier = _convert.bars(
+        "add",
+        (source0, source1),
+        (
+            "source0",
+            "source1",
+        ),
+        (
+            "series",
+            "series",
+        ),
+    )
+    out = _core.add(*columns)
+    return _convert.wrap_outputs(out, carrier, ("add",))
+
+
+def adosc(
+    high=None,
+    low=None,
+    close=None,
+    volume=None,
+    *,
+    fast_period: int = _PARAMS["adosc"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["adosc"]["slow_period"]["default"],
+) -> Any:
+    """Chaikin Accumulation/Distribution Oscillator.
+
+    Parameters
+    ----------
+    fast_period : int, default 3
+        Number of bars in the shorter average, from 2 to 100000.
+    slow_period : int, default 10
+        Number of bars in the longer average, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Short exponential average of the A/D line minus the long one.
+    """
+    fast_period = _convert.as_int("adosc", "fast_period", fast_period)
+    slow_period = _convert.as_int("adosc", "slow_period", slow_period)
+    columns, carrier = _convert.bars(
+        "adosc",
+        (high, low, close, volume),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.adosc(*columns, fast_period=fast_period, slow_period=slow_period)
+    return _convert.wrap_outputs(out, carrier, ("adosc",))
+
+
+def adr(high=None, low=None, *, period: int = _PARAMS["adr"]["period"]["default"]) -> Any:
+    """Average Day Range.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the range is averaged over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Average high-low range over the window.
+    """
+    period = _convert.as_int("adr", "period", period)
+    columns, carrier = _convert.bars(
+        "adr",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.adr(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("adr",))
+
+
+def adx(
+    high=None, low=None, close=None, *, period: int = _PARAMS["adx"]["period"]["default"]
+) -> Any:
+    """Average Directional Movement Index.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the movement is accumulated over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Wilder average of the directional movement index.
+    """
+    period = _convert.as_int("adx", "period", period)
+    columns, carrier = _convert.bars(
+        "adx",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.adx(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("adx",))
+
+
+def adxr(
+    high=None, low=None, close=None, *, period: int = _PARAMS["adxr"]["period"]["default"]
+) -> Any:
+    """Average Directional Movement Index Rating.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the movement is accumulated over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        The average index now and as it stood period minus one bars ago, averaged.
+    """
+    period = _convert.as_int("adxr", "period", period)
+    columns, carrier = _convert.bars(
+        "adxr",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.adxr(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("adxr",))
+
+
+def alligator(
+    high=None,
+    low=None,
+    *,
+    jaw_period: int = _PARAMS["alligator"]["jaw_period"]["default"],
+    jaw_shift: int = _PARAMS["alligator"]["jaw_shift"]["default"],
+    teeth_period: int = _PARAMS["alligator"]["teeth_period"]["default"],
+    teeth_shift: int = _PARAMS["alligator"]["teeth_shift"]["default"],
+    lips_period: int = _PARAMS["alligator"]["lips_period"]["default"],
+    lips_shift: int = _PARAMS["alligator"]["lips_shift"]["default"],
+) -> Any:
+    """Williams Alligator.
+
+    Parameters
+    ----------
+    jaw_period : int, default 13
+        Bars the jaw's smoothed median spans, from 1 to 100000.
+    jaw_shift : int, default 8
+        Bars the jaw is drawn ahead, from 1 to 100000.
+    teeth_period : int, default 8
+        Bars the teeth's smoothed median spans, from 1 to 100000.
+    teeth_shift : int, default 5
+        Bars the teeth are drawn ahead, from 1 to 100000.
+    lips_period : int, default 5
+        Bars the lips' smoothed median spans, from 1 to 100000.
+    lips_shift : int, default 3
+        Bars the lips are drawn ahead, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        alligator_jaw: Jaw, the jaw_period smoothed median drawn jaw_shift bars ahead.
+        alligator_teeth: Teeth, the teeth_period smoothed median drawn teeth_shift bars ahead.
+        alligator_lips: Lips, the lips_period smoothed median drawn lips_shift bars ahead.
+    """
+    jaw_period = _convert.as_int("alligator", "jaw_period", jaw_period)
+    jaw_shift = _convert.as_int("alligator", "jaw_shift", jaw_shift)
+    teeth_period = _convert.as_int("alligator", "teeth_period", teeth_period)
+    teeth_shift = _convert.as_int("alligator", "teeth_shift", teeth_shift)
+    lips_period = _convert.as_int("alligator", "lips_period", lips_period)
+    lips_shift = _convert.as_int("alligator", "lips_shift", lips_shift)
+    columns, carrier = _convert.bars(
+        "alligator",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.alligator(
+        *columns,
+        jaw_period=jaw_period,
+        jaw_shift=jaw_shift,
+        teeth_period=teeth_period,
+        teeth_shift=teeth_shift,
+        lips_period=lips_period,
+        lips_shift=lips_shift,
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "alligator_jaw",
+            "alligator_teeth",
+            "alligator_lips",
+        ),
+    )
+
+
+def ao(
+    high=None,
+    low=None,
+    *,
+    fast_period: int = _PARAMS["ao"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["ao"]["slow_period"]["default"],
+) -> Any:
+    """Awesome Oscillator.
+
+    Parameters
+    ----------
+    fast_period : int, default 5
+        Number of bars in the shorter average, from 2 to 100000.
+    slow_period : int, default 34
+        Number of bars in the longer average, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Short average of the bar midpoints minus the long one.
+    """
+    fast_period = _convert.as_int("ao", "fast_period", fast_period)
+    slow_period = _convert.as_int("ao", "slow_period", slow_period)
+    columns, carrier = _convert.bars(
+        "ao",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.ao(*columns, fast_period=fast_period, slow_period=slow_period)
+    return _convert.wrap_outputs(out, carrier, ("ao",))
+
+
+def apo(
+    source=None,
+    *,
+    fast_period: int = _PARAMS["apo"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["apo"]["slow_period"]["default"],
+    ma_type: str = _PARAMS["apo"]["ma_type"]["default"],
+) -> Any:
+    """Absolute Price Oscillator.
+
+    Parameters
+    ----------
+    fast_period : int, default 12
+        Number of bars in the shorter moving average, from 2 to 100000.
+    slow_period : int, default 26
+        Number of bars in the longer moving average, from 2 to 100000.
+    ma_type : str, default "ema"
+        Which moving average both stages use.
+
+    Returns
+    -------
+    ndarray or Series
+        Difference between the fast and the slow moving average.
+    """
+    fast_period = _convert.as_int("apo", "fast_period", fast_period)
+    slow_period = _convert.as_int("apo", "slow_period", slow_period)
+    ma_type = _convert.as_text("apo", "ma_type", ma_type)
+    columns, carrier = _convert.bars("apo", (source,), ("source",), ("series",))
+    out = _core.apo(*columns, fast_period=fast_period, slow_period=slow_period, ma_type=ma_type)
+    return _convert.wrap_outputs(out, carrier, ("apo",))
+
+
+def aroon(high=None, low=None, *, period: int = _PARAMS["aroon"]["period"]["default"]) -> Any:
+    """Aroon.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars back the window reaches, from 2 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        aroon_down: How recently the lowest low was set, from 0 to 100.
+        aroon_up: How recently the highest high was set, from 0 to 100.
+    """
+    period = _convert.as_int("aroon", "period", period)
+    columns, carrier = _convert.bars(
+        "aroon",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.aroon(*columns, period=period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "aroon_down",
+            "aroon_up",
+        ),
+    )
+
+
+def aroonosc(high=None, low=None, *, period: int = _PARAMS["aroonosc"]["period"]["default"]) -> Any:
+    """Aroon Oscillator.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars back the window reaches, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        How much fresher the highest high is than the lowest low, from -100 to 100.
+    """
+    period = _convert.as_int("aroonosc", "period", period)
+    columns, carrier = _convert.bars(
+        "aroonosc",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.aroonosc(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("aroonosc",))
+
+
+def asi(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    limit_move: float = _PARAMS["asi"]["limit_move"]["default"],
+) -> Any:
+    """Accumulative Swing Index.
+
+    Parameters
+    ----------
+    limit_move : float, default 0.5
+        The largest move allowed in one bar, in price units.
+
+    Returns
+    -------
+    ndarray or Series
+        Running total of the swing index.
+    """
+    limit_move = _convert.as_float("asi", "limit_move", limit_move)
+    columns, carrier = _convert.bars(
+        "asi",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.asi(*columns, limit_move=limit_move)
+    return _convert.wrap_outputs(out, carrier, ("asi",))
+
+
+def asin(source=None) -> Any:
+    """Vector Arc Sine.
+
+    Returns
+    -------
+    ndarray or Series
+        Arc Sine of source, element by element.
+    """
+    columns, carrier = _convert.bars("asin", (source,), ("source",), ("series",))
+    out = _core.asin(*columns)
+    return _convert.wrap_outputs(out, carrier, ("asin",))
+
+
+def atan(source=None) -> Any:
+    """Vector Arc Tangent.
+
+    Returns
+    -------
+    ndarray or Series
+        Arc Tangent of source, element by element.
+    """
+    columns, carrier = _convert.bars("atan", (source,), ("source",), ("series",))
+    out = _core.atan(*columns)
+    return _convert.wrap_outputs(out, carrier, ("atan",))
+
+
+def atr(
+    high=None, low=None, close=None, *, period: int = _PARAMS["atr"]["period"]["default"]
+) -> Any:
+    """Average True Range.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the true ranges are averaged over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Wilder average of the true range.
+    """
+    period = _convert.as_int("atr", "period", period)
+    columns, carrier = _convert.bars(
+        "atr",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.atr(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("atr",))
+
+
+def atr_bands(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["atr_bands"]["period"]["default"],
+    shift: float = _PARAMS["atr_bands"]["shift"]["default"],
+) -> Any:
+    """ATR Bands.
+
+    Parameters
+    ----------
+    period : int, default 5
+        Bars of the average true range, from 1 to 100000.
+    shift : float, default 3.0
+        Multiple of the average true range each band sits from the close.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        atr_bands_upper: Close plus shift average true ranges.
+        atr_bands_lower: Close minus shift average true ranges.
+    """
+    period = _convert.as_int("atr_bands", "period", period)
+    shift = _convert.as_float("atr_bands", "shift", shift)
+    columns, carrier = _convert.bars(
+        "atr_bands",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.atr_bands(*columns, period=period, shift=shift)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "atr_bands_upper",
+            "atr_bands_lower",
+        ),
+    )
+
+
+def avgdev(source=None, *, period: int = _PARAMS["avgdev"]["period"]["default"]) -> Any:
+    """Average Deviation.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the deviation is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Mean distance of the last period values from their own average.
+    """
+    period = _convert.as_int("avgdev", "period", period)
+    columns, carrier = _convert.bars("avgdev", (source,), ("source",), ("series",))
+    out = _core.avgdev(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("avgdev",))
+
+
+def avgprice(open=None, high=None, low=None, close=None) -> Any:
+    """Average Price.
+
+    Returns
+    -------
+    ndarray or Series
+        The four prices a bar records, averaged equally.
+    """
+    columns, carrier = _convert.bars(
+        "avgprice",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.avgprice(*columns)
+    return _convert.wrap_outputs(out, carrier, ("avgprice",))
+
+
+def bar_dead_cat_bounce(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    drop_pct: float = _PARAMS["bar_dead_cat_bounce"]["drop_pct"]["default"],
+    bounce_pct: float = _PARAMS["bar_dead_cat_bounce"]["bounce_pct"]["default"],
+    period: int = _PARAMS["bar_dead_cat_bounce"]["period"]["default"],
+) -> Any:
+    """Dead-Cat Bounce.
+
+    Parameters
+    ----------
+    drop_pct : float, default 0.1
+        Smallest fall that starts the pattern, as a fraction.
+    bounce_pct : float, default 0.5
+        Largest share of the fall the bounce may recover.
+    period : int, default 15
+        Bars the fall and bounce must fit in, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A weak bounce after a sharp fall.
+    """
+    drop_pct = _convert.as_float("bar_dead_cat_bounce", "drop_pct", drop_pct)
+    bounce_pct = _convert.as_float("bar_dead_cat_bounce", "bounce_pct", bounce_pct)
+    period = _convert.as_int("bar_dead_cat_bounce", "period", period)
+    columns, carrier = _convert.bars(
+        "bar_dead_cat_bounce",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_dead_cat_bounce(
+        *columns, drop_pct=drop_pct, bounce_pct=bounce_pct, period=period
+    )
+    return _convert.wrap_outputs(out, carrier, ("bar_dead_cat_bounce",))
+
+
+def bar_fakey(open=None, high=None, low=None, close=None) -> Any:
+    """Fakey.
+
+    Returns
+    -------
+    ndarray or Series
+        An inside bar, then a close beyond the bar it sat within.
+    """
+    columns, carrier = _convert.bars(
+        "bar_fakey",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_fakey(*columns)
+    return _convert.wrap_outputs(out, carrier, ("bar_fakey",))
+
+
+def bar_gap2h(open=None, high=None, low=None, close=None) -> Any:
+    """Gap Beyond Two Bars.
+
+    Returns
+    -------
+    ndarray or Series
+        An open beyond the highs or the lows of both bars before it.
+    """
+    columns, carrier = _convert.bars(
+        "bar_gap2h",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_gap2h(*columns)
+    return _convert.wrap_outputs(out, carrier, ("bar_gap2h",))
+
+
+def bar_hook_reversal(open=None, high=None, low=None, close=None) -> Any:
+    """Hook Reversal.
+
+    Returns
+    -------
+    ndarray or Series
+        An open inside the previous bar and a close past the previous open.
+    """
+    columns, carrier = _convert.bars(
+        "bar_hook_reversal",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_hook_reversal(*columns)
+    return _convert.wrap_outputs(out, carrier, ("bar_hook_reversal",))
+
+
+def bar_horn_bottom(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    tol: float = _PARAMS["bar_horn_bottom"]["tol"]["default"],
+) -> Any:
+    """Horn Bottom.
+
+    Parameters
+    ----------
+    tol : float, default 0.02
+        How far apart the two horns' lows may be, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        Two matching lows two bars apart with a higher bar between.
+    """
+    tol = _convert.as_float("bar_horn_bottom", "tol", tol)
+    columns, carrier = _convert.bars(
+        "bar_horn_bottom",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_horn_bottom(*columns, tol=tol)
+    return _convert.wrap_outputs(out, carrier, ("bar_horn_bottom",))
+
+
+def bar_horn_top(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    tol: float = _PARAMS["bar_horn_top"]["tol"]["default"],
+) -> Any:
+    """Horn Top.
+
+    Parameters
+    ----------
+    tol : float, default 0.02
+        How far apart the two horns' highs may be, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        Two matching highs two bars apart with a lower bar between.
+    """
+    tol = _convert.as_float("bar_horn_top", "tol", tol)
+    columns, carrier = _convert.bars(
+        "bar_horn_top",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_horn_top(*columns, tol=tol)
+    return _convert.wrap_outputs(out, carrier, ("bar_horn_top",))
+
+
+def bar_inside_day(open=None, high=None, low=None, close=None) -> Any:
+    """Inside Day.
+
+    Returns
+    -------
+    ndarray or Series
+        A range inside the previous bar's.
+    """
+    columns, carrier = _convert.bars(
+        "bar_inside_day",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_inside_day(*columns)
+    return _convert.wrap_outputs(out, carrier, ("bar_inside_day",))
+
+
+def bar_inverted_dead_cat_bounce(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    rise_pct: float = _PARAMS["bar_inverted_dead_cat_bounce"]["rise_pct"]["default"],
+    pullback_pct: float = _PARAMS["bar_inverted_dead_cat_bounce"]["pullback_pct"]["default"],
+    period: int = _PARAMS["bar_inverted_dead_cat_bounce"]["period"]["default"],
+) -> Any:
+    """Inverted Dead-Cat Bounce.
+
+    Parameters
+    ----------
+    rise_pct : float, default 0.1
+        Smallest rise that starts the pattern, as a fraction.
+    pullback_pct : float, default 0.5
+        Largest share of the rise the pullback may give back.
+    period : int, default 15
+        Bars the rise and pullback must fit in, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A shallow pullback after a sharp rise.
+    """
+    rise_pct = _convert.as_float("bar_inverted_dead_cat_bounce", "rise_pct", rise_pct)
+    pullback_pct = _convert.as_float("bar_inverted_dead_cat_bounce", "pullback_pct", pullback_pct)
+    period = _convert.as_int("bar_inverted_dead_cat_bounce", "period", period)
+    columns, carrier = _convert.bars(
+        "bar_inverted_dead_cat_bounce",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_inverted_dead_cat_bounce(
+        *columns, rise_pct=rise_pct, pullback_pct=pullback_pct, period=period
+    )
+    return _convert.wrap_outputs(out, carrier, ("bar_inverted_dead_cat_bounce",))
+
+
+def bar_key_reversal(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    lookback: int = _PARAMS["bar_key_reversal"]["lookback"]["default"],
+) -> Any:
+    """Key Reversal.
+
+    Parameters
+    ----------
+    lookback : int, default 5
+        Bars whose extreme the bar must exceed, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A new low or high for the window that closes back against the move.
+    """
+    lookback = _convert.as_int("bar_key_reversal", "lookback", lookback)
+    columns, carrier = _convert.bars(
+        "bar_key_reversal",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_key_reversal(*columns, lookback=lookback)
+    return _convert.wrap_outputs(out, carrier, ("bar_key_reversal",))
+
+
+def bar_narrow_range_4(open=None, high=None, low=None, close=None) -> Any:
+    """Narrow Range 4.
+
+    Returns
+    -------
+    ndarray or Series
+        The narrowest range of the last 4 bars.
+    """
+    columns, carrier = _convert.bars(
+        "bar_narrow_range_4",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_narrow_range_4(*columns)
+    return _convert.wrap_outputs(out, carrier, ("bar_narrow_range_4",))
+
+
+def bar_narrow_range_7(open=None, high=None, low=None, close=None) -> Any:
+    """Narrow Range 7.
+
+    Returns
+    -------
+    ndarray or Series
+        The narrowest range of the last 7 bars.
+    """
+    columns, carrier = _convert.bars(
+        "bar_narrow_range_7",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_narrow_range_7(*columns)
+    return _convert.wrap_outputs(out, carrier, ("bar_narrow_range_7",))
+
+
+def bar_one_day_reversal(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    lookback: int = _PARAMS["bar_one_day_reversal"]["lookback"]["default"],
+) -> Any:
+    """One-Day Reversal.
+
+    Parameters
+    ----------
+    lookback : int, default 10
+        Bars whose extreme the bar must exceed, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A new extreme for the window closing in the other half of the bar.
+    """
+    lookback = _convert.as_int("bar_one_day_reversal", "lookback", lookback)
+    columns, carrier = _convert.bars(
+        "bar_one_day_reversal",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_one_day_reversal(*columns, lookback=lookback)
+    return _convert.wrap_outputs(out, carrier, ("bar_one_day_reversal",))
+
+
+def bar_one_two_three(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["bar_one_two_three"]["period"]["default"],
+    pivot_n: int = _PARAMS["bar_one_two_three"]["pivot_n"]["default"],
+) -> Any:
+    """1-2-3 Reversal.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Bars back the two swing points may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 3
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Two swing points, the second less extreme, and a close through the swing between them.
+    """
+    period = _convert.as_int("bar_one_two_three", "period", period)
+    pivot_n = _convert.as_int("bar_one_two_three", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "bar_one_two_three",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_one_two_three(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("bar_one_two_three",))
+
+
+def bar_outside_day(open=None, high=None, low=None, close=None) -> Any:
+    """Outside Day.
+
+    Returns
+    -------
+    ndarray or Series
+        A bar covering the previous one and closing beyond it.
+    """
+    columns, carrier = _convert.bars(
+        "bar_outside_day",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_outside_day(*columns)
+    return _convert.wrap_outputs(out, carrier, ("bar_outside_day",))
+
+
+def bar_pipe_bottom(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    height_tol: float = _PARAMS["bar_pipe_bottom"]["height_tol"]["default"],
+) -> Any:
+    """Pipe Bottom.
+
+    Parameters
+    ----------
+    height_tol : float, default 0.02
+        How far apart the two spikes' lows may be, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        Two tall adjacent bars with matching lows.
+    """
+    height_tol = _convert.as_float("bar_pipe_bottom", "height_tol", height_tol)
+    columns, carrier = _convert.bars(
+        "bar_pipe_bottom",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_pipe_bottom(*columns, height_tol=height_tol)
+    return _convert.wrap_outputs(out, carrier, ("bar_pipe_bottom",))
+
+
+def bar_pipe_top(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    height_tol: float = _PARAMS["bar_pipe_top"]["height_tol"]["default"],
+) -> Any:
+    """Pipe Top.
+
+    Parameters
+    ----------
+    height_tol : float, default 0.02
+        How far apart the two spikes' highs may be, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        Two tall adjacent bars with matching highs.
+    """
+    height_tol = _convert.as_float("bar_pipe_top", "height_tol", height_tol)
+    columns, carrier = _convert.bars(
+        "bar_pipe_top",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_pipe_top(*columns, height_tol=height_tol)
+    return _convert.wrap_outputs(out, carrier, ("bar_pipe_top",))
+
+
+def bar_pivot_point_reversal(open=None, high=None, low=None, close=None) -> Any:
+    """Pivot Point Reversal.
+
+    Returns
+    -------
+    ndarray or Series
+        A gap past the previous bar's extreme and a close past the open.
+    """
+    columns, carrier = _convert.bars(
+        "bar_pivot_point_reversal",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_pivot_point_reversal(*columns)
+    return _convert.wrap_outputs(out, carrier, ("bar_pivot_point_reversal",))
+
+
+def bar_two_b(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    lookback: int = _PARAMS["bar_two_b"]["lookback"]["default"],
+    tol: float = _PARAMS["bar_two_b"]["tol"]["default"],
+) -> Any:
+    """2B Reversal.
+
+    Parameters
+    ----------
+    lookback : int, default 5
+        Bars before the breakout bar its high or low is compared with, from 1 to 100000.
+    tol : float, default 0.01
+        How far beyond the earlier extreme the breakout bar must reach, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A bar beyond the extreme of the bars before it, then a close back inside it.
+    """
+    lookback = _convert.as_int("bar_two_b", "lookback", lookback)
+    tol = _convert.as_float("bar_two_b", "tol", tol)
+    columns, carrier = _convert.bars(
+        "bar_two_b",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_two_b(*columns, lookback=lookback, tol=tol)
+    return _convert.wrap_outputs(out, carrier, ("bar_two_b",))
+
+
+def bar_wide_ranging_day(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    factor: float = _PARAMS["bar_wide_ranging_day"]["factor"]["default"],
+    lookback: int = _PARAMS["bar_wide_ranging_day"]["lookback"]["default"],
+) -> Any:
+    """Wide-Ranging Day.
+
+    Parameters
+    ----------
+    factor : float, default 2.0
+        How many times the average range the bar's range must exceed.
+    lookback : int, default 10
+        Bars the average range is taken over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A range well above the recent average, closing in its upper or lower half.
+    """
+    factor = _convert.as_float("bar_wide_ranging_day", "factor", factor)
+    lookback = _convert.as_int("bar_wide_ranging_day", "lookback", lookback)
+    columns, carrier = _convert.bars(
+        "bar_wide_ranging_day",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bar_wide_ranging_day(*columns, factor=factor, lookback=lookback)
+    return _convert.wrap_outputs(out, carrier, ("bar_wide_ranging_day",))
+
+
+def bbands(
+    source=None,
+    *,
+    period: int = _PARAMS["bbands"]["period"]["default"],
+    nbdev_up: float = _PARAMS["bbands"]["nbdev_up"]["default"],
+    nbdev_dn: float = _PARAMS["bbands"]["nbdev_dn"]["default"],
+    ma_type: str = _PARAMS["bbands"]["ma_type"]["default"],
+) -> Any:
+    """Bollinger Bands.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Number of bars in the average and the deviation window, from 2 to 100000.
+    nbdev_up : float, default 2.0
+        Standard deviations added to the middle band.
+    nbdev_dn : float, default 2.0
+        Standard deviations subtracted from the middle band.
+    ma_type : str, default "sma"
+        Moving average used for the middle band.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        bbands_upper: Middle band plus nbdev_up standard deviations.
+        bbands_middle: Moving average of source.
+        bbands_lower: Middle band minus nbdev_dn standard deviations.
+    """
+    period = _convert.as_int("bbands", "period", period)
+    nbdev_up = _convert.as_float("bbands", "nbdev_up", nbdev_up)
+    nbdev_dn = _convert.as_float("bbands", "nbdev_dn", nbdev_dn)
+    ma_type = _convert.as_text("bbands", "ma_type", ma_type)
+    columns, carrier = _convert.bars("bbands", (source,), ("source",), ("series",))
+    out = _core.bbands(
+        *columns, period=period, nbdev_up=nbdev_up, nbdev_dn=nbdev_dn, ma_type=ma_type
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "bbands_upper",
+            "bbands_middle",
+            "bbands_lower",
+        ),
+    )
+
+
+def beta(source0=None, source1=None, *, period: int = _PARAMS["beta"]["period"]["default"]) -> Any:
+    """Beta.
+
+    Parameters
+    ----------
+    period : int, default 5
+        Number of returns the slope is fitted over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Slope of the first series' returns against the second's.
+    """
+    period = _convert.as_int("beta", "period", period)
+    columns, carrier = _convert.bars(
+        "beta",
+        (source0, source1),
+        (
+            "source0",
+            "source1",
+        ),
+        (
+            "series",
+            "series",
+        ),
+    )
+    out = _core.beta(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("beta",))
+
+
+def bop(open=None, high=None, low=None, close=None) -> Any:
+    """Balance of Power.
+
+    Returns
+    -------
+    ndarray or Series
+        Where the close finished relative to the open, scaled by the bar's range.
+    """
+    columns, carrier = _convert.bars(
+        "bop",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.bop(*columns)
+    return _convert.wrap_outputs(out, carrier, ("bop",))
+
+
+def cci(
+    high=None, low=None, close=None, *, period: int = _PARAMS["cci"]["period"]["default"]
+) -> Any:
+    """Commodity Channel Index.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the average and the deviation are taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Distance of the typical price from its average, in units of its own mean deviation.
+    """
+    period = _convert.as_int("cci", "period", period)
+    columns, carrier = _convert.bars(
+        "cci",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cci(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("cci",))
+
+
+def cdl_2crows(open=None, high=None, low=None, close=None) -> Any:
+    """Two Crows.
+
+    Returns
+    -------
+    ndarray or Series
+        A long white bar, a black one gapping above it, then a black one closing back inside it.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_2crows",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_2crows(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_2crows",))
+
+
+def cdl_3blackcrows(open=None, high=None, low=None, close=None) -> Any:
+    """Three Black Crows.
+
+    Returns
+    -------
+    ndarray or Series
+        Three black bars each opening inside the last body and closing lower, after a white one.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_3blackcrows",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_3blackcrows(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_3blackcrows",))
+
+
+def cdl_3inside(open=None, high=None, low=None, close=None) -> Any:
+    """Three Inside Up/Down.
+
+    Returns
+    -------
+    ndarray or Series
+        A harami carried on by a third bar closing past the first bar's open.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_3inside",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_3inside(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_3inside",))
+
+
+def cdl_3linestrike(open=None, high=None, low=None, close=None) -> Any:
+    """Three-Line Strike.
+
+    Returns
+    -------
+    ndarray or Series
+        Three bars running one way, then one that opens past the last and closes past the first.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_3linestrike",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_3linestrike(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_3linestrike",))
+
+
+def cdl_3outside(open=None, high=None, low=None, close=None) -> Any:
+    """Three Outside Up/Down.
+
+    Returns
+    -------
+    ndarray or Series
+        An engulfing pattern carried on by a third bar closing further in the same direction.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_3outside",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_3outside(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_3outside",))
+
+
+def cdl_3starsinsouth(open=None, high=None, low=None, close=None) -> Any:
+    """Three Stars In The South.
+
+    Returns
+    -------
+    ndarray or Series
+        Three black bars, each smaller than the last and giving back less ground.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_3starsinsouth",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_3starsinsouth(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_3starsinsouth",))
+
+
+def cdl_3whitesoldiers(open=None, high=None, low=None, close=None) -> Any:
+    """Three Advancing White Soldiers.
+
+    Returns
+    -------
+    ndarray or Series
+        Three white bars each opening inside the last body and closing higher without shortening.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_3whitesoldiers",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_3whitesoldiers(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_3whitesoldiers",))
+
+
+def cdl_abandonedbaby(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    penetration: float = _PARAMS["cdl_abandonedbaby"]["penetration"]["default"],
+) -> Any:
+    """Abandoned Baby.
+
+    Parameters
+    ----------
+    penetration : float, default 0.3
+        How far into the previous body the close has to travel, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A doji stranded by a gap on both sides, between two long bars of opposite colours.
+    """
+    penetration = _convert.as_float("cdl_abandonedbaby", "penetration", penetration)
+    columns, carrier = _convert.bars(
+        "cdl_abandonedbaby",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_abandonedbaby(*columns, penetration=penetration)
+    return _convert.wrap_outputs(out, carrier, ("cdl_abandonedbaby",))
+
+
+def cdl_advanceblock(open=None, high=None, low=None, close=None) -> Any:
+    """Advance Block.
+
+    Returns
+    -------
+    ndarray or Series
+        Three white bars closing higher, with the advance visibly slowing.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_advanceblock",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_advanceblock(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_advanceblock",))
+
+
+def cdl_belthold(open=None, high=None, low=None, close=None) -> Any:
+    """Belt Hold.
+
+    Returns
+    -------
+    ndarray or Series
+        A long body that opened at the end of its range and ran from there.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_belthold",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_belthold(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_belthold",))
+
+
+def cdl_breakaway(open=None, high=None, low=None, close=None) -> Any:
+    """Breakaway.
+
+    Returns
+    -------
+    ndarray or Series
+        A gap away from a long bar, three bars drifting further, then one closing back into the gap.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_breakaway",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_breakaway(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_breakaway",))
+
+
+def cdl_closingmarubozu(open=None, high=None, low=None, close=None) -> Any:
+    """Closing Marubozu.
+
+    Returns
+    -------
+    ndarray or Series
+        A long body that closed at the end of its range, whatever the other wick did.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_closingmarubozu",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_closingmarubozu(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_closingmarubozu",))
+
+
+def cdl_concealbabyswall(open=None, high=None, low=None, close=None) -> Any:
+    """Concealing Baby Swallow.
+
+    Returns
+    -------
+    ndarray or Series
+        Four black bars, two of them marubozu, then one that swallows the bar before it whole.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_concealbabyswall",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_concealbabyswall(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_concealbabyswall",))
+
+
+def cdl_counterattack(open=None, high=None, low=None, close=None) -> Any:
+    """Counterattack.
+
+    Returns
+    -------
+    ndarray or Series
+        Two long bars of opposite colours that closed at the same price.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_counterattack",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_counterattack(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_counterattack",))
+
+
+def cdl_darkcloudcover(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    penetration: float = _PARAMS["cdl_darkcloudcover"]["penetration"]["default"],
+) -> Any:
+    """Dark Cloud Cover.
+
+    Parameters
+    ----------
+    penetration : float, default 0.5
+        How far into the previous body the close has to travel, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A black bar that opened above the previous high and closed well into the white body before
+        it.
+    """
+    penetration = _convert.as_float("cdl_darkcloudcover", "penetration", penetration)
+    columns, carrier = _convert.bars(
+        "cdl_darkcloudcover",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_darkcloudcover(*columns, penetration=penetration)
+    return _convert.wrap_outputs(out, carrier, ("cdl_darkcloudcover",))
+
+
+def cdl_doji(open=None, high=None, low=None, close=None) -> Any:
+    """Doji.
+
+    Returns
+    -------
+    ndarray or Series
+        A bar whose open and close are close enough together to count as the same price.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_doji",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_doji(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_doji",))
+
+
+def cdl_dojistar(open=None, high=None, low=None, close=None) -> Any:
+    """Doji Star.
+
+    Returns
+    -------
+    ndarray or Series
+        A doji whose body gaps clear of the long body before it.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_dojistar",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_dojistar(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_dojistar",))
+
+
+def cdl_dragonflydoji(open=None, high=None, low=None, close=None) -> Any:
+    """Dragonfly Doji.
+
+    Returns
+    -------
+    ndarray or Series
+        A doji that opened and closed at the top of its range, with a long tail below.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_dragonflydoji",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_dragonflydoji(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_dragonflydoji",))
+
+
+def cdl_engulfing(open=None, high=None, low=None, close=None) -> Any:
+    """Engulfing Pattern.
+
+    Returns
+    -------
+    ndarray or Series
+        A body that covers the whole of the previous one, in the other colour.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_engulfing",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_engulfing(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_engulfing",))
+
+
+def cdl_eveningdojistar(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    penetration: float = _PARAMS["cdl_eveningdojistar"]["penetration"]["default"],
+) -> Any:
+    """Evening Doji Star.
+
+    Parameters
+    ----------
+    penetration : float, default 0.3
+        How far into the previous body the close has to travel, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A long white bar, a doji one gapping up from it, then a black one closing well back into it.
+    """
+    penetration = _convert.as_float("cdl_eveningdojistar", "penetration", penetration)
+    columns, carrier = _convert.bars(
+        "cdl_eveningdojistar",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_eveningdojistar(*columns, penetration=penetration)
+    return _convert.wrap_outputs(out, carrier, ("cdl_eveningdojistar",))
+
+
+def cdl_eveningstar(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    penetration: float = _PARAMS["cdl_eveningstar"]["penetration"]["default"],
+) -> Any:
+    """Evening Star.
+
+    Parameters
+    ----------
+    penetration : float, default 0.3
+        How far into the previous body the close has to travel, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A long white bar, a short one gapping up from it, then a black one closing well back into
+        it.
+    """
+    penetration = _convert.as_float("cdl_eveningstar", "penetration", penetration)
+    columns, carrier = _convert.bars(
+        "cdl_eveningstar",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_eveningstar(*columns, penetration=penetration)
+    return _convert.wrap_outputs(out, carrier, ("cdl_eveningstar",))
+
+
+def cdl_gapsidesidewhite(open=None, high=None, low=None, close=None) -> Any:
+    """Up/Down-gap Side-by-side White Lines.
+
+    Returns
+    -------
+    ndarray or Series
+        Two white bars of the same size opening at the same price, both on the far side of a gap.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_gapsidesidewhite",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_gapsidesidewhite(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_gapsidesidewhite",))
+
+
+def cdl_gravestonedoji(open=None, high=None, low=None, close=None) -> Any:
+    """Gravestone Doji.
+
+    Returns
+    -------
+    ndarray or Series
+        A doji that opened and closed at the bottom of its range, with a long wick above.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_gravestonedoji",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_gravestonedoji(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_gravestonedoji",))
+
+
+def cdl_hammer(open=None, high=None, low=None, close=None) -> Any:
+    """Hammer.
+
+    Returns
+    -------
+    ndarray or Series
+        A short body with a long tail below it, sitting near the previous low.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_hammer",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_hammer(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_hammer",))
+
+
+def cdl_hangingman(open=None, high=None, low=None, close=None) -> Any:
+    """Hanging Man.
+
+    Returns
+    -------
+    ndarray or Series
+        A short body with a long tail below it, sitting near the previous high.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_hangingman",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_hangingman(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_hangingman",))
+
+
+def cdl_harami(open=None, high=None, low=None, close=None) -> Any:
+    """Harami Pattern.
+
+    Returns
+    -------
+    ndarray or Series
+        A short body sitting entirely inside the long body before it.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_harami",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_harami(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_harami",))
+
+
+def cdl_haramicross(open=None, high=None, low=None, close=None) -> Any:
+    """Harami Cross Pattern.
+
+    Returns
+    -------
+    ndarray or Series
+        A harami whose second bar is a doji rather than merely a short body.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_haramicross",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_haramicross(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_haramicross",))
+
+
+def cdl_highwave(open=None, high=None, low=None, close=None) -> Any:
+    """High Wave Candle.
+
+    Returns
+    -------
+    ndarray or Series
+        A short body with a very long wick on each side.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_highwave",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_highwave(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_highwave",))
+
+
+def cdl_hikkake(open=None, high=None, low=None, close=None) -> Any:
+    """Hikkake Pattern.
+
+    Returns
+    -------
+    ndarray or Series
+        An inside bar broken the wrong way, and the close that confirms it.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_hikkake",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_hikkake(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_hikkake",))
+
+
+def cdl_hikkakemod(open=None, high=None, low=None, close=None) -> Any:
+    """Modified Hikkake Pattern.
+
+    Returns
+    -------
+    ndarray or Series
+        Two nested inside bars broken the wrong way, after a close at the end of the range.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_hikkakemod",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_hikkakemod(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_hikkakemod",))
+
+
+def cdl_homingpigeon(open=None, high=None, low=None, close=None) -> Any:
+    """Homing Pigeon.
+
+    Returns
+    -------
+    ndarray or Series
+        A short black body inside the long black one before it.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_homingpigeon",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_homingpigeon(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_homingpigeon",))
+
+
+def cdl_identical3crows(open=None, high=None, low=None, close=None) -> Any:
+    """Identical Three Crows.
+
+    Returns
+    -------
+    ndarray or Series
+        Three black bars each opening where the last one closed and closing lower.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_identical3crows",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_identical3crows(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_identical3crows",))
+
+
+def cdl_inneck(open=None, high=None, low=None, close=None) -> Any:
+    """In Neck Pattern.
+
+    Returns
+    -------
+    ndarray or Series
+        A white bar that opened under the previous low and closed barely past its close.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_inneck",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_inneck(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_inneck",))
+
+
+def cdl_invertedhammer(open=None, high=None, low=None, close=None) -> Any:
+    """Inverted Hammer.
+
+    Returns
+    -------
+    ndarray or Series
+        A short body with a long wick above it, opening below the previous body.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_invertedhammer",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_invertedhammer(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_invertedhammer",))
+
+
+def cdl_kicking(open=None, high=None, low=None, close=None) -> Any:
+    """Kicking.
+
+    Returns
+    -------
+    ndarray or Series
+        Two marubozu of opposite colours with a gap between them.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_kicking",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_kicking(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_kicking",))
+
+
+def cdl_kickingbylength(open=None, high=None, low=None, close=None) -> Any:
+    """Kicking by Length.
+
+    Returns
+    -------
+    ndarray or Series
+        A kicking pattern answered with the colour of the longer of its two bodies.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_kickingbylength",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_kickingbylength(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_kickingbylength",))
+
+
+def cdl_ladderbottom(open=None, high=None, low=None, close=None) -> Any:
+    """Ladder Bottom.
+
+    Returns
+    -------
+    ndarray or Series
+        Three black bars stepping down, a fourth with a wick above, then a white one clearing it.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_ladderbottom",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_ladderbottom(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_ladderbottom",))
+
+
+def cdl_longleggeddoji(open=None, high=None, low=None, close=None) -> Any:
+    """Long Legged Doji.
+
+    Returns
+    -------
+    ndarray or Series
+        A doji with a long wick on at least one side.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_longleggeddoji",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_longleggeddoji(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_longleggeddoji",))
+
+
+def cdl_longline(open=None, high=None, low=None, close=None) -> Any:
+    """Long Line Candle.
+
+    Returns
+    -------
+    ndarray or Series
+        A long body with both wicks short, so the bar moved and stayed moved.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_longline",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_longline(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_longline",))
+
+
+def cdl_marubozu(open=None, high=None, low=None, close=None) -> Any:
+    """Marubozu.
+
+    Returns
+    -------
+    ndarray or Series
+        A long body with almost no wick at either end.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_marubozu",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_marubozu(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_marubozu",))
+
+
+def cdl_matchinglow(open=None, high=None, low=None, close=None) -> Any:
+    """Matching Low.
+
+    Returns
+    -------
+    ndarray or Series
+        Two black bars that closed at the same price.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_matchinglow",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_matchinglow(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_matchinglow",))
+
+
+def cdl_mathold(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    penetration: float = _PARAMS["cdl_mathold"]["penetration"]["default"],
+) -> Any:
+    """Mat Hold.
+
+    Parameters
+    ----------
+    penetration : float, default 0.5
+        How far into the previous body the close has to travel, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A long white bar, three small ones drifting back without undoing it, then another long white
+        one.
+    """
+    penetration = _convert.as_float("cdl_mathold", "penetration", penetration)
+    columns, carrier = _convert.bars(
+        "cdl_mathold",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_mathold(*columns, penetration=penetration)
+    return _convert.wrap_outputs(out, carrier, ("cdl_mathold",))
+
+
+def cdl_morningdojistar(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    penetration: float = _PARAMS["cdl_morningdojistar"]["penetration"]["default"],
+) -> Any:
+    """Morning Doji Star.
+
+    Parameters
+    ----------
+    penetration : float, default 0.3
+        How far into the previous body the close has to travel, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A long black bar, a doji one gapping down from it, then a white one closing well back into
+        it.
+    """
+    penetration = _convert.as_float("cdl_morningdojistar", "penetration", penetration)
+    columns, carrier = _convert.bars(
+        "cdl_morningdojistar",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_morningdojistar(*columns, penetration=penetration)
+    return _convert.wrap_outputs(out, carrier, ("cdl_morningdojistar",))
+
+
+def cdl_morningstar(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    penetration: float = _PARAMS["cdl_morningstar"]["penetration"]["default"],
+) -> Any:
+    """Morning Star.
+
+    Parameters
+    ----------
+    penetration : float, default 0.3
+        How far into the previous body the close has to travel, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A long black bar, a short one gapping down from it, then a white one closing well back into
+        it.
+    """
+    penetration = _convert.as_float("cdl_morningstar", "penetration", penetration)
+    columns, carrier = _convert.bars(
+        "cdl_morningstar",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_morningstar(*columns, penetration=penetration)
+    return _convert.wrap_outputs(out, carrier, ("cdl_morningstar",))
+
+
+def cdl_onneck(open=None, high=None, low=None, close=None) -> Any:
+    """On Neck Pattern.
+
+    Returns
+    -------
+    ndarray or Series
+        A white bar that opened under the previous low and closed back at it.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_onneck",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_onneck(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_onneck",))
+
+
+def cdl_piercing(open=None, high=None, low=None, close=None) -> Any:
+    """Piercing Pattern.
+
+    Returns
+    -------
+    ndarray or Series
+        A long white bar that opened under the previous low and closed past the middle of the black
+        body before it.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_piercing",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_piercing(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_piercing",))
+
+
+def cdl_rickshawman(open=None, high=None, low=None, close=None) -> Any:
+    """Rickshaw Man.
+
+    Returns
+    -------
+    ndarray or Series
+        A doji with a long wick on each side and its body near the middle of the range.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_rickshawman",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_rickshawman(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_rickshawman",))
+
+
+def cdl_risefall3methods(open=None, high=None, low=None, close=None) -> Any:
+    """Rising/Falling Three Methods.
+
+    Returns
+    -------
+    ndarray or Series
+        A long bar, three short ones drifting back inside its range, then a long one carrying on.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_risefall3methods",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_risefall3methods(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_risefall3methods",))
+
+
+def cdl_separatinglines(open=None, high=None, low=None, close=None) -> Any:
+    """Separating Lines.
+
+    Returns
+    -------
+    ndarray or Series
+        A long bar that opened where the opposite-coloured bar before it opened, and ran the other
+        way.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_separatinglines",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_separatinglines(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_separatinglines",))
+
+
+def cdl_shootingstar(open=None, high=None, low=None, close=None) -> Any:
+    """Shooting Star.
+
+    Returns
+    -------
+    ndarray or Series
+        A short body with a long wick above it, opening above the previous body.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_shootingstar",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_shootingstar(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_shootingstar",))
+
+
+def cdl_shortline(open=None, high=None, low=None, close=None) -> Any:
+    """Short Line Candle.
+
+    Returns
+    -------
+    ndarray or Series
+        A short body with both wicks short, so the bar barely moved at all.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_shortline",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_shortline(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_shortline",))
+
+
+def cdl_spinningtop(open=None, high=None, low=None, close=None) -> Any:
+    """Spinning Top.
+
+    Returns
+    -------
+    ndarray or Series
+        A short body with a wick longer than itself on each side.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_spinningtop",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_spinningtop(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_spinningtop",))
+
+
+def cdl_stalledpattern(open=None, high=None, low=None, close=None) -> Any:
+    """Stalled Pattern.
+
+    Returns
+    -------
+    ndarray or Series
+        Two long white bars then a short one riding on the second's shoulder.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_stalledpattern",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_stalledpattern(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_stalledpattern",))
+
+
+def cdl_sticksandwich(open=None, high=None, low=None, close=None) -> Any:
+    """Stick Sandwich.
+
+    Returns
+    -------
+    ndarray or Series
+        Two black bars closing at the same price with a white one between them.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_sticksandwich",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_sticksandwich(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_sticksandwich",))
+
+
+def cdl_takuri(open=None, high=None, low=None, close=None) -> Any:
+    """Takuri Line.
+
+    Returns
+    -------
+    ndarray or Series
+        A dragonfly doji whose tail is very long rather than merely long.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_takuri",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_takuri(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_takuri",))
+
+
+def cdl_tasukigap(open=None, high=None, low=None, close=None) -> Any:
+    """Tasuki Gap.
+
+    Returns
+    -------
+    ndarray or Series
+        A gap, then a bar of the other colour that opens inside the gapping body and closes into the
+        gap without filling it.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_tasukigap",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_tasukigap(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_tasukigap",))
+
+
+def cdl_thrusting(open=None, high=None, low=None, close=None) -> Any:
+    """Thrusting Pattern.
+
+    Returns
+    -------
+    ndarray or Series
+        A white bar that opened under the previous low and closed inside the black body but short of
+        its middle.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_thrusting",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_thrusting(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_thrusting",))
+
+
+def cdl_tristar(open=None, high=None, low=None, close=None) -> Any:
+    """Tristar Pattern.
+
+    Returns
+    -------
+    ndarray or Series
+        Three doji in a row, the middle one gapping clear and the third coming back.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_tristar",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_tristar(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_tristar",))
+
+
+def cdl_unique3river(open=None, high=None, low=None, close=None) -> Any:
+    """Unique Three River.
+
+    Returns
+    -------
+    ndarray or Series
+        A long black bar, a smaller black one making a new low, then a short white one above it.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_unique3river",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_unique3river(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_unique3river",))
+
+
+def cdl_upsidegap2crows(open=None, high=None, low=None, close=None) -> Any:
+    """Upside Gap Two Crows.
+
+    Returns
+    -------
+    ndarray or Series
+        A long white bar, then two black ones above it, the second swallowing the first without
+        closing the gap.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_upsidegap2crows",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_upsidegap2crows(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_upsidegap2crows",))
+
+
+def cdl_xsidegap3methods(open=None, high=None, low=None, close=None) -> Any:
+    """Upside/Downside Gap Three Methods.
+
+    Returns
+    -------
+    ndarray or Series
+        Two bars of one colour with a gap between them, then a third that closes the gap.
+    """
+    columns, carrier = _convert.bars(
+        "cdl_xsidegap3methods",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cdl_xsidegap3methods(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cdl_xsidegap3methods",))
+
+
+def ceil(source=None) -> Any:
+    """Vector Ceiling.
+
+    Returns
+    -------
+    ndarray or Series
+        Ceiling of source, element by element.
+    """
+    columns, carrier = _convert.bars("ceil", (source,), ("source",), ("series",))
+    out = _core.ceil(*columns)
+    return _convert.wrap_outputs(out, carrier, ("ceil",))
+
+
+def chart_ascending_broadening_wedge(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_ascending_broadening_wedge"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_ascending_broadening_wedge"]["pivot_n"]["default"],
+) -> Any:
+    """Ascending Broadening Wedge.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Two rising lines, the lower climbing faster, and a close below the lower one.
+    """
+    period = _convert.as_int("chart_ascending_broadening_wedge", "period", period)
+    pivot_n = _convert.as_int("chart_ascending_broadening_wedge", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_ascending_broadening_wedge",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_ascending_broadening_wedge(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("chart_ascending_broadening_wedge",))
+
+
+def chart_ascending_channel(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_ascending_channel"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_ascending_channel"]["pivot_n"]["default"],
+    parallel_tol: float = _PARAMS["chart_ascending_channel"]["parallel_tol"]["default"],
+) -> Any:
+    """Ascending Channel.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 4
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    parallel_tol : float, default 0.25
+        How far the two slopes may differ, as a fraction of the lower line's.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below the lower of two rising lines of about the same slope.
+    """
+    period = _convert.as_int("chart_ascending_channel", "period", period)
+    pivot_n = _convert.as_int("chart_ascending_channel", "pivot_n", pivot_n)
+    parallel_tol = _convert.as_float("chart_ascending_channel", "parallel_tol", parallel_tol)
+    columns, carrier = _convert.bars(
+        "chart_ascending_channel",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_ascending_channel(
+        *columns, period=period, pivot_n=pivot_n, parallel_tol=parallel_tol
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_ascending_channel",))
+
+
+def chart_ascending_right_angle_broadening(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_ascending_right_angle_broadening"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_ascending_right_angle_broadening"]["pivot_n"]["default"],
+    flat_tol: float = _PARAMS["chart_ascending_right_angle_broadening"]["flat_tol"]["default"],
+) -> Any:
+    """Ascending Right-Angled Broadening.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    flat_tol : float, default 0.015
+        Steepest the flat line may be and still count as flat, in price per bar.
+
+    Returns
+    -------
+    ndarray or Series
+        A flat line over the swing highs, a falling one under the lows, and a close below it.
+    """
+    period = _convert.as_int("chart_ascending_right_angle_broadening", "period", period)
+    pivot_n = _convert.as_int("chart_ascending_right_angle_broadening", "pivot_n", pivot_n)
+    flat_tol = _convert.as_float("chart_ascending_right_angle_broadening", "flat_tol", flat_tol)
+    columns, carrier = _convert.bars(
+        "chart_ascending_right_angle_broadening",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_ascending_right_angle_broadening(
+        *columns, period=period, pivot_n=pivot_n, flat_tol=flat_tol
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_ascending_right_angle_broadening",))
+
+
+def chart_ascending_scallop(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_ascending_scallop"]["period"]["default"],
+) -> Any:
+    """Ascending Scallop.
+
+    Parameters
+    ----------
+    period : int, default 25
+        Bars the scallop spans, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above a J-shaped dip and recovery of the last period closes.
+    """
+    period = _convert.as_int("chart_ascending_scallop", "period", period)
+    columns, carrier = _convert.bars(
+        "chart_ascending_scallop",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_ascending_scallop(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("chart_ascending_scallop",))
+
+
+def chart_ascending_triangle(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_ascending_triangle"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_ascending_triangle"]["pivot_n"]["default"],
+    flat_tol: float = _PARAMS["chart_ascending_triangle"]["flat_tol"]["default"],
+) -> Any:
+    """Ascending Triangle.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    flat_tol : float, default 0.02
+        Steepest the upper line may be and still count as flat, in price per bar.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above a flat line over the swing highs that a rising line under the swing lows is
+        closing in on.
+    """
+    period = _convert.as_int("chart_ascending_triangle", "period", period)
+    pivot_n = _convert.as_int("chart_ascending_triangle", "pivot_n", pivot_n)
+    flat_tol = _convert.as_float("chart_ascending_triangle", "flat_tol", flat_tol)
+    columns, carrier = _convert.bars(
+        "chart_ascending_triangle",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_ascending_triangle(
+        *columns, period=period, pivot_n=pivot_n, flat_tol=flat_tol
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_ascending_triangle",))
+
+
+def chart_bear_flag(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_bear_flag"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_bear_flag"]["pivot_n"]["default"],
+    pole_bars: int = _PARAMS["chart_bear_flag"]["pole_bars"]["default"],
+    min_pole: float = _PARAMS["chart_bear_flag"]["min_pole"]["default"],
+    max_retrace: float = _PARAMS["chart_bear_flag"]["max_retrace"]["default"],
+) -> Any:
+    """Bear Flag.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Bars the flag spans after its pole, from 2 to 100000.
+    pivot_n : int, default 3
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    pole_bars : int, default 10
+        Bars the pole is measured over, from 1 to 100000.
+    min_pole : float, default 0.05
+        Smallest fall the pole must make, as a fraction of its first close.
+    max_retrace : float, default 0.5
+        Furthest the flag may run back over the pole, as a fraction of the pole.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below a rising flag that follows a sharp fall.
+    """
+    period = _convert.as_int("chart_bear_flag", "period", period)
+    pivot_n = _convert.as_int("chart_bear_flag", "pivot_n", pivot_n)
+    pole_bars = _convert.as_int("chart_bear_flag", "pole_bars", pole_bars)
+    min_pole = _convert.as_float("chart_bear_flag", "min_pole", min_pole)
+    max_retrace = _convert.as_float("chart_bear_flag", "max_retrace", max_retrace)
+    columns, carrier = _convert.bars(
+        "chart_bear_flag",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_bear_flag(
+        *columns,
+        period=period,
+        pivot_n=pivot_n,
+        pole_bars=pole_bars,
+        min_pole=min_pole,
+        max_retrace=max_retrace,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_bear_flag",))
+
+
+def chart_bear_pennant(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_bear_pennant"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_bear_pennant"]["pivot_n"]["default"],
+    pole_bars: int = _PARAMS["chart_bear_pennant"]["pole_bars"]["default"],
+    min_pole: float = _PARAMS["chart_bear_pennant"]["min_pole"]["default"],
+) -> Any:
+    """Bear Pennant.
+
+    Parameters
+    ----------
+    period : int, default 15
+        Bars the pennant spans after its pole, from 2 to 100000.
+    pivot_n : int, default 3
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    pole_bars : int, default 10
+        Bars the pole is measured over, from 1 to 100000.
+    min_pole : float, default 0.05
+        Smallest fall the pole must make, as a fraction of its first close.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below a narrowing pennant that follows a sharp fall.
+    """
+    period = _convert.as_int("chart_bear_pennant", "period", period)
+    pivot_n = _convert.as_int("chart_bear_pennant", "pivot_n", pivot_n)
+    pole_bars = _convert.as_int("chart_bear_pennant", "pole_bars", pole_bars)
+    min_pole = _convert.as_float("chart_bear_pennant", "min_pole", min_pole)
+    columns, carrier = _convert.bars(
+        "chart_bear_pennant",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_bear_pennant(
+        *columns, period=period, pivot_n=pivot_n, pole_bars=pole_bars, min_pole=min_pole
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_bear_pennant",))
+
+
+def chart_big_m(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_big_m"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_big_m"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_big_m"]["tol"]["default"],
+    min_sep: int = _PARAMS["chart_big_m"]["min_sep"]["default"],
+) -> Any:
+    """Big M.
+
+    Parameters
+    ----------
+    period : int, default 150
+        Bars back the first top may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 7
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    tol : float, default 0.03
+        How far apart the tops may be, as a fraction of the larger.
+    min_sep : int, default 15
+        Fewest bars between the two tops' confirmations, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below the neckline of a wide double top.
+    """
+    period = _convert.as_int("chart_big_m", "period", period)
+    pivot_n = _convert.as_int("chart_big_m", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_big_m", "tol", tol)
+    min_sep = _convert.as_int("chart_big_m", "min_sep", min_sep)
+    columns, carrier = _convert.bars(
+        "chart_big_m",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_big_m(*columns, period=period, pivot_n=pivot_n, tol=tol, min_sep=min_sep)
+    return _convert.wrap_outputs(out, carrier, ("chart_big_m",))
+
+
+def chart_big_w(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_big_w"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_big_w"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_big_w"]["tol"]["default"],
+    min_sep: int = _PARAMS["chart_big_w"]["min_sep"]["default"],
+) -> Any:
+    """Big W.
+
+    Parameters
+    ----------
+    period : int, default 150
+        Bars back the first bottom may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 7
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    tol : float, default 0.03
+        How far apart the bottoms may be, as a fraction of the larger.
+    min_sep : int, default 15
+        Fewest bars between the two bottoms' confirmations, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above the neckline of a wide double bottom.
+    """
+    period = _convert.as_int("chart_big_w", "period", period)
+    pivot_n = _convert.as_int("chart_big_w", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_big_w", "tol", tol)
+    min_sep = _convert.as_int("chart_big_w", "min_sep", min_sep)
+    columns, carrier = _convert.bars(
+        "chart_big_w",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_big_w(*columns, period=period, pivot_n=pivot_n, tol=tol, min_sep=min_sep)
+    return _convert.wrap_outputs(out, carrier, ("chart_big_w",))
+
+
+def chart_broadening(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_broadening"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_broadening"]["pivot_n"]["default"],
+) -> Any:
+    """Broadening Formation.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close through a rising line over the swing highs or a falling line under the swing lows,
+        the two spreading apart.
+    """
+    period = _convert.as_int("chart_broadening", "period", period)
+    pivot_n = _convert.as_int("chart_broadening", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_broadening",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_broadening(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("chart_broadening",))
+
+
+def chart_bull_flag(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_bull_flag"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_bull_flag"]["pivot_n"]["default"],
+    pole_bars: int = _PARAMS["chart_bull_flag"]["pole_bars"]["default"],
+    min_pole: float = _PARAMS["chart_bull_flag"]["min_pole"]["default"],
+    max_retrace: float = _PARAMS["chart_bull_flag"]["max_retrace"]["default"],
+) -> Any:
+    """Bull Flag.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Bars the flag spans after its pole, from 2 to 100000.
+    pivot_n : int, default 3
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    pole_bars : int, default 10
+        Bars the pole is measured over, from 1 to 100000.
+    min_pole : float, default 0.05
+        Smallest rise the pole must make, as a fraction of its first close.
+    max_retrace : float, default 0.5
+        Furthest the flag may run back over the pole, as a fraction of the pole.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above a falling flag that follows a sharp rise.
+    """
+    period = _convert.as_int("chart_bull_flag", "period", period)
+    pivot_n = _convert.as_int("chart_bull_flag", "pivot_n", pivot_n)
+    pole_bars = _convert.as_int("chart_bull_flag", "pole_bars", pole_bars)
+    min_pole = _convert.as_float("chart_bull_flag", "min_pole", min_pole)
+    max_retrace = _convert.as_float("chart_bull_flag", "max_retrace", max_retrace)
+    columns, carrier = _convert.bars(
+        "chart_bull_flag",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_bull_flag(
+        *columns,
+        period=period,
+        pivot_n=pivot_n,
+        pole_bars=pole_bars,
+        min_pole=min_pole,
+        max_retrace=max_retrace,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_bull_flag",))
+
+
+def chart_bull_pennant(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_bull_pennant"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_bull_pennant"]["pivot_n"]["default"],
+    pole_bars: int = _PARAMS["chart_bull_pennant"]["pole_bars"]["default"],
+    min_pole: float = _PARAMS["chart_bull_pennant"]["min_pole"]["default"],
+) -> Any:
+    """Bull Pennant.
+
+    Parameters
+    ----------
+    period : int, default 15
+        Bars the pennant spans after its pole, from 2 to 100000.
+    pivot_n : int, default 3
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    pole_bars : int, default 10
+        Bars the pole is measured over, from 1 to 100000.
+    min_pole : float, default 0.05
+        Smallest rise the pole must make, as a fraction of its first close.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above a narrowing pennant that follows a sharp rise.
+    """
+    period = _convert.as_int("chart_bull_pennant", "period", period)
+    pivot_n = _convert.as_int("chart_bull_pennant", "pivot_n", pivot_n)
+    pole_bars = _convert.as_int("chart_bull_pennant", "pole_bars", pole_bars)
+    min_pole = _convert.as_float("chart_bull_pennant", "min_pole", min_pole)
+    columns, carrier = _convert.bars(
+        "chart_bull_pennant",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_bull_pennant(
+        *columns, period=period, pivot_n=pivot_n, pole_bars=pole_bars, min_pole=min_pole
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_bull_pennant",))
+
+
+def chart_bump_and_run_bottom(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    lead_window: int = _PARAMS["chart_bump_and_run_bottom"]["lead_window"]["default"],
+    bump_window: int = _PARAMS["chart_bump_and_run_bottom"]["bump_window"]["default"],
+    bump_factor: float = _PARAMS["chart_bump_and_run_bottom"]["bump_factor"]["default"],
+    pivot_n: int = _PARAMS["chart_bump_and_run_bottom"]["pivot_n"]["default"],
+) -> Any:
+    """Bump-and-Run Reversal Bottom.
+
+    Parameters
+    ----------
+    lead_window : int, default 30
+        Bars of the lead-in trend, from 2 to 100000.
+    bump_window : int, default 15
+        Bars of the bump, from 2 to 100000.
+    bump_factor : float, default 2.0
+        How many times the lead-in slope the bump must fall.
+    pivot_n : int, default 4
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close back through a lead-in line after a much steeper bump.
+    """
+    lead_window = _convert.as_int("chart_bump_and_run_bottom", "lead_window", lead_window)
+    bump_window = _convert.as_int("chart_bump_and_run_bottom", "bump_window", bump_window)
+    bump_factor = _convert.as_float("chart_bump_and_run_bottom", "bump_factor", bump_factor)
+    pivot_n = _convert.as_int("chart_bump_and_run_bottom", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_bump_and_run_bottom",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_bump_and_run_bottom(
+        *columns,
+        lead_window=lead_window,
+        bump_window=bump_window,
+        bump_factor=bump_factor,
+        pivot_n=pivot_n,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_bump_and_run_bottom",))
+
+
+def chart_bump_and_run_top(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    lead_window: int = _PARAMS["chart_bump_and_run_top"]["lead_window"]["default"],
+    bump_window: int = _PARAMS["chart_bump_and_run_top"]["bump_window"]["default"],
+    bump_factor: float = _PARAMS["chart_bump_and_run_top"]["bump_factor"]["default"],
+    pivot_n: int = _PARAMS["chart_bump_and_run_top"]["pivot_n"]["default"],
+) -> Any:
+    """Bump-and-Run Reversal Top.
+
+    Parameters
+    ----------
+    lead_window : int, default 30
+        Bars of the lead-in trend, from 2 to 100000.
+    bump_window : int, default 15
+        Bars of the bump, from 2 to 100000.
+    bump_factor : float, default 2.0
+        How many times the lead-in slope the bump must climb.
+    pivot_n : int, default 4
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close back through a lead-in line after a much steeper bump.
+    """
+    lead_window = _convert.as_int("chart_bump_and_run_top", "lead_window", lead_window)
+    bump_window = _convert.as_int("chart_bump_and_run_top", "bump_window", bump_window)
+    bump_factor = _convert.as_float("chart_bump_and_run_top", "bump_factor", bump_factor)
+    pivot_n = _convert.as_int("chart_bump_and_run_top", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_bump_and_run_top",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_bump_and_run_top(
+        *columns,
+        lead_window=lead_window,
+        bump_window=bump_window,
+        bump_factor=bump_factor,
+        pivot_n=pivot_n,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_bump_and_run_top",))
+
+
+def chart_busted_ascending_triangle(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    reversal_bars: int = _PARAMS["chart_busted_ascending_triangle"]["reversal_bars"]["default"],
+    reversal_pct: float = _PARAMS["chart_busted_ascending_triangle"]["reversal_pct"]["default"],
+) -> Any:
+    """Busted Ascending Triangle.
+
+    Parameters
+    ----------
+    reversal_bars : int, default 10
+        Bars after the breakout in which the reversal must come, from 1 to 100000.
+    reversal_pct : float, default 0.05
+        How far back through the breakout level the close must go, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A fall of reversal_pct soon after a ascending triangle reads.
+    """
+    reversal_bars = _convert.as_int(
+        "chart_busted_ascending_triangle", "reversal_bars", reversal_bars
+    )
+    reversal_pct = _convert.as_float(
+        "chart_busted_ascending_triangle", "reversal_pct", reversal_pct
+    )
+    columns, carrier = _convert.bars(
+        "chart_busted_ascending_triangle",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_busted_ascending_triangle(
+        *columns, reversal_bars=reversal_bars, reversal_pct=reversal_pct
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_busted_ascending_triangle",))
+
+
+def chart_busted_descending_triangle(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    reversal_bars: int = _PARAMS["chart_busted_descending_triangle"]["reversal_bars"]["default"],
+    reversal_pct: float = _PARAMS["chart_busted_descending_triangle"]["reversal_pct"]["default"],
+) -> Any:
+    """Busted Descending Triangle.
+
+    Parameters
+    ----------
+    reversal_bars : int, default 10
+        Bars after the breakout in which the reversal must come, from 1 to 100000.
+    reversal_pct : float, default 0.05
+        How far back through the breakout level the close must go, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A rise of reversal_pct soon after a descending triangle reads.
+    """
+    reversal_bars = _convert.as_int(
+        "chart_busted_descending_triangle", "reversal_bars", reversal_bars
+    )
+    reversal_pct = _convert.as_float(
+        "chart_busted_descending_triangle", "reversal_pct", reversal_pct
+    )
+    columns, carrier = _convert.bars(
+        "chart_busted_descending_triangle",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_busted_descending_triangle(
+        *columns, reversal_bars=reversal_bars, reversal_pct=reversal_pct
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_busted_descending_triangle",))
+
+
+def chart_busted_double_bottom(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    reversal_bars: int = _PARAMS["chart_busted_double_bottom"]["reversal_bars"]["default"],
+    reversal_pct: float = _PARAMS["chart_busted_double_bottom"]["reversal_pct"]["default"],
+) -> Any:
+    """Busted Double Bottom.
+
+    Parameters
+    ----------
+    reversal_bars : int, default 10
+        Bars after the breakout in which the reversal must come, from 1 to 100000.
+    reversal_pct : float, default 0.05
+        How far back through the breakout level the close must go, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A fall of reversal_pct soon after a double bottom reads.
+    """
+    reversal_bars = _convert.as_int("chart_busted_double_bottom", "reversal_bars", reversal_bars)
+    reversal_pct = _convert.as_float("chart_busted_double_bottom", "reversal_pct", reversal_pct)
+    columns, carrier = _convert.bars(
+        "chart_busted_double_bottom",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_busted_double_bottom(
+        *columns, reversal_bars=reversal_bars, reversal_pct=reversal_pct
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_busted_double_bottom",))
+
+
+def chart_busted_double_top(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    reversal_bars: int = _PARAMS["chart_busted_double_top"]["reversal_bars"]["default"],
+    reversal_pct: float = _PARAMS["chart_busted_double_top"]["reversal_pct"]["default"],
+) -> Any:
+    """Busted Double Top.
+
+    Parameters
+    ----------
+    reversal_bars : int, default 10
+        Bars after the breakout in which the reversal must come, from 1 to 100000.
+    reversal_pct : float, default 0.05
+        How far back through the breakout level the close must go, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A rise of reversal_pct soon after a double top reads.
+    """
+    reversal_bars = _convert.as_int("chart_busted_double_top", "reversal_bars", reversal_bars)
+    reversal_pct = _convert.as_float("chart_busted_double_top", "reversal_pct", reversal_pct)
+    columns, carrier = _convert.bars(
+        "chart_busted_double_top",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_busted_double_top(
+        *columns, reversal_bars=reversal_bars, reversal_pct=reversal_pct
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_busted_double_top",))
+
+
+def chart_busted_head_shoulders(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    reversal_bars: int = _PARAMS["chart_busted_head_shoulders"]["reversal_bars"]["default"],
+    reversal_pct: float = _PARAMS["chart_busted_head_shoulders"]["reversal_pct"]["default"],
+) -> Any:
+    """Busted Head and Shoulders.
+
+    Parameters
+    ----------
+    reversal_bars : int, default 10
+        Bars after the breakout in which the reversal must come, from 1 to 100000.
+    reversal_pct : float, default 0.05
+        How far back through the breakout level the close must go, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A rise of reversal_pct soon after a head and shoulders reads.
+    """
+    reversal_bars = _convert.as_int("chart_busted_head_shoulders", "reversal_bars", reversal_bars)
+    reversal_pct = _convert.as_float("chart_busted_head_shoulders", "reversal_pct", reversal_pct)
+    columns, carrier = _convert.bars(
+        "chart_busted_head_shoulders",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_busted_head_shoulders(
+        *columns, reversal_bars=reversal_bars, reversal_pct=reversal_pct
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_busted_head_shoulders",))
+
+
+def chart_busted_inverse_head_shoulders(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    reversal_bars: int = _PARAMS["chart_busted_inverse_head_shoulders"]["reversal_bars"]["default"],
+    reversal_pct: float = _PARAMS["chart_busted_inverse_head_shoulders"]["reversal_pct"]["default"],
+) -> Any:
+    """Busted Inverse Head and Shoulders.
+
+    Parameters
+    ----------
+    reversal_bars : int, default 10
+        Bars after the breakout in which the reversal must come, from 1 to 100000.
+    reversal_pct : float, default 0.05
+        How far back through the breakout level the close must go, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A fall of reversal_pct soon after a inverse head and shoulders reads.
+    """
+    reversal_bars = _convert.as_int(
+        "chart_busted_inverse_head_shoulders", "reversal_bars", reversal_bars
+    )
+    reversal_pct = _convert.as_float(
+        "chart_busted_inverse_head_shoulders", "reversal_pct", reversal_pct
+    )
+    columns, carrier = _convert.bars(
+        "chart_busted_inverse_head_shoulders",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_busted_inverse_head_shoulders(
+        *columns, reversal_bars=reversal_bars, reversal_pct=reversal_pct
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_busted_inverse_head_shoulders",))
+
+
+def chart_busted_rectangle(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    reversal_bars: int = _PARAMS["chart_busted_rectangle"]["reversal_bars"]["default"],
+    reversal_pct: float = _PARAMS["chart_busted_rectangle"]["reversal_pct"]["default"],
+) -> Any:
+    """Busted Rectangle.
+
+    Parameters
+    ----------
+    reversal_bars : int, default 10
+        Bars after the breakout in which the reversal must come, from 1 to 100000.
+    reversal_pct : float, default 0.05
+        How far back through the breakout level the close must go, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A reversal of reversal_pct soon after a rectangle breakout, in the other direction.
+    """
+    reversal_bars = _convert.as_int("chart_busted_rectangle", "reversal_bars", reversal_bars)
+    reversal_pct = _convert.as_float("chart_busted_rectangle", "reversal_pct", reversal_pct)
+    columns, carrier = _convert.bars(
+        "chart_busted_rectangle",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_busted_rectangle(
+        *columns, reversal_bars=reversal_bars, reversal_pct=reversal_pct
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_busted_rectangle",))
+
+
+def chart_busted_triple_bottom(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    reversal_bars: int = _PARAMS["chart_busted_triple_bottom"]["reversal_bars"]["default"],
+    reversal_pct: float = _PARAMS["chart_busted_triple_bottom"]["reversal_pct"]["default"],
+) -> Any:
+    """Busted Triple Bottom.
+
+    Parameters
+    ----------
+    reversal_bars : int, default 10
+        Bars after the breakout in which the reversal must come, from 1 to 100000.
+    reversal_pct : float, default 0.05
+        How far back through the breakout level the close must go, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A fall of reversal_pct soon after a triple bottom reads.
+    """
+    reversal_bars = _convert.as_int("chart_busted_triple_bottom", "reversal_bars", reversal_bars)
+    reversal_pct = _convert.as_float("chart_busted_triple_bottom", "reversal_pct", reversal_pct)
+    columns, carrier = _convert.bars(
+        "chart_busted_triple_bottom",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_busted_triple_bottom(
+        *columns, reversal_bars=reversal_bars, reversal_pct=reversal_pct
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_busted_triple_bottom",))
+
+
+def chart_busted_triple_top(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    reversal_bars: int = _PARAMS["chart_busted_triple_top"]["reversal_bars"]["default"],
+    reversal_pct: float = _PARAMS["chart_busted_triple_top"]["reversal_pct"]["default"],
+) -> Any:
+    """Busted Triple Top.
+
+    Parameters
+    ----------
+    reversal_bars : int, default 10
+        Bars after the breakout in which the reversal must come, from 1 to 100000.
+    reversal_pct : float, default 0.05
+        How far back through the breakout level the close must go, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A rise of reversal_pct soon after a triple top reads.
+    """
+    reversal_bars = _convert.as_int("chart_busted_triple_top", "reversal_bars", reversal_bars)
+    reversal_pct = _convert.as_float("chart_busted_triple_top", "reversal_pct", reversal_pct)
+    columns, carrier = _convert.bars(
+        "chart_busted_triple_top",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_busted_triple_top(
+        *columns, reversal_bars=reversal_bars, reversal_pct=reversal_pct
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_busted_triple_top",))
+
+
+def chart_complex_head_shoulders(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_complex_head_shoulders"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_complex_head_shoulders"]["pivot_n"]["default"],
+    shoulder_tol: float = _PARAMS["chart_complex_head_shoulders"]["shoulder_tol"]["default"],
+    min_separation: int = _PARAMS["chart_complex_head_shoulders"]["min_separation"]["default"],
+) -> Any:
+    """Complex Head and Shoulders.
+
+    Parameters
+    ----------
+    period : int, default 200
+        Bars back the shoulders and head may have been confirmed, and bars the neckline waits, from
+        2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    shoulder_tol : float, default 0.08
+        How far apart the shoulders may be, as a fraction of the larger.
+    min_separation : int, default 8
+        Fewest bars between the confirmations of a shoulder and the head, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        The first close below the neckline of a head and shoulders with loose shoulders.
+    """
+    period = _convert.as_int("chart_complex_head_shoulders", "period", period)
+    pivot_n = _convert.as_int("chart_complex_head_shoulders", "pivot_n", pivot_n)
+    shoulder_tol = _convert.as_float("chart_complex_head_shoulders", "shoulder_tol", shoulder_tol)
+    min_separation = _convert.as_int(
+        "chart_complex_head_shoulders", "min_separation", min_separation
+    )
+    columns, carrier = _convert.bars(
+        "chart_complex_head_shoulders",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_complex_head_shoulders(
+        *columns,
+        period=period,
+        pivot_n=pivot_n,
+        shoulder_tol=shoulder_tol,
+        min_separation=min_separation,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_complex_head_shoulders",))
+
+
+def chart_complex_inverse_head_shoulders(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_complex_inverse_head_shoulders"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_complex_inverse_head_shoulders"]["pivot_n"]["default"],
+    shoulder_tol: float = _PARAMS["chart_complex_inverse_head_shoulders"]["shoulder_tol"][
+        "default"
+    ],
+    min_separation: int = _PARAMS["chart_complex_inverse_head_shoulders"]["min_separation"][
+        "default"
+    ],
+) -> Any:
+    """Complex Inverse Head and Shoulders.
+
+    Parameters
+    ----------
+    period : int, default 200
+        Bars back the shoulders and head may have been confirmed, and bars the neckline waits, from
+        2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    shoulder_tol : float, default 0.08
+        How far apart the shoulders may be, as a fraction of the larger.
+    min_separation : int, default 8
+        Fewest bars between the confirmations of a shoulder and the head, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        The first close above the neckline of a head and shoulders with loose shoulders.
+    """
+    period = _convert.as_int("chart_complex_inverse_head_shoulders", "period", period)
+    pivot_n = _convert.as_int("chart_complex_inverse_head_shoulders", "pivot_n", pivot_n)
+    shoulder_tol = _convert.as_float(
+        "chart_complex_inverse_head_shoulders", "shoulder_tol", shoulder_tol
+    )
+    min_separation = _convert.as_int(
+        "chart_complex_inverse_head_shoulders", "min_separation", min_separation
+    )
+    columns, carrier = _convert.bars(
+        "chart_complex_inverse_head_shoulders",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_complex_inverse_head_shoulders(
+        *columns,
+        period=period,
+        pivot_n=pivot_n,
+        shoulder_tol=shoulder_tol,
+        min_separation=min_separation,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_complex_inverse_head_shoulders",))
+
+
+def chart_cup_with_handle(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    cup_window: int = _PARAMS["chart_cup_with_handle"]["cup_window"]["default"],
+    handle_window: int = _PARAMS["chart_cup_with_handle"]["handle_window"]["default"],
+    pivot_n: int = _PARAMS["chart_cup_with_handle"]["pivot_n"]["default"],
+    max_handle_retrace: float = _PARAMS["chart_cup_with_handle"]["max_handle_retrace"]["default"],
+) -> Any:
+    """Cup with Handle.
+
+    Parameters
+    ----------
+    cup_window : int, default 65
+        Bars the cup may span, from 2 to 100000.
+    handle_window : int, default 15
+        Bars the handle may span, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    max_handle_retrace : float, default 0.5
+        Deepest the handle may dip, as a fraction of the cup's depth.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above the rim of a cup, after a handle that stayed near it.
+    """
+    cup_window = _convert.as_int("chart_cup_with_handle", "cup_window", cup_window)
+    handle_window = _convert.as_int("chart_cup_with_handle", "handle_window", handle_window)
+    pivot_n = _convert.as_int("chart_cup_with_handle", "pivot_n", pivot_n)
+    max_handle_retrace = _convert.as_float(
+        "chart_cup_with_handle", "max_handle_retrace", max_handle_retrace
+    )
+    columns, carrier = _convert.bars(
+        "chart_cup_with_handle",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_cup_with_handle(
+        *columns,
+        cup_window=cup_window,
+        handle_window=handle_window,
+        pivot_n=pivot_n,
+        max_handle_retrace=max_handle_retrace,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_cup_with_handle",))
+
+
+def chart_descending_broadening_wedge(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_descending_broadening_wedge"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_descending_broadening_wedge"]["pivot_n"]["default"],
+) -> Any:
+    """Descending Broadening Wedge.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Two falling lines, the upper falling faster, and a close above the upper one.
+    """
+    period = _convert.as_int("chart_descending_broadening_wedge", "period", period)
+    pivot_n = _convert.as_int("chart_descending_broadening_wedge", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_descending_broadening_wedge",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_descending_broadening_wedge(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("chart_descending_broadening_wedge",))
+
+
+def chart_descending_channel(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_descending_channel"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_descending_channel"]["pivot_n"]["default"],
+    parallel_tol: float = _PARAMS["chart_descending_channel"]["parallel_tol"]["default"],
+) -> Any:
+    """Descending Channel.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 4
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    parallel_tol : float, default 0.25
+        How far the two slopes may differ, as a fraction of the lower line's.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above the upper of two falling lines of about the same slope.
+    """
+    period = _convert.as_int("chart_descending_channel", "period", period)
+    pivot_n = _convert.as_int("chart_descending_channel", "pivot_n", pivot_n)
+    parallel_tol = _convert.as_float("chart_descending_channel", "parallel_tol", parallel_tol)
+    columns, carrier = _convert.bars(
+        "chart_descending_channel",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_descending_channel(
+        *columns, period=period, pivot_n=pivot_n, parallel_tol=parallel_tol
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_descending_channel",))
+
+
+def chart_descending_right_angle_broadening(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_descending_right_angle_broadening"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_descending_right_angle_broadening"]["pivot_n"]["default"],
+    flat_tol: float = _PARAMS["chart_descending_right_angle_broadening"]["flat_tol"]["default"],
+) -> Any:
+    """Descending Right-Angled Broadening.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    flat_tol : float, default 0.015
+        Steepest the flat line may be and still count as flat, in price per bar.
+
+    Returns
+    -------
+    ndarray or Series
+        A flat line under the swing lows, a rising one over the highs, and a close above it.
+    """
+    period = _convert.as_int("chart_descending_right_angle_broadening", "period", period)
+    pivot_n = _convert.as_int("chart_descending_right_angle_broadening", "pivot_n", pivot_n)
+    flat_tol = _convert.as_float("chart_descending_right_angle_broadening", "flat_tol", flat_tol)
+    columns, carrier = _convert.bars(
+        "chart_descending_right_angle_broadening",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_descending_right_angle_broadening(
+        *columns, period=period, pivot_n=pivot_n, flat_tol=flat_tol
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_descending_right_angle_broadening",))
+
+
+def chart_descending_scallop(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_descending_scallop"]["period"]["default"],
+) -> Any:
+    """Descending Scallop.
+
+    Parameters
+    ----------
+    period : int, default 25
+        Bars the scallop spans, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below a ∩-shaped rise and fall of the last period closes.
+    """
+    period = _convert.as_int("chart_descending_scallop", "period", period)
+    columns, carrier = _convert.bars(
+        "chart_descending_scallop",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_descending_scallop(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("chart_descending_scallop",))
+
+
+def chart_descending_triangle(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_descending_triangle"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_descending_triangle"]["pivot_n"]["default"],
+    flat_tol: float = _PARAMS["chart_descending_triangle"]["flat_tol"]["default"],
+) -> Any:
+    """Descending Triangle.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    flat_tol : float, default 0.02
+        Steepest the lower line may be and still count as flat, in price per bar.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below a flat line under the swing lows that a falling line over the swing highs is
+        closing in on.
+    """
+    period = _convert.as_int("chart_descending_triangle", "period", period)
+    pivot_n = _convert.as_int("chart_descending_triangle", "pivot_n", pivot_n)
+    flat_tol = _convert.as_float("chart_descending_triangle", "flat_tol", flat_tol)
+    columns, carrier = _convert.bars(
+        "chart_descending_triangle",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_descending_triangle(
+        *columns, period=period, pivot_n=pivot_n, flat_tol=flat_tol
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_descending_triangle",))
+
+
+def chart_diamond_bottom(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_diamond_bottom"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_diamond_bottom"]["pivot_n"]["default"],
+) -> Any:
+    """Diamond Bottom.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the shape may reach, from 2 to 100000.
+    pivot_n : int, default 4
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above a diamond's upper line after it broadened and narrowed.
+    """
+    period = _convert.as_int("chart_diamond_bottom", "period", period)
+    pivot_n = _convert.as_int("chart_diamond_bottom", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_diamond_bottom",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_diamond_bottom(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("chart_diamond_bottom",))
+
+
+def chart_diamond_top(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_diamond_top"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_diamond_top"]["pivot_n"]["default"],
+) -> Any:
+    """Diamond Top.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the shape may reach, from 2 to 100000.
+    pivot_n : int, default 4
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below a diamond's lower line after it broadened and narrowed.
+    """
+    period = _convert.as_int("chart_diamond_top", "period", period)
+    pivot_n = _convert.as_int("chart_diamond_top", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_diamond_top",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_diamond_top(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("chart_diamond_top",))
+
+
+def chart_double_bottom(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_bottom"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_bottom"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_bottom"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_bottom"]["min_separation"]["default"],
+) -> Any:
+    """Double Bottom.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first bottom may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    tol : float, default 0.03
+        How far apart the bottoms may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one bottom's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above the swing high between two bottoms at about the same price.
+    """
+    period = _convert.as_int("chart_double_bottom", "period", period)
+    pivot_n = _convert.as_int("chart_double_bottom", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_bottom", "tol", tol)
+    min_separation = _convert.as_int("chart_double_bottom", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_double_bottom",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_bottom(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_bottom",))
+
+
+def chart_double_bottom_adam_adam(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_bottom_adam_adam"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_bottom_adam_adam"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_bottom_adam_adam"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_bottom_adam_adam"]["min_separation"]["default"],
+) -> Any:
+    """Double Bottom, Adam and Adam.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first bottom may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 3 to 100000.
+    tol : float, default 0.03
+        How far apart the bottoms may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one bottom's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above the neckline of a double bottom whose bottoms are Adam then Adam.
+    """
+    period = _convert.as_int("chart_double_bottom_adam_adam", "period", period)
+    pivot_n = _convert.as_int("chart_double_bottom_adam_adam", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_bottom_adam_adam", "tol", tol)
+    min_separation = _convert.as_int(
+        "chart_double_bottom_adam_adam", "min_separation", min_separation
+    )
+    columns, carrier = _convert.bars(
+        "chart_double_bottom_adam_adam",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_bottom_adam_adam(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_bottom_adam_adam",))
+
+
+def chart_double_bottom_adam_eve(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_bottom_adam_eve"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_bottom_adam_eve"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_bottom_adam_eve"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_bottom_adam_eve"]["min_separation"]["default"],
+) -> Any:
+    """Double Bottom, Adam and Eve.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first bottom may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 3 to 100000.
+    tol : float, default 0.03
+        How far apart the bottoms may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one bottom's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above the neckline of a double bottom whose bottoms are Adam then Eve.
+    """
+    period = _convert.as_int("chart_double_bottom_adam_eve", "period", period)
+    pivot_n = _convert.as_int("chart_double_bottom_adam_eve", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_bottom_adam_eve", "tol", tol)
+    min_separation = _convert.as_int(
+        "chart_double_bottom_adam_eve", "min_separation", min_separation
+    )
+    columns, carrier = _convert.bars(
+        "chart_double_bottom_adam_eve",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_bottom_adam_eve(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_bottom_adam_eve",))
+
+
+def chart_double_bottom_eve_adam(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_bottom_eve_adam"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_bottom_eve_adam"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_bottom_eve_adam"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_bottom_eve_adam"]["min_separation"]["default"],
+) -> Any:
+    """Double Bottom, Eve and Adam.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first bottom may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 3 to 100000.
+    tol : float, default 0.03
+        How far apart the bottoms may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one bottom's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above the neckline of a double bottom whose bottoms are Eve then Adam.
+    """
+    period = _convert.as_int("chart_double_bottom_eve_adam", "period", period)
+    pivot_n = _convert.as_int("chart_double_bottom_eve_adam", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_bottom_eve_adam", "tol", tol)
+    min_separation = _convert.as_int(
+        "chart_double_bottom_eve_adam", "min_separation", min_separation
+    )
+    columns, carrier = _convert.bars(
+        "chart_double_bottom_eve_adam",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_bottom_eve_adam(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_bottom_eve_adam",))
+
+
+def chart_double_bottom_eve_eve(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_bottom_eve_eve"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_bottom_eve_eve"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_bottom_eve_eve"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_bottom_eve_eve"]["min_separation"]["default"],
+) -> Any:
+    """Double Bottom, Eve and Eve.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first bottom may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 3 to 100000.
+    tol : float, default 0.03
+        How far apart the bottoms may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one bottom's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above the neckline of a double bottom whose bottoms are Eve then Eve.
+    """
+    period = _convert.as_int("chart_double_bottom_eve_eve", "period", period)
+    pivot_n = _convert.as_int("chart_double_bottom_eve_eve", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_bottom_eve_eve", "tol", tol)
+    min_separation = _convert.as_int(
+        "chart_double_bottom_eve_eve", "min_separation", min_separation
+    )
+    columns, carrier = _convert.bars(
+        "chart_double_bottom_eve_eve",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_bottom_eve_eve(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_bottom_eve_eve",))
+
+
+def chart_double_top(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_top"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_top"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_top"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_top"]["min_separation"]["default"],
+) -> Any:
+    """Double Top.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first top may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    tol : float, default 0.03
+        How far apart the tops may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one top's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below the swing low between two tops at about the same price.
+    """
+    period = _convert.as_int("chart_double_top", "period", period)
+    pivot_n = _convert.as_int("chart_double_top", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_top", "tol", tol)
+    min_separation = _convert.as_int("chart_double_top", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_double_top",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_top(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_top",))
+
+
+def chart_double_top_adam_adam(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_top_adam_adam"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_top_adam_adam"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_top_adam_adam"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_top_adam_adam"]["min_separation"]["default"],
+) -> Any:
+    """Double Top, Adam and Adam.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first top may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 3 to 100000.
+    tol : float, default 0.03
+        How far apart the tops may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one top's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below the neckline of a double top whose tops are Adam then Adam.
+    """
+    period = _convert.as_int("chart_double_top_adam_adam", "period", period)
+    pivot_n = _convert.as_int("chart_double_top_adam_adam", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_top_adam_adam", "tol", tol)
+    min_separation = _convert.as_int("chart_double_top_adam_adam", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_double_top_adam_adam",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_top_adam_adam(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_top_adam_adam",))
+
+
+def chart_double_top_adam_eve(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_top_adam_eve"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_top_adam_eve"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_top_adam_eve"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_top_adam_eve"]["min_separation"]["default"],
+) -> Any:
+    """Double Top, Adam and Eve.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first top may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 3 to 100000.
+    tol : float, default 0.03
+        How far apart the tops may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one top's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below the neckline of a double top whose tops are Adam then Eve.
+    """
+    period = _convert.as_int("chart_double_top_adam_eve", "period", period)
+    pivot_n = _convert.as_int("chart_double_top_adam_eve", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_top_adam_eve", "tol", tol)
+    min_separation = _convert.as_int("chart_double_top_adam_eve", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_double_top_adam_eve",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_top_adam_eve(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_top_adam_eve",))
+
+
+def chart_double_top_eve_adam(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_top_eve_adam"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_top_eve_adam"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_top_eve_adam"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_top_eve_adam"]["min_separation"]["default"],
+) -> Any:
+    """Double Top, Eve and Adam.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first top may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 3 to 100000.
+    tol : float, default 0.03
+        How far apart the tops may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one top's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below the neckline of a double top whose tops are Eve then Adam.
+    """
+    period = _convert.as_int("chart_double_top_eve_adam", "period", period)
+    pivot_n = _convert.as_int("chart_double_top_eve_adam", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_top_eve_adam", "tol", tol)
+    min_separation = _convert.as_int("chart_double_top_eve_adam", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_double_top_eve_adam",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_top_eve_adam(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_top_eve_adam",))
+
+
+def chart_double_top_eve_eve(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_double_top_eve_eve"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_double_top_eve_eve"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_double_top_eve_eve"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_double_top_eve_eve"]["min_separation"]["default"],
+) -> Any:
+    """Double Top, Eve and Eve.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the first top may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 3 to 100000.
+    tol : float, default 0.03
+        How far apart the tops may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one top's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below the neckline of a double top whose tops are Eve then Eve.
+    """
+    period = _convert.as_int("chart_double_top_eve_eve", "period", period)
+    pivot_n = _convert.as_int("chart_double_top_eve_eve", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_double_top_eve_eve", "tol", tol)
+    min_separation = _convert.as_int("chart_double_top_eve_eve", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_double_top_eve_eve",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_double_top_eve_eve(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_double_top_eve_eve",))
+
+
+def chart_falling_wedge(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_falling_wedge"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_falling_wedge"]["pivot_n"]["default"],
+) -> Any:
+    """Falling Wedge.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above a falling line over the swing highs that drops faster than the falling line
+        under the swing lows.
+    """
+    period = _convert.as_int("chart_falling_wedge", "period", period)
+    pivot_n = _convert.as_int("chart_falling_wedge", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_falling_wedge",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_falling_wedge(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("chart_falling_wedge",))
+
+
+def chart_head_shoulders(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_head_shoulders"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_head_shoulders"]["pivot_n"]["default"],
+    shoulder_tol: float = _PARAMS["chart_head_shoulders"]["shoulder_tol"]["default"],
+    min_separation: int = _PARAMS["chart_head_shoulders"]["min_separation"]["default"],
+) -> Any:
+    """Head and Shoulders.
+
+    Parameters
+    ----------
+    period : int, default 150
+        Bars back the shoulders and head may have been confirmed, and bars the neckline waits for a
+        close through it, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    shoulder_tol : float, default 0.05
+        How far apart the shoulders may be, as a fraction of the larger.
+    min_separation : int, default 8
+        Fewest bars between the confirmations of a shoulder and the head, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        The first close below the neckline after a head above two shoulders of about the same
+        height.
+    """
+    period = _convert.as_int("chart_head_shoulders", "period", period)
+    pivot_n = _convert.as_int("chart_head_shoulders", "pivot_n", pivot_n)
+    shoulder_tol = _convert.as_float("chart_head_shoulders", "shoulder_tol", shoulder_tol)
+    min_separation = _convert.as_int("chart_head_shoulders", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_head_shoulders",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_head_shoulders(
+        *columns,
+        period=period,
+        pivot_n=pivot_n,
+        shoulder_tol=shoulder_tol,
+        min_separation=min_separation,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_head_shoulders",))
+
+
+def chart_high_tight_flag(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_high_tight_flag"]["period"]["default"],
+    pole_bars: int = _PARAMS["chart_high_tight_flag"]["pole_bars"]["default"],
+    min_pole: float = _PARAMS["chart_high_tight_flag"]["min_pole"]["default"],
+    max_retrace: float = _PARAMS["chart_high_tight_flag"]["max_retrace"]["default"],
+) -> Any:
+    """High and Tight Flag.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Bars the flag spans after its pole, from 2 to 100000.
+    pole_bars : int, default 10
+        Bars the pole is measured over, from 1 to 100000.
+    min_pole : float, default 0.4
+        Smallest rise the pole must make, as a fraction.
+    max_retrace : float, default 0.2
+        Widest the flag's range may be, as a fraction of the pole's last close.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above a tight flag that follows a very sharp rise.
+    """
+    period = _convert.as_int("chart_high_tight_flag", "period", period)
+    pole_bars = _convert.as_int("chart_high_tight_flag", "pole_bars", pole_bars)
+    min_pole = _convert.as_float("chart_high_tight_flag", "min_pole", min_pole)
+    max_retrace = _convert.as_float("chart_high_tight_flag", "max_retrace", max_retrace)
+    columns, carrier = _convert.bars(
+        "chart_high_tight_flag",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_high_tight_flag(
+        *columns, period=period, pole_bars=pole_bars, min_pole=min_pole, max_retrace=max_retrace
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_high_tight_flag",))
+
+
+def chart_inverse_head_shoulders(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_inverse_head_shoulders"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_inverse_head_shoulders"]["pivot_n"]["default"],
+    shoulder_tol: float = _PARAMS["chart_inverse_head_shoulders"]["shoulder_tol"]["default"],
+    min_separation: int = _PARAMS["chart_inverse_head_shoulders"]["min_separation"]["default"],
+) -> Any:
+    """Inverse Head and Shoulders.
+
+    Parameters
+    ----------
+    period : int, default 150
+        Bars back the shoulders and head may have been confirmed, and bars the neckline waits for a
+        close through it, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    shoulder_tol : float, default 0.05
+        How far apart the shoulders may be, as a fraction of the larger.
+    min_separation : int, default 8
+        Fewest bars between the confirmations of a shoulder and the head, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        The first close above the neckline after a head below two shoulders of about the same depth.
+    """
+    period = _convert.as_int("chart_inverse_head_shoulders", "period", period)
+    pivot_n = _convert.as_int("chart_inverse_head_shoulders", "pivot_n", pivot_n)
+    shoulder_tol = _convert.as_float("chart_inverse_head_shoulders", "shoulder_tol", shoulder_tol)
+    min_separation = _convert.as_int(
+        "chart_inverse_head_shoulders", "min_separation", min_separation
+    )
+    columns, carrier = _convert.bars(
+        "chart_inverse_head_shoulders",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_inverse_head_shoulders(
+        *columns,
+        period=period,
+        pivot_n=pivot_n,
+        shoulder_tol=shoulder_tol,
+        min_separation=min_separation,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_inverse_head_shoulders",))
+
+
+def chart_inverted_cup_with_handle(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    cup_window: int = _PARAMS["chart_inverted_cup_with_handle"]["cup_window"]["default"],
+    handle_window: int = _PARAMS["chart_inverted_cup_with_handle"]["handle_window"]["default"],
+    pivot_n: int = _PARAMS["chart_inverted_cup_with_handle"]["pivot_n"]["default"],
+    max_handle_retrace: float = _PARAMS["chart_inverted_cup_with_handle"]["max_handle_retrace"][
+        "default"
+    ],
+) -> Any:
+    """Inverted Cup with Handle.
+
+    Parameters
+    ----------
+    cup_window : int, default 65
+        Bars the cup may span, from 2 to 100000.
+    handle_window : int, default 15
+        Bars the handle may span, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    max_handle_retrace : float, default 0.5
+        Highest the handle may rise, as a fraction of the cup's height.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below the floor of an inverted cup, after a handle that stayed near it.
+    """
+    cup_window = _convert.as_int("chart_inverted_cup_with_handle", "cup_window", cup_window)
+    handle_window = _convert.as_int(
+        "chart_inverted_cup_with_handle", "handle_window", handle_window
+    )
+    pivot_n = _convert.as_int("chart_inverted_cup_with_handle", "pivot_n", pivot_n)
+    max_handle_retrace = _convert.as_float(
+        "chart_inverted_cup_with_handle", "max_handle_retrace", max_handle_retrace
+    )
+    columns, carrier = _convert.bars(
+        "chart_inverted_cup_with_handle",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_inverted_cup_with_handle(
+        *columns,
+        cup_window=cup_window,
+        handle_window=handle_window,
+        pivot_n=pivot_n,
+        max_handle_retrace=max_handle_retrace,
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_inverted_cup_with_handle",))
+
+
+def chart_island_bottom(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    max_island_bars: int = _PARAMS["chart_island_bottom"]["max_island_bars"]["default"],
+) -> Any:
+    """Island Bottom.
+
+    Parameters
+    ----------
+    max_island_bars : int, default 10
+        Most bars the island may hold, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A gap up out of an island that a gap down opened.
+    """
+    max_island_bars = _convert.as_int("chart_island_bottom", "max_island_bars", max_island_bars)
+    columns, carrier = _convert.bars(
+        "chart_island_bottom",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_island_bottom(*columns, max_island_bars=max_island_bars)
+    return _convert.wrap_outputs(out, carrier, ("chart_island_bottom",))
+
+
+def chart_island_top(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    max_island_bars: int = _PARAMS["chart_island_top"]["max_island_bars"]["default"],
+) -> Any:
+    """Island Top.
+
+    Parameters
+    ----------
+    max_island_bars : int, default 10
+        Most bars the island may hold, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A gap down out of an island that a gap up opened.
+    """
+    max_island_bars = _convert.as_int("chart_island_top", "max_island_bars", max_island_bars)
+    columns, carrier = _convert.bars(
+        "chart_island_top",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_island_top(*columns, max_island_bars=max_island_bars)
+    return _convert.wrap_outputs(out, carrier, ("chart_island_top",))
+
+
+def chart_measured_move_down(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    pivot_n: int = _PARAMS["chart_measured_move_down"]["pivot_n"]["default"],
+    leg_tol: float = _PARAMS["chart_measured_move_down"]["leg_tol"]["default"],
+) -> Any:
+    """Measured Move Down.
+
+    Parameters
+    ----------
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    leg_tol : float, default 0.2
+        How far the two legs' lengths may differ, as a fraction of the first.
+
+    Returns
+    -------
+    ndarray or Series
+        Two falling legs of about equal length, on the bar the second ends.
+    """
+    pivot_n = _convert.as_int("chart_measured_move_down", "pivot_n", pivot_n)
+    leg_tol = _convert.as_float("chart_measured_move_down", "leg_tol", leg_tol)
+    columns, carrier = _convert.bars(
+        "chart_measured_move_down",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_measured_move_down(*columns, pivot_n=pivot_n, leg_tol=leg_tol)
+    return _convert.wrap_outputs(out, carrier, ("chart_measured_move_down",))
+
+
+def chart_measured_move_up(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    pivot_n: int = _PARAMS["chart_measured_move_up"]["pivot_n"]["default"],
+    leg_tol: float = _PARAMS["chart_measured_move_up"]["leg_tol"]["default"],
+) -> Any:
+    """Measured Move Up.
+
+    Parameters
+    ----------
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    leg_tol : float, default 0.2
+        How far the two legs' lengths may differ, as a fraction of the first.
+
+    Returns
+    -------
+    ndarray or Series
+        Two rising legs of about equal length, on the bar the second ends.
+    """
+    pivot_n = _convert.as_int("chart_measured_move_up", "pivot_n", pivot_n)
+    leg_tol = _convert.as_float("chart_measured_move_up", "leg_tol", leg_tol)
+    columns, carrier = _convert.bars(
+        "chart_measured_move_up",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_measured_move_up(*columns, pivot_n=pivot_n, leg_tol=leg_tol)
+    return _convert.wrap_outputs(out, carrier, ("chart_measured_move_up",))
+
+
+def chart_rectangle(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_rectangle"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_rectangle"]["pivot_n"]["default"],
+    flat_tol: float = _PARAMS["chart_rectangle"]["flat_tol"]["default"],
+) -> Any:
+    """Rectangle.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 4
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    flat_tol : float, default 0.025
+        Steepest either line may be and still count as flat, in price per bar.
+
+    Returns
+    -------
+    ndarray or Series
+        A close through either of two flat lines, one over the swing highs and one under the swing
+        lows.
+    """
+    period = _convert.as_int("chart_rectangle", "period", period)
+    pivot_n = _convert.as_int("chart_rectangle", "pivot_n", pivot_n)
+    flat_tol = _convert.as_float("chart_rectangle", "flat_tol", flat_tol)
+    columns, carrier = _convert.bars(
+        "chart_rectangle",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_rectangle(*columns, period=period, pivot_n=pivot_n, flat_tol=flat_tol)
+    return _convert.wrap_outputs(out, carrier, ("chart_rectangle",))
+
+
+def chart_rising_wedge(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_rising_wedge"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_rising_wedge"]["pivot_n"]["default"],
+) -> Any:
+    """Rising Wedge.
+
+    Parameters
+    ----------
+    period : int, default 80
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below a rising line under the swing lows that climbs faster than the rising line
+        over the swing highs.
+    """
+    period = _convert.as_int("chart_rising_wedge", "period", period)
+    pivot_n = _convert.as_int("chart_rising_wedge", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_rising_wedge",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_rising_wedge(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("chart_rising_wedge",))
+
+
+def chart_rounding_bottom(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_rounding_bottom"]["period"]["default"],
+    min_depth: float = _PARAMS["chart_rounding_bottom"]["min_depth"]["default"],
+) -> Any:
+    """Rounding Bottom.
+
+    Parameters
+    ----------
+    period : int, default 40
+        Bars the saucer spans, from 2 to 100000.
+    min_depth : float, default 0.05
+        Shallowest the saucer may be, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A close beyond a saucer in the last period closes.
+    """
+    period = _convert.as_int("chart_rounding_bottom", "period", period)
+    min_depth = _convert.as_float("chart_rounding_bottom", "min_depth", min_depth)
+    columns, carrier = _convert.bars(
+        "chart_rounding_bottom",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_rounding_bottom(*columns, period=period, min_depth=min_depth)
+    return _convert.wrap_outputs(out, carrier, ("chart_rounding_bottom",))
+
+
+def chart_rounding_top(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_rounding_top"]["period"]["default"],
+    min_depth: float = _PARAMS["chart_rounding_top"]["min_depth"]["default"],
+) -> Any:
+    """Rounding Top.
+
+    Parameters
+    ----------
+    period : int, default 40
+        Bars the dome spans, from 2 to 100000.
+    min_depth : float, default 0.05
+        Lowest the dome may be, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A close beyond a dome in the last period closes.
+    """
+    period = _convert.as_int("chart_rounding_top", "period", period)
+    min_depth = _convert.as_float("chart_rounding_top", "min_depth", min_depth)
+    columns, carrier = _convert.bars(
+        "chart_rounding_top",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_rounding_top(*columns, period=period, min_depth=min_depth)
+    return _convert.wrap_outputs(out, carrier, ("chart_rounding_top",))
+
+
+def chart_symmetrical_triangle(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_symmetrical_triangle"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_symmetrical_triangle"]["pivot_n"]["default"],
+) -> Any:
+    """Symmetrical Triangle.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back a swing point may have been placed and still be on a line, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close through a falling line over the swing highs or a rising line under the swing lows,
+        the two closing in on each other.
+    """
+    period = _convert.as_int("chart_symmetrical_triangle", "period", period)
+    pivot_n = _convert.as_int("chart_symmetrical_triangle", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "chart_symmetrical_triangle",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_symmetrical_triangle(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("chart_symmetrical_triangle",))
+
+
+def chart_three_peaks(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_three_peaks"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_three_peaks"]["pivot_n"]["default"],
+    min_separation: int = _PARAMS["chart_three_peaks"]["min_separation"]["default"],
+) -> Any:
+    """Three Peaks.
+
+    Parameters
+    ----------
+    period : int, default 120
+        Bars back the first top may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    min_separation : int, default 8
+        Fewest bars between one top's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Three falling swing highs and a close beyond the span between them.
+    """
+    period = _convert.as_int("chart_three_peaks", "period", period)
+    pivot_n = _convert.as_int("chart_three_peaks", "pivot_n", pivot_n)
+    min_separation = _convert.as_int("chart_three_peaks", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_three_peaks",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_three_peaks(
+        *columns, period=period, pivot_n=pivot_n, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_three_peaks",))
+
+
+def chart_three_valleys(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_three_valleys"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_three_valleys"]["pivot_n"]["default"],
+    min_separation: int = _PARAMS["chart_three_valleys"]["min_separation"]["default"],
+) -> Any:
+    """Three Valleys.
+
+    Parameters
+    ----------
+    period : int, default 120
+        Bars back the first bottom may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    min_separation : int, default 8
+        Fewest bars between one bottom's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Three rising swing lows and a close beyond the span between them.
+    """
+    period = _convert.as_int("chart_three_valleys", "period", period)
+    pivot_n = _convert.as_int("chart_three_valleys", "pivot_n", pivot_n)
+    min_separation = _convert.as_int("chart_three_valleys", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_three_valleys",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_three_valleys(
+        *columns, period=period, pivot_n=pivot_n, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_three_valleys",))
+
+
+def chart_triple_bottom(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_triple_bottom"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_triple_bottom"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_triple_bottom"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_triple_bottom"]["min_separation"]["default"],
+) -> Any:
+    """Triple Bottom.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the first bottom may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    tol : float, default 0.03
+        How far apart the bottoms may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one bottom's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close above the higher of the two swing highs between three bottoms at about the same
+        price.
+    """
+    period = _convert.as_int("chart_triple_bottom", "period", period)
+    pivot_n = _convert.as_int("chart_triple_bottom", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_triple_bottom", "tol", tol)
+    min_separation = _convert.as_int("chart_triple_bottom", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_triple_bottom",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_triple_bottom(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_triple_bottom",))
+
+
+def chart_triple_top(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_triple_top"]["period"]["default"],
+    pivot_n: int = _PARAMS["chart_triple_top"]["pivot_n"]["default"],
+    tol: float = _PARAMS["chart_triple_top"]["tol"]["default"],
+    min_separation: int = _PARAMS["chart_triple_top"]["min_separation"]["default"],
+) -> Any:
+    """Triple Top.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the first top may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    tol : float, default 0.03
+        How far apart the tops may be, as a fraction of the larger.
+    min_separation : int, default 5
+        Fewest bars between one top's confirmation and the next, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A close below the lower of the two swing lows between three tops at about the same price.
+    """
+    period = _convert.as_int("chart_triple_top", "period", period)
+    pivot_n = _convert.as_int("chart_triple_top", "pivot_n", pivot_n)
+    tol = _convert.as_float("chart_triple_top", "tol", tol)
+    min_separation = _convert.as_int("chart_triple_top", "min_separation", min_separation)
+    columns, carrier = _convert.bars(
+        "chart_triple_top",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_triple_top(
+        *columns, period=period, pivot_n=pivot_n, tol=tol, min_separation=min_separation
+    )
+    return _convert.wrap_outputs(out, carrier, ("chart_triple_top",))
+
+
+def chart_v_bottom(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_v_bottom"]["period"]["default"],
+    min_drop: float = _PARAMS["chart_v_bottom"]["min_drop"]["default"],
+) -> Any:
+    """V-Bottom.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Bars each arm of the V spans, from 2 to 100000.
+    min_drop : float, default 0.05
+        Smallest fall into the V, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        A V in the last period closes.
+    """
+    period = _convert.as_int("chart_v_bottom", "period", period)
+    min_drop = _convert.as_float("chart_v_bottom", "min_drop", min_drop)
+    columns, carrier = _convert.bars(
+        "chart_v_bottom",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_v_bottom(*columns, period=period, min_drop=min_drop)
+    return _convert.wrap_outputs(out, carrier, ("chart_v_bottom",))
+
+
+def chart_v_top(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["chart_v_top"]["period"]["default"],
+    min_rise: float = _PARAMS["chart_v_top"]["min_rise"]["default"],
+) -> Any:
+    """V-Top.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Bars each arm of the inverted V spans, from 2 to 100000.
+    min_rise : float, default 0.05
+        Smallest rise into the top, as a fraction.
+
+    Returns
+    -------
+    ndarray or Series
+        An inverted V in the last period closes.
+    """
+    period = _convert.as_int("chart_v_top", "period", period)
+    min_rise = _convert.as_float("chart_v_top", "min_rise", min_rise)
+    columns, carrier = _convert.bars(
+        "chart_v_top",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.chart_v_top(*columns, period=period, min_rise=min_rise)
+    return _convert.wrap_outputs(out, carrier, ("chart_v_top",))
+
+
+def cmf(
+    high=None,
+    low=None,
+    close=None,
+    volume=None,
+    *,
+    period: int = _PARAMS["cmf"]["period"]["default"],
+) -> Any:
+    """Chaikin Money Flow.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Number of bars the flows are summed over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Share of recent volume that traded in the upper half of its bars.
+    """
+    period = _convert.as_int("cmf", "period", period)
+    columns, carrier = _convert.bars(
+        "cmf",
+        (high, low, close, volume),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.cmf(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("cmf",))
+
+
+def cmo(source=None, *, period: int = _PARAMS["cmo"]["period"]["default"]) -> Any:
+    """Chande Momentum Oscillator.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bar-to-bar changes the gains and losses are accumulated over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Gains minus losses as a share of the two combined, from -100 to 100.
+    """
+    period = _convert.as_int("cmo", "period", period)
+    columns, carrier = _convert.bars("cmo", (source,), ("source",), ("series",))
+    out = _core.cmo(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("cmo",))
+
+
+def cmou(source=None, *, period: int = _PARAMS["cmou"]["period"]["default"]) -> Any:
+    """Chande Momentum Oscillator (unsmoothed).
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bar-to-bar changes summed, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Net movement as a percentage of total movement.
+    """
+    period = _convert.as_int("cmou", "period", period)
+    columns, carrier = _convert.bars("cmou", (source,), ("source",), ("series",))
+    out = _core.cmou(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("cmou",))
+
+
+def connors_rsi(
+    source=None,
+    *,
+    rsi_period: int = _PARAMS["connors_rsi"]["rsi_period"]["default"],
+    streak_period: int = _PARAMS["connors_rsi"]["streak_period"]["default"],
+    rank_period: int = _PARAMS["connors_rsi"]["rank_period"]["default"],
+) -> Any:
+    """Connors RSI.
+
+    Parameters
+    ----------
+    rsi_period : int, default 3
+        Bars of the price RSI, from 2 to 100000.
+    streak_period : int, default 2
+        Bars of the streak RSI, from 2 to 100000.
+    rank_period : int, default 100
+        Bars the one-bar change is ranked against, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Mean of the price RSI, the streak RSI and the change's percent rank.
+    """
+    rsi_period = _convert.as_int("connors_rsi", "rsi_period", rsi_period)
+    streak_period = _convert.as_int("connors_rsi", "streak_period", streak_period)
+    rank_period = _convert.as_int("connors_rsi", "rank_period", rank_period)
+    columns, carrier = _convert.bars("connors_rsi", (source,), ("source",), ("series",))
+    out = _core.connors_rsi(
+        *columns, rsi_period=rsi_period, streak_period=streak_period, rank_period=rank_period
+    )
+    return _convert.wrap_outputs(out, carrier, ("connors_rsi",))
+
+
+def coppock(
+    source=None,
+    *,
+    wma_period: int = _PARAMS["coppock"]["wma_period"]["default"],
+    roc1_period: int = _PARAMS["coppock"]["roc1_period"]["default"],
+    roc2_period: int = _PARAMS["coppock"]["roc2_period"]["default"],
+) -> Any:
+    """Coppock Curve.
+
+    Parameters
+    ----------
+    wma_period : int, default 10
+        Number of bars the sum is weighted over, from 1 to 100000.
+    roc1_period : int, default 11
+        Bars back for the first rate of change, from 1 to 100000.
+    roc2_period : int, default 14
+        Bars back for the second rate of change, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Weighted average of two rates of change.
+    """
+    wma_period = _convert.as_int("coppock", "wma_period", wma_period)
+    roc1_period = _convert.as_int("coppock", "roc1_period", roc1_period)
+    roc2_period = _convert.as_int("coppock", "roc2_period", roc2_period)
+    columns, carrier = _convert.bars("coppock", (source,), ("source",), ("series",))
+    out = _core.coppock(
+        *columns, wma_period=wma_period, roc1_period=roc1_period, roc2_period=roc2_period
+    )
+    return _convert.wrap_outputs(out, carrier, ("coppock",))
+
+
+def correl(
+    source0=None, source1=None, *, period: int = _PARAMS["correl"]["period"]["default"]
+) -> Any:
+    """Pearson Correlation.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the correlation is measured over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Correlation between the two series over the window.
+    """
+    period = _convert.as_int("correl", "period", period)
+    columns, carrier = _convert.bars(
+        "correl",
+        (source0, source1),
+        (
+            "source0",
+            "source1",
+        ),
+        (
+            "series",
+            "series",
+        ),
+    )
+    out = _core.correl(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("correl",))
+
+
+def cos(source=None) -> Any:
+    """Vector Cosine.
+
+    Returns
+    -------
+    ndarray or Series
+        Cosine of source, element by element.
+    """
+    columns, carrier = _convert.bars("cos", (source,), ("source",), ("series",))
+    out = _core.cos(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cos",))
+
+
+def cosh(source=None) -> Any:
+    """Vector Hyperbolic Cosine.
+
+    Returns
+    -------
+    ndarray or Series
+        Hyperbolic Cosine of source, element by element.
+    """
+    columns, carrier = _convert.bars("cosh", (source,), ("source",), ("series",))
+    out = _core.cosh(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cosh",))
+
+
+def cpr(high=None, low=None, close=None) -> Any:
+    """Central Pivot Range.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        cpr_pivot: Average of the previous bar's high, low and close.
+        cpr_bc: Midpoint of the previous bar's range.
+        cpr_tc: The pivot reflected through the midpoint.
+    """
+    columns, carrier = _convert.bars(
+        "cpr",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.cpr(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "cpr_pivot",
+            "cpr_bc",
+            "cpr_tc",
+        ),
+    )
+
+
+def cumsum(source=None) -> Any:
+    """Cumulative Sum.
+
+    Returns
+    -------
+    ndarray or Series
+        Running total of source from the first valid bar.
+    """
+    columns, carrier = _convert.bars("cumsum", (source,), ("source",), ("series",))
+    out = _core.cumsum(*columns)
+    return _convert.wrap_outputs(out, carrier, ("cumsum",))
+
+
+def cvi(
+    high=None,
+    low=None,
+    *,
+    period: int = _PARAMS["cvi"]["period"]["default"],
+    roc_period: int = _PARAMS["cvi"]["roc_period"]["default"],
+) -> Any:
+    """Chaikin Volatility.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Number of bars the range is smoothed over, from 2 to 100000.
+    roc_period : int, default 10
+        Bars back the smoothed range is compared with, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Percentage change in the smoothed high-low range.
+    """
+    period = _convert.as_int("cvi", "period", period)
+    roc_period = _convert.as_int("cvi", "roc_period", roc_period)
+    columns, carrier = _convert.bars(
+        "cvi",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.cvi(*columns, period=period, roc_period=roc_period)
+    return _convert.wrap_outputs(out, carrier, ("cvi",))
+
+
+def darvas_box(
+    high=None, low=None, *, confirm_bars: int = _PARAMS["darvas_box"]["confirm_bars"]["default"]
+) -> Any:
+    """Darvas Box.
+
+    Parameters
+    ----------
+    confirm_bars : int, default 3
+        Bars a box edge must hold before it is set, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        darvas_top: Top of the latest confirmed box.
+        darvas_bottom: Bottom of the latest confirmed box.
+    """
+    confirm_bars = _convert.as_int("darvas_box", "confirm_bars", confirm_bars)
+    columns, carrier = _convert.bars(
+        "darvas_box",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.darvas_box(*columns, confirm_bars=confirm_bars)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "darvas_top",
+            "darvas_bottom",
+        ),
+    )
+
+
+def dema(source=None, *, period: int = _PARAMS["dema"]["period"]["default"]) -> Any:
+    """Double Exponential Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars each exponential stage is derived from, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Exponential average with most of its own lag subtracted back out.
+    """
+    period = _convert.as_int("dema", "period", period)
+    columns, carrier = _convert.bars("dema", (source,), ("source",), ("series",))
+    out = _core.dema(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("dema",))
+
+
+def div(source0=None, source1=None) -> Any:
+    """Vector Division.
+
+    Returns
+    -------
+    ndarray or Series
+        Division of the two inputs.
+    """
+    columns, carrier = _convert.bars(
+        "div",
+        (source0, source1),
+        (
+            "source0",
+            "source1",
+        ),
+        (
+            "series",
+            "series",
+        ),
+    )
+    out = _core.div(*columns)
+    return _convert.wrap_outputs(out, carrier, ("div",))
+
+
+def donchian(high=None, low=None, *, period: int = _PARAMS["donchian"]["period"]["default"]) -> Any:
+    """Donchian Channel.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Number of bars the channel is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        donchian_upper: Highest high of the last period bars.
+        donchian_middle: Halfway between the upper and lower bands.
+        donchian_lower: Lowest low of the last period bars.
+    """
+    period = _convert.as_int("donchian", "period", period)
+    columns, carrier = _convert.bars(
+        "donchian",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.donchian(*columns, period=period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "donchian_upper",
+            "donchian_middle",
+            "donchian_lower",
+        ),
+    )
+
+
+def dpo(source=None, *, period: int = _PARAMS["dpo"]["period"]["default"]) -> Any:
+    """Detrended Price Oscillator.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Number of bars the trend is measured over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        How far an earlier value sat above or below the current average.
+    """
+    period = _convert.as_int("dpo", "period", period)
+    columns, carrier = _convert.bars("dpo", (source,), ("source",), ("series",))
+    out = _core.dpo(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("dpo",))
+
+
+def dx(high=None, low=None, close=None, *, period: int = _PARAMS["dx"]["period"]["default"]) -> Any:
+    """Directional Movement Index.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the movement is accumulated over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        How one-sided the directional movement has been, from 0 to 100.
+    """
+    period = _convert.as_int("dx", "period", period)
+    columns, carrier = _convert.bars(
+        "dx",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.dx(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("dx",))
+
+
+def efi(close=None, volume=None, *, period: int = _PARAMS["efi"]["period"]["default"]) -> Any:
+    """Elder Force Index.
+
+    Parameters
+    ----------
+    period : int, default 13
+        Number of bars the force is smoothed over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Exponentially smoothed move times volume.
+    """
+    period = _convert.as_int("efi", "period", period)
+    columns, carrier = _convert.bars(
+        "efi",
+        (close, volume),
+        (
+            "close",
+            "volume",
+        ),
+        (
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.efi(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("efi",))
+
+
+def elder_impulse(
+    source=None,
+    *,
+    ema_period: int = _PARAMS["elder_impulse"]["ema_period"]["default"],
+    fast_period: int = _PARAMS["elder_impulse"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["elder_impulse"]["slow_period"]["default"],
+    signal_period: int = _PARAMS["elder_impulse"]["signal_period"]["default"],
+) -> Any:
+    """Elder Impulse System.
+
+    Parameters
+    ----------
+    ema_period : int, default 13
+        Bars of the trend average, from 2 to 100000.
+    fast_period : int, default 12
+        Bars of MACD's fast average, from 2 to 100000.
+    slow_period : int, default 26
+        Bars of MACD's slow average, from 2 to 100000.
+    signal_period : int, default 9
+        Bars of MACD's signal average, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        1 when the average and the MACD histogram both rose, -1 when both fell, else 0.
+    """
+    ema_period = _convert.as_int("elder_impulse", "ema_period", ema_period)
+    fast_period = _convert.as_int("elder_impulse", "fast_period", fast_period)
+    slow_period = _convert.as_int("elder_impulse", "slow_period", slow_period)
+    signal_period = _convert.as_int("elder_impulse", "signal_period", signal_period)
+    columns, carrier = _convert.bars("elder_impulse", (source,), ("source",), ("series",))
+    out = _core.elder_impulse(
+        *columns,
+        ema_period=ema_period,
+        fast_period=fast_period,
+        slow_period=slow_period,
+        signal_period=signal_period,
+    )
+    return _convert.wrap_outputs(out, carrier, ("elder_impulse",))
+
+
+def ema(source=None, *, period: int = _PARAMS["ema"]["period"]["default"]) -> Any:
+    """Exponential Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the smoothing factor is derived from, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Exponentially weighted mean of source.
+    """
+    period = _convert.as_int("ema", "period", period)
+    columns, carrier = _convert.bars("ema", (source,), ("source",), ("series",))
+    out = _core.ema(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("ema",))
+
+
+def envelope(
+    source=None,
+    *,
+    period: int = _PARAMS["envelope"]["period"]["default"],
+    percent: float = _PARAMS["envelope"]["percent"]["default"],
+) -> Any:
+    """Moving Average Envelope.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Bars of the simple moving average, from 2 to 100000.
+    percent : float, default 10.0
+        Percent each band sits from the average.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        envelope_upper: The average raised by percent.
+        envelope_middle: The simple moving average.
+        envelope_lower: The average lowered by percent.
+    """
+    period = _convert.as_int("envelope", "period", period)
+    percent = _convert.as_float("envelope", "percent", percent)
+    columns, carrier = _convert.bars("envelope", (source,), ("source",), ("series",))
+    out = _core.envelope(*columns, period=period, percent=percent)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "envelope_upper",
+            "envelope_middle",
+            "envelope_lower",
+        ),
+    )
+
+
+def er(source=None, *, period: int = _PARAMS["er"]["period"]["default"]) -> Any:
+    """Efficiency Ratio.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Number of bars the ratio is measured over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Net progress as a share of the distance actually travelled.
+    """
+    period = _convert.as_int("er", "period", period)
+    columns, carrier = _convert.bars("er", (source,), ("source",), ("series",))
+    out = _core.er(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("er",))
+
+
+def eri(
+    high=None, low=None, close=None, *, period: int = _PARAMS["eri"]["period"]["default"]
+) -> Any:
+    """Elder Ray Index.
+
+    Parameters
+    ----------
+    period : int, default 13
+        Number of bars the average is taken over, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        eri_bull_power: How far the high reached above the average close.
+        eri_bear_power: How far the low reached below the average close.
+    """
+    period = _convert.as_int("eri", "period", period)
+    columns, carrier = _convert.bars(
+        "eri",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.eri(*columns, period=period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "eri_bull_power",
+            "eri_bear_power",
+        ),
+    )
+
+
+def exp(source=None) -> Any:
+    """Vector Exponential.
+
+    Returns
+    -------
+    ndarray or Series
+        Exponential of source, element by element.
+    """
+    columns, carrier = _convert.bars("exp", (source,), ("source",), ("series",))
+    out = _core.exp(*columns)
+    return _convert.wrap_outputs(out, carrier, ("exp",))
+
+
+def floor(source=None) -> Any:
+    """Vector Floor.
+
+    Returns
+    -------
+    ndarray or Series
+        Floor of source, element by element.
+    """
+    columns, carrier = _convert.bars("floor", (source,), ("source",), ("series",))
+    out = _core.floor(*columns)
+    return _convert.wrap_outputs(out, carrier, ("floor",))
+
+
+def fosc(source=None, *, period: int = _PARAMS["fosc"]["period"]["default"]) -> Any:
+    """Forecast Oscillator.
+
+    Parameters
+    ----------
+    period : int, default 5
+        Number of bars the forecast is fitted over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        How far the value came in above or below the forecast, as a percentage.
+    """
+    period = _convert.as_int("fosc", "period", period)
+    columns, carrier = _convert.bars("fosc", (source,), ("source",), ("series",))
+    out = _core.fosc(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("fosc",))
+
+
+def fractal(
+    high=None,
+    low=None,
+    *,
+    left_bars: int = _PARAMS["fractal"]["left_bars"]["default"],
+    right_bars: int = _PARAMS["fractal"]["right_bars"]["default"],
+) -> Any:
+    """Fractal.
+
+    Parameters
+    ----------
+    left_bars : int, default 2
+        Bars before the middle one that it must beat, from 1 to 100000.
+    right_bars : int, default 2
+        Bars after the middle one that it must beat, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        fractal_swing_high: Marks the bar where a swing high became confirmed.
+        fractal_swing_low: Marks the bar where a swing low became confirmed.
+    """
+    left_bars = _convert.as_int("fractal", "left_bars", left_bars)
+    right_bars = _convert.as_int("fractal", "right_bars", right_bars)
+    columns, carrier = _convert.bars(
+        "fractal",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.fractal(*columns, left_bars=left_bars, right_bars=right_bars)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "fractal_swing_high",
+            "fractal_swing_low",
+        ),
+    )
+
+
+def fractal_chaos_bands(
+    high=None,
+    low=None,
+    *,
+    left_bars: int = _PARAMS["fractal_chaos_bands"]["left_bars"]["default"],
+    right_bars: int = _PARAMS["fractal_chaos_bands"]["right_bars"]["default"],
+) -> Any:
+    """Fractal Chaos Bands.
+
+    Parameters
+    ----------
+    left_bars : int, default 2
+        Bars before a fractal it must beat, from 1 to 100000.
+    right_bars : int, default 2
+        Bars after a fractal it must beat, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        fractal_chaos_upper: High of the latest confirmed swing high.
+        fractal_chaos_lower: Low of the latest confirmed swing low.
+    """
+    left_bars = _convert.as_int("fractal_chaos_bands", "left_bars", left_bars)
+    right_bars = _convert.as_int("fractal_chaos_bands", "right_bars", right_bars)
+    columns, carrier = _convert.bars(
+        "fractal_chaos_bands",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.fractal_chaos_bands(*columns, left_bars=left_bars, right_bars=right_bars)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "fractal_chaos_upper",
+            "fractal_chaos_lower",
+        ),
+    )
+
+
+def frama(high=None, low=None, *, period: int = _PARAMS["frama"]["period"]["default"]) -> Any:
+    """Fractal Adaptive Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 16
+        Bars the fractal dimension is measured over, split into two halves, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Exponential average whose step follows the fractal dimension.
+    """
+    period = _convert.as_int("frama", "period", period)
+    columns, carrier = _convert.bars(
+        "frama",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.frama(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("frama",))
+
+
+def gapo(high=None, low=None, *, period: int = _PARAMS["gapo"]["period"]["default"]) -> Any:
+    """Gopalakrishnan Range Index.
+
+    Parameters
+    ----------
+    period : int, default 5
+        Bars the range is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Logarithm of the window's range over the logarithm of its length.
+    """
+    period = _convert.as_int("gapo", "period", period)
+    columns, carrier = _convert.bars(
+        "gapo",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.gapo(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("gapo",))
+
+
+def gator(
+    high=None,
+    low=None,
+    *,
+    jaw_period: int = _PARAMS["gator"]["jaw_period"]["default"],
+    jaw_shift: int = _PARAMS["gator"]["jaw_shift"]["default"],
+    teeth_period: int = _PARAMS["gator"]["teeth_period"]["default"],
+    teeth_shift: int = _PARAMS["gator"]["teeth_shift"]["default"],
+    lips_period: int = _PARAMS["gator"]["lips_period"]["default"],
+    lips_shift: int = _PARAMS["gator"]["lips_shift"]["default"],
+) -> Any:
+    """Gator Oscillator.
+
+    Parameters
+    ----------
+    jaw_period : int, default 13
+        Bars the jaw's smoothed median spans, from 1 to 100000.
+    jaw_shift : int, default 8
+        Bars the jaw is drawn ahead, from 1 to 100000.
+    teeth_period : int, default 8
+        Bars the teeth's smoothed median spans, from 1 to 100000.
+    teeth_shift : int, default 5
+        Bars the teeth are drawn ahead, from 1 to 100000.
+    lips_period : int, default 5
+        Bars the lips' smoothed median spans, from 1 to 100000.
+    lips_shift : int, default 3
+        Bars the lips are drawn ahead, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        gator_upper: Distance between the jaw and the teeth.
+        gator_lower: Distance between the teeth and the lips, negated.
+    """
+    jaw_period = _convert.as_int("gator", "jaw_period", jaw_period)
+    jaw_shift = _convert.as_int("gator", "jaw_shift", jaw_shift)
+    teeth_period = _convert.as_int("gator", "teeth_period", teeth_period)
+    teeth_shift = _convert.as_int("gator", "teeth_shift", teeth_shift)
+    lips_period = _convert.as_int("gator", "lips_period", lips_period)
+    lips_shift = _convert.as_int("gator", "lips_shift", lips_shift)
+    columns, carrier = _convert.bars(
+        "gator",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.gator(
+        *columns,
+        jaw_period=jaw_period,
+        jaw_shift=jaw_shift,
+        teeth_period=teeth_period,
+        teeth_shift=teeth_shift,
+        lips_period=lips_period,
+        lips_shift=lips_shift,
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "gator_upper",
+            "gator_lower",
+        ),
+    )
+
+
+def guppy(source=None) -> Any:
+    """Guppy Multiple Moving Average.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        guppy_short_3: Exponential moving average over 3 bars.
+        guppy_short_5: Exponential moving average over 5 bars.
+        guppy_short_8: Exponential moving average over 8 bars.
+        guppy_short_10: Exponential moving average over 10 bars.
+        guppy_short_12: Exponential moving average over 12 bars.
+        guppy_short_15: Exponential moving average over 15 bars.
+        guppy_long_30: Exponential moving average over 30 bars.
+        guppy_long_35: Exponential moving average over 35 bars.
+        guppy_long_40: Exponential moving average over 40 bars.
+        guppy_long_45: Exponential moving average over 45 bars.
+        guppy_long_50: Exponential moving average over 50 bars.
+        guppy_long_60: Exponential moving average over 60 bars.
+    """
+    columns, carrier = _convert.bars("guppy", (source,), ("source",), ("series",))
+    out = _core.guppy(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "guppy_short_3",
+            "guppy_short_5",
+            "guppy_short_8",
+            "guppy_short_10",
+            "guppy_short_12",
+            "guppy_short_15",
+            "guppy_long_30",
+            "guppy_long_35",
+            "guppy_long_40",
+            "guppy_long_45",
+            "guppy_long_50",
+            "guppy_long_60",
+        ),
+    )
+
+
+def ha(open=None, high=None, low=None, close=None) -> Any:
+    """Heikin-Ashi Candles.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        ha_open: Midpoint of the previous Heikin-Ashi candle.
+        ha_high: Highest of the bar's high and the two Heikin-Ashi ends.
+        ha_low: Lowest of the bar's low and the two Heikin-Ashi ends.
+        ha_close: Average of the bar's open, high, low and close.
+    """
+    columns, carrier = _convert.bars(
+        "ha",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.ha(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "ha_open",
+            "ha_high",
+            "ha_low",
+            "ha_close",
+        ),
+    )
+
+
+def harmonic_abcd_bearish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_abcd_bearish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_abcd_bearish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_abcd_bearish"]["fib_tol"]["default"],
+) -> Any:
+    """Bearish AB=CD.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.05
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        An AB=CD whose last swing is a high, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_abcd_bearish", "period", period)
+    pivot_n = _convert.as_int("harmonic_abcd_bearish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_abcd_bearish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_abcd_bearish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_abcd_bearish(*columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_abcd_bearish",))
+
+
+def harmonic_abcd_bullish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_abcd_bullish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_abcd_bullish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_abcd_bullish"]["fib_tol"]["default"],
+) -> Any:
+    """Bullish AB=CD.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.05
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        An AB=CD whose last swing is a low, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_abcd_bullish", "period", period)
+    pivot_n = _convert.as_int("harmonic_abcd_bullish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_abcd_bullish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_abcd_bullish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_abcd_bullish(*columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_abcd_bullish",))
+
+
+def harmonic_bat_bearish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_bat_bearish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_bat_bearish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_bat_bearish"]["fib_tol"]["default"],
+) -> Any:
+    """Bearish Bat.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.05
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A Bat whose last swing is a high, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_bat_bearish", "period", period)
+    pivot_n = _convert.as_int("harmonic_bat_bearish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_bat_bearish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_bat_bearish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_bat_bearish(*columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_bat_bearish",))
+
+
+def harmonic_bat_bullish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_bat_bullish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_bat_bullish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_bat_bullish"]["fib_tol"]["default"],
+) -> Any:
+    """Bullish Bat.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.05
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A Bat whose last swing is a low, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_bat_bullish", "period", period)
+    pivot_n = _convert.as_int("harmonic_bat_bullish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_bat_bullish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_bat_bullish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_bat_bullish(*columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_bat_bullish",))
+
+
+def harmonic_butterfly_bearish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_butterfly_bearish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_butterfly_bearish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_butterfly_bearish"]["fib_tol"]["default"],
+) -> Any:
+    """Bearish Butterfly.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.06
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A Butterfly whose last swing is a high, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_butterfly_bearish", "period", period)
+    pivot_n = _convert.as_int("harmonic_butterfly_bearish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_butterfly_bearish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_butterfly_bearish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_butterfly_bearish(
+        *columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol
+    )
+    return _convert.wrap_outputs(out, carrier, ("harmonic_butterfly_bearish",))
+
+
+def harmonic_butterfly_bullish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_butterfly_bullish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_butterfly_bullish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_butterfly_bullish"]["fib_tol"]["default"],
+) -> Any:
+    """Bullish Butterfly.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.06
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A Butterfly whose last swing is a low, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_butterfly_bullish", "period", period)
+    pivot_n = _convert.as_int("harmonic_butterfly_bullish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_butterfly_bullish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_butterfly_bullish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_butterfly_bullish(
+        *columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol
+    )
+    return _convert.wrap_outputs(out, carrier, ("harmonic_butterfly_bullish",))
+
+
+def harmonic_crab_bearish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_crab_bearish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_crab_bearish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_crab_bearish"]["fib_tol"]["default"],
+) -> Any:
+    """Bearish Crab.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.06
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A Crab whose last swing is a high, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_crab_bearish", "period", period)
+    pivot_n = _convert.as_int("harmonic_crab_bearish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_crab_bearish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_crab_bearish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_crab_bearish(*columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_crab_bearish",))
+
+
+def harmonic_crab_bullish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_crab_bullish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_crab_bullish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_crab_bullish"]["fib_tol"]["default"],
+) -> Any:
+    """Bullish Crab.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.06
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A Crab whose last swing is a low, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_crab_bullish", "period", period)
+    pivot_n = _convert.as_int("harmonic_crab_bullish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_crab_bullish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_crab_bullish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_crab_bullish(*columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_crab_bullish",))
+
+
+def harmonic_gartley_bearish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_gartley_bearish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_gartley_bearish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_gartley_bearish"]["fib_tol"]["default"],
+) -> Any:
+    """Bearish Gartley.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.05
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A Gartley whose last swing is a high, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_gartley_bearish", "period", period)
+    pivot_n = _convert.as_int("harmonic_gartley_bearish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_gartley_bearish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_gartley_bearish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_gartley_bearish(*columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_gartley_bearish",))
+
+
+def harmonic_gartley_bullish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_gartley_bullish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_gartley_bullish"]["pivot_n"]["default"],
+    fib_tol: float = _PARAMS["harmonic_gartley_bullish"]["fib_tol"]["default"],
+) -> Any:
+    """Bullish Gartley.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+    fib_tol : float, default 0.05
+        How far a leg's ratio may stray from its Fibonacci ratio, as a fraction of it.
+
+    Returns
+    -------
+    ndarray or Series
+        A Gartley whose last swing is a low, closing beyond it.
+    """
+    period = _convert.as_int("harmonic_gartley_bullish", "period", period)
+    pivot_n = _convert.as_int("harmonic_gartley_bullish", "pivot_n", pivot_n)
+    fib_tol = _convert.as_float("harmonic_gartley_bullish", "fib_tol", fib_tol)
+    columns, carrier = _convert.bars(
+        "harmonic_gartley_bullish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_gartley_bullish(*columns, period=period, pivot_n=pivot_n, fib_tol=fib_tol)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_gartley_bullish",))
+
+
+def harmonic_wolfe_wave_bearish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_wolfe_wave_bearish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_wolfe_wave_bearish"]["pivot_n"]["default"],
+) -> Any:
+    """Bearish Wolfe Wave.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 4
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A fifth swing high beyond the 1-3 line, and a close back across it.
+    """
+    period = _convert.as_int("harmonic_wolfe_wave_bearish", "period", period)
+    pivot_n = _convert.as_int("harmonic_wolfe_wave_bearish", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "harmonic_wolfe_wave_bearish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_wolfe_wave_bearish(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_wolfe_wave_bearish",))
+
+
+def harmonic_wolfe_wave_bullish(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["harmonic_wolfe_wave_bullish"]["period"]["default"],
+    pivot_n: int = _PARAMS["harmonic_wolfe_wave_bullish"]["pivot_n"]["default"],
+) -> Any:
+    """Bullish Wolfe Wave.
+
+    Parameters
+    ----------
+    period : int, default 60
+        Bars back the pattern's first swing point may have been confirmed, from 2 to 100000.
+    pivot_n : int, default 4
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        A fifth swing low beyond the 1-3 line, and a close back across it.
+    """
+    period = _convert.as_int("harmonic_wolfe_wave_bullish", "period", period)
+    pivot_n = _convert.as_int("harmonic_wolfe_wave_bullish", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "harmonic_wolfe_wave_bullish",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.harmonic_wolfe_wave_bullish(*columns, period=period, pivot_n=pivot_n)
+    return _convert.wrap_outputs(out, carrier, ("harmonic_wolfe_wave_bullish",))
+
+
+def hma(source=None, *, period: int = _PARAMS["hma"]["period"]["default"]) -> Any:
+    """Hull Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Number of bars the longer weighted average uses, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Weighted average with most of its lag subtracted back out.
+    """
+    period = _convert.as_int("hma", "period", period)
+    columns, carrier = _convert.bars("hma", (source,), ("source",), ("series",))
+    out = _core.hma(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("hma",))
+
+
+def ht_dcperiod(source=None) -> Any:
+    """Hilbert Transform Dominant Cycle Period.
+
+    Returns
+    -------
+    ndarray or Series
+        Length of the dominant cycle, in bars.
+    """
+    columns, carrier = _convert.bars("ht_dcperiod", (source,), ("source",), ("series",))
+    out = _core.ht_dcperiod(*columns)
+    return _convert.wrap_outputs(out, carrier, ("ht_dcperiod",))
+
+
+def ht_dcphase(source=None) -> Any:
+    """Hilbert Transform Dominant Cycle Phase.
+
+    Returns
+    -------
+    ndarray or Series
+        Where the dominant cycle currently sits in its turn, in degrees.
+    """
+    columns, carrier = _convert.bars("ht_dcphase", (source,), ("source",), ("series",))
+    out = _core.ht_dcphase(*columns)
+    return _convert.wrap_outputs(out, carrier, ("ht_dcphase",))
+
+
+def ht_phasor(source=None) -> Any:
+    """Hilbert Transform Phasor Components.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        ht_phasor_in_phase: The part of the signal in phase with the dominant cycle.
+        ht_phasor_quadrature: The part a quarter turn ahead of it.
+    """
+    columns, carrier = _convert.bars("ht_phasor", (source,), ("source",), ("series",))
+    out = _core.ht_phasor(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "ht_phasor_in_phase",
+            "ht_phasor_quadrature",
+        ),
+    )
+
+
+def ht_sine(source=None) -> Any:
+    """Hilbert Transform SineWave.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        ht_sine_sine: Sine of the dominant cycle's phase.
+        ht_sine_lead_sine: The same an eighth of a turn ahead.
+    """
+    columns, carrier = _convert.bars("ht_sine", (source,), ("source",), ("series",))
+    out = _core.ht_sine(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "ht_sine_sine",
+            "ht_sine_lead_sine",
+        ),
+    )
+
+
+def ht_trendline(source=None) -> Any:
+    """Hilbert Transform Instantaneous Trendline.
+
+    Returns
+    -------
+    ndarray or Series
+        The series averaged over one dominant cycle and smoothed.
+    """
+    columns, carrier = _convert.bars("ht_trendline", (source,), ("source",), ("series",))
+    out = _core.ht_trendline(*columns)
+    return _convert.wrap_outputs(out, carrier, ("ht_trendline",))
+
+
+def ht_trendmode(source=None) -> Any:
+    """Hilbert Transform Trend vs Cycle Mode.
+
+    Returns
+    -------
+    ndarray or Series
+        One while the series is trending, zero while it is cycling.
+    """
+    columns, carrier = _convert.bars("ht_trendmode", (source,), ("source",), ("series",))
+    out = _core.ht_trendmode(*columns)
+    return _convert.wrap_outputs(out, carrier, ("ht_trendmode",))
+
+
+def ichimoku(
+    high=None,
+    low=None,
+    *,
+    tenkan_period: int = _PARAMS["ichimoku"]["tenkan_period"]["default"],
+    kijun_period: int = _PARAMS["ichimoku"]["kijun_period"]["default"],
+    senkou_period: int = _PARAMS["ichimoku"]["senkou_period"]["default"],
+    displacement: int = _PARAMS["ichimoku"]["displacement"]["default"],
+) -> Any:
+    """Ichimoku Kinko Hyo.
+
+    Parameters
+    ----------
+    tenkan_period : int, default 9
+        Bars the conversion line's midpoint spans, from 1 to 100000.
+    kijun_period : int, default 26
+        Bars the base line's midpoint spans, from 1 to 100000.
+    senkou_period : int, default 52
+        Bars the second leading span's midpoint spans, from 1 to 100000.
+    displacement : int, default 26
+        Bars the leading spans are drawn ahead, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        ichimoku_tenkan: Conversion line, the midpoint of the highest high and lowest low over
+        tenkan_period bars.
+        ichimoku_kijun: Base line, the same midpoint over kijun_period bars.
+        ichimoku_senkou_a: Leading span A as drawn at this bar, the mean of the two lines
+        displacement bars ago.
+        ichimoku_senkou_b: Leading span B as drawn at this bar, the senkou_period midpoint
+        displacement bars ago.
+    """
+    tenkan_period = _convert.as_int("ichimoku", "tenkan_period", tenkan_period)
+    kijun_period = _convert.as_int("ichimoku", "kijun_period", kijun_period)
+    senkou_period = _convert.as_int("ichimoku", "senkou_period", senkou_period)
+    displacement = _convert.as_int("ichimoku", "displacement", displacement)
+    columns, carrier = _convert.bars(
+        "ichimoku",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.ichimoku(
+        *columns,
+        tenkan_period=tenkan_period,
+        kijun_period=kijun_period,
+        senkou_period=senkou_period,
+        displacement=displacement,
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "ichimoku_tenkan",
+            "ichimoku_kijun",
+            "ichimoku_senkou_a",
+            "ichimoku_senkou_b",
+        ),
+    )
+
+
+def ift_rsi(
+    source=None,
+    *,
+    rsi_period: int = _PARAMS["ift_rsi"]["rsi_period"]["default"],
+    wma_period: int = _PARAMS["ift_rsi"]["wma_period"]["default"],
+) -> Any:
+    """Inverse Fisher Transform of RSI.
+
+    Parameters
+    ----------
+    rsi_period : int, default 5
+        Bars of the RSI, from 2 to 100000.
+    wma_period : int, default 9
+        Bars of the weighted average of the rescaled RSI, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        The transformed RSI, between -1 and 1.
+    """
+    rsi_period = _convert.as_int("ift_rsi", "rsi_period", rsi_period)
+    wma_period = _convert.as_int("ift_rsi", "wma_period", wma_period)
+    columns, carrier = _convert.bars("ift_rsi", (source,), ("source",), ("series",))
+    out = _core.ift_rsi(*columns, rsi_period=rsi_period, wma_period=wma_period)
+    return _convert.wrap_outputs(out, carrier, ("ift_rsi",))
+
+
+def imi(open=None, close=None, *, period: int = _PARAMS["imi"]["period"]["default"]) -> Any:
+    """Intraday Momentum Index.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the bodies are summed over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Share of recent body movement that was upward, as a percentage.
+    """
+    period = _convert.as_int("imi", "period", period)
+    columns, carrier = _convert.bars(
+        "imi",
+        (open, close),
+        (
+            "open",
+            "close",
+        ),
+        (
+            "open",
+            "close",
+        ),
+    )
+    out = _core.imi(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("imi",))
+
+
+def kama(source=None, *, period: int = _PARAMS["kama"]["period"]["default"]) -> Any:
+    """Kaufman Adaptive Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the efficiency ratio is measured over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Average that smooths more when the series is going nowhere.
+    """
+    period = _convert.as_int("kama", "period", period)
+    columns, carrier = _convert.bars("kama", (source,), ("source",), ("series",))
+    out = _core.kama(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("kama",))
+
+
+def kc(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["kc"]["period"]["default"],
+    atr_period: int = _PARAMS["kc"]["atr_period"]["default"],
+    nbdev: float = _PARAMS["kc"]["nbdev"]["default"],
+) -> Any:
+    """Keltner Channel.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Number of bars the middle band is averaged over, from 2 to 100000.
+    atr_period : int, default 10
+        Number of bars the average true range uses, from 1 to 100000.
+    nbdev : float, default 2.0
+        How many average true ranges the bands sit from the middle.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        kc_upper: Middle band plus nbdev average true ranges.
+        kc_middle: Exponential average of the typical price.
+        kc_lower: Middle band minus nbdev average true ranges.
+    """
+    period = _convert.as_int("kc", "period", period)
+    atr_period = _convert.as_int("kc", "atr_period", atr_period)
+    nbdev = _convert.as_float("kc", "nbdev", nbdev)
+    columns, carrier = _convert.bars(
+        "kc",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.kc(*columns, period=period, atr_period=atr_period, nbdev=nbdev)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "kc_upper",
+            "kc_middle",
+            "kc_lower",
+        ),
+    )
+
+
+def kdj(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    fastk_period: int = _PARAMS["kdj"]["fastk_period"]["default"],
+    slowk_period: int = _PARAMS["kdj"]["slowk_period"]["default"],
+    slowk_ma_type: str = _PARAMS["kdj"]["slowk_ma_type"]["default"],
+    slowd_period: int = _PARAMS["kdj"]["slowd_period"]["default"],
+    slowd_ma_type: str = _PARAMS["kdj"]["slowd_ma_type"]["default"],
+) -> Any:
+    """KDJ.
+
+    Parameters
+    ----------
+    fastk_period : int, default 9
+        Number of bars the high-low range is taken over, from 1 to 100000.
+    slowk_period : int, default 3
+        Number of bars the raw %K is smoothed over, from 1 to 100000.
+    slowk_ma_type : str, default "rma"
+        Moving average used to smooth the raw %K.
+    slowd_period : int, default 3
+        Number of bars %K is smoothed over, from 1 to 100000.
+    slowd_ma_type : str, default "rma"
+        Moving average used to smooth %K into %D.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        kdj_k: Raw stochastic smoothed over slowk_period.
+        kdj_d: The K line smoothed over slowd_period.
+        kdj_j: Three times K less twice D, which runs outside both.
+    """
+    fastk_period = _convert.as_int("kdj", "fastk_period", fastk_period)
+    slowk_period = _convert.as_int("kdj", "slowk_period", slowk_period)
+    slowk_ma_type = _convert.as_text("kdj", "slowk_ma_type", slowk_ma_type)
+    slowd_period = _convert.as_int("kdj", "slowd_period", slowd_period)
+    slowd_ma_type = _convert.as_text("kdj", "slowd_ma_type", slowd_ma_type)
+    columns, carrier = _convert.bars(
+        "kdj",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.kdj(
+        *columns,
+        fastk_period=fastk_period,
+        slowk_period=slowk_period,
+        slowk_ma_type=slowk_ma_type,
+        slowd_period=slowd_period,
+        slowd_ma_type=slowd_ma_type,
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "kdj_k",
+            "kdj_d",
+            "kdj_j",
+        ),
+    )
+
+
+def linearreg(source=None, *, period: int = _PARAMS["linearreg"]["period"]["default"]) -> Any:
+    """Linear Regression.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the line is fitted to, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Value of the fitted line at the newest bar.
+    """
+    period = _convert.as_int("linearreg", "period", period)
+    columns, carrier = _convert.bars("linearreg", (source,), ("source",), ("series",))
+    out = _core.linearreg(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("linearreg",))
+
+
+def linearreg_angle(
+    source=None, *, period: int = _PARAMS["linearreg_angle"]["period"]["default"]
+) -> Any:
+    """Linear Regression Angle.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the line is fitted to, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Slope of the fitted line as an angle in degrees.
+    """
+    period = _convert.as_int("linearreg_angle", "period", period)
+    columns, carrier = _convert.bars("linearreg_angle", (source,), ("source",), ("series",))
+    out = _core.linearreg_angle(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("linearreg_angle",))
+
+
+def linearreg_intercept(
+    source=None, *, period: int = _PARAMS["linearreg_intercept"]["period"]["default"]
+) -> Any:
+    """Linear Regression Intercept.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the line is fitted to, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Value of the fitted line at the oldest bar in the window.
+    """
+    period = _convert.as_int("linearreg_intercept", "period", period)
+    columns, carrier = _convert.bars("linearreg_intercept", (source,), ("source",), ("series",))
+    out = _core.linearreg_intercept(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("linearreg_intercept",))
+
+
+def linearreg_slope(
+    source=None, *, period: int = _PARAMS["linearreg_slope"]["period"]["default"]
+) -> Any:
+    """Linear Regression Slope.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the line is fitted to, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Slope of the fitted line, in units of source per bar.
+    """
+    period = _convert.as_int("linearreg_slope", "period", period)
+    columns, carrier = _convert.bars("linearreg_slope", (source,), ("source",), ("series",))
+    out = _core.linearreg_slope(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("linearreg_slope",))
+
+
+def linreg_channel(
+    source=None,
+    *,
+    period: int = _PARAMS["linreg_channel"]["period"]["default"],
+    deviation: float = _PARAMS["linreg_channel"]["deviation"]["default"],
+) -> Any:
+    """Linear Regression Channel.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Bars the line is fitted over, from 2 to 100000.
+    deviation : float, default 2.0
+        Standard deviations of the residuals each band sits from the line.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        linreg_channel_upper: The line's end plus deviation residual standard deviations.
+        linreg_channel_middle: The least-squares line's value at the newest bar.
+        linreg_channel_lower: The line's end minus deviation residual standard deviations.
+    """
+    period = _convert.as_int("linreg_channel", "period", period)
+    deviation = _convert.as_float("linreg_channel", "deviation", deviation)
+    columns, carrier = _convert.bars("linreg_channel", (source,), ("source",), ("series",))
+    out = _core.linreg_channel(*columns, period=period, deviation=deviation)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "linreg_channel_upper",
+            "linreg_channel_middle",
+            "linreg_channel_lower",
+        ),
+    )
+
+
+def ln(source=None) -> Any:
+    """Vector Natural Logarithm.
+
+    Returns
+    -------
+    ndarray or Series
+        Natural Logarithm of source, element by element.
+    """
+    columns, carrier = _convert.bars("ln", (source,), ("source",), ("series",))
+    out = _core.ln(*columns)
+    return _convert.wrap_outputs(out, carrier, ("ln",))
+
+
+def log10(source=None) -> Any:
+    """Vector Base 10 Logarithm.
+
+    Returns
+    -------
+    ndarray or Series
+        Base 10 Logarithm of source, element by element.
+    """
+    columns, carrier = _convert.bars("log10", (source,), ("source",), ("series",))
+    out = _core.log10(*columns)
+    return _convert.wrap_outputs(out, carrier, ("log10",))
+
+
+def ma(
+    source=None,
+    *,
+    period: int = _PARAMS["ma"]["period"]["default"],
+    ma_type: str = _PARAMS["ma"]["ma_type"]["default"],
+) -> Any:
+    """Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the average is taken over, from 1 to 100000.
+    ma_type : str, default "sma"
+        Which moving average to apply.
+
+    Returns
+    -------
+    ndarray or Series
+        Chosen moving average of source.
+    """
+    period = _convert.as_int("ma", "period", period)
+    ma_type = _convert.as_text("ma", "ma_type", ma_type)
+    columns, carrier = _convert.bars("ma", (source,), ("source",), ("series",))
+    out = _core.ma(*columns, period=period, ma_type=ma_type)
+    return _convert.wrap_outputs(out, carrier, ("ma",))
+
+
+def macd(
+    source=None,
+    *,
+    fast_period: int = _PARAMS["macd"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["macd"]["slow_period"]["default"],
+    signal_period: int = _PARAMS["macd"]["signal_period"]["default"],
+) -> Any:
+    """Moving Average Convergence Divergence.
+
+    Parameters
+    ----------
+    fast_period : int, default 12
+        Bars in the faster exponential average, from 2 to 100000.
+    slow_period : int, default 26
+        Bars in the slower exponential average, from 2 to 100000.
+    signal_period : int, default 9
+        Bars in the exponential average taken of the difference, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        macd: Faster average minus the slower one.
+        macd_signal: Exponential average of macd.
+        macd_hist: macd minus its signal line.
+    """
+    fast_period = _convert.as_int("macd", "fast_period", fast_period)
+    slow_period = _convert.as_int("macd", "slow_period", slow_period)
+    signal_period = _convert.as_int("macd", "signal_period", signal_period)
+    columns, carrier = _convert.bars("macd", (source,), ("source",), ("series",))
+    out = _core.macd(
+        *columns, fast_period=fast_period, slow_period=slow_period, signal_period=signal_period
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "macd",
+            "macd_signal",
+            "macd_hist",
+        ),
+    )
+
+
+def macdext(
+    source=None,
+    *,
+    fast_period: int = _PARAMS["macdext"]["fast_period"]["default"],
+    fast_ma_type: str = _PARAMS["macdext"]["fast_ma_type"]["default"],
+    slow_period: int = _PARAMS["macdext"]["slow_period"]["default"],
+    slow_ma_type: str = _PARAMS["macdext"]["slow_ma_type"]["default"],
+    signal_period: int = _PARAMS["macdext"]["signal_period"]["default"],
+    signal_ma_type: str = _PARAMS["macdext"]["signal_ma_type"]["default"],
+) -> Any:
+    """MACD with Selectable Averages.
+
+    Parameters
+    ----------
+    fast_period : int, default 12
+        Number of bars in the shorter average, from 2 to 100000.
+    fast_ma_type : str, default "sma"
+        Moving average used for the shorter one.
+    slow_period : int, default 26
+        Number of bars in the longer average, from 2 to 100000.
+    slow_ma_type : str, default "sma"
+        Moving average used for the longer one.
+    signal_period : int, default 9
+        Number of bars the MACD line is smoothed over, from 1 to 100000.
+    signal_ma_type : str, default "sma"
+        Moving average used for the signal line.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        macdext_macd: Shorter average minus the longer one.
+        macdext_signal: Average of the MACD line.
+        macdext_hist: MACD line minus the signal line.
+    """
+    fast_period = _convert.as_int("macdext", "fast_period", fast_period)
+    fast_ma_type = _convert.as_text("macdext", "fast_ma_type", fast_ma_type)
+    slow_period = _convert.as_int("macdext", "slow_period", slow_period)
+    slow_ma_type = _convert.as_text("macdext", "slow_ma_type", slow_ma_type)
+    signal_period = _convert.as_int("macdext", "signal_period", signal_period)
+    signal_ma_type = _convert.as_text("macdext", "signal_ma_type", signal_ma_type)
+    columns, carrier = _convert.bars("macdext", (source,), ("source",), ("series",))
+    out = _core.macdext(
+        *columns,
+        fast_period=fast_period,
+        fast_ma_type=fast_ma_type,
+        slow_period=slow_period,
+        slow_ma_type=slow_ma_type,
+        signal_period=signal_period,
+        signal_ma_type=signal_ma_type,
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "macdext_macd",
+            "macdext_signal",
+            "macdext_hist",
+        ),
+    )
+
+
+def macdfix(
+    source=None, *, signal_period: int = _PARAMS["macdfix"]["signal_period"]["default"]
+) -> Any:
+    """MACD with Fixed Periods.
+
+    Parameters
+    ----------
+    signal_period : int, default 9
+        Number of bars the signal line is smoothed over, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        macdfix_macd: Fast exponential average minus the slow one.
+        macdfix_signal: Exponential average of the MACD line.
+        macdfix_hist: MACD line minus the signal line.
+    """
+    signal_period = _convert.as_int("macdfix", "signal_period", signal_period)
+    columns, carrier = _convert.bars("macdfix", (source,), ("source",), ("series",))
+    out = _core.macdfix(*columns, signal_period=signal_period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "macdfix_macd",
+            "macdfix_signal",
+            "macdfix_hist",
+        ),
+    )
+
+
+def mama(
+    source=None,
+    *,
+    fast_limit: float = _PARAMS["mama"]["fast_limit"]["default"],
+    slow_limit: float = _PARAMS["mama"]["slow_limit"]["default"],
+) -> Any:
+    """MESA Adaptive Moving Average.
+
+    Parameters
+    ----------
+    fast_limit : float, default 0.5
+        Largest share of a new bar the average will take, from 0.01 to 0.99.
+    slow_limit : float, default 0.05
+        Smallest share of a new bar the average will take, from 0.01 to 0.99.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        mama: Average whose step follows how fast the cycle's phase is turning.
+        mama_fama: The same average smoothed again at half the step.
+    """
+    fast_limit = _convert.as_float("mama", "fast_limit", fast_limit)
+    slow_limit = _convert.as_float("mama", "slow_limit", slow_limit)
+    columns, carrier = _convert.bars("mama", (source,), ("source",), ("series",))
+    out = _core.mama(*columns, fast_limit=fast_limit, slow_limit=slow_limit)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "mama",
+            "mama_fama",
+        ),
+    )
+
+
+def marketfi(high=None, low=None, volume=None) -> Any:
+    """Market Facilitation Index.
+
+    Returns
+    -------
+    ndarray or Series
+        How much range the bar covered per unit of volume.
+    """
+    columns, carrier = _convert.bars(
+        "marketfi",
+        (high, low, volume),
+        (
+            "high",
+            "low",
+            "volume",
+        ),
+        (
+            "high",
+            "low",
+            "volume",
+        ),
+    )
+    out = _core.marketfi(*columns)
+    return _convert.wrap_outputs(out, carrier, ("marketfi",))
+
+
+def massi(
+    high=None,
+    low=None,
+    *,
+    fast_period: int = _PARAMS["massi"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["massi"]["slow_period"]["default"],
+) -> Any:
+    """Mass Index.
+
+    Parameters
+    ----------
+    fast_period : int, default 9
+        Number of bars each exponential stage uses, from 2 to 100000.
+    slow_period : int, default 25
+        Number of ratios summed, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Sum of the ratio between a smoothed range and a twice-smoothed one.
+    """
+    fast_period = _convert.as_int("massi", "fast_period", fast_period)
+    slow_period = _convert.as_int("massi", "slow_period", slow_period)
+    columns, carrier = _convert.bars(
+        "massi",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.massi(*columns, fast_period=fast_period, slow_period=slow_period)
+    return _convert.wrap_outputs(out, carrier, ("massi",))
+
+
+def mavp(
+    close=None,
+    periods=None,
+    *,
+    min_period: int = _PARAMS["mavp"]["min_period"]["default"],
+    max_period: int = _PARAMS["mavp"]["max_period"]["default"],
+    ma_type: str = _PARAMS["mavp"]["ma_type"]["default"],
+) -> Any:
+    """Moving Average with Variable Period.
+
+    Parameters
+    ----------
+    min_period : int, default 2
+        Shortest average any bar may ask for, from 1 to 30.
+    max_period : int, default 30
+        Longest average any bar may ask for, from 2 to 100000.
+    ma_type : str, default "sma"
+        Which moving average to apply.
+
+    Returns
+    -------
+    ndarray or Series
+        Moving average whose length each bar chooses for itself.
+    """
+    min_period = _convert.as_int("mavp", "min_period", min_period)
+    max_period = _convert.as_int("mavp", "max_period", max_period)
+    ma_type = _convert.as_text("mavp", "ma_type", ma_type)
+    columns, carrier = _convert.bars(
+        "mavp",
+        (close, periods),
+        (
+            "close",
+            "periods",
+        ),
+        (
+            "close",
+            "series",
+        ),
+    )
+    out = _core.mavp(*columns, min_period=min_period, max_period=max_period, ma_type=ma_type)
+    return _convert.wrap_outputs(out, carrier, ("mavp",))
+
+
+def max(source=None, *, period: int = _PARAMS["max"]["period"]["default"]) -> Any:
+    """Rolling Maximum.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the highest is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        The highest value of the last period bars.
+    """
+    period = _convert.as_int("max", "period", period)
+    columns, carrier = _convert.bars("max", (source,), ("source",), ("series",))
+    out = _core.max(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("max",))
+
+
+def maxindex(source=None, *, period: int = _PARAMS["maxindex"]["period"]["default"]) -> Any:
+    """Index of the Rolling Maximum.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the extreme is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Row of the input holding the highest value of the last period bars.
+    """
+    period = _convert.as_int("maxindex", "period", period)
+    columns, carrier = _convert.bars("maxindex", (source,), ("source",), ("series",))
+    out = _core.maxindex(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("maxindex",))
+
+
+def medprice(high=None, low=None) -> Any:
+    """Median Price.
+
+    Returns
+    -------
+    ndarray or Series
+        The midpoint of the bar's range.
+    """
+    columns, carrier = _convert.bars(
+        "medprice",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.medprice(*columns)
+    return _convert.wrap_outputs(out, carrier, ("medprice",))
+
+
+def mfi(
+    high=None,
+    low=None,
+    close=None,
+    volume=None,
+    *,
+    period: int = _PARAMS["mfi"]["period"]["default"],
+) -> Any:
+    """Money Flow Index.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bar-to-bar changes the flows are summed over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Share of recent money flow that moved on up bars, as a percentage.
+    """
+    period = _convert.as_int("mfi", "period", period)
+    columns, carrier = _convert.bars(
+        "mfi",
+        (high, low, close, volume),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.mfi(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("mfi",))
+
+
+def midpoint(source=None, *, period: int = _PARAMS["midpoint"]["period"]["default"]) -> Any:
+    """Midpoint.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the highest and lowest values are taken from, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Halfway between the highest and lowest value in the window.
+    """
+    period = _convert.as_int("midpoint", "period", period)
+    columns, carrier = _convert.bars("midpoint", (source,), ("source",), ("series",))
+    out = _core.midpoint(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("midpoint",))
+
+
+def midprice(high=None, low=None, *, period: int = _PARAMS["midprice"]["period"]["default"]) -> Any:
+    """Midprice.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the highest high and lowest low are taken from, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Halfway between the highest high and the lowest low in the window.
+    """
+    period = _convert.as_int("midprice", "period", period)
+    columns, carrier = _convert.bars(
+        "midprice",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.midprice(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("midprice",))
+
+
+def min(source=None, *, period: int = _PARAMS["min"]["period"]["default"]) -> Any:
+    """Rolling Minimum.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the lowest is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        The lowest value of the last period bars.
+    """
+    period = _convert.as_int("min", "period", period)
+    columns, carrier = _convert.bars("min", (source,), ("source",), ("series",))
+    out = _core.min(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("min",))
+
+
+def minindex(source=None, *, period: int = _PARAMS["minindex"]["period"]["default"]) -> Any:
+    """Index of the Rolling Minimum.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the extreme is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Row of the input holding the lowest value of the last period bars.
+    """
+    period = _convert.as_int("minindex", "period", period)
+    columns, carrier = _convert.bars("minindex", (source,), ("source",), ("series",))
+    out = _core.minindex(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("minindex",))
+
+
+def minmax(source=None, *, period: int = _PARAMS["minmax"]["period"]["default"]) -> Any:
+    """Rolling Minimum and Maximum.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the extremes are taken over, from 2 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        minmax_min: The lowest value of the last period bars.
+        minmax_max: The highest value of the last period bars.
+    """
+    period = _convert.as_int("minmax", "period", period)
+    columns, carrier = _convert.bars("minmax", (source,), ("source",), ("series",))
+    out = _core.minmax(*columns, period=period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "minmax_min",
+            "minmax_max",
+        ),
+    )
+
+
+def minmaxindex(source=None, *, period: int = _PARAMS["minmaxindex"]["period"]["default"]) -> Any:
+    """Indices of the Rolling Minimum and Maximum.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the extremes are taken over, from 2 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        minmaxindex_min_index: Row of the input holding the lowest value of the last period bars.
+        minmaxindex_max_index: Row of the input holding the highest value of the last period bars.
+    """
+    period = _convert.as_int("minmaxindex", "period", period)
+    columns, carrier = _convert.bars("minmaxindex", (source,), ("source",), ("series",))
+    out = _core.minmaxindex(*columns, period=period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "minmaxindex_min_index",
+            "minmaxindex_max_index",
+        ),
+    )
+
+
+def minus_di(
+    high=None, low=None, close=None, *, period: int = _PARAMS["minus_di"]["period"]["default"]
+) -> Any:
+    """Minus Directional Indicator.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the movement is accumulated over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Share of recent range that was covered downward, from 0 to 100.
+    """
+    period = _convert.as_int("minus_di", "period", period)
+    columns, carrier = _convert.bars(
+        "minus_di",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.minus_di(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("minus_di",))
+
+
+def minus_dm(high=None, low=None, *, period: int = _PARAMS["minus_dm"]["period"]["default"]) -> Any:
+    """Minus Directional Movement.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the movement is accumulated over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Wilder's running total of downward directional movement.
+    """
+    period = _convert.as_int("minus_dm", "period", period)
+    columns, carrier = _convert.bars(
+        "minus_dm",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.minus_dm(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("minus_dm",))
+
+
+def mom(source=None, *, period: int = _PARAMS["mom"]["period"]["default"]) -> Any:
+    """Momentum.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Number of bars back the comparison is made to, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Momentum of source over period bars.
+    """
+    period = _convert.as_int("mom", "period", period)
+    columns, carrier = _convert.bars("mom", (source,), ("source",), ("series",))
+    out = _core.mom(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("mom",))
+
+
+def mult(source0=None, source1=None) -> Any:
+    """Vector Multiplication.
+
+    Returns
+    -------
+    ndarray or Series
+        Multiplication of the two inputs.
+    """
+    columns, carrier = _convert.bars(
+        "mult",
+        (source0, source1),
+        (
+            "source0",
+            "source1",
+        ),
+        (
+            "series",
+            "series",
+        ),
+    )
+    out = _core.mult(*columns)
+    return _convert.wrap_outputs(out, carrier, ("mult",))
+
+
+def natr(
+    high=None, low=None, close=None, *, period: int = _PARAMS["natr"]["period"]["default"]
+) -> Any:
+    """Normalized Average True Range.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the true ranges are averaged over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Wilder average of the true range as a percentage of the close.
+    """
+    period = _convert.as_int("natr", "period", period)
+    columns, carrier = _convert.bars(
+        "natr",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.natr(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("natr",))
+
+
+def nvi(close=None, volume=None) -> Any:
+    """Negative Volume Index.
+
+    Returns
+    -------
+    ndarray or Series
+        Index that only moves on bars where volume falls.
+    """
+    columns, carrier = _convert.bars(
+        "nvi",
+        (close, volume),
+        (
+            "close",
+            "volume",
+        ),
+        (
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.nvi(*columns)
+    return _convert.wrap_outputs(out, carrier, ("nvi",))
+
+
+def obv(close=None, volume=None) -> Any:
+    """On Balance Volume.
+
+    Returns
+    -------
+    ndarray or Series
+        Running total of volume, added on an up close and subtracted on a down close.
+    """
+    columns, carrier = _convert.bars(
+        "obv",
+        (close, volume),
+        (
+            "close",
+            "volume",
+        ),
+        (
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.obv(*columns)
+    return _convert.wrap_outputs(out, carrier, ("obv",))
+
+
+def percentile(
+    source=None,
+    *,
+    period: int = _PARAMS["percentile"]["period"]["default"],
+    percentile: float = _PARAMS["percentile"]["percentile"]["default"],
+) -> Any:
+    """Percentile (nearest rank).
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the percentile is taken over, from 2 to 100000.
+    percentile : float, default 50.0
+        Which percentile of the window to report, from 0.0 to 100.0.
+
+    Returns
+    -------
+    ndarray or Series
+        Value at the requested percentile of the window.
+    """
+    period = _convert.as_int("percentile", "period", period)
+    percentile = _convert.as_float("percentile", "percentile", percentile)
+    columns, carrier = _convert.bars("percentile", (source,), ("source",), ("series",))
+    out = _core.percentile(*columns, period=period, percentile=percentile)
+    return _convert.wrap_outputs(out, carrier, ("percentile",))
+
+
+def percentrank(source=None, *, period: int = _PARAMS["percentrank"]["period"]["default"]) -> Any:
+    """Percent Rank.
+
+    Parameters
+    ----------
+    period : int, default 100
+        Number of bars the current value is ranked against, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Share of the previous period bars below the current value, as a percentage.
+    """
+    period = _convert.as_int("percentrank", "period", period)
+    columns, carrier = _convert.bars("percentrank", (source,), ("source",), ("series",))
+    out = _core.percentrank(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("percentrank",))
+
+
+def pivots_camarilla(high=None, low=None, close=None) -> Any:
+    """Camarilla Pivot Points.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        camarilla_r1: First level above the previous close.
+        camarilla_r2: Second level above the previous close.
+        camarilla_r3: Third level above the previous close.
+        camarilla_r4: Fourth level above the previous close.
+        camarilla_s1: First level below the previous close.
+        camarilla_s2: Second level below the previous close.
+        camarilla_s3: Third level below the previous close.
+        camarilla_s4: Fourth level below the previous close.
+    """
+    columns, carrier = _convert.bars(
+        "pivots_camarilla",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.pivots_camarilla(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "camarilla_r1",
+            "camarilla_r2",
+            "camarilla_r3",
+            "camarilla_r4",
+            "camarilla_s1",
+            "camarilla_s2",
+            "camarilla_s3",
+            "camarilla_s4",
+        ),
+    )
+
+
+def pivots_demark(open=None, high=None, low=None, close=None) -> Any:
+    """DeMark Pivot Points.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        demark_pp: A quarter of DeMark's weighted sum of the previous bar.
+        demark_r1: Half that sum less the previous low.
+        demark_s1: Half that sum less the previous high.
+    """
+    columns, carrier = _convert.bars(
+        "pivots_demark",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.pivots_demark(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "demark_pp",
+            "demark_r1",
+            "demark_s1",
+        ),
+    )
+
+
+def pivots_fibonacci(high=None, low=None, close=None) -> Any:
+    """Fibonacci Pivot Points.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        fibonacci_pp: The previous bar's typical price.
+        fibonacci_s1: Pivot less 0.382 of the previous range.
+        fibonacci_s2: Pivot less 0.618 of the previous range.
+        fibonacci_s3: Pivot less the previous range.
+        fibonacci_s4: Pivot less 1.382 of the previous range.
+        fibonacci_r1: Pivot plus 0.382 of the previous range.
+        fibonacci_r2: Pivot plus 0.618 of the previous range.
+        fibonacci_r3: Pivot plus the previous range.
+        fibonacci_r4: Pivot plus 1.382 of the previous range.
+    """
+    columns, carrier = _convert.bars(
+        "pivots_fibonacci",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.pivots_fibonacci(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "fibonacci_pp",
+            "fibonacci_s1",
+            "fibonacci_s2",
+            "fibonacci_s3",
+            "fibonacci_s4",
+            "fibonacci_r1",
+            "fibonacci_r2",
+            "fibonacci_r3",
+            "fibonacci_r4",
+        ),
+    )
+
+
+def pivots_traditional(high=None, low=None, close=None) -> Any:
+    """Traditional Pivot Points.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        pivots_traditional_pp: Average of the previous bar's high, low and close.
+        pivots_traditional_r1: First level above the pivot.
+        pivots_traditional_r2: Second level above the pivot.
+        pivots_traditional_r3: Third level above the pivot.
+        pivots_traditional_s1: First level below the pivot.
+        pivots_traditional_s2: Second level below the pivot.
+        pivots_traditional_s3: Third level below the pivot.
+    """
+    columns, carrier = _convert.bars(
+        "pivots_traditional",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.pivots_traditional(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "pivots_traditional_pp",
+            "pivots_traditional_r1",
+            "pivots_traditional_r2",
+            "pivots_traditional_r3",
+            "pivots_traditional_s1",
+            "pivots_traditional_s2",
+            "pivots_traditional_s3",
+        ),
+    )
+
+
+def pivots_woodie(high=None, low=None, close=None) -> Any:
+    """Woodie Pivot Points.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        woodie_pp: The previous bar's high, low and twice its close, averaged.
+        woodie_r1: Twice the pivot less the previous low.
+        woodie_s1: Twice the pivot less the previous high.
+        woodie_r2: Pivot plus the previous range.
+        woodie_s2: Pivot less the previous range.
+    """
+    columns, carrier = _convert.bars(
+        "pivots_woodie",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.pivots_woodie(*columns)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "woodie_pp",
+            "woodie_r1",
+            "woodie_s1",
+            "woodie_r2",
+            "woodie_s2",
+        ),
+    )
+
+
+def plus_di(
+    high=None, low=None, close=None, *, period: int = _PARAMS["plus_di"]["period"]["default"]
+) -> Any:
+    """Plus Directional Indicator.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the movement is accumulated over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Share of recent range that was covered upward, from 0 to 100.
+    """
+    period = _convert.as_int("plus_di", "period", period)
+    columns, carrier = _convert.bars(
+        "plus_di",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.plus_di(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("plus_di",))
+
+
+def plus_dm(high=None, low=None, *, period: int = _PARAMS["plus_dm"]["period"]["default"]) -> Any:
+    """Plus Directional Movement.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the movement is accumulated over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Wilder's running total of upward directional movement.
+    """
+    period = _convert.as_int("plus_dm", "period", period)
+    columns, carrier = _convert.bars(
+        "plus_dm",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.plus_dm(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("plus_dm",))
+
+
+def pmo(
+    source=None,
+    *,
+    first_period: int = _PARAMS["pmo"]["first_period"]["default"],
+    second_period: int = _PARAMS["pmo"]["second_period"]["default"],
+    signal_period: int = _PARAMS["pmo"]["signal_period"]["default"],
+) -> Any:
+    """Price Momentum Oscillator.
+
+    Parameters
+    ----------
+    first_period : int, default 35
+        Bars of the first custom smoothing, from 2 to 100000.
+    second_period : int, default 20
+        Bars of the second custom smoothing, from 2 to 100000.
+    signal_period : int, default 10
+        Bars of the signal line's average, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        pmo: The twice-smoothed one-bar change, times ten.
+        pmo_signal: Exponential average of the oscillator.
+    """
+    first_period = _convert.as_int("pmo", "first_period", first_period)
+    second_period = _convert.as_int("pmo", "second_period", second_period)
+    signal_period = _convert.as_int("pmo", "signal_period", signal_period)
+    columns, carrier = _convert.bars("pmo", (source,), ("source",), ("series",))
+    out = _core.pmo(
+        *columns,
+        first_period=first_period,
+        second_period=second_period,
+        signal_period=signal_period,
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "pmo",
+            "pmo_signal",
+        ),
+    )
+
+
+def ppo(
+    source=None,
+    *,
+    fast_period: int = _PARAMS["ppo"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["ppo"]["slow_period"]["default"],
+    ma_type: str = _PARAMS["ppo"]["ma_type"]["default"],
+) -> Any:
+    """Percentage Price Oscillator.
+
+    Parameters
+    ----------
+    fast_period : int, default 12
+        Number of bars in the shorter moving average, from 2 to 100000.
+    slow_period : int, default 26
+        Number of bars in the longer moving average, from 2 to 100000.
+    ma_type : str, default "ema"
+        Which moving average both stages use.
+
+    Returns
+    -------
+    ndarray or Series
+        Difference between the fast and the slow moving average as a percentage of the slow one.
+    """
+    fast_period = _convert.as_int("ppo", "fast_period", fast_period)
+    slow_period = _convert.as_int("ppo", "slow_period", slow_period)
+    ma_type = _convert.as_text("ppo", "ma_type", ma_type)
+    columns, carrier = _convert.bars("ppo", (source,), ("source",), ("series",))
+    out = _core.ppo(*columns, fast_period=fast_period, slow_period=slow_period, ma_type=ma_type)
+    return _convert.wrap_outputs(out, carrier, ("ppo",))
+
+
+def pvi(close=None, volume=None) -> Any:
+    """Positive Volume Index.
+
+    Returns
+    -------
+    ndarray or Series
+        Index that only moves on bars where volume rises.
+    """
+    columns, carrier = _convert.bars(
+        "pvi",
+        (close, volume),
+        (
+            "close",
+            "volume",
+        ),
+        (
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.pvi(*columns)
+    return _convert.wrap_outputs(out, carrier, ("pvi",))
+
+
+def pvo(
+    volume=None,
+    *,
+    fast_period: int = _PARAMS["pvo"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["pvo"]["slow_period"]["default"],
+    ma_type: str = _PARAMS["pvo"]["ma_type"]["default"],
+) -> Any:
+    """Percentage Volume Oscillator.
+
+    Parameters
+    ----------
+    fast_period : int, default 12
+        Number of bars in the shorter average, from 2 to 100000.
+    slow_period : int, default 26
+        Number of bars in the longer average, from 2 to 100000.
+    ma_type : str, default "ema"
+        Which moving average both stages use.
+
+    Returns
+    -------
+    ndarray or Series
+        Gap between a short and a long average of volume, as a percentage of the long one.
+    """
+    fast_period = _convert.as_int("pvo", "fast_period", fast_period)
+    slow_period = _convert.as_int("pvo", "slow_period", slow_period)
+    ma_type = _convert.as_text("pvo", "ma_type", ma_type)
+    columns, carrier = _convert.bars("pvo", (volume,), ("volume",), ("volume",))
+    out = _core.pvo(*columns, fast_period=fast_period, slow_period=slow_period, ma_type=ma_type)
+    return _convert.wrap_outputs(out, carrier, ("pvo",))
+
+
+def pvt(close=None, volume=None) -> Any:
+    """Price Volume Trend.
+
+    Returns
+    -------
+    ndarray or Series
+        Running total of volume weighted by each bar's percentage change.
+    """
+    columns, carrier = _convert.bars(
+        "pvt",
+        (close, volume),
+        (
+            "close",
+            "volume",
+        ),
+        (
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.pvt(*columns)
+    return _convert.wrap_outputs(out, carrier, ("pvt",))
+
+
+def qstick(open=None, close=None, *, period: int = _PARAMS["qstick"]["period"]["default"]) -> Any:
+    """Qstick.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Number of bars the body is averaged over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Average distance from open to close over the window.
+    """
+    period = _convert.as_int("qstick", "period", period)
+    columns, carrier = _convert.bars(
+        "qstick",
+        (open, close),
+        (
+            "open",
+            "close",
+        ),
+        (
+            "open",
+            "close",
+        ),
+    )
+    out = _core.qstick(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("qstick",))
+
+
+def rma(source=None, *, period: int = _PARAMS["rma"]["period"]["default"]) -> Any:
+    """Wilder Smoothed Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the smoothing is derived from, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Wilder's smoothing of source.
+    """
+    period = _convert.as_int("rma", "period", period)
+    columns, carrier = _convert.bars("rma", (source,), ("source",), ("series",))
+    out = _core.rma(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("rma",))
+
+
+def roc(source=None, *, period: int = _PARAMS["roc"]["period"]["default"]) -> Any:
+    """Rate of Change.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Number of bars back the comparison is made to, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Percentage change from the value period bars ago.
+    """
+    period = _convert.as_int("roc", "period", period)
+    columns, carrier = _convert.bars("roc", (source,), ("source",), ("series",))
+    out = _core.roc(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("roc",))
+
+
+def rocp(source=None, *, period: int = _PARAMS["rocp"]["period"]["default"]) -> Any:
+    """Rate of Change Percentage.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Number of bars back the comparison is made to, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Rate of Change Percentage of source over period bars.
+    """
+    period = _convert.as_int("rocp", "period", period)
+    columns, carrier = _convert.bars("rocp", (source,), ("source",), ("series",))
+    out = _core.rocp(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("rocp",))
+
+
+def rocr(source=None, *, period: int = _PARAMS["rocr"]["period"]["default"]) -> Any:
+    """Rate of Change Ratio.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Number of bars back the comparison is made to, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Rate of Change Ratio of source over period bars.
+    """
+    period = _convert.as_int("rocr", "period", period)
+    columns, carrier = _convert.bars("rocr", (source,), ("source",), ("series",))
+    out = _core.rocr(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("rocr",))
+
+
+def rocr100(source=None, *, period: int = _PARAMS["rocr100"]["period"]["default"]) -> Any:
+    """Rate of Change Ratio Times 100.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Number of bars back the comparison is made to, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Rate of Change Ratio Times 100 of source over period bars.
+    """
+    period = _convert.as_int("rocr100", "period", period)
+    columns, carrier = _convert.bars("rocr100", (source,), ("source",), ("series",))
+    out = _core.rocr100(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("rocr100",))
+
+
+def rsi(source=None, *, period: int = _PARAMS["rsi"]["period"]["default"]) -> Any:
+    """Relative Strength Index.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bar-to-bar changes the average gain and loss are taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Share of recent movement that was upward, from 0 to 100.
+    """
+    period = _convert.as_int("rsi", "period", period)
+    columns, carrier = _convert.bars("rsi", (source,), ("source",), ("series",))
+    out = _core.rsi(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("rsi",))
+
+
+def rvi(
+    source=None,
+    *,
+    period: int = _PARAMS["rvi"]["period"]["default"],
+    stddev_period: int = _PARAMS["rvi"]["stddev_period"]["default"],
+) -> Any:
+    """Relative Volatility Index.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the deviations are smoothed over, from 1 to 100000.
+    stddev_period : int, default 10
+        Number of bars each standard deviation is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Share of recent volatility that came on up bars, as a percentage.
+    """
+    period = _convert.as_int("rvi", "period", period)
+    stddev_period = _convert.as_int("rvi", "stddev_period", stddev_period)
+    columns, carrier = _convert.bars("rvi", (source,), ("source",), ("series",))
+    out = _core.rvi(*columns, period=period, stddev_period=stddev_period)
+    return _convert.wrap_outputs(out, carrier, ("rvi",))
+
+
+def rvol(volume=None, *, period: int = _PARAMS["rvol"]["period"]["default"]) -> Any:
+    """Relative Volume.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Number of earlier bars the volume is compared against, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        This bar's volume as a multiple of the recent average.
+    """
+    period = _convert.as_int("rvol", "period", period)
+    columns, carrier = _convert.bars("rvol", (volume,), ("volume",), ("volume",))
+    out = _core.rvol(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("rvol",))
+
+
+def rwi(
+    high=None, low=None, close=None, *, period: int = _PARAMS["rwi"]["period"]["default"]
+) -> Any:
+    """Random Walk Index.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Bars the move is measured over and the true range averaged over, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        rwi_high: Rise from the low period bars ago, in random-walk units.
+        rwi_low: Fall from the high period bars ago, in random-walk units.
+    """
+    period = _convert.as_int("rwi", "period", period)
+    columns, carrier = _convert.bars(
+        "rwi",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.rwi(*columns, period=period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "rwi_high",
+            "rwi_low",
+        ),
+    )
+
+
+def safezone(
+    high=None,
+    low=None,
+    *,
+    period: int = _PARAMS["safezone"]["period"]["default"],
+    coefficient: float = _PARAMS["safezone"]["coefficient"]["default"],
+    hold: int = _PARAMS["safezone"]["hold"]["default"],
+) -> Any:
+    """Elder SafeZone.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Bars the average penetration is taken over, from 1 to 100000.
+    coefficient : float, default 2.0
+        Multiple of the average penetration the level sits beyond the prior bar.
+    hold : int, default 3
+        Bars a level may not move against the trend, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        safezone_lower: Prior low less coefficient average downside penetrations, held from falling.
+        safezone_upper: Prior high plus coefficient average upside penetrations, held from rising.
+    """
+    period = _convert.as_int("safezone", "period", period)
+    coefficient = _convert.as_float("safezone", "coefficient", coefficient)
+    hold = _convert.as_int("safezone", "hold", hold)
+    columns, carrier = _convert.bars(
+        "safezone",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.safezone(*columns, period=period, coefficient=coefficient, hold=hold)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "safezone_lower",
+            "safezone_upper",
+        ),
+    )
+
+
+def sar(
+    high=None,
+    low=None,
+    *,
+    acceleration: float = _PARAMS["sar"]["acceleration"]["default"],
+    maximum: float = _PARAMS["sar"]["maximum"]["default"],
+) -> Any:
+    """Parabolic SAR.
+
+    Parameters
+    ----------
+    acceleration : float, default 0.02
+        How much the step grows each time a new extreme is reached.
+    maximum : float, default 0.2
+        Largest step the acceleration is allowed to reach.
+
+    Returns
+    -------
+    ndarray or Series
+        Trailing stop that converges on price and flips when it is reached.
+    """
+    acceleration = _convert.as_float("sar", "acceleration", acceleration)
+    maximum = _convert.as_float("sar", "maximum", maximum)
+    columns, carrier = _convert.bars(
+        "sar",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.sar(*columns, acceleration=acceleration, maximum=maximum)
+    return _convert.wrap_outputs(out, carrier, ("sar",))
+
+
+def sarext(
+    high=None,
+    low=None,
+    *,
+    start_value: float = _PARAMS["sarext"]["start_value"]["default"],
+    offset_on_reverse: float = _PARAMS["sarext"]["offset_on_reverse"]["default"],
+    acceleration_init_long: float = _PARAMS["sarext"]["acceleration_init_long"]["default"],
+    acceleration_long: float = _PARAMS["sarext"]["acceleration_long"]["default"],
+    acceleration_max_long: float = _PARAMS["sarext"]["acceleration_max_long"]["default"],
+    acceleration_init_short: float = _PARAMS["sarext"]["acceleration_init_short"]["default"],
+    acceleration_short: float = _PARAMS["sarext"]["acceleration_short"]["default"],
+    acceleration_max_short: float = _PARAMS["sarext"]["acceleration_max_short"]["default"],
+) -> Any:
+    """Parabolic SAR Extended.
+
+    Parameters
+    ----------
+    start_value : float, default 0.0
+        Where and which way to start; zero reads the direction from the first two bars.
+    offset_on_reverse : float, default 0.0
+        Fraction the stop is pushed further away by when it flips.
+    acceleration_init_long : float, default 0.02
+        Step a rising stop starts at.
+    acceleration_long : float, default 0.02
+        How much a rising stop's step grows at each new high.
+    acceleration_max_long : float, default 0.2
+        Largest step a rising stop reaches.
+    acceleration_init_short : float, default 0.02
+        Step a falling stop starts at.
+    acceleration_short : float, default 0.02
+        How much a falling stop's step grows at each new low.
+    acceleration_max_short : float, default 0.2
+        Largest step a falling stop reaches.
+
+    Returns
+    -------
+    ndarray or Series
+        The stop, signed negative while it sits above price.
+    """
+    start_value = _convert.as_float("sarext", "start_value", start_value)
+    offset_on_reverse = _convert.as_float("sarext", "offset_on_reverse", offset_on_reverse)
+    acceleration_init_long = _convert.as_float(
+        "sarext", "acceleration_init_long", acceleration_init_long
+    )
+    acceleration_long = _convert.as_float("sarext", "acceleration_long", acceleration_long)
+    acceleration_max_long = _convert.as_float(
+        "sarext", "acceleration_max_long", acceleration_max_long
+    )
+    acceleration_init_short = _convert.as_float(
+        "sarext", "acceleration_init_short", acceleration_init_short
+    )
+    acceleration_short = _convert.as_float("sarext", "acceleration_short", acceleration_short)
+    acceleration_max_short = _convert.as_float(
+        "sarext", "acceleration_max_short", acceleration_max_short
+    )
+    columns, carrier = _convert.bars(
+        "sarext",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.sarext(
+        *columns,
+        start_value=start_value,
+        offset_on_reverse=offset_on_reverse,
+        acceleration_init_long=acceleration_init_long,
+        acceleration_long=acceleration_long,
+        acceleration_max_long=acceleration_max_long,
+        acceleration_init_short=acceleration_init_short,
+        acceleration_short=acceleration_short,
+        acceleration_max_short=acceleration_max_short,
+    )
+    return _convert.wrap_outputs(out, carrier, ("sarext",))
+
+
+def sin(source=None) -> Any:
+    """Vector Sine.
+
+    Returns
+    -------
+    ndarray or Series
+        Sine of source, element by element.
+    """
+    columns, carrier = _convert.bars("sin", (source,), ("source",), ("series",))
+    out = _core.sin(*columns)
+    return _convert.wrap_outputs(out, carrier, ("sin",))
+
+
+def sinh(source=None) -> Any:
+    """Vector Hyperbolic Sine.
+
+    Returns
+    -------
+    ndarray or Series
+        Hyperbolic Sine of source, element by element.
+    """
+    columns, carrier = _convert.bars("sinh", (source,), ("source",), ("series",))
+    out = _core.sinh(*columns)
+    return _convert.wrap_outputs(out, carrier, ("sinh",))
+
+
+def sma(source=None, *, period: int = _PARAMS["sma"]["period"]["default"]) -> Any:
+    """Simple Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars in the average, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Mean of the last period values of source.
+    """
+    period = _convert.as_int("sma", "period", period)
+    columns, carrier = _convert.bars("sma", (source,), ("source",), ("series",))
+    out = _core.sma(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("sma",))
+
+
+def smi(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["smi"]["period"]["default"],
+    fast_period: int = _PARAMS["smi"]["fast_period"]["default"],
+    slow_period: int = _PARAMS["smi"]["slow_period"]["default"],
+    signal_period: int = _PARAMS["smi"]["signal_period"]["default"],
+) -> Any:
+    """Stochastic Momentum Index.
+
+    Parameters
+    ----------
+    period : int, default 13
+        Number of bars the high-low range is taken over, from 2 to 100000.
+    fast_period : int, default 2
+        Number of bars in the second smoothing stage, from 2 to 100000.
+    slow_period : int, default 25
+        Number of bars in the first smoothing stage, from 2 to 100000.
+    signal_period : int, default 9
+        Number of bars the index is smoothed over, from 2 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        smi: Where the close sits relative to the middle of the recent range, smoothed twice.
+        smi_smisignal: Exponential average of the index.
+    """
+    period = _convert.as_int("smi", "period", period)
+    fast_period = _convert.as_int("smi", "fast_period", fast_period)
+    slow_period = _convert.as_int("smi", "slow_period", slow_period)
+    signal_period = _convert.as_int("smi", "signal_period", signal_period)
+    columns, carrier = _convert.bars(
+        "smi",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.smi(
+        *columns,
+        period=period,
+        fast_period=fast_period,
+        slow_period=slow_period,
+        signal_period=signal_period,
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "smi",
+            "smi_smisignal",
+        ),
+    )
+
+
+def sqrt(source=None) -> Any:
+    """Vector Square Root.
+
+    Returns
+    -------
+    ndarray or Series
+        Square Root of source, element by element.
+    """
+    columns, carrier = _convert.bars("sqrt", (source,), ("source",), ("series",))
+    out = _core.sqrt(*columns)
+    return _convert.wrap_outputs(out, carrier, ("sqrt",))
+
+
+def stddev(
+    source=None,
+    *,
+    period: int = _PARAMS["stddev"]["period"]["default"],
+    nbdev: float = _PARAMS["stddev"]["nbdev"]["default"],
+) -> Any:
+    """Standard Deviation.
+
+    Parameters
+    ----------
+    period : int, default 5
+        Number of bars the spread is taken over, from 2 to 100000.
+    nbdev : float, default 1.0
+        Multiplier applied to the deviation.
+
+    Returns
+    -------
+    ndarray or Series
+        Population standard deviation of the last period values, times nbdev.
+    """
+    period = _convert.as_int("stddev", "period", period)
+    nbdev = _convert.as_float("stddev", "nbdev", nbdev)
+    columns, carrier = _convert.bars("stddev", (source,), ("source",), ("series",))
+    out = _core.stddev(*columns, period=period, nbdev=nbdev)
+    return _convert.wrap_outputs(out, carrier, ("stddev",))
+
+
+def stoch(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    fastk_period: int = _PARAMS["stoch"]["fastk_period"]["default"],
+    slowk_period: int = _PARAMS["stoch"]["slowk_period"]["default"],
+    slowk_ma_type: str = _PARAMS["stoch"]["slowk_ma_type"]["default"],
+    slowd_period: int = _PARAMS["stoch"]["slowd_period"]["default"],
+    slowd_ma_type: str = _PARAMS["stoch"]["slowd_ma_type"]["default"],
+) -> Any:
+    """Slow Stochastic.
+
+    Parameters
+    ----------
+    fastk_period : int, default 5
+        Number of bars the high-low range is taken over, from 1 to 100000.
+    slowk_period : int, default 3
+        Number of bars the raw %K is smoothed over, from 1 to 100000.
+    slowk_ma_type : str, default "sma"
+        Moving average used to smooth the raw %K.
+    slowd_period : int, default 3
+        Number of bars the slow %K is smoothed over, from 1 to 100000.
+    slowd_ma_type : str, default "sma"
+        Moving average used to smooth slow %K into %D.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        stoch_k: Raw stochastic smoothed over slowk_period.
+        stoch_d: Slow %K smoothed over slowd_period.
+    """
+    fastk_period = _convert.as_int("stoch", "fastk_period", fastk_period)
+    slowk_period = _convert.as_int("stoch", "slowk_period", slowk_period)
+    slowk_ma_type = _convert.as_text("stoch", "slowk_ma_type", slowk_ma_type)
+    slowd_period = _convert.as_int("stoch", "slowd_period", slowd_period)
+    slowd_ma_type = _convert.as_text("stoch", "slowd_ma_type", slowd_ma_type)
+    columns, carrier = _convert.bars(
+        "stoch",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.stoch(
+        *columns,
+        fastk_period=fastk_period,
+        slowk_period=slowk_period,
+        slowk_ma_type=slowk_ma_type,
+        slowd_period=slowd_period,
+        slowd_ma_type=slowd_ma_type,
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "stoch_k",
+            "stoch_d",
+        ),
+    )
+
+
+def stochf(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    fastk_period: int = _PARAMS["stochf"]["fastk_period"]["default"],
+    fastd_period: int = _PARAMS["stochf"]["fastd_period"]["default"],
+    fastd_ma_type: str = _PARAMS["stochf"]["fastd_ma_type"]["default"],
+) -> Any:
+    """Fast Stochastic.
+
+    Parameters
+    ----------
+    fastk_period : int, default 5
+        Number of bars the high-low range is taken over, from 1 to 100000.
+    fastd_period : int, default 3
+        Number of bars the %K line is smoothed over, from 1 to 100000.
+    fastd_ma_type : str, default "sma"
+        Moving average used to smooth %K into %D.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        stochf_k: Where the close sits in the recent high-low range, as a percentage.
+        stochf_d: Smoothed %K.
+    """
+    fastk_period = _convert.as_int("stochf", "fastk_period", fastk_period)
+    fastd_period = _convert.as_int("stochf", "fastd_period", fastd_period)
+    fastd_ma_type = _convert.as_text("stochf", "fastd_ma_type", fastd_ma_type)
+    columns, carrier = _convert.bars(
+        "stochf",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.stochf(
+        *columns, fastk_period=fastk_period, fastd_period=fastd_period, fastd_ma_type=fastd_ma_type
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "stochf_k",
+            "stochf_d",
+        ),
+    )
+
+
+def stochrsi(
+    source=None,
+    *,
+    period: int = _PARAMS["stochrsi"]["period"]["default"],
+    fastk_period: int = _PARAMS["stochrsi"]["fastk_period"]["default"],
+    fastd_period: int = _PARAMS["stochrsi"]["fastd_period"]["default"],
+    fastd_ma_type: str = _PARAMS["stochrsi"]["fastd_ma_type"]["default"],
+) -> Any:
+    """Stochastic RSI.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the RSI is taken over, from 2 to 100000.
+    fastk_period : int, default 5
+        Number of RSI values the range is taken over, from 1 to 100000.
+    fastd_period : int, default 3
+        Number of bars the %K line is smoothed over, from 1 to 100000.
+    fastd_ma_type : str, default "sma"
+        Moving average used to smooth %K into %D.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        stochrsi_k: Where the RSI sits in its own recent range, as a percentage.
+        stochrsi_d: Smoothed %K.
+    """
+    period = _convert.as_int("stochrsi", "period", period)
+    fastk_period = _convert.as_int("stochrsi", "fastk_period", fastk_period)
+    fastd_period = _convert.as_int("stochrsi", "fastd_period", fastd_period)
+    fastd_ma_type = _convert.as_text("stochrsi", "fastd_ma_type", fastd_ma_type)
+    columns, carrier = _convert.bars("stochrsi", (source,), ("source",), ("series",))
+    out = _core.stochrsi(
+        *columns,
+        period=period,
+        fastk_period=fastk_period,
+        fastd_period=fastd_period,
+        fastd_ma_type=fastd_ma_type,
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "stochrsi_k",
+            "stochrsi_d",
+        ),
+    )
+
+
+def sub(source0=None, source1=None) -> Any:
+    """Vector Subtraction.
+
+    Returns
+    -------
+    ndarray or Series
+        Subtraction of the two inputs.
+    """
+    columns, carrier = _convert.bars(
+        "sub",
+        (source0, source1),
+        (
+            "source0",
+            "source1",
+        ),
+        (
+            "series",
+            "series",
+        ),
+    )
+    out = _core.sub(*columns)
+    return _convert.wrap_outputs(out, carrier, ("sub",))
+
+
+def sum(source=None, *, period: int = _PARAMS["sum"]["period"]["default"]) -> Any:
+    """Summation.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars added together, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Total of the last period values.
+    """
+    period = _convert.as_int("sum", "period", period)
+    columns, carrier = _convert.bars("sum", (source,), ("source",), ("series",))
+    out = _core.sum(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("sum",))
+
+
+def supertrend(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["supertrend"]["period"]["default"],
+    multiplier: float = _PARAMS["supertrend"]["multiplier"]["default"],
+) -> Any:
+    """Supertrend.
+
+    Parameters
+    ----------
+    period : int, default 10
+        Number of bars the average true range uses, from 2 to 100000.
+    multiplier : float, default 3.0
+        How many average true ranges the bands sit from the midpoint.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        supertrend: Whichever band the trend is currently following.
+        supertrend_direction: Plus one while the lower band is followed, minus one while the upper
+        is.
+    """
+    period = _convert.as_int("supertrend", "period", period)
+    multiplier = _convert.as_float("supertrend", "multiplier", multiplier)
+    columns, carrier = _convert.bars(
+        "supertrend",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.supertrend(*columns, period=period, multiplier=multiplier)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "supertrend",
+            "supertrend_direction",
+        ),
+    )
+
+
+def swing_index(
+    open=None,
+    high=None,
+    low=None,
+    close=None,
+    *,
+    limit_move: float = _PARAMS["swing_index"]["limit_move"]["default"],
+) -> Any:
+    """Swing Index.
+
+    Parameters
+    ----------
+    limit_move : float, default 0.5
+        The largest move allowed in one bar, in price units.
+
+    Returns
+    -------
+    ndarray or Series
+        Wilder's swing index of the bar against the one before it.
+    """
+    limit_move = _convert.as_float("swing_index", "limit_move", limit_move)
+    columns, carrier = _convert.bars(
+        "swing_index",
+        (open, high, low, close),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "open",
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.swing_index(*columns, limit_move=limit_move)
+    return _convert.wrap_outputs(out, carrier, ("swing_index",))
+
+
+def t3(
+    source=None,
+    *,
+    period: int = _PARAMS["t3"]["period"]["default"],
+    v_factor: float = _PARAMS["t3"]["v_factor"]["default"],
+) -> Any:
+    """Tillson T3.
+
+    Parameters
+    ----------
+    period : int, default 5
+        Number of bars each of the six exponential stages uses, from 1 to 100000.
+    v_factor : float, default 0.7
+        How much of the lag the combination subtracts back out, from 0.0 to 1.0.
+
+    Returns
+    -------
+    ndarray or Series
+        Six exponential stages combined to cancel most of their lag.
+    """
+    period = _convert.as_int("t3", "period", period)
+    v_factor = _convert.as_float("t3", "v_factor", v_factor)
+    columns, carrier = _convert.bars("t3", (source,), ("source",), ("series",))
+    out = _core.t3(*columns, period=period, v_factor=v_factor)
+    return _convert.wrap_outputs(out, carrier, ("t3",))
+
+
+def tan(source=None) -> Any:
+    """Vector Tangent.
+
+    Returns
+    -------
+    ndarray or Series
+        Tangent of source, element by element.
+    """
+    columns, carrier = _convert.bars("tan", (source,), ("source",), ("series",))
+    out = _core.tan(*columns)
+    return _convert.wrap_outputs(out, carrier, ("tan",))
+
+
+def tanh(source=None) -> Any:
+    """Vector Hyperbolic Tangent.
+
+    Returns
+    -------
+    ndarray or Series
+        Hyperbolic Tangent of source, element by element.
+    """
+    columns, carrier = _convert.bars("tanh", (source,), ("source",), ("series",))
+    out = _core.tanh(*columns)
+    return _convert.wrap_outputs(out, carrier, ("tanh",))
+
+
+def tema(source=None, *, period: int = _PARAMS["tema"]["period"]["default"]) -> Any:
+    """Triple Exponential Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars each exponential stage is derived from, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Exponential average with lag removed through three stages.
+    """
+    period = _convert.as_int("tema", "period", period)
+    columns, carrier = _convert.bars("tema", (source,), ("source",), ("series",))
+    out = _core.tema(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("tema",))
+
+
+def trange(high=None, low=None, close=None) -> Any:
+    """True Range.
+
+    Returns
+    -------
+    ndarray or Series
+        Greater of the bar's own range and its distance from the previous close.
+    """
+    columns, carrier = _convert.bars(
+        "trange",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.trange(*columns)
+    return _convert.wrap_outputs(out, carrier, ("trange",))
+
+
+def trima(source=None, *, period: int = _PARAMS["trima"]["period"]["default"]) -> Any:
+    """Triangular Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars in the average, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Mean of source weighted most heavily in the middle of the window.
+    """
+    period = _convert.as_int("trima", "period", period)
+    columns, carrier = _convert.bars("trima", (source,), ("source",), ("series",))
+    out = _core.trima(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("trima",))
+
+
+def trix(source=None, *, period: int = _PARAMS["trix"]["period"]["default"]) -> Any:
+    """Triple Exponential Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars each of the three exponential stages uses, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Bar-to-bar percentage change of the triple exponential average.
+    """
+    period = _convert.as_int("trix", "period", period)
+    columns, carrier = _convert.bars("trix", (source,), ("source",), ("series",))
+    out = _core.trix(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("trix",))
+
+
+def tsf(source=None, *, period: int = _PARAMS["tsf"]["period"]["default"]) -> Any:
+    """Time Series Forecast.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the line is fitted to, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Fitted line carried one bar past the newest.
+    """
+    period = _convert.as_int("tsf", "period", period)
+    columns, carrier = _convert.bars("tsf", (source,), ("source",), ("series",))
+    out = _core.tsf(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("tsf",))
+
+
+def tsi(
+    source=None,
+    *,
+    first_period: int = _PARAMS["tsi"]["first_period"]["default"],
+    second_period: int = _PARAMS["tsi"]["second_period"]["default"],
+) -> Any:
+    """True Strength Index.
+
+    Parameters
+    ----------
+    first_period : int, default 25
+        Number of bars in the first exponential stage, from 2 to 100000.
+    second_period : int, default 13
+        Number of bars in the second exponential stage, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Twice-smoothed movement as a percentage of twice-smoothed absolute movement.
+    """
+    first_period = _convert.as_int("tsi", "first_period", first_period)
+    second_period = _convert.as_int("tsi", "second_period", second_period)
+    columns, carrier = _convert.bars("tsi", (source,), ("source",), ("series",))
+    out = _core.tsi(*columns, first_period=first_period, second_period=second_period)
+    return _convert.wrap_outputs(out, carrier, ("tsi",))
+
+
+def twiggs_mf(
+    high=None,
+    low=None,
+    close=None,
+    volume=None,
+    *,
+    period: int = _PARAMS["twiggs_mf"]["period"]["default"],
+) -> Any:
+    """Twiggs Money Flow.
+
+    Parameters
+    ----------
+    period : int, default 21
+        Bars of the Wilder smoothing, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Smoothed volume-weighted close location as a share of smoothed volume.
+    """
+    period = _convert.as_int("twiggs_mf", "period", period)
+    columns, carrier = _convert.bars(
+        "twiggs_mf",
+        (high, low, close, volume),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.twiggs_mf(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("twiggs_mf",))
+
+
+def typprice(high=None, low=None, close=None) -> Any:
+    """Typical Price.
+
+    Returns
+    -------
+    ndarray or Series
+        The average of the high, the low and the close.
+    """
+    columns, carrier = _convert.bars(
+        "typprice",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.typprice(*columns)
+    return _convert.wrap_outputs(out, carrier, ("typprice",))
+
+
+def ultosc(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period1: int = _PARAMS["ultosc"]["period1"]["default"],
+    period2: int = _PARAMS["ultosc"]["period2"]["default"],
+    period3: int = _PARAMS["ultosc"]["period3"]["default"],
+) -> Any:
+    """Ultimate Oscillator.
+
+    Parameters
+    ----------
+    period1 : int, default 7
+        Shortest window, weighted four times, from 1 to 100000.
+    period2 : int, default 14
+        Middle window, weighted twice, from 1 to 100000.
+    period3 : int, default 28
+        Longest window, weighted once, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Weighted blend of three buying-pressure ratios, as a percentage.
+    """
+    period1 = _convert.as_int("ultosc", "period1", period1)
+    period2 = _convert.as_int("ultosc", "period2", period2)
+    period3 = _convert.as_int("ultosc", "period3", period3)
+    columns, carrier = _convert.bars(
+        "ultosc",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.ultosc(*columns, period1=period1, period2=period2, period3=period3)
+    return _convert.wrap_outputs(out, carrier, ("ultosc",))
+
+
+def var(
+    source=None,
+    *,
+    period: int = _PARAMS["var"]["period"]["default"],
+    nbdev: float = _PARAMS["var"]["nbdev"]["default"],
+) -> Any:
+    """Variance.
+
+    Parameters
+    ----------
+    period : int, default 5
+        Number of bars the spread is taken over, from 1 to 100000.
+    nbdev : float, default 1.0
+        Accepted for TA-Lib compatibility and ignored, as TA-Lib ignores it.
+
+    Returns
+    -------
+    ndarray or Series
+        Population variance of the last period values.
+    """
+    period = _convert.as_int("var", "period", period)
+    nbdev = _convert.as_float("var", "nbdev", nbdev)
+    columns, carrier = _convert.bars("var", (source,), ("source",), ("series",))
+    out = _core.var(*columns, period=period, nbdev=nbdev)
+    return _convert.wrap_outputs(out, carrier, ("var",))
+
+
+def vhf(source=None, *, period: int = _PARAMS["vhf"]["period"]["default"]) -> Any:
+    """Vertical Horizontal Filter.
+
+    Parameters
+    ----------
+    period : int, default 28
+        Number of bars the filter is measured over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Range of the window as a share of the distance travelled in it.
+    """
+    period = _convert.as_int("vhf", "period", period)
+    columns, carrier = _convert.bars("vhf", (source,), ("source",), ("series",))
+    out = _core.vhf(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("vhf",))
+
+
+def vortex(
+    high=None, low=None, close=None, *, period: int = _PARAMS["vortex"]["period"]["default"]
+) -> Any:
+    """Vortex Indicator.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the movements are summed over, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        vortex_plusvi: Upward movement as a share of the true range.
+        vortex_minusvi: Downward movement as a share of the true range.
+    """
+    period = _convert.as_int("vortex", "period", period)
+    columns, carrier = _convert.bars(
+        "vortex",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.vortex(*columns, period=period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "vortex_plusvi",
+            "vortex_minusvi",
+        ),
+    )
+
+
+def vwap(
+    high=None,
+    low=None,
+    close=None,
+    volume=None,
+    timestamps=None,
+    *,
+    anchor: str = _PARAMS["vwap"]["anchor"]["default"],
+) -> Any:
+    """Volume Weighted Average Price.
+
+    Parameters
+    ----------
+    anchor : str, default "day"
+        Where the running total starts over.
+
+    Returns
+    -------
+    ndarray or Series
+        Average price so far this session, weighted by the volume at each.
+    """
+    anchor = _convert.as_text("vwap", "anchor", anchor)
+    columns, carrier = _convert.bars(
+        "vwap",
+        (high, low, close, volume, timestamps),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+            "timestamps",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+            "volume",
+            "timestamps",
+        ),
+    )
+    out = _core.vwap(*columns, anchor=anchor)
+    return _convert.wrap_outputs(out, carrier, ("vwap",))
+
+
+def vwma(close=None, volume=None, *, period: int = _PARAMS["vwma"]["period"]["default"]) -> Any:
+    """Volume Weighted Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the average is taken over, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Average close over the window, each bar weighted by its volume.
+    """
+    period = _convert.as_int("vwma", "period", period)
+    columns, carrier = _convert.bars(
+        "vwma",
+        (close, volume),
+        (
+            "close",
+            "volume",
+        ),
+        (
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.vwma(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("vwma",))
+
+
+def vzo(close=None, volume=None, *, period: int = _PARAMS["vzo"]["period"]["default"]) -> Any:
+    """Volume Zone Oscillator.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Bars of the averages, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Percent of the average volume that came on rising closes, net of falling ones.
+    """
+    period = _convert.as_int("vzo", "period", period)
+    columns, carrier = _convert.bars(
+        "vzo",
+        (close, volume),
+        (
+            "close",
+            "volume",
+        ),
+        (
+            "close",
+            "volume",
+        ),
+    )
+    out = _core.vzo(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("vzo",))
+
+
+def wad(high=None, low=None, close=None) -> Any:
+    """Williams Accumulation/Distribution.
+
+    Returns
+    -------
+    ndarray or Series
+        Running total of how much ground each bar took or gave up.
+    """
+    columns, carrier = _convert.bars(
+        "wad",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.wad(*columns)
+    return _convert.wrap_outputs(out, carrier, ("wad",))
+
+
+def wavetrend(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    channel_length: int = _PARAMS["wavetrend"]["channel_length"]["default"],
+    average_length: int = _PARAMS["wavetrend"]["average_length"]["default"],
+) -> Any:
+    """WaveTrend Oscillator.
+
+    Parameters
+    ----------
+    channel_length : int, default 10
+        Bars of the channel's averages, from 2 to 100000.
+    average_length : int, default 21
+        Bars of the oscillator's average, from 2 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        wavetrend_1: The averaged channel index.
+        wavetrend_2: Four-bar mean of the first line.
+    """
+    channel_length = _convert.as_int("wavetrend", "channel_length", channel_length)
+    average_length = _convert.as_int("wavetrend", "average_length", average_length)
+    columns, carrier = _convert.bars(
+        "wavetrend",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.wavetrend(*columns, channel_length=channel_length, average_length=average_length)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "wavetrend_1",
+            "wavetrend_2",
+        ),
+    )
+
+
+def wclprice(high=None, low=None, close=None) -> Any:
+    """Weighted Close Price.
+
+    Returns
+    -------
+    ndarray or Series
+        The bar's range and its close, with the close counted twice.
+    """
+    columns, carrier = _convert.bars(
+        "wclprice",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.wclprice(*columns)
+    return _convert.wrap_outputs(out, carrier, ("wclprice",))
+
+
+def wilder_volatility(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["wilder_volatility"]["period"]["default"],
+    multiplier: float = _PARAMS["wilder_volatility"]["multiplier"]["default"],
+) -> Any:
+    """Wilder Volatility System.
+
+    Parameters
+    ----------
+    period : int, default 7
+        Bars of the average true range, from 1 to 100000.
+    multiplier : float, default 3.0
+        Multiple of the average true range the level sits from the extreme close.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        wilder_volatility: The extreme close of the current swing less (or plus) multiplier average
+        true ranges.
+        wilder_volatility_direction: 1 while the level sits below the closes, -1 while above.
+    """
+    period = _convert.as_int("wilder_volatility", "period", period)
+    multiplier = _convert.as_float("wilder_volatility", "multiplier", multiplier)
+    columns, carrier = _convert.bars(
+        "wilder_volatility",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.wilder_volatility(*columns, period=period, multiplier=multiplier)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "wilder_volatility",
+            "wilder_volatility_direction",
+        ),
+    )
+
+
+def willr(
+    high=None, low=None, close=None, *, period: int = _PARAMS["willr"]["period"]["default"]
+) -> Any:
+    """Williams Percent Range.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Number of bars the high and low range is taken over, from 2 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Where the close sits in the recent range, from -100 at the low to 0 at the high.
+    """
+    period = _convert.as_int("willr", "period", period)
+    columns, carrier = _convert.bars(
+        "willr",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.willr(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("willr",))
+
+
+def wma(source=None, *, period: int = _PARAMS["wma"]["period"]["default"]) -> Any:
+    """Weighted Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars in the average, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Mean of the last period values weighted by recency.
+    """
+    period = _convert.as_int("wma", "period", period)
+    columns, carrier = _convert.bars("wma", (source,), ("source",), ("series",))
+    out = _core.wma(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("wma",))
+
+
+def woodies_cci(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    cci_period: int = _PARAMS["woodies_cci"]["cci_period"]["default"],
+    turbo_period: int = _PARAMS["woodies_cci"]["turbo_period"]["default"],
+) -> Any:
+    """Woodies CCI.
+
+    Parameters
+    ----------
+    cci_period : int, default 14
+        Bars of the main CCI, from 2 to 100000.
+    turbo_period : int, default 6
+        Bars of the turbo CCI, from 2 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        woodies_cci: Commodity Channel Index over cci_period bars.
+        woodies_cci_turbo: Commodity Channel Index over turbo_period bars.
+    """
+    cci_period = _convert.as_int("woodies_cci", "cci_period", cci_period)
+    turbo_period = _convert.as_int("woodies_cci", "turbo_period", turbo_period)
+    columns, carrier = _convert.bars(
+        "woodies_cci",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.woodies_cci(*columns, cci_period=cci_period, turbo_period=turbo_period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "woodies_cci",
+            "woodies_cci_turbo",
+        ),
+    )
+
+
+def zlema(source=None, *, period: int = _PARAMS["zlema"]["period"]["default"]) -> Any:
+    """Zero Lag Exponential Moving Average.
+
+    Parameters
+    ----------
+    period : int, default 30
+        Number of bars the exponential average uses, from 1 to 100000.
+
+    Returns
+    -------
+    ndarray or Series
+        Exponential average of the series with its own lag added back in.
+    """
+    period = _convert.as_int("zlema", "period", period)
+    columns, carrier = _convert.bars("zlema", (source,), ("source",), ("series",))
+    out = _core.zlema(*columns, period=period)
+    return _convert.wrap_outputs(out, carrier, ("zlema",))
+
+
+def lookback(name: str, **params: Any) -> int:
+    """Warm-up rows before the first defined value."""
+    known = _PARAMS.get(name)
+    if known is None:
+        raise _convert.InvalidInput(f"lookback: no indicator named {name!r}")
+    unknown = set(params) - set(known)
+    if unknown:
+        raise TypeError(f"lookback: {name} has no parameter {sorted(unknown)[0]!r}")
+    return _core.lookback(name, **params)
+
+
+def AC(
+    high,
+    low,
+    fastperiod: int = _PARAMS["ac"]["fast_period"]["default"],
+    slowperiod: int = _PARAMS["ac"]["slow_period"]["default"],
+    signalperiod: int = _PARAMS["ac"]["signal_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`ac`."""
+    return ac(high, low, fast_period=fastperiod, slow_period=slowperiod, signal_period=signalperiod)
+
+
+def ACCBANDS(high, low, close, timeperiod: int = _PARAMS["accbands"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`accbands`."""
+    return accbands(high, low, close, period=timeperiod)
+
+
+def ACOS(source) -> Any:
+    """TA-Lib-style alias for :func:`acos`."""
+    return acos(source)
+
+
+def AD(high, low, close, volume) -> Any:
+    """TA-Lib-style alias for :func:`ad`."""
+    return ad(high, low, close, volume)
+
+
+def ADD(source0, source1) -> Any:
+    """TA-Lib-style alias for :func:`add`."""
+    return add(source0, source1)
+
+
+def ADOSC(
+    high,
+    low,
+    close,
+    volume,
+    fastperiod: int = _PARAMS["adosc"]["fast_period"]["default"],
+    slowperiod: int = _PARAMS["adosc"]["slow_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`adosc`."""
+    return adosc(high, low, close, volume, fast_period=fastperiod, slow_period=slowperiod)
+
+
+def ADR(high, low, timeperiod: int = _PARAMS["adr"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`adr`."""
+    return adr(high, low, period=timeperiod)
+
+
+def ADX(high, low, close, timeperiod: int = _PARAMS["adx"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`adx`."""
+    return adx(high, low, close, period=timeperiod)
+
+
+def ADXR(high, low, close, timeperiod: int = _PARAMS["adxr"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`adxr`."""
+    return adxr(high, low, close, period=timeperiod)
+
+
+def AO(
+    high,
+    low,
+    fastperiod: int = _PARAMS["ao"]["fast_period"]["default"],
+    slowperiod: int = _PARAMS["ao"]["slow_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`ao`."""
+    return ao(high, low, fast_period=fastperiod, slow_period=slowperiod)
+
+
+def APO(
+    source,
+    fastperiod: int = _PARAMS["apo"]["fast_period"]["default"],
+    slowperiod: int = _PARAMS["apo"]["slow_period"]["default"],
+    matype: str = _PARAMS["apo"]["ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`apo`."""
+    matype = _convert.talib_enum("apo", "ma_type", matype)
+    return apo(source, fast_period=fastperiod, slow_period=slowperiod, ma_type=matype)
+
+
+def AROON(high, low, timeperiod: int = _PARAMS["aroon"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`aroon`."""
+    return aroon(high, low, period=timeperiod)
+
+
+def AROONOSC(high, low, timeperiod: int = _PARAMS["aroonosc"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`aroonosc`."""
+    return aroonosc(high, low, period=timeperiod)
+
+
+def ASIN(source) -> Any:
+    """TA-Lib-style alias for :func:`asin`."""
+    return asin(source)
+
+
+def ATAN(source) -> Any:
+    """TA-Lib-style alias for :func:`atan`."""
+    return atan(source)
+
+
+def ATR(high, low, close, timeperiod: int = _PARAMS["atr"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`atr`."""
+    return atr(high, low, close, period=timeperiod)
+
+
+def AVGDEV(source, timeperiod: int = _PARAMS["avgdev"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`avgdev`."""
+    return avgdev(source, period=timeperiod)
+
+
+def AVGPRICE(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`avgprice`."""
+    return avgprice(open, high, low, close)
+
+
+def BBANDS(
+    source,
+    timeperiod: int = _PARAMS["bbands"]["period"]["default"],
+    nbdevup: float = _PARAMS["bbands"]["nbdev_up"]["default"],
+    nbdevdn: float = _PARAMS["bbands"]["nbdev_dn"]["default"],
+    matype: str = _PARAMS["bbands"]["ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`bbands`."""
+    matype = _convert.talib_enum("bbands", "ma_type", matype)
+    return bbands(source, period=timeperiod, nbdev_up=nbdevup, nbdev_dn=nbdevdn, ma_type=matype)
+
+
+def BETA(source0, source1, timeperiod: int = _PARAMS["beta"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`beta`."""
+    return beta(source0, source1, period=timeperiod)
+
+
+def BOP(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`bop`."""
+    return bop(open, high, low, close)
+
+
+def CCI(high, low, close, timeperiod: int = _PARAMS["cci"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`cci`."""
+    return cci(high, low, close, period=timeperiod)
+
+
+def CDL2CROWS(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_2crows`."""
+    return cdl_2crows(open, high, low, close)
+
+
+def CDL3BLACKCROWS(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_3blackcrows`."""
+    return cdl_3blackcrows(open, high, low, close)
+
+
+def CDL3INSIDE(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_3inside`."""
+    return cdl_3inside(open, high, low, close)
+
+
+def CDL3LINESTRIKE(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_3linestrike`."""
+    return cdl_3linestrike(open, high, low, close)
+
+
+def CDL3OUTSIDE(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_3outside`."""
+    return cdl_3outside(open, high, low, close)
+
+
+def CDL3STARSINSOUTH(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_3starsinsouth`."""
+    return cdl_3starsinsouth(open, high, low, close)
+
+
+def CDL3WHITESOLDIERS(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_3whitesoldiers`."""
+    return cdl_3whitesoldiers(open, high, low, close)
+
+
+def CDLABANDONEDBABY(
+    open,
+    high,
+    low,
+    close,
+    penetration: float = _PARAMS["cdl_abandonedbaby"]["penetration"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`cdl_abandonedbaby`."""
+    return cdl_abandonedbaby(open, high, low, close, penetration=penetration)
+
+
+def CDLADVANCEBLOCK(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_advanceblock`."""
+    return cdl_advanceblock(open, high, low, close)
+
+
+def CDLBELTHOLD(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_belthold`."""
+    return cdl_belthold(open, high, low, close)
+
+
+def CDLBREAKAWAY(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_breakaway`."""
+    return cdl_breakaway(open, high, low, close)
+
+
+def CDLCLOSINGMARUBOZU(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_closingmarubozu`."""
+    return cdl_closingmarubozu(open, high, low, close)
+
+
+def CDLCONCEALBABYSWALL(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_concealbabyswall`."""
+    return cdl_concealbabyswall(open, high, low, close)
+
+
+def CDLCOUNTERATTACK(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_counterattack`."""
+    return cdl_counterattack(open, high, low, close)
+
+
+def CDLDARKCLOUDCOVER(
+    open,
+    high,
+    low,
+    close,
+    penetration: float = _PARAMS["cdl_darkcloudcover"]["penetration"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`cdl_darkcloudcover`."""
+    return cdl_darkcloudcover(open, high, low, close, penetration=penetration)
+
+
+def CDLDOJI(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_doji`."""
+    return cdl_doji(open, high, low, close)
+
+
+def CDLDOJISTAR(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_dojistar`."""
+    return cdl_dojistar(open, high, low, close)
+
+
+def CDLDRAGONFLYDOJI(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_dragonflydoji`."""
+    return cdl_dragonflydoji(open, high, low, close)
+
+
+def CDLENGULFING(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_engulfing`."""
+    return cdl_engulfing(open, high, low, close)
+
+
+def CDLEVENINGDOJISTAR(
+    open,
+    high,
+    low,
+    close,
+    penetration: float = _PARAMS["cdl_eveningdojistar"]["penetration"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`cdl_eveningdojistar`."""
+    return cdl_eveningdojistar(open, high, low, close, penetration=penetration)
+
+
+def CDLEVENINGSTAR(
+    open,
+    high,
+    low,
+    close,
+    penetration: float = _PARAMS["cdl_eveningstar"]["penetration"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`cdl_eveningstar`."""
+    return cdl_eveningstar(open, high, low, close, penetration=penetration)
+
+
+def CDLGAPSIDESIDEWHITE(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_gapsidesidewhite`."""
+    return cdl_gapsidesidewhite(open, high, low, close)
+
+
+def CDLGRAVESTONEDOJI(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_gravestonedoji`."""
+    return cdl_gravestonedoji(open, high, low, close)
+
+
+def CDLHAMMER(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_hammer`."""
+    return cdl_hammer(open, high, low, close)
+
+
+def CDLHANGINGMAN(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_hangingman`."""
+    return cdl_hangingman(open, high, low, close)
+
+
+def CDLHARAMI(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_harami`."""
+    return cdl_harami(open, high, low, close)
+
+
+def CDLHARAMICROSS(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_haramicross`."""
+    return cdl_haramicross(open, high, low, close)
+
+
+def CDLHIGHWAVE(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_highwave`."""
+    return cdl_highwave(open, high, low, close)
+
+
+def CDLHIKKAKE(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_hikkake`."""
+    return cdl_hikkake(open, high, low, close)
+
+
+def CDLHIKKAKEMOD(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_hikkakemod`."""
+    return cdl_hikkakemod(open, high, low, close)
+
+
+def CDLHOMINGPIGEON(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_homingpigeon`."""
+    return cdl_homingpigeon(open, high, low, close)
+
+
+def CDLIDENTICAL3CROWS(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_identical3crows`."""
+    return cdl_identical3crows(open, high, low, close)
+
+
+def CDLINNECK(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_inneck`."""
+    return cdl_inneck(open, high, low, close)
+
+
+def CDLINVERTEDHAMMER(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_invertedhammer`."""
+    return cdl_invertedhammer(open, high, low, close)
+
+
+def CDLKICKING(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_kicking`."""
+    return cdl_kicking(open, high, low, close)
+
+
+def CDLKICKINGBYLENGTH(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_kickingbylength`."""
+    return cdl_kickingbylength(open, high, low, close)
+
+
+def CDLLADDERBOTTOM(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_ladderbottom`."""
+    return cdl_ladderbottom(open, high, low, close)
+
+
+def CDLLONGLEGGEDDOJI(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_longleggeddoji`."""
+    return cdl_longleggeddoji(open, high, low, close)
+
+
+def CDLLONGLINE(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_longline`."""
+    return cdl_longline(open, high, low, close)
+
+
+def CDLMARUBOZU(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_marubozu`."""
+    return cdl_marubozu(open, high, low, close)
+
+
+def CDLMATCHINGLOW(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_matchinglow`."""
+    return cdl_matchinglow(open, high, low, close)
+
+
+def CDLMATHOLD(
+    open, high, low, close, penetration: float = _PARAMS["cdl_mathold"]["penetration"]["default"]
+) -> Any:
+    """TA-Lib-style alias for :func:`cdl_mathold`."""
+    return cdl_mathold(open, high, low, close, penetration=penetration)
+
+
+def CDLMORNINGDOJISTAR(
+    open,
+    high,
+    low,
+    close,
+    penetration: float = _PARAMS["cdl_morningdojistar"]["penetration"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`cdl_morningdojistar`."""
+    return cdl_morningdojistar(open, high, low, close, penetration=penetration)
+
+
+def CDLMORNINGSTAR(
+    open,
+    high,
+    low,
+    close,
+    penetration: float = _PARAMS["cdl_morningstar"]["penetration"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`cdl_morningstar`."""
+    return cdl_morningstar(open, high, low, close, penetration=penetration)
+
+
+def CDLONNECK(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_onneck`."""
+    return cdl_onneck(open, high, low, close)
+
+
+def CDLPIERCING(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_piercing`."""
+    return cdl_piercing(open, high, low, close)
+
+
+def CDLRICKSHAWMAN(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_rickshawman`."""
+    return cdl_rickshawman(open, high, low, close)
+
+
+def CDLRISEFALL3METHODS(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_risefall3methods`."""
+    return cdl_risefall3methods(open, high, low, close)
+
+
+def CDLSEPARATINGLINES(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_separatinglines`."""
+    return cdl_separatinglines(open, high, low, close)
+
+
+def CDLSHOOTINGSTAR(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_shootingstar`."""
+    return cdl_shootingstar(open, high, low, close)
+
+
+def CDLSHORTLINE(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_shortline`."""
+    return cdl_shortline(open, high, low, close)
+
+
+def CDLSPINNINGTOP(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_spinningtop`."""
+    return cdl_spinningtop(open, high, low, close)
+
+
+def CDLSTALLEDPATTERN(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_stalledpattern`."""
+    return cdl_stalledpattern(open, high, low, close)
+
+
+def CDLSTICKSANDWICH(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_sticksandwich`."""
+    return cdl_sticksandwich(open, high, low, close)
+
+
+def CDLTAKURI(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_takuri`."""
+    return cdl_takuri(open, high, low, close)
+
+
+def CDLTASUKIGAP(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_tasukigap`."""
+    return cdl_tasukigap(open, high, low, close)
+
+
+def CDLTHRUSTING(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_thrusting`."""
+    return cdl_thrusting(open, high, low, close)
+
+
+def CDLTRISTAR(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_tristar`."""
+    return cdl_tristar(open, high, low, close)
+
+
+def CDLUNIQUE3RIVER(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_unique3river`."""
+    return cdl_unique3river(open, high, low, close)
+
+
+def CDLUPSIDEGAP2CROWS(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_upsidegap2crows`."""
+    return cdl_upsidegap2crows(open, high, low, close)
+
+
+def CDLXSIDEGAP3METHODS(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`cdl_xsidegap3methods`."""
+    return cdl_xsidegap3methods(open, high, low, close)
+
+
+def CEIL(source) -> Any:
+    """TA-Lib-style alias for :func:`ceil`."""
+    return ceil(source)
+
+
+def CMF(high, low, close, volume, timeperiod: int = _PARAMS["cmf"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`cmf`."""
+    return cmf(high, low, close, volume, period=timeperiod)
+
+
+def CMO(source, timeperiod: int = _PARAMS["cmo"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`cmo`."""
+    return cmo(source, period=timeperiod)
+
+
+def CMOU(source, timeperiod: int = _PARAMS["cmou"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`cmou`."""
+    return cmou(source, period=timeperiod)
+
+
+def COPPOCK(
+    source,
+    wmaperiod: int = _PARAMS["coppock"]["wma_period"]["default"],
+    roc1period: int = _PARAMS["coppock"]["roc1_period"]["default"],
+    roc2period: int = _PARAMS["coppock"]["roc2_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`coppock`."""
+    return coppock(source, wma_period=wmaperiod, roc1_period=roc1period, roc2_period=roc2period)
+
+
+def CORREL(source0, source1, timeperiod: int = _PARAMS["correl"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`correl`."""
+    return correl(source0, source1, period=timeperiod)
+
+
+def COS(source) -> Any:
+    """TA-Lib-style alias for :func:`cos`."""
+    return cos(source)
+
+
+def COSH(source) -> Any:
+    """TA-Lib-style alias for :func:`cosh`."""
+    return cosh(source)
+
+
+def CUMSUM(source) -> Any:
+    """TA-Lib-style alias for :func:`cumsum`."""
+    return cumsum(source)
+
+
+def CVI(
+    high,
+    low,
+    timeperiod: int = _PARAMS["cvi"]["period"]["default"],
+    rocperiod: int = _PARAMS["cvi"]["roc_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`cvi`."""
+    return cvi(high, low, period=timeperiod, roc_period=rocperiod)
+
+
+def DEMA(source, timeperiod: int = _PARAMS["dema"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`dema`."""
+    return dema(source, period=timeperiod)
+
+
+def DIV(source0, source1) -> Any:
+    """TA-Lib-style alias for :func:`div`."""
+    return div(source0, source1)
+
+
+def DONCHIAN(high, low, timeperiod: int = _PARAMS["donchian"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`donchian`."""
+    return donchian(high, low, period=timeperiod)
+
+
+def DPO(source, timeperiod: int = _PARAMS["dpo"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`dpo`."""
+    return dpo(source, period=timeperiod)
+
+
+def DX(high, low, close, timeperiod: int = _PARAMS["dx"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`dx`."""
+    return dx(high, low, close, period=timeperiod)
+
+
+def EFI(close, volume, timeperiod: int = _PARAMS["efi"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`efi`."""
+    return efi(close, volume, period=timeperiod)
+
+
+def EMA(source, timeperiod: int = _PARAMS["ema"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`ema`."""
+    return ema(source, period=timeperiod)
+
+
+def ER(source, timeperiod: int = _PARAMS["er"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`er`."""
+    return er(source, period=timeperiod)
+
+
+def ERI(high, low, close, timeperiod: int = _PARAMS["eri"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`eri`."""
+    return eri(high, low, close, period=timeperiod)
+
+
+def EXP(source) -> Any:
+    """TA-Lib-style alias for :func:`exp`."""
+    return exp(source)
+
+
+def FLOOR(source) -> Any:
+    """TA-Lib-style alias for :func:`floor`."""
+    return floor(source)
+
+
+def FOSC(source, timeperiod: int = _PARAMS["fosc"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`fosc`."""
+    return fosc(source, period=timeperiod)
+
+
+def FRACTAL(
+    high,
+    low,
+    leftbars: int = _PARAMS["fractal"]["left_bars"]["default"],
+    rightbars: int = _PARAMS["fractal"]["right_bars"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`fractal`."""
+    return fractal(high, low, left_bars=leftbars, right_bars=rightbars)
+
+
+def HA(open, high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`ha`."""
+    return ha(open, high, low, close)
+
+
+def HMA(source, timeperiod: int = _PARAMS["hma"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`hma`."""
+    return hma(source, period=timeperiod)
+
+
+def HT_DCPERIOD(source) -> Any:
+    """TA-Lib-style alias for :func:`ht_dcperiod`."""
+    return ht_dcperiod(source)
+
+
+def HT_DCPHASE(source) -> Any:
+    """TA-Lib-style alias for :func:`ht_dcphase`."""
+    return ht_dcphase(source)
+
+
+def HT_PHASOR(source) -> Any:
+    """TA-Lib-style alias for :func:`ht_phasor`."""
+    return ht_phasor(source)
+
+
+def HT_SINE(source) -> Any:
+    """TA-Lib-style alias for :func:`ht_sine`."""
+    return ht_sine(source)
+
+
+def HT_TRENDLINE(source) -> Any:
+    """TA-Lib-style alias for :func:`ht_trendline`."""
+    return ht_trendline(source)
+
+
+def HT_TRENDMODE(source) -> Any:
+    """TA-Lib-style alias for :func:`ht_trendmode`."""
+    return ht_trendmode(source)
+
+
+def IMI(open, close, timeperiod: int = _PARAMS["imi"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`imi`."""
+    return imi(open, close, period=timeperiod)
+
+
+def KAMA(source, timeperiod: int = _PARAMS["kama"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`kama`."""
+    return kama(source, period=timeperiod)
+
+
+def KC(
+    high,
+    low,
+    close,
+    timeperiod: int = _PARAMS["kc"]["period"]["default"],
+    atrperiod: int = _PARAMS["kc"]["atr_period"]["default"],
+    nbdev: float = _PARAMS["kc"]["nbdev"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`kc`."""
+    return kc(high, low, close, period=timeperiod, atr_period=atrperiod, nbdev=nbdev)
+
+
+def KDJ(
+    high,
+    low,
+    close,
+    fastk_period: int = _PARAMS["kdj"]["fastk_period"]["default"],
+    slowk_period: int = _PARAMS["kdj"]["slowk_period"]["default"],
+    slowk_matype: str = _PARAMS["kdj"]["slowk_ma_type"]["default"],
+    slowd_period: int = _PARAMS["kdj"]["slowd_period"]["default"],
+    slowd_matype: str = _PARAMS["kdj"]["slowd_ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`kdj`."""
+    slowk_matype = _convert.talib_enum("kdj", "slowk_ma_type", slowk_matype)
+    slowd_matype = _convert.talib_enum("kdj", "slowd_ma_type", slowd_matype)
+    return kdj(
+        high,
+        low,
+        close,
+        fastk_period=fastk_period,
+        slowk_period=slowk_period,
+        slowk_ma_type=slowk_matype,
+        slowd_period=slowd_period,
+        slowd_ma_type=slowd_matype,
+    )
+
+
+def LINEARREG(source, timeperiod: int = _PARAMS["linearreg"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`linearreg`."""
+    return linearreg(source, period=timeperiod)
+
+
+def LINEARREG_ANGLE(
+    source, timeperiod: int = _PARAMS["linearreg_angle"]["period"]["default"]
+) -> Any:
+    """TA-Lib-style alias for :func:`linearreg_angle`."""
+    return linearreg_angle(source, period=timeperiod)
+
+
+def LINEARREG_INTERCEPT(
+    source, timeperiod: int = _PARAMS["linearreg_intercept"]["period"]["default"]
+) -> Any:
+    """TA-Lib-style alias for :func:`linearreg_intercept`."""
+    return linearreg_intercept(source, period=timeperiod)
+
+
+def LINEARREG_SLOPE(
+    source, timeperiod: int = _PARAMS["linearreg_slope"]["period"]["default"]
+) -> Any:
+    """TA-Lib-style alias for :func:`linearreg_slope`."""
+    return linearreg_slope(source, period=timeperiod)
+
+
+def LN(source) -> Any:
+    """TA-Lib-style alias for :func:`ln`."""
+    return ln(source)
+
+
+def LOG10(source) -> Any:
+    """TA-Lib-style alias for :func:`log10`."""
+    return log10(source)
+
+
+def MA(
+    source,
+    timeperiod: int = _PARAMS["ma"]["period"]["default"],
+    matype: str = _PARAMS["ma"]["ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`ma`."""
+    matype = _convert.talib_enum("ma", "ma_type", matype)
+    return ma(source, period=timeperiod, ma_type=matype)
+
+
+def MACD(
+    source,
+    fastperiod: int = _PARAMS["macd"]["fast_period"]["default"],
+    slowperiod: int = _PARAMS["macd"]["slow_period"]["default"],
+    signalperiod: int = _PARAMS["macd"]["signal_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`macd`."""
+    return macd(source, fast_period=fastperiod, slow_period=slowperiod, signal_period=signalperiod)
+
+
+def MACDEXT(
+    source,
+    fastperiod: int = _PARAMS["macdext"]["fast_period"]["default"],
+    fastmatype: str = _PARAMS["macdext"]["fast_ma_type"]["default"],
+    slowperiod: int = _PARAMS["macdext"]["slow_period"]["default"],
+    slowmatype: str = _PARAMS["macdext"]["slow_ma_type"]["default"],
+    signalperiod: int = _PARAMS["macdext"]["signal_period"]["default"],
+    signalmatype: str = _PARAMS["macdext"]["signal_ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`macdext`."""
+    fastmatype = _convert.talib_enum("macdext", "fast_ma_type", fastmatype)
+    slowmatype = _convert.talib_enum("macdext", "slow_ma_type", slowmatype)
+    signalmatype = _convert.talib_enum("macdext", "signal_ma_type", signalmatype)
+    return macdext(
+        source,
+        fast_period=fastperiod,
+        fast_ma_type=fastmatype,
+        slow_period=slowperiod,
+        slow_ma_type=slowmatype,
+        signal_period=signalperiod,
+        signal_ma_type=signalmatype,
+    )
+
+
+def MACDFIX(source, signalperiod: int = _PARAMS["macdfix"]["signal_period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`macdfix`."""
+    return macdfix(source, signal_period=signalperiod)
+
+
+def MAMA(
+    source,
+    fastlimit: float = _PARAMS["mama"]["fast_limit"]["default"],
+    slowlimit: float = _PARAMS["mama"]["slow_limit"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`mama`."""
+    return mama(source, fast_limit=fastlimit, slow_limit=slowlimit)
+
+
+def MARKETFI(high, low, volume) -> Any:
+    """TA-Lib-style alias for :func:`marketfi`."""
+    return marketfi(high, low, volume)
+
+
+def MASSI(
+    high,
+    low,
+    fastperiod: int = _PARAMS["massi"]["fast_period"]["default"],
+    slowperiod: int = _PARAMS["massi"]["slow_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`massi`."""
+    return massi(high, low, fast_period=fastperiod, slow_period=slowperiod)
+
+
+def MAVP(
+    close,
+    periods,
+    minperiod: int = _PARAMS["mavp"]["min_period"]["default"],
+    maxperiod: int = _PARAMS["mavp"]["max_period"]["default"],
+    matype: str = _PARAMS["mavp"]["ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`mavp`."""
+    matype = _convert.talib_enum("mavp", "ma_type", matype)
+    return mavp(close, periods, min_period=minperiod, max_period=maxperiod, ma_type=matype)
+
+
+def MAX(source, timeperiod: int = _PARAMS["max"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`max`."""
+    return max(source, period=timeperiod)
+
+
+def MAXINDEX(source, timeperiod: int = _PARAMS["maxindex"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`maxindex`."""
+    return maxindex(source, period=timeperiod)
+
+
+def MEDPRICE(high, low) -> Any:
+    """TA-Lib-style alias for :func:`medprice`."""
+    return medprice(high, low)
+
+
+def MFI(high, low, close, volume, timeperiod: int = _PARAMS["mfi"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`mfi`."""
+    return mfi(high, low, close, volume, period=timeperiod)
+
+
+def MIDPOINT(source, timeperiod: int = _PARAMS["midpoint"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`midpoint`."""
+    return midpoint(source, period=timeperiod)
+
+
+def MIDPRICE(high, low, timeperiod: int = _PARAMS["midprice"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`midprice`."""
+    return midprice(high, low, period=timeperiod)
+
+
+def MIN(source, timeperiod: int = _PARAMS["min"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`min`."""
+    return min(source, period=timeperiod)
+
+
+def MININDEX(source, timeperiod: int = _PARAMS["minindex"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`minindex`."""
+    return minindex(source, period=timeperiod)
+
+
+def MINMAX(source, timeperiod: int = _PARAMS["minmax"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`minmax`."""
+    return minmax(source, period=timeperiod)
+
+
+def MINMAXINDEX(source, timeperiod: int = _PARAMS["minmaxindex"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`minmaxindex`."""
+    return minmaxindex(source, period=timeperiod)
+
+
+def MINUS_DI(high, low, close, timeperiod: int = _PARAMS["minus_di"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`minus_di`."""
+    return minus_di(high, low, close, period=timeperiod)
+
+
+def MINUS_DM(high, low, timeperiod: int = _PARAMS["minus_dm"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`minus_dm`."""
+    return minus_dm(high, low, period=timeperiod)
+
+
+def MOM(source, timeperiod: int = _PARAMS["mom"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`mom`."""
+    return mom(source, period=timeperiod)
+
+
+def MULT(source0, source1) -> Any:
+    """TA-Lib-style alias for :func:`mult`."""
+    return mult(source0, source1)
+
+
+def NATR(high, low, close, timeperiod: int = _PARAMS["natr"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`natr`."""
+    return natr(high, low, close, period=timeperiod)
+
+
+def NVI(close, volume) -> Any:
+    """TA-Lib-style alias for :func:`nvi`."""
+    return nvi(close, volume)
+
+
+def OBV(close, volume) -> Any:
+    """TA-Lib-style alias for :func:`obv`."""
+    return obv(close, volume)
+
+
+# `percentile` is also a parameter name below, where it would shadow this.
+_percentile = percentile
+
+
+def PERCENTILE(
+    source,
+    timeperiod: int = _PARAMS["percentile"]["period"]["default"],
+    percentile: float = _PARAMS["percentile"]["percentile"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`percentile`."""
+    return _percentile(source, period=timeperiod, percentile=percentile)
+
+
+def PERCENTRANK(source, timeperiod: int = _PARAMS["percentrank"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`percentrank`."""
+    return percentrank(source, period=timeperiod)
+
+
+def PLUS_DI(high, low, close, timeperiod: int = _PARAMS["plus_di"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`plus_di`."""
+    return plus_di(high, low, close, period=timeperiod)
+
+
+def PLUS_DM(high, low, timeperiod: int = _PARAMS["plus_dm"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`plus_dm`."""
+    return plus_dm(high, low, period=timeperiod)
+
+
+def PPO(
+    source,
+    fastperiod: int = _PARAMS["ppo"]["fast_period"]["default"],
+    slowperiod: int = _PARAMS["ppo"]["slow_period"]["default"],
+    matype: str = _PARAMS["ppo"]["ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`ppo`."""
+    matype = _convert.talib_enum("ppo", "ma_type", matype)
+    return ppo(source, fast_period=fastperiod, slow_period=slowperiod, ma_type=matype)
+
+
+def PVI(close, volume) -> Any:
+    """TA-Lib-style alias for :func:`pvi`."""
+    return pvi(close, volume)
+
+
+def PVO(
+    volume,
+    fastperiod: int = _PARAMS["pvo"]["fast_period"]["default"],
+    slowperiod: int = _PARAMS["pvo"]["slow_period"]["default"],
+    matype: str = _PARAMS["pvo"]["ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`pvo`."""
+    matype = _convert.talib_enum("pvo", "ma_type", matype)
+    return pvo(volume, fast_period=fastperiod, slow_period=slowperiod, ma_type=matype)
+
+
+def PVT(close, volume) -> Any:
+    """TA-Lib-style alias for :func:`pvt`."""
+    return pvt(close, volume)
+
+
+def QSTICK(open, close, timeperiod: int = _PARAMS["qstick"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`qstick`."""
+    return qstick(open, close, period=timeperiod)
+
+
+def RMA(source, timeperiod: int = _PARAMS["rma"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`rma`."""
+    return rma(source, period=timeperiod)
+
+
+def ROC(source, timeperiod: int = _PARAMS["roc"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`roc`."""
+    return roc(source, period=timeperiod)
+
+
+def ROCP(source, timeperiod: int = _PARAMS["rocp"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`rocp`."""
+    return rocp(source, period=timeperiod)
+
+
+def ROCR(source, timeperiod: int = _PARAMS["rocr"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`rocr`."""
+    return rocr(source, period=timeperiod)
+
+
+def ROCR100(source, timeperiod: int = _PARAMS["rocr100"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`rocr100`."""
+    return rocr100(source, period=timeperiod)
+
+
+def RSI(source, timeperiod: int = _PARAMS["rsi"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`rsi`."""
+    return rsi(source, period=timeperiod)
+
+
+def RVI(
+    source,
+    timeperiod: int = _PARAMS["rvi"]["period"]["default"],
+    stddevperiod: int = _PARAMS["rvi"]["stddev_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`rvi`."""
+    return rvi(source, period=timeperiod, stddev_period=stddevperiod)
+
+
+def RVOL(volume, timeperiod: int = _PARAMS["rvol"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`rvol`."""
+    return rvol(volume, period=timeperiod)
+
+
+def SAR(
+    high,
+    low,
+    acceleration: float = _PARAMS["sar"]["acceleration"]["default"],
+    maximum: float = _PARAMS["sar"]["maximum"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`sar`."""
+    return sar(high, low, acceleration=acceleration, maximum=maximum)
+
+
+def SAREXT(
+    high,
+    low,
+    startvalue: float = _PARAMS["sarext"]["start_value"]["default"],
+    offsetonreverse: float = _PARAMS["sarext"]["offset_on_reverse"]["default"],
+    accelerationinitlong: float = _PARAMS["sarext"]["acceleration_init_long"]["default"],
+    accelerationlong: float = _PARAMS["sarext"]["acceleration_long"]["default"],
+    accelerationmaxlong: float = _PARAMS["sarext"]["acceleration_max_long"]["default"],
+    accelerationinitshort: float = _PARAMS["sarext"]["acceleration_init_short"]["default"],
+    accelerationshort: float = _PARAMS["sarext"]["acceleration_short"]["default"],
+    accelerationmaxshort: float = _PARAMS["sarext"]["acceleration_max_short"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`sarext`."""
+    return sarext(
+        high,
+        low,
+        start_value=startvalue,
+        offset_on_reverse=offsetonreverse,
+        acceleration_init_long=accelerationinitlong,
+        acceleration_long=accelerationlong,
+        acceleration_max_long=accelerationmaxlong,
+        acceleration_init_short=accelerationinitshort,
+        acceleration_short=accelerationshort,
+        acceleration_max_short=accelerationmaxshort,
+    )
+
+
+def SIN(source) -> Any:
+    """TA-Lib-style alias for :func:`sin`."""
+    return sin(source)
+
+
+def SINH(source) -> Any:
+    """TA-Lib-style alias for :func:`sinh`."""
+    return sinh(source)
+
+
+def SMA(source, timeperiod: int = _PARAMS["sma"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`sma`."""
+    return sma(source, period=timeperiod)
+
+
+def SMI(
+    high,
+    low,
+    close,
+    timeperiod: int = _PARAMS["smi"]["period"]["default"],
+    fastperiod: int = _PARAMS["smi"]["fast_period"]["default"],
+    slowperiod: int = _PARAMS["smi"]["slow_period"]["default"],
+    signalperiod: int = _PARAMS["smi"]["signal_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`smi`."""
+    return smi(
+        high,
+        low,
+        close,
+        period=timeperiod,
+        fast_period=fastperiod,
+        slow_period=slowperiod,
+        signal_period=signalperiod,
+    )
+
+
+def SQRT(source) -> Any:
+    """TA-Lib-style alias for :func:`sqrt`."""
+    return sqrt(source)
+
+
+def STDDEV(
+    source,
+    timeperiod: int = _PARAMS["stddev"]["period"]["default"],
+    nbdev: float = _PARAMS["stddev"]["nbdev"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`stddev`."""
+    return stddev(source, period=timeperiod, nbdev=nbdev)
+
+
+def STOCH(
+    high,
+    low,
+    close,
+    fastk_period: int = _PARAMS["stoch"]["fastk_period"]["default"],
+    slowk_period: int = _PARAMS["stoch"]["slowk_period"]["default"],
+    slowk_matype: str = _PARAMS["stoch"]["slowk_ma_type"]["default"],
+    slowd_period: int = _PARAMS["stoch"]["slowd_period"]["default"],
+    slowd_matype: str = _PARAMS["stoch"]["slowd_ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`stoch`."""
+    slowk_matype = _convert.talib_enum("stoch", "slowk_ma_type", slowk_matype)
+    slowd_matype = _convert.talib_enum("stoch", "slowd_ma_type", slowd_matype)
+    return stoch(
+        high,
+        low,
+        close,
+        fastk_period=fastk_period,
+        slowk_period=slowk_period,
+        slowk_ma_type=slowk_matype,
+        slowd_period=slowd_period,
+        slowd_ma_type=slowd_matype,
+    )
+
+
+def STOCHF(
+    high,
+    low,
+    close,
+    fastk_period: int = _PARAMS["stochf"]["fastk_period"]["default"],
+    fastd_period: int = _PARAMS["stochf"]["fastd_period"]["default"],
+    fastd_matype: str = _PARAMS["stochf"]["fastd_ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`stochf`."""
+    fastd_matype = _convert.talib_enum("stochf", "fastd_ma_type", fastd_matype)
+    return stochf(
+        high,
+        low,
+        close,
+        fastk_period=fastk_period,
+        fastd_period=fastd_period,
+        fastd_ma_type=fastd_matype,
+    )
+
+
+def STOCHRSI(
+    source,
+    timeperiod: int = _PARAMS["stochrsi"]["period"]["default"],
+    fastk_period: int = _PARAMS["stochrsi"]["fastk_period"]["default"],
+    fastd_period: int = _PARAMS["stochrsi"]["fastd_period"]["default"],
+    fastd_matype: str = _PARAMS["stochrsi"]["fastd_ma_type"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`stochrsi`."""
+    fastd_matype = _convert.talib_enum("stochrsi", "fastd_ma_type", fastd_matype)
+    return stochrsi(
+        source,
+        period=timeperiod,
+        fastk_period=fastk_period,
+        fastd_period=fastd_period,
+        fastd_ma_type=fastd_matype,
+    )
+
+
+def SUB(source0, source1) -> Any:
+    """TA-Lib-style alias for :func:`sub`."""
+    return sub(source0, source1)
+
+
+def SUM(source, timeperiod: int = _PARAMS["sum"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`sum`."""
+    return sum(source, period=timeperiod)
+
+
+def SUPERTREND(
+    high,
+    low,
+    close,
+    timeperiod: int = _PARAMS["supertrend"]["period"]["default"],
+    multiplier: float = _PARAMS["supertrend"]["multiplier"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`supertrend`."""
+    return supertrend(high, low, close, period=timeperiod, multiplier=multiplier)
+
+
+def T3(
+    source,
+    timeperiod: int = _PARAMS["t3"]["period"]["default"],
+    vfactor: float = _PARAMS["t3"]["v_factor"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`t3`."""
+    return t3(source, period=timeperiod, v_factor=vfactor)
+
+
+def TAN(source) -> Any:
+    """TA-Lib-style alias for :func:`tan`."""
+    return tan(source)
+
+
+def TANH(source) -> Any:
+    """TA-Lib-style alias for :func:`tanh`."""
+    return tanh(source)
+
+
+def TEMA(source, timeperiod: int = _PARAMS["tema"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`tema`."""
+    return tema(source, period=timeperiod)
+
+
+def TRANGE(high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`trange`."""
+    return trange(high, low, close)
+
+
+def TRIMA(source, timeperiod: int = _PARAMS["trima"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`trima`."""
+    return trima(source, period=timeperiod)
+
+
+def TRIX(source, timeperiod: int = _PARAMS["trix"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`trix`."""
+    return trix(source, period=timeperiod)
+
+
+def TSF(source, timeperiod: int = _PARAMS["tsf"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`tsf`."""
+    return tsf(source, period=timeperiod)
+
+
+def TSI(
+    source,
+    firstperiod: int = _PARAMS["tsi"]["first_period"]["default"],
+    secondperiod: int = _PARAMS["tsi"]["second_period"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`tsi`."""
+    return tsi(source, first_period=firstperiod, second_period=secondperiod)
+
+
+def TYPPRICE(high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`typprice`."""
+    return typprice(high, low, close)
+
+
+def ULTOSC(
+    high,
+    low,
+    close,
+    timeperiod1: int = _PARAMS["ultosc"]["period1"]["default"],
+    timeperiod2: int = _PARAMS["ultosc"]["period2"]["default"],
+    timeperiod3: int = _PARAMS["ultosc"]["period3"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`ultosc`."""
+    return ultosc(high, low, close, period1=timeperiod1, period2=timeperiod2, period3=timeperiod3)
+
+
+def VAR(
+    source,
+    timeperiod: int = _PARAMS["var"]["period"]["default"],
+    nbdev: float = _PARAMS["var"]["nbdev"]["default"],
+) -> Any:
+    """TA-Lib-style alias for :func:`var`."""
+    return var(source, period=timeperiod, nbdev=nbdev)
+
+
+def VHF(source, timeperiod: int = _PARAMS["vhf"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`vhf`."""
+    return vhf(source, period=timeperiod)
+
+
+def VORTEX(high, low, close, timeperiod: int = _PARAMS["vortex"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`vortex`."""
+    return vortex(high, low, close, period=timeperiod)
+
+
+def VWAP(
+    high, low, close, volume, timestamps, anchor: str = _PARAMS["vwap"]["anchor"]["default"]
+) -> Any:
+    """TA-Lib-style alias for :func:`vwap`."""
+    anchor = _convert.talib_enum("vwap", "anchor", anchor)
+    return vwap(high, low, close, volume, timestamps, anchor=anchor)
+
+
+def VWMA(close, volume, timeperiod: int = _PARAMS["vwma"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`vwma`."""
+    return vwma(close, volume, period=timeperiod)
+
+
+def WAD(high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`wad`."""
+    return wad(high, low, close)
+
+
+def WCLPRICE(high, low, close) -> Any:
+    """TA-Lib-style alias for :func:`wclprice`."""
+    return wclprice(high, low, close)
+
+
+def WILLR(high, low, close, timeperiod: int = _PARAMS["willr"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`willr`."""
+    return willr(high, low, close, period=timeperiod)
+
+
+def WMA(source, timeperiod: int = _PARAMS["wma"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`wma`."""
+    return wma(source, period=timeperiod)
+
+
+def ZLEMA(source, timeperiod: int = _PARAMS["zlema"]["period"]["default"]) -> Any:
+    """TA-Lib-style alias for :func:`zlema`."""
+    return zlema(source, period=timeperiod)
