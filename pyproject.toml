@@ -33,6 +33,14 @@ Changelog = "https://github.com/GAIINAPP/TrendLib/blob/main/CHANGELOG.md"
 
 [tool.maturin]
 manifest-path = "crates/trendlib-py/Cargo.toml"
+# The sdist is packed from the bindings crate's manifest, so the licence files
+# at the repo root are not picked up on their own. PyPI rejects a distribution
+# whose metadata names a License-File it does not contain.
+include = [
+  { path = "LICENSE-APACHE", format = "sdist" },
+  { path = "LICENSE-MIT", format = "sdist" },
+  { path = "NOTICE", format = "sdist" },
+]
 python-source = "python"
 module-name = "trendlib._core"
 features = ["pyo3/extension-module", "pyo3/abi3-py311"]
