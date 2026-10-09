@@ -30,8 +30,14 @@ jobs:
       - name: clippy
         run: cargo clippy --workspace --all-targets -- -D warnings
 
+      # The core crate links on its own. The bindings crate is a cdylib that
+      # resolves CPython's symbols at load time, which needs the linker flags
+      # maturin passes, so the python job below is what proves it links.
       - name: build
-        run: cargo build --workspace --release
+        run: cargo build --release -p trendlib
+
+      - name: check the bindings crate
+        run: cargo check --workspace --all-targets
 
       - name: the core crate has no runtime dependencies
         shell: bash
