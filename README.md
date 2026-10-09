@@ -28,19 +28,17 @@ tl.cdl_engulfing(open_, high, low, close) # int32: +100, -100 or 0
 
 ## Install
 
-> **Not on PyPI yet.** `pip install trendlib` does not work today. Until the
-> first release, build it from source:
-
 ```bash
-git clone https://github.com/GAIINAPP/TrendLib
-cd TrendLib
-pip install maturin
-maturin develop --release        # or: maturin build --release
+pip install trendlib
 ```
 
-You need a Rust toolchain (1.95 or later) for that, and nothing else: no system
-TA-Lib, no C dependencies. The extension is `abi3`, so once wheels are published
-one per platform will cover Python 3.11 and every version after it.
+The first release ships a source distribution, so this compiles the Rust core
+and needs a toolchain (1.95 or later). Nothing else is required: no system
+TA-Lib, no C dependencies.
+
+Pre-built wheels are on the way. The extension is `abi3`, so one wheel per
+platform will cover Python 3.11 and every version after it, and the install
+becomes a download with no toolchain at all.
 
 ## What's in it
 
