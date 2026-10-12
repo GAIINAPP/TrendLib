@@ -30826,6 +30826,332 @@ impl PyExpStream {
     }
 }
 
+type FibRetracementOutputs<'py> = (
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+);
+
+#[pyfunction]
+#[pyo3(name = "fib_retracement", signature = (high, low, *, pivot_n))]
+pub fn fib_retracement<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    pivot_n: i64,
+) -> PyResult<FibRetracementOutputs<'py>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let pivot_n = int_param("fib_retracement", "pivot_n", pivot_n, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::fib_retracement::Params { pivot_n };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::fib_retracement::FibRetracement as Kernel<2, 7>>::batch(
+                [high, low],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok((
+        std::mem::take(&mut out[0]).into_pyarray(py),
+        std::mem::take(&mut out[1]).into_pyarray(py),
+        std::mem::take(&mut out[2]).into_pyarray(py),
+        std::mem::take(&mut out[3]).into_pyarray(py),
+        std::mem::take(&mut out[4]).into_pyarray(py),
+        std::mem::take(&mut out[5]).into_pyarray(py),
+        std::mem::take(&mut out[6]).into_pyarray(py),
+    ))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "FibRetracementStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyFibRetracementStream {
+    inner: BarStream<trendlib::indicators::fib_retracement::FibRetracement, 2, 7>,
+}
+
+#[pymethods]
+impl PyFibRetracementStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, pivot_n))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        pivot_n: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let pivot_n = int_param("fib_retracement", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::fib_retracement::Params { pivot_n };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::fib_retracement::FibRetracement, 2, 7> as Stream>::open([high, low], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, pivot_n))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        pivot_n: i64,
+    ) -> PyResult<(Self, FibRetracementOutputs<'py>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let pivot_n = int_param("fib_retracement", "pivot_n", pivot_n, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::fib_retracement::Params { pivot_n };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::fib_retracement::FibRetracement as Kernel<2, 7>>::open_and_fill([high, low], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            (
+                std::mem::take(&mut out[0]).into_pyarray(py),
+                std::mem::take(&mut out[1]).into_pyarray(py),
+                std::mem::take(&mut out[2]).into_pyarray(py),
+                std::mem::take(&mut out[3]).into_pyarray(py),
+                std::mem::take(&mut out[4]).into_pyarray(py),
+                std::mem::take(&mut out[5]).into_pyarray(py),
+                std::mem::take(&mut out[6]).into_pyarray(py),
+            )
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        high: f64,
+        low: f64,
+    ) -> PyResult<(f64, f64, f64, f64, f64, f64, f64)> {
+        let row = self
+            .inner
+            .update([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn peek(
+        &self,
+        py: Python<'_>,
+        high: f64,
+        low: f64,
+    ) -> PyResult<(f64, f64, f64, f64, f64, f64, f64)> {
+        let row = self
+            .inner
+            .peek([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64, f64, f64, f64, f64, f64)> {
+        self.inner
+            .value()
+            .map(|row| (row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "fib_retracement"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream fib_retracement bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
+type FibRetracementWindowOutputs<'py> = (
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+    Bound<'py, PyArray1<f64>>,
+);
+
+#[pyfunction]
+#[pyo3(name = "fib_retracement_window", signature = (high, low, *, period))]
+pub fn fib_retracement_window<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    period: i64,
+) -> PyResult<FibRetracementWindowOutputs<'py>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let period = int_param("fib_retracement_window", "period", period, 2, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::fib_retracement_window::Params { period };
+    let out = py
+        .detach(|| <trendlib::indicators::fib_retracement_window::FibRetracementWindow as Kernel<2, 7>>::batch([high, low], &params))
+        .map_err(|e| to_py_err(py, &e))?;
+    let mut out = out;
+    Ok((
+        std::mem::take(&mut out[0]).into_pyarray(py),
+        std::mem::take(&mut out[1]).into_pyarray(py),
+        std::mem::take(&mut out[2]).into_pyarray(py),
+        std::mem::take(&mut out[3]).into_pyarray(py),
+        std::mem::take(&mut out[4]).into_pyarray(py),
+        std::mem::take(&mut out[5]).into_pyarray(py),
+        std::mem::take(&mut out[6]).into_pyarray(py),
+    ))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "FibRetracementWindowStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyFibRetracementWindowStream {
+    inner: BarStream<trendlib::indicators::fib_retracement_window::FibRetracementWindow, 2, 7>,
+}
+
+#[pymethods]
+impl PyFibRetracementWindowStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, period))]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let period = int_param("fib_retracement_window", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::fib_retracement_window::Params { period };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::fib_retracement_window::FibRetracementWindow, 2, 7> as Stream>::open([high, low], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, *, period))]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        period: i64,
+    ) -> PyResult<(Self, FibRetracementWindowOutputs<'py>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let period = int_param("fib_retracement_window", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::fib_retracement_window::Params { period };
+        let (inner, out) = py
+            .detach(|| {
+                <trendlib::indicators::fib_retracement_window::FibRetracementWindow as Kernel<
+                    2,
+                    7,
+                >>::open_and_fill([high, low], &params)
+            })
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            let mut out = out;
+            (
+                std::mem::take(&mut out[0]).into_pyarray(py),
+                std::mem::take(&mut out[1]).into_pyarray(py),
+                std::mem::take(&mut out[2]).into_pyarray(py),
+                std::mem::take(&mut out[3]).into_pyarray(py),
+                std::mem::take(&mut out[4]).into_pyarray(py),
+                std::mem::take(&mut out[5]).into_pyarray(py),
+                std::mem::take(&mut out[6]).into_pyarray(py),
+            )
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn update(
+        &mut self,
+        py: Python<'_>,
+        high: f64,
+        low: f64,
+    ) -> PyResult<(f64, f64, f64, f64, f64, f64, f64)> {
+        let row = self
+            .inner
+            .update([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
+    }
+
+    #[pyo3(signature = (high, low))]
+    fn peek(
+        &self,
+        py: Python<'_>,
+        high: f64,
+        low: f64,
+    ) -> PyResult<(f64, f64, f64, f64, f64, f64, f64)> {
+        let row = self
+            .inner
+            .peek([high, low])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(f64, f64, f64, f64, f64, f64, f64)> {
+        self.inner
+            .value()
+            .map(|row| (row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "fib_retracement_window"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream fib_retracement_window bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
 #[pyfunction]
 #[pyo3(name = "floor", signature = (source))]
 pub fn floor<'py>(
@@ -49309,6 +49635,8 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(er, m)?)?;
     m.add_function(wrap_pyfunction!(eri, m)?)?;
     m.add_function(wrap_pyfunction!(exp, m)?)?;
+    m.add_function(wrap_pyfunction!(fib_retracement, m)?)?;
+    m.add_function(wrap_pyfunction!(fib_retracement_window, m)?)?;
     m.add_function(wrap_pyfunction!(floor, m)?)?;
     m.add_function(wrap_pyfunction!(fosc, m)?)?;
     m.add_function(wrap_pyfunction!(fractal, m)?)?;
@@ -49634,6 +49962,8 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyErStream>()?;
     m.add_class::<PyEriStream>()?;
     m.add_class::<PyExpStream>()?;
+    m.add_class::<PyFibRetracementStream>()?;
+    m.add_class::<PyFibRetracementWindowStream>()?;
     m.add_class::<PyFloorStream>()?;
     m.add_class::<PyFoscStream>()?;
     m.add_class::<PyFractalStream>()?;
@@ -52741,6 +53071,30 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     }
     {
         let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("pivot_n", entry)?;
+        }
+        table.set_item("fib_retracement", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 20)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        table.set_item("fib_retracement_window", params)?;
+    }
+    {
+        let params = PyDict::new(py);
         table.set_item("floor", params)?;
     }
     {
@@ -55114,6 +55468,8 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("er", vec!["source"])?;
     table.set_item("eri", vec!["high", "low", "close"])?;
     table.set_item("exp", vec!["source"])?;
+    table.set_item("fib_retracement", vec!["high", "low"])?;
+    table.set_item("fib_retracement_window", vec!["high", "low"])?;
     table.set_item("floor", vec!["source"])?;
     table.set_item("fosc", vec!["source"])?;
     table.set_item("fractal", vec!["high", "low"])?;
@@ -55481,6 +55837,8 @@ fn kinds_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("er", vec!["series"])?;
     table.set_item("eri", vec!["high", "low", "close"])?;
     table.set_item("exp", vec!["series"])?;
+    table.set_item("fib_retracement", vec!["high", "low"])?;
+    table.set_item("fib_retracement_window", vec!["high", "low"])?;
     table.set_item("floor", vec!["series"])?;
     table.set_item("fosc", vec!["series"])?;
     table.set_item("fractal", vec!["high", "low"])?;
@@ -55902,6 +56260,24 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("er", vec!["er"])?;
     table.set_item("eri", vec!["eri_bull_power", "eri_bear_power"])?;
     table.set_item("exp", vec!["exp"])?;
+    table.set_item(
+        "fib_retracement",
+        vec![
+            "fib_0", "fib_236", "fib_382", "fib_500", "fib_618", "fib_786", "fib_1000",
+        ],
+    )?;
+    table.set_item(
+        "fib_retracement_window",
+        vec![
+            "fib_window_0",
+            "fib_window_236",
+            "fib_window_382",
+            "fib_window_500",
+            "fib_window_618",
+            "fib_window_786",
+            "fib_window_1000",
+        ],
+    )?;
     table.set_item("floor", vec!["floor"])?;
     table.set_item("fosc", vec!["fosc"])?;
     table.set_item("fractal", vec!["fractal_swing_high", "fractal_swing_low"])?;
@@ -56339,6 +56715,18 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("er", vec!["float64"])?;
     table.set_item("eri", vec!["float64", "float64"])?;
     table.set_item("exp", vec!["float64"])?;
+    table.set_item(
+        "fib_retracement",
+        vec![
+            "float64", "float64", "float64", "float64", "float64", "float64", "float64",
+        ],
+    )?;
+    table.set_item(
+        "fib_retracement_window",
+        vec![
+            "float64", "float64", "float64", "float64", "float64", "float64", "float64",
+        ],
+    )?;
     table.set_item("floor", vec!["float64"])?;
     table.set_item("fosc", vec!["float64"])?;
     table.set_item("fractal", vec!["int32", "int32"])?;
@@ -56830,6 +57218,11 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("er", Vec::<&str>::new())?;
     table.set_item("eri", vec!["unstable", "path_dependent"])?;
     table.set_item("exp", vec!["nan_inf_output"])?;
+    table.set_item(
+        "fib_retracement",
+        vec!["overlap", "path_dependent", "nan_inf_output"],
+    )?;
+    table.set_item("fib_retracement_window", vec!["overlap"])?;
     table.set_item("floor", vec!["nan_inf_output"])?;
     table.set_item("fosc", vec!["nan_inf_output"])?;
     table.set_item("fractal", Vec::<&str>::new())?;
@@ -57220,6 +57613,8 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("er", "statistic")?;
     table.set_item("eri", "momentum")?;
     table.set_item("exp", "math")?;
+    table.set_item("fib_retracement", "levels")?;
+    table.set_item("fib_retracement_window", "levels")?;
     table.set_item("floor", "math")?;
     table.set_item("fosc", "statistic")?;
     table.set_item("fractal", "levels")?;
@@ -58817,6 +59212,20 @@ pub fn lookback_of(
         }
         "exp" => {
             Ok(<trendlib::indicators::exp::Exp as Kernel<1, 1>>::lookback(&trendlib::indicators::exp::Params { }))
+        }
+        "fib_retracement" => {
+            let pivot_n = match get("pivot_n")? {
+                Some(value) => int_param("fib_retracement", "pivot_n", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            Ok(<trendlib::indicators::fib_retracement::FibRetracement as Kernel<2, 7>>::lookback(&trendlib::indicators::fib_retracement::Params { pivot_n, }))
+        }
+        "fib_retracement_window" => {
+            let period = match get("period")? {
+                Some(value) => int_param("fib_retracement_window", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 20,
+            };
+            Ok(<trendlib::indicators::fib_retracement_window::FibRetracementWindow as Kernel<2, 7>>::lookback(&trendlib::indicators::fib_retracement_window::Params { period, }))
         }
         "floor" => {
             Ok(<trendlib::indicators::floor::Floor as Kernel<1, 1>>::lookback(&trendlib::indicators::floor::Params { }))

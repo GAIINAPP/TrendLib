@@ -407,6 +407,8 @@ __all__ = [
     "er",
     "eri",
     "exp",
+    "fib_retracement",
+    "fib_retracement_window",
     "floor",
     "fosc",
     "fractal",
@@ -7698,6 +7700,107 @@ def exp(source=None) -> Any:
     columns, carrier = _convert.bars("exp", (source,), ("source",), ("series",))
     out = _core.exp(*columns)
     return _convert.wrap_outputs(out, carrier, ("exp",))
+
+
+def fib_retracement(
+    high=None, low=None, *, pivot_n: int = _PARAMS["fib_retracement"]["pivot_n"]["default"]
+) -> Any:
+    """Fibonacci Retracement.
+
+    Parameters
+    ----------
+    pivot_n : int, default 5
+        Bars on each side a swing high must be at least as high as, and a swing low at least as low
+        as, from 1 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        fib_0: The swing point the latest leg ends at, where none of it has been given back.
+        fib_236: 23.6 percent of the leg back from its end.
+        fib_382: 38.2 percent of the leg back from its end.
+        fib_500: Half of the leg back from its end.
+        fib_618: 61.8 percent of the leg back from its end.
+        fib_786: 78.6 percent of the leg back from its end.
+        fib_1000: The swing point the latest leg started from, where all of it has been given back.
+    """
+    pivot_n = _convert.as_int("fib_retracement", "pivot_n", pivot_n)
+    columns, carrier = _convert.bars(
+        "fib_retracement",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.fib_retracement(*columns, pivot_n=pivot_n)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "fib_0",
+            "fib_236",
+            "fib_382",
+            "fib_500",
+            "fib_618",
+            "fib_786",
+            "fib_1000",
+        ),
+    )
+
+
+def fib_retracement_window(
+    high=None, low=None, *, period: int = _PARAMS["fib_retracement_window"]["period"]["default"]
+) -> Any:
+    """Fibonacci Retracement of a Window.
+
+    Parameters
+    ----------
+    period : int, default 20
+        Number of bars the highest high and the lowest low are taken over, from 2 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        fib_window_0: The more recent of the window's highest high and lowest low.
+        fib_window_236: 23.6 percent of the window's range back from its more recent extreme.
+        fib_window_382: 38.2 percent of the window's range back from its more recent extreme.
+        fib_window_500: Halfway between the window's highest high and lowest low.
+        fib_window_618: 61.8 percent of the window's range back from its more recent extreme.
+        fib_window_786: 78.6 percent of the window's range back from its more recent extreme.
+        fib_window_1000: The earlier of the window's highest high and lowest low.
+    """
+    period = _convert.as_int("fib_retracement_window", "period", period)
+    columns, carrier = _convert.bars(
+        "fib_retracement_window",
+        (high, low),
+        (
+            "high",
+            "low",
+        ),
+        (
+            "high",
+            "low",
+        ),
+    )
+    out = _core.fib_retracement_window(*columns, period=period)
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "fib_window_0",
+            "fib_window_236",
+            "fib_window_382",
+            "fib_window_500",
+            "fib_window_618",
+            "fib_window_786",
+            "fib_window_1000",
+        ),
+    )
 
 
 def floor(source=None) -> Any:

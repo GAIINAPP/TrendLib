@@ -116,6 +116,31 @@ impl SwingFinder {
         });
         (!beaten).then_some(candidate)
     }
+
+    /// What `push` would return for `value`, without taking it.
+    pub fn preview(&self, value: f64) -> Option<f64> {
+        if self.seen < self.n {
+            return None;
+        }
+        // The bar offered would become the newest, so the candidate `n` bars
+        // behind it is `n - 1` behind the newest bar held.
+        let candidate = match self.n {
+            0 => value,
+            n => self.back(n - 1),
+        };
+        let held = self.seen.min(self.values.len() - 1);
+        let beaten = (0..held)
+            .map(|back| self.back(back))
+            .chain(std::iter::once(value))
+            .any(|other| {
+                if self.highs {
+                    other > candidate
+                } else {
+                    other < candidate
+                }
+            });
+        (!beaten).then_some(candidate)
+    }
 }
 
 /// Swing points confirmed within a trailing window, oldest first.
@@ -1156,6 +1181,24 @@ mod tests {
             .map(|&v| lows.push(v))
             .collect();
         assert_eq!(found, [None, None, Some(1.0), Some(1.0), None]);
+    }
+
+    #[test]
+    fn a_preview_is_what_the_next_push_returns() {
+        // Few distinct prices, so ties occur, and the loop starts on an empty
+        // finder, so the window that is still filling is covered too.
+        let series: Vec<f64> = (0..200u64).map(|i| ((i * i + 3 * i) % 7) as f64).collect();
+        for n in 1..=4 {
+            for mut finder in [SwingFinder::highs(n), SwingFinder::lows(n)] {
+                let mut found = 0;
+                for &value in &series {
+                    let previewed = finder.preview(value);
+                    assert_eq!(previewed, finder.push(value));
+                    found += usize::from(previewed.is_some());
+                }
+                assert!(found > 0, "no swing point in the series for n = {n}");
+            }
+        }
     }
 
     #[test]

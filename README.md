@@ -2,7 +2,7 @@
 
 # TrendLib
 
-**325 technical-analysis indicators and patterns. Rust core, Python API.**
+**327 technical-analysis indicators and patterns. Rust core, Python API.**
 
 [![CI](https://github.com/GAIINAPP/TrendLib/actions/workflows/ci.yml/badge.svg)](https://github.com/GAIINAPP/TrendLib/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue)](https://www.python.org/)
@@ -54,7 +54,7 @@ becomes a download with no toolchain at all.
 | Math transforms | 15 | log, exp, trigonometric and hyperbolic functions |
 | Harmonic patterns | 12 | Gartley, bat, butterfly, crab, ABCD, Wolfe wave |
 | Volatility | 9 | ATR, NATR, true range, Chaikin volatility, GAPO |
-| Levels | 7 | traditional, Camarilla, Fibonacci, Woodie and DeMark pivots, CPR |
+| Levels | 9 | traditional, Camarilla, Fibonacci, Woodie and DeMark pivots, CPR, Fibonacci retracement |
 | Cycle | 6 | Hilbert transform: dominant cycle period, phase, trend mode |
 | Math operators | 5 | add, subtract, multiply, divide, cumulative sum |
 | Price transforms | 4 | typical, weighted, median and average price |
@@ -90,7 +90,7 @@ live.copy()                     # fork the state to explore a branch
 live.value, live.bars_seen      # where it stands
 ```
 
-`tl.stream.<name>` exists for all 325.
+`tl.stream.<name>` exists for all 327.
 
 ### Frames
 

@@ -193,6 +193,8 @@ pub mod envelope;
 pub mod er;
 pub mod eri;
 pub mod exp;
+pub mod fib_retracement;
+pub mod fib_retracement_window;
 pub mod floor;
 pub mod fosc;
 pub mod fractal;

@@ -1,6 +1,6 @@
 # trendlib
 
-325 technical-analysis indicators and patterns, with no runtime dependencies.
+327 technical-analysis indicators and patterns, with no runtime dependencies.
 
 This crate is the computation core of
 [TrendLib](https://github.com/GAIINAPP/TrendLib). It forbids `unsafe`, pulls in

@@ -207,6 +207,8 @@ __all__ = [
     "er",
     "eri",
     "exp",
+    "fib_retracement",
+    "fib_retracement_window",
     "floor",
     "fosc",
     "fractal",
@@ -3138,6 +3140,48 @@ eri = Factory(
     ),
 )
 exp = Factory("exp", _core.ExpStream, ("source",), ("series",), ("exp",))
+fib_retracement = Factory(
+    "fib_retracement",
+    _core.FibRetracementStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "fib_0",
+        "fib_236",
+        "fib_382",
+        "fib_500",
+        "fib_618",
+        "fib_786",
+        "fib_1000",
+    ),
+)
+fib_retracement_window = Factory(
+    "fib_retracement_window",
+    _core.FibRetracementWindowStream,
+    (
+        "high",
+        "low",
+    ),
+    (
+        "high",
+        "low",
+    ),
+    (
+        "fib_window_0",
+        "fib_window_236",
+        "fib_window_382",
+        "fib_window_500",
+        "fib_window_618",
+        "fib_window_786",
+        "fib_window_1000",
+    ),
+)
 floor = Factory("floor", _core.FloorStream, ("source",), ("series",), ("floor",))
 fosc = Factory("fosc", _core.FoscStream, ("source",), ("series",), ("fosc",))
 fractal = Factory(
