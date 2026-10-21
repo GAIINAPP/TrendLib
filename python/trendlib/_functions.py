@@ -1310,7 +1310,8 @@ def bar_fakey(open=None, high=None, low=None, close=None) -> Any:
     Returns
     -------
     ndarray or Series
-        An inside bar, then a close beyond the bar it sat within.
+        An inside bar, then a break of one side of it that closes back across, inside the mother
+        bar: +100 for a false break down, -100 for a false break up.
     """
     columns, carrier = _convert.bars(
         "bar_fakey",
