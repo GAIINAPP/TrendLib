@@ -65,8 +65,11 @@ impl State {
             .map(|k| (k + 1) as f64 * self.scaled[(self.head + k) % len])
             .sum();
         let average = weighted / ((len * (len + 1)) as f64 / 2.0);
-        let squared = average * average;
-        Some((squared - 1.0) / (squared + 1.0))
+        // The inverse Fisher transform, (e^2x - 1) / (e^2x + 1), is tanh(x).
+        // It keeps the sign of the RSI's swing about 50, so an overbought and
+        // an oversold reading come out on opposite sides of zero, and it
+        // saturates at +/-1 where the exponential form would overflow.
+        Some(average.tanh())
     }
 }
 
@@ -123,6 +126,48 @@ impl Kernel<1, 1> for IftRsi {
             scaled: vec![f64::NAN; params.wma_period].into_boxed_slice(),
             head: 0,
             bars: 0,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{IftRsi, Params};
+    use crate::core::kernel::Kernel;
+
+    fn ift(close: &[f64]) -> Vec<f64> {
+        let [out] = IftRsi::batch([close], &Params::default()).unwrap();
+        out
+    }
+
+    fn wavy(start: f64, step: f64) -> Vec<f64> {
+        (0..80)
+            .map(|i| start + step * i as f64 + (i as f64 * 0.7).sin() * 0.4)
+            .collect()
+    }
+
+    #[test]
+    fn a_rise_reads_near_plus_one_and_a_fall_near_minus_one() {
+        let rise = ift(&wavy(100.0, 1.0));
+        let fall = ift(&wavy(200.0, -1.0));
+        assert!(*rise.last().unwrap() > 0.99, "rise: {:?}", rise.last());
+        assert!(*fall.last().unwrap() < -0.99, "fall: {:?}", fall.last());
+    }
+
+    #[test]
+    fn mirrored_prices_give_the_negated_reading() {
+        // Reflecting prices turns RSI r into 100 - r, so the transform, an odd
+        // function of the rescaled RSI, must flip sign bar for bar.
+        let close = wavy(150.0, 0.2);
+        let mirror: Vec<f64> = close.iter().map(|c| 300.0 - c).collect();
+        let (a, b) = (ift(&close), ift(&mirror));
+        for (row, (x, y)) in a.iter().zip(&b).enumerate() {
+            if x.is_nan() {
+                assert!(y.is_nan(), "row {row}");
+                continue;
+            }
+            assert!((x + y).abs() < 1e-12, "row {row}: {x} vs {y}");
+            assert!(x.abs() < 1.0);
         }
     }
 }
