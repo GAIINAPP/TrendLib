@@ -296,6 +296,7 @@ __all__ = [
     "rocr",
     "rocr100",
     "rsi",
+    "rsi_divergence",
     "rvi",
     "rvol",
     "rwi",
@@ -4050,6 +4051,24 @@ rocp = Factory("rocp", _core.RocpStream, ("source",), ("series",), ("rocp",))
 rocr = Factory("rocr", _core.RocrStream, ("source",), ("series",), ("rocr",))
 rocr100 = Factory("rocr100", _core.Rocr100Stream, ("source",), ("series",), ("rocr100",))
 rsi = Factory("rsi", _core.RsiStream, ("source",), ("series",), ("rsi",))
+rsi_divergence = Factory(
+    "rsi_divergence",
+    _core.RsiDivergenceStream,
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "high",
+        "low",
+        "close",
+    ),
+    (
+        "rsi_divergence",
+        "rsi_hidden_divergence",
+    ),
+)
 rvi = Factory("rvi", _core.RviStream, ("source",), ("series",), ("rvi",))
 rvol = Factory("rvol", _core.RvolStream, ("volume",), ("volume",), ("rvol",))
 rwi = Factory(
