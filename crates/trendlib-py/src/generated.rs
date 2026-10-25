@@ -43230,6 +43230,252 @@ impl PyRsiStream {
     }
 }
 
+type RsiDivergenceOutputs<'py> = (Bound<'py, PyArray1<i32>>, Bound<'py, PyArray1<i32>>);
+
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+#[pyo3(name = "rsi_divergence", signature = (high, low, close, *, period, left_bars, right_bars, min_bars_between, max_bars_between))]
+pub fn rsi_divergence<'py>(
+    py: Python<'py>,
+    high: PyReadonlyArray1<'py, f64>,
+    low: PyReadonlyArray1<'py, f64>,
+    close: PyReadonlyArray1<'py, f64>,
+    period: i64,
+    left_bars: i64,
+    right_bars: i64,
+    min_bars_between: i64,
+    max_bars_between: i64,
+) -> PyResult<RsiDivergenceOutputs<'py>> {
+    let high = as_slice(&high, "high")?;
+    let low = as_slice(&low, "low")?;
+    let close = as_slice(&close, "close")?;
+    let period =
+        int_param("rsi_divergence", "period", period, 2, 100000).map_err(|e| to_py_err(py, &e))?;
+    let left_bars = int_param("rsi_divergence", "left_bars", left_bars, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let right_bars = int_param("rsi_divergence", "right_bars", right_bars, 1, 100000)
+        .map_err(|e| to_py_err(py, &e))?;
+    let min_bars_between = int_param(
+        "rsi_divergence",
+        "min_bars_between",
+        min_bars_between,
+        0,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let max_bars_between = int_param(
+        "rsi_divergence",
+        "max_bars_between",
+        max_bars_between,
+        0,
+        100000,
+    )
+    .map_err(|e| to_py_err(py, &e))?;
+    let params = trendlib::indicators::rsi_divergence::Params {
+        period,
+        left_bars,
+        right_bars,
+        min_bars_between,
+        max_bars_between,
+    };
+    let out = py
+        .detach(|| {
+            <trendlib::indicators::rsi_divergence::RsiDivergence as Kernel<3, 2>>::batch(
+                [high, low, close],
+                &params,
+            )
+        })
+        .map_err(|e| to_py_err(py, &e))?;
+    Ok((
+        out[0]
+            .iter()
+            .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+            .collect::<Vec<i32>>()
+            .into_pyarray(py),
+        out[1]
+            .iter()
+            .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+            .collect::<Vec<i32>>()
+            .into_pyarray(py),
+    ))
+}
+
+#[pyclass(
+    module = "trendlib._core",
+    name = "RsiDivergenceStream",
+    skip_from_py_object
+)]
+#[derive(Clone, Debug)]
+pub struct PyRsiDivergenceStream {
+    inner: BarStream<trendlib::indicators::rsi_divergence::RsiDivergence, 3, 2>,
+}
+
+#[pymethods]
+impl PyRsiDivergenceStream {
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, left_bars, right_bars, min_bars_between, max_bars_between))]
+    #[allow(clippy::too_many_arguments)]
+    fn open<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        left_bars: i64,
+        right_bars: i64,
+        min_bars_between: i64,
+        max_bars_between: i64,
+    ) -> PyResult<Self> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("rsi_divergence", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let left_bars = int_param("rsi_divergence", "left_bars", left_bars, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let right_bars = int_param("rsi_divergence", "right_bars", right_bars, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let min_bars_between = int_param(
+            "rsi_divergence",
+            "min_bars_between",
+            min_bars_between,
+            0,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let max_bars_between = int_param(
+            "rsi_divergence",
+            "max_bars_between",
+            max_bars_between,
+            0,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::rsi_divergence::Params {
+            period,
+            left_bars,
+            right_bars,
+            min_bars_between,
+            max_bars_between,
+        };
+        let inner = py
+            .detach(|| <BarStream<trendlib::indicators::rsi_divergence::RsiDivergence, 3, 2> as Stream>::open([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok(Self { inner })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (high, low, close, *, period, left_bars, right_bars, min_bars_between, max_bars_between))]
+    #[allow(clippy::too_many_arguments)]
+    fn open_and_fill<'py>(
+        py: Python<'py>,
+        high: PyReadonlyArray1<'py, f64>,
+        low: PyReadonlyArray1<'py, f64>,
+        close: PyReadonlyArray1<'py, f64>,
+        period: i64,
+        left_bars: i64,
+        right_bars: i64,
+        min_bars_between: i64,
+        max_bars_between: i64,
+    ) -> PyResult<(Self, RsiDivergenceOutputs<'py>)> {
+        let high = as_slice(&high, "high")?;
+        let low = as_slice(&low, "low")?;
+        let close = as_slice(&close, "close")?;
+        let period = int_param("rsi_divergence", "period", period, 2, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let left_bars = int_param("rsi_divergence", "left_bars", left_bars, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let right_bars = int_param("rsi_divergence", "right_bars", right_bars, 1, 100000)
+            .map_err(|e| to_py_err(py, &e))?;
+        let min_bars_between = int_param(
+            "rsi_divergence",
+            "min_bars_between",
+            min_bars_between,
+            0,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let max_bars_between = int_param(
+            "rsi_divergence",
+            "max_bars_between",
+            max_bars_between,
+            0,
+            100000,
+        )
+        .map_err(|e| to_py_err(py, &e))?;
+        let params = trendlib::indicators::rsi_divergence::Params {
+            period,
+            left_bars,
+            right_bars,
+            min_bars_between,
+            max_bars_between,
+        };
+        let (inner, out) = py
+            .detach(|| <trendlib::indicators::rsi_divergence::RsiDivergence as Kernel<3, 2>>::open_and_fill([high, low, close], &params))
+            .map_err(|e| to_py_err(py, &e))?;
+        let filled = {
+            (
+                out[0]
+                    .iter()
+                    .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                    .collect::<Vec<i32>>()
+                    .into_pyarray(py),
+                out[1]
+                    .iter()
+                    .map(|v| if v.is_nan() { 0 } else { *v as i32 })
+                    .collect::<Vec<i32>>()
+                    .into_pyarray(py),
+            )
+        };
+        Ok((Self { inner }, filled))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn update(&mut self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<(i32, i32)> {
+        let row = self
+            .inner
+            .update([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0] as i32, row[1] as i32))
+    }
+
+    #[pyo3(signature = (high, low, close))]
+    fn peek(&self, py: Python<'_>, high: f64, low: f64, close: f64) -> PyResult<(i32, i32)> {
+        let row = self
+            .inner
+            .peek([high, low, close])
+            .map_err(|e| to_py_err(py, &e))?;
+        Ok((row[0] as i32, row[1] as i32))
+    }
+
+    fn copy(&self) -> Self {
+        self.clone()
+    }
+
+    #[getter]
+    fn value(&self) -> Option<(i32, i32)> {
+        self.inner.value().map(|row| (row[0] as i32, row[1] as i32))
+    }
+
+    #[getter]
+    fn bars_seen(&self) -> u64 {
+        self.inner.bars_seen()
+    }
+
+    #[getter]
+    fn name(&self) -> &'static str {
+        "rsi_divergence"
+    }
+
+    fn __repr__(&self) -> String {
+        format!(
+            "<trendlib stream rsi_divergence bars_seen={} value={:?}>",
+            self.inner.bars_seen(),
+            self.inner.value()
+        )
+    }
+}
+
 #[pyfunction]
 #[pyo3(name = "rvi", signature = (source, *, period, stddev_period))]
 pub fn rvi<'py>(
@@ -49724,6 +49970,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(rocr, m)?)?;
     m.add_function(wrap_pyfunction!(rocr100, m)?)?;
     m.add_function(wrap_pyfunction!(rsi, m)?)?;
+    m.add_function(wrap_pyfunction!(rsi_divergence, m)?)?;
     m.add_function(wrap_pyfunction!(rvi, m)?)?;
     m.add_function(wrap_pyfunction!(rvol, m)?)?;
     m.add_function(wrap_pyfunction!(rwi, m)?)?;
@@ -50051,6 +50298,7 @@ pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyRocrStream>()?;
     m.add_class::<PyRocr100Stream>()?;
     m.add_class::<PyRsiStream>()?;
+    m.add_class::<PyRsiDivergenceStream>()?;
     m.add_class::<PyRviStream>()?;
     m.add_class::<PyRvolStream>()?;
     m.add_class::<PyRwiStream>()?;
@@ -54484,6 +54732,50 @@ fn params_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
         {
             let entry = PyDict::new(py);
             entry.set_item("default", 14)?;
+            entry.set_item("min", 2)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("period", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("left_bars", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 1)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("right_bars", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 5)?;
+            entry.set_item("min", 0)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("min_bars_between", entry)?;
+        }
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 60)?;
+            entry.set_item("min", 0)?;
+            entry.set_item("max", 100000)?;
+            entry.set_item("choices", py.None())?;
+            params.set_item("max_bars_between", entry)?;
+        }
+        table.set_item("rsi_divergence", params)?;
+    }
+    {
+        let params = PyDict::new(py);
+        {
+            let entry = PyDict::new(py);
+            entry.set_item("default", 14)?;
             entry.set_item("min", 1)?;
             entry.set_item("max", 100000)?;
             entry.set_item("choices", py.None())?;
@@ -55557,6 +55849,7 @@ fn inputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("rocr", vec!["source"])?;
     table.set_item("rocr100", vec!["source"])?;
     table.set_item("rsi", vec!["source"])?;
+    table.set_item("rsi_divergence", vec!["high", "low", "close"])?;
     table.set_item("rvi", vec!["source"])?;
     table.set_item("rvol", vec!["volume"])?;
     table.set_item("rwi", vec!["high", "low", "close"])?;
@@ -55926,6 +56219,7 @@ fn kinds_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("rocr", vec!["series"])?;
     table.set_item("rocr100", vec!["series"])?;
     table.set_item("rsi", vec!["series"])?;
+    table.set_item("rsi_divergence", vec!["high", "low", "close"])?;
     table.set_item("rvi", vec!["series"])?;
     table.set_item("rvol", vec!["volume"])?;
     table.set_item("rwi", vec!["high", "low", "close"])?;
@@ -56468,6 +56762,10 @@ fn outputs_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("rocr", vec!["rocr"])?;
     table.set_item("rocr100", vec!["rocr100"])?;
     table.set_item("rsi", vec!["rsi"])?;
+    table.set_item(
+        "rsi_divergence",
+        vec!["rsi_divergence", "rsi_hidden_divergence"],
+    )?;
     table.set_item("rvi", vec!["rvi"])?;
     table.set_item("rvol", vec!["rvol"])?;
     table.set_item("rwi", vec!["rwi_high", "rwi_low"])?;
@@ -56839,6 +57137,7 @@ fn dtypes_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("rocr", vec!["float64"])?;
     table.set_item("rocr100", vec!["float64"])?;
     table.set_item("rsi", vec!["float64"])?;
+    table.set_item("rsi_divergence", vec!["int32", "int32"])?;
     table.set_item("rvi", vec!["float64"])?;
     table.set_item("rvol", vec!["float64"])?;
     table.set_item("rwi", vec!["float64", "float64"])?;
@@ -57355,6 +57654,7 @@ fn flags_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("rocr", Vec::<&str>::new())?;
     table.set_item("rocr100", Vec::<&str>::new())?;
     table.set_item("rsi", Vec::<&str>::new())?;
+    table.set_item("rsi_divergence", vec!["unstable"])?;
     table.set_item("rvi", vec!["unstable", "path_dependent", "nan_inf_output"])?;
     table.set_item("rvol", vec!["nan_inf_output"])?;
     table.set_item("rwi", vec!["unstable"])?;
@@ -57702,6 +58002,7 @@ fn groups_table<'py>(py: Python<'py>) -> PyResult<Bound<'py, PyDict>> {
     table.set_item("rocr", "momentum")?;
     table.set_item("rocr100", "momentum")?;
     table.set_item("rsi", "momentum")?;
+    table.set_item("rsi_divergence", "momentum")?;
     table.set_item("rvi", "volatility")?;
     table.set_item("rvol", "volume")?;
     table.set_item("rwi", "momentum")?;
@@ -59934,6 +60235,29 @@ pub fn lookback_of(
                 None => 14,
             };
             Ok(<trendlib::indicators::rsi::Rsi as Kernel<1, 1>>::lookback(&trendlib::indicators::rsi::Params { period, }))
+        }
+        "rsi_divergence" => {
+            let period = match get("period")? {
+                Some(value) => int_param("rsi_divergence", "period", value, 2, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 14,
+            };
+            let left_bars = match get("left_bars")? {
+                Some(value) => int_param("rsi_divergence", "left_bars", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let right_bars = match get("right_bars")? {
+                Some(value) => int_param("rsi_divergence", "right_bars", value, 1, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let min_bars_between = match get("min_bars_between")? {
+                Some(value) => int_param("rsi_divergence", "min_bars_between", value, 0, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 5,
+            };
+            let max_bars_between = match get("max_bars_between")? {
+                Some(value) => int_param("rsi_divergence", "max_bars_between", value, 0, 100000).map_err(|e| to_py_err(py, &e))?,
+                None => 60,
+            };
+            Ok(<trendlib::indicators::rsi_divergence::RsiDivergence as Kernel<3, 2>>::lookback(&trendlib::indicators::rsi_divergence::Params { period, left_bars, right_bars, min_bars_between, max_bars_between, }))
         }
         "rvi" => {
             let period = match get("period")? {

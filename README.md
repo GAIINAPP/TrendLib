@@ -2,7 +2,7 @@
 
 # TrendLib
 
-**327 technical-analysis indicators and patterns. Rust core, Python API.**
+**328 technical-analysis indicators and patterns. Rust core, Python API.**
 
 [![CI](https://github.com/GAIINAPP/TrendLib/actions/workflows/ci.yml/badge.svg)](https://github.com/GAIINAPP/TrendLib/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue)](https://www.python.org/)
@@ -46,7 +46,7 @@ becomes a download with no toolchain at all.
 | --- | ---: | --- |
 | Chart patterns | 63 | head and shoulders, double top, wedges, channels, flags, cup with handle |
 | Candlestick patterns | 61 | engulfing, harami, morning star, three black crows, hikkake |
-| Momentum | 51 | RSI, MACD, stochastic, ADX, CCI, Williams %R, Connors RSI, TSI |
+| Momentum | 52 | RSI, MACD, stochastic, ADX, CCI, Williams %R, Connors RSI, TSI, RSI divergence |
 | Overlap studies | 34 | SMA, EMA, WMA, HMA, KAMA, T3, Bollinger, Keltner, Ichimoku, SuperTrend |
 | Statistics | 23 | linear regression, correlation, beta, standard deviation, percentile |
 | Bar patterns | 19 | inside day, outside day, key reversal, pipe top, narrow range |
@@ -90,7 +90,7 @@ live.copy()                     # fork the state to explore a branch
 live.value, live.bars_seen      # where it stands
 ```
 
-`tl.stream.<name>` exists for all 327.
+`tl.stream.<name>` exists for all 328.
 
 ### Frames
 

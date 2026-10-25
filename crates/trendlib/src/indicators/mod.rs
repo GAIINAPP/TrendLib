@@ -282,6 +282,7 @@ pub mod rocp;
 pub mod rocr;
 pub mod rocr100;
 pub mod rsi;
+pub mod rsi_divergence;
 pub mod rvi;
 pub mod rvol;
 pub mod rwi;

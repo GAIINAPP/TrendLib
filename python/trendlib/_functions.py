@@ -497,6 +497,7 @@ __all__ = [
     "rocr",
     "rocr100",
     "rsi",
+    "rsi_divergence",
     "rvi",
     "rvol",
     "rwi",
@@ -10591,6 +10592,77 @@ def rsi(source=None, *, period: int = _PARAMS["rsi"]["period"]["default"]) -> An
     columns, carrier = _convert.bars("rsi", (source,), ("source",), ("series",))
     out = _core.rsi(*columns, period=period)
     return _convert.wrap_outputs(out, carrier, ("rsi",))
+
+
+def rsi_divergence(
+    high=None,
+    low=None,
+    close=None,
+    *,
+    period: int = _PARAMS["rsi_divergence"]["period"]["default"],
+    left_bars: int = _PARAMS["rsi_divergence"]["left_bars"]["default"],
+    right_bars: int = _PARAMS["rsi_divergence"]["right_bars"]["default"],
+    min_bars_between: int = _PARAMS["rsi_divergence"]["min_bars_between"]["default"],
+    max_bars_between: int = _PARAMS["rsi_divergence"]["max_bars_between"]["default"],
+) -> Any:
+    """RSI Divergence.
+
+    Parameters
+    ----------
+    period : int, default 14
+        Bars of the RSI, from 2 to 100000.
+    left_bars : int, default 5
+        RSI readings before a pivot it must beat, from 1 to 100000.
+    right_bars : int, default 5
+        RSI readings after a pivot it must beat, from 1 to 100000.
+    min_bars_between : int, default 5
+        Fewest bars between two pivots that are compared, from 0 to 100000.
+    max_bars_between : int, default 60
+        Most bars between two pivots that are compared, from 0 to 100000.
+
+    Returns
+    -------
+    tuple of ndarray, or DataFrame
+        rsi_divergence: +100 where price made a lower low and RSI a higher one, -100 where price
+        made a higher high and RSI a lower one.
+        rsi_hidden_divergence: +100 where price made a higher low and RSI a lower one, -100 where
+        price made a lower high and RSI a higher one.
+    """
+    period = _convert.as_int("rsi_divergence", "period", period)
+    left_bars = _convert.as_int("rsi_divergence", "left_bars", left_bars)
+    right_bars = _convert.as_int("rsi_divergence", "right_bars", right_bars)
+    min_bars_between = _convert.as_int("rsi_divergence", "min_bars_between", min_bars_between)
+    max_bars_between = _convert.as_int("rsi_divergence", "max_bars_between", max_bars_between)
+    columns, carrier = _convert.bars(
+        "rsi_divergence",
+        (high, low, close),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+        (
+            "high",
+            "low",
+            "close",
+        ),
+    )
+    out = _core.rsi_divergence(
+        *columns,
+        period=period,
+        left_bars=left_bars,
+        right_bars=right_bars,
+        min_bars_between=min_bars_between,
+        max_bars_between=max_bars_between,
+    )
+    return _convert.wrap_outputs(
+        out,
+        carrier,
+        (
+            "rsi_divergence",
+            "rsi_hidden_divergence",
+        ),
+    )
 
 
 def rvi(
